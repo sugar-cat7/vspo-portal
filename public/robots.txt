@@ -1,0 +1,17 @@
+# Googlebot
+User-agent: Googlebot
+Allow: /
+
+# Googlebot-Image
+User-agent: Googlebot-Image
+Allow: /
+
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.vspo-schedule.com
+
+# Sitemaps
+Sitemap: https://www.vspo-schedule.com/sitemap.xml
