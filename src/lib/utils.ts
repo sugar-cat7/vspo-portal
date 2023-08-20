@@ -476,7 +476,7 @@ export const isStatusLive = (livestream: Livestream): string => {
   ) {
     return "live";
   } else {
-    return "archieve";
+    return "archive";
   }
 };
 

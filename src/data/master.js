@@ -8,7 +8,7 @@ export const platforms = [
 export const sideBarContents = [
   { id: "live", name: "配信中" },
   { id: "upcoming", name: "配信予定" },
-  { id: "archieve", name: "アーカイブ" },
+  { id: "archive", name: "アーカイブ" },
   { id: "freechat", name: "フリーチャット" },
   { id: "clip", name: "切り抜き一覧" },
   { id: "twitch-clip", name: "クリップ一覧" },

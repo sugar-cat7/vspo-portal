@@ -111,7 +111,7 @@ export const Header: React.FC<Props> = ({ title }) => {
                 // justifyContent: "center",
                 width: "100%",
               }}
-              href="/"
+              href="/schedule/all"
             >
               <Image
                 src="/icon-top_transparent.png"
