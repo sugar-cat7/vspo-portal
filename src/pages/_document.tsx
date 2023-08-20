@@ -13,7 +13,7 @@ class MyDocument extends Document {
               crossOrigin="anonymous"
             />
           )}
-          <meta name="keywords" content="ぶいすぽっ!, 配信スケジュール" />
+          <meta name="keywords" content="ぶいすぽ 配信スケジュール" />
           <meta property="og:type" content="website" />
           <meta
             property="og:image"
