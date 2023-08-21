@@ -158,13 +158,13 @@ const VideoPlayerOrLinkComponent: React.FC<{
   if (livestream) {
     if (livestream.platform === Platform.YouTube) {
       const c = isStatusLive(livestream) === "live" ? "?controls=0" : "";
-      embedUrl = url.replace("watch?v=", "embed/") + c;
+      embedUrl = url.replace("watch?v=", "embed/");
     } else if (livestream.platform === Platform.Twitch) {
       const tid = !livestream?.twitchPastVideoId
         ? `channel=${livestream.twitchName}`
         : `video=${livestream.twitchPastVideoId}`;
       const c = isStatusLive(livestream) === "live" ? "&controls=false" : "";
-      embedUrl = `https://player.twitch.tv/?${tid}&parent=${document.location.hostname}&autoplay=false${c}`;
+      embedUrl = `https://player.twitch.tv/?${tid}&parent=${document.location.hostname}&autoplay=false`;
     } else if (livestream.platform === Platform.TwitCasting) {
       // Assuming livestream.id is the Twitcasting live id
       embedUrl = url;
@@ -176,7 +176,7 @@ const VideoPlayerOrLinkComponent: React.FC<{
     if (clip.platform === Platform.YouTube) {
       embedUrl = url.replace("watch?v=", "embed/");
     } else if (clip.platform === Platform.Twitch) {
-      embedUrl = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${document.location.hostname}&autoplay=false&controls=false`;
+      embedUrl = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${document.location.hostname}&autoplay=false`;
     }
   }
   if (isEmbedMode) {

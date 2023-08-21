@@ -111,7 +111,7 @@ export const Header: React.FC<Props> = ({ title }) => {
                 // justifyContent: "center",
                 width: "100%",
               }}
-              href="/"
+              href="/schedule/all"
             >
               <Image
                 src="/icon-top_transparent.png"
@@ -176,6 +176,10 @@ export const Header: React.FC<Props> = ({ title }) => {
           </div>
         </Toolbar>
       </StyledAppBar>
+      {/* SEO */}
+      <Box id="nonevisible" sx={{ display: "none" }}>
+        <CustomDrawer />
+      </Box>
 
       <SwipeableDrawer
         anchor="left"

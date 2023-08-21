@@ -57,7 +57,7 @@ export const CustomDrawer: React.FC = () => {
               ? "/twitch-clips"
               : id === "about"
               ? "/about"
-              : "/#" + id;
+              : "/schedule/" + id;
           const isExternalLink = id === "qa" || id == "support";
 
           if (id === "freechat") {
