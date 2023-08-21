@@ -1,31 +1,32 @@
 import React, { useEffect, useState } from "react";
 import { Container, Box, Tab, Tabs, IconButton } from "@mui/material";
-import { GetStaticProps } from "next";
+import { GetStaticPaths, GetStaticProps } from "next";
 import { Livestream } from "@/types/streaming";
 import {
   formatWithTimeZone,
   getOneWeekRange,
   groupBy,
-  liveStatusFilterLivestreams,
+  isStatusLive,
   removeDuplicateTitles,
 } from "@/lib/utils";
 import { styled } from "@mui/system";
 import { TabContext } from "@mui/lab";
 import { ArrowBackIos } from "@mui/icons-material";
-import { useRouter } from "next/router";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
-import { NextPageWithLayout } from "./_app";
+import { NextPageWithLayout } from "./../_app";
 import { Loading, SerarchDialog } from "@/components/Elements";
 import { LivestreamCards } from "@/components/Templates";
 import { freeChatVideoIds } from "@/data/master";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { fetchVspoEvents, fetchVspoLivestreams } from "@/lib/api";
 import { VspoEvent } from "@/types/events";
+import { usePathname } from "next/navigation";
 
 type LivestreamsProps = {
   livestreamsByDate: Record<string, Livestream[]>;
   eventsByDate: Record<string, VspoEvent[]>;
   lastUpdateDate: string;
+  liveStatus?: string | string[];
 };
 
 const ContainerBox = styled(Box)(() => ({
@@ -53,7 +54,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   eventsByDate,
 }) => {
   const [tabValue, setTabValue] = useState("0");
-  const router = useRouter();
+  const pathname = usePathname();
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
     setTabValue(newValue);
@@ -103,40 +104,11 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
     }
     setDates(dates);
     setIsLoading(false);
-  }, [filteredLivestreamsByDate]);
-
+    console.log(pathname);
+  }, [filteredLivestreamsByDate, pathname]);
   useEffect(() => {
-    setIsLoading(true);
-    const handleRouteChange = (url: string) => {
-      const hash = window.location.hash
-        ? window.location.hash.substring(1)
-        : "";
-      let newTabValue = tabValue;
-      if (!hash) {
-        newTabValue = (Object.keys(livestreamsByDate).length - 1).toString();
-        setFilteredLivestreamsByDate(livestreamsByDate);
-      } else {
-        const statusFilterLivestreams = liveStatusFilterLivestreams(
-          filteredLivestreamsByDate,
-          hash
-        );
-        newTabValue = (
-          Object.keys(statusFilterLivestreams).length - 1
-        ).toString();
-        setFilteredLivestreamsByDate(statusFilterLivestreams);
-      }
-      setTabValue(newTabValue);
-    };
-
-    router.events.on("hashChangeComplete", handleRouteChange);
-    router.events.on("routeChangeComplete", handleRouteChange);
-    setIsLoading(false);
-    return () => {
-      router.events.off("hashChangeComplete", handleRouteChange);
-      router.events.off("routeChangeComplete", handleRouteChange);
-    };
-  }, [router.events, filteredLivestreamsByDate, livestreamsByDate, tabValue]);
-
+    setFilteredLivestreamsByDate(livestreamsByDate);
+  }, [pathname, livestreamsByDate]);
   return (
     <>
       <Container>
@@ -211,20 +183,32 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   );
 };
 
-export const getStaticProps: GetStaticProps<LivestreamsProps> = async () => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  const paths = ["all", "live", "upcoming", "archive"].map((status) => ({
+    params: { status },
+  }));
+  return { paths, fallback: false };
+};
+
+export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
+  params,
+}) => {
   const pastLivestreams = await fetchVspoLivestreams({ limit: 300 });
 
   const fetchEvents = await fetchVspoEvents();
 
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams);
+
   const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
   const filteredLivestreams = uniqueLivestreams.filter((livestream) => {
     const scheduledStartTime = new Date(livestream.scheduledStartTime);
     scheduledStartTime.setHours(0, 0, 0, 0); // Set time to 00:00:00
+    const isAll = params?.status === "all";
     return (
       scheduledStartTime >= oneWeekAgo &&
       scheduledStartTime <= oneWeekLater &&
-      !freeChatVideoIds.includes(livestream.id)
+      !freeChatVideoIds.includes(livestream.id) &&
+      (isAll || params?.status === isStatusLive(livestream))
     );
   });
   // Sort livestreams by scheduled start time in ascending order
@@ -260,16 +244,35 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async () => {
       livestreamsByDate: livestreamsByDate,
       eventsByDate: fetchEventsByDate,
       lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
+      liveStatus: params?.status,
     },
-    revalidate: 60,
+    revalidate: 30,
   };
 };
 
 HomePage.getLayout = (page, pageProps) => {
+  let title = "";
+  switch (pageProps.liveStatus) {
+    case "all":
+      title = "配信スケジュール";
+      break;
+    case "live":
+      title = "配信中";
+      break;
+    case "upcoming":
+      title = "配信予定";
+      break;
+    case "archive":
+      title = "アーカイブ";
+      break;
+    default:
+      title = "配信スケジュール";
+      break;
+  }
   return (
     <ContentLayout
-      title="ぶいすぽっ!配信スケジュール【非公式】"
-      description="ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス)を確認できます。"
+      title={`ぶいすぽっ!${title}`}
+      description={`ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス)を確認できます。`}
       lastUpdateDate={pageProps.lastUpdateDate}
       footerMessage="※メン限の配信は掲載していません。"
     >

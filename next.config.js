@@ -10,8 +10,8 @@ const withPWA = require("next-pwa")({
       options: {
         cacheName: "vspo-schedule",
         expiration: {
-          maxEntries: 60,
-          maxAgeSeconds: 3 * 60, // 3 minutes
+          maxEntries: 30,
+          maxAgeSeconds: 60, // 1 minutes
         },
         cacheableResponse: {
           statuses: [0, 200],
@@ -36,5 +36,14 @@ module.exports = withPWA({
       "yt3.ggpht.com",
       "clips-media-assets2.twitch.tv",
     ],
+  },
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/schedule/all",
+        permanent: true,
+      },
+    ];
   },
 });
