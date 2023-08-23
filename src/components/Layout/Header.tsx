@@ -249,7 +249,7 @@ export const Header: React.FC<Props> = ({ title }) => {
         </Menu>
       </SwipeableDrawer>
 
-      <Snackbar
+      {/* <Snackbar
         open={alertOpen}
         autoHideDuration={6000}
         anchorOrigin={{
@@ -273,7 +273,7 @@ export const Header: React.FC<Props> = ({ title }) => {
         >
           [お知らせ]ソースコードを公開しました！
         </StyledAlert>
-      </Snackbar>
+      </Snackbar> */}
     </>
   );
 };
