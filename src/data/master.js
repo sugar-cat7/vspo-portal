@@ -15,7 +15,7 @@ export const sideBarContents = [
   { id: "about", name: "すぽじゅーるについて" },
   { id: "notification", name: "お知らせ" },
   { id: "qa", name: "お問い合わせ" },
-  { id: "discord", name: "Discord" },
+  { id: "discord", name: "Discord Bot" },
   // { id: "support", name: "メッセージやご支援" },
 ];
 
