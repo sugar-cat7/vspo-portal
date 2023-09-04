@@ -1,4 +1,4 @@
-import { faTwitch } from "@fortawesome/free-brands-svg-icons";
+import { faDiscord, faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
 import { styled } from "@mui/system";
@@ -83,6 +83,10 @@ export const DrawerIcon: React.FC<DrawerIconProps> = ({ id }) => {
       return <EventIcon />;
     case "about":
       return <InfoIcon />;
+    case "discord":
+      return (
+        <StyledFontAwesomeIcon icon={faDiscord} style={{ height: "20px" }} />
+      );
     default:
       return <></>;
   }

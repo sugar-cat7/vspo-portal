@@ -16,7 +16,7 @@ import Link from "next/link";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { styled } from "@mui/system";
-import { QA_LINK, SUPPORT_LINK } from "@/lib/Const";
+import { QA_LINK, SUPPORT_LINK, DISCORD_LINK } from "@/lib/Const";
 import { DrawerIcon } from "../Icon";
 
 const StyledListItemIcon = styled(ListItemIcon)(() => ({
@@ -57,6 +57,8 @@ export const CustomDrawer: React.FC = () => {
               ? "/twitch-clips"
               : id === "about"
               ? "/about"
+              : id === "discord"
+              ? DISCORD_LINK
               : "/schedule/" + id;
           const isExternalLink = id === "qa" || id == "support";
 

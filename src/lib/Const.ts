@@ -4,6 +4,8 @@ export const QA_LINK = process.env.NEXT_PUBLIC_FORM;
 
 export const SUPPORT_LINK = process.env.NEXT_PUBLIC_SUPPORT_LINK;
 
+export const DISCORD_LINK = process.env.NEXT_PUBLIC_DISCORD_LINK;
+
 export const API_ROOT =
   process.env.NODE_ENV === "development"
     ? "http://localhost:3000"
