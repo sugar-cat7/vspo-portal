@@ -2,6 +2,14 @@ import { Notice } from "@/types/notice";
 
 export const notifications: Notice[] = [
   {
+    id: 14,
+    title: "配信情報を通知するDiscord Botを公開しました。",
+    content: "今後は切り抜きやイベント情報の通知機能も追加予定です。",
+    updated: "2023年9月5日",
+    tags: ["新機能追加"],
+    tweetLink: "https://twitter.com/vspodule/status/1699057082513920186",
+  },
+  {
     id: 13,
     title: "配信の概要を表示するようにしました。",
     content: "配信や切り抜きをクリックすると概要を表示するようにしました。",

@@ -65,11 +65,11 @@ export const Header: React.FC<Props> = ({ title }) => {
 
   const handleClose = () => {
     setAlertOpen(false);
-    localStorage.setItem("headerAlertSeen1", "false");
+    localStorage.setItem("headerAlertSeen5", "false");
   };
 
   useEffect(() => {
-    const hasSeenAlert = localStorage.getItem("headerAlertSeen1");
+    const hasSeenAlert = localStorage.getItem("headerAlertSeen5");
 
     if (!hasSeenAlert) {
       setAlertOpen(true);
@@ -249,7 +249,7 @@ export const Header: React.FC<Props> = ({ title }) => {
         </Menu>
       </SwipeableDrawer>
 
-      {/* <Snackbar
+      <Snackbar
         open={alertOpen}
         autoHideDuration={6000}
         anchorOrigin={{
@@ -271,9 +271,13 @@ export const Header: React.FC<Props> = ({ title }) => {
             </IconButton>
           }
         >
-          [お知らせ]ソースコードを公開しました！
+          [お知らせ]
+          <br />
+          配信情報を通知するDiscord Botを公開しました！
+          <br />
+          サイドバーから追加できます。
         </StyledAlert>
-      </Snackbar> */}
+      </Snackbar>
     </>
   );
 };
