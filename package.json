@@ -19,7 +19,7 @@
     "@mui/material": "^5.14.7",
     "@mui/system": "^5.14.7",
     "@types/node": "^20.5.9",
-    "@types/react": "^18.2.20",
+    "@types/react": "^18.2.21",
     "@types/react-dom": "18.2.7",
     "@vercel/analytics": "^1.0.2",
     "axios": "^1.5.0",
