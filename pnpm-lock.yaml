@@ -68,6 +68,9 @@ dependencies:
   next-sitemap:
     specifier: ^4.2.2
     version: 4.2.2(next@13.4.19)
+  openapi-fetch:
+    specifier: ^0.7.6
+    version: 0.7.6
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -4660,6 +4663,16 @@ packages:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
     dependencies:
       wrappy: 1.0.2
+    dev: false
+
+  /openapi-fetch@0.7.6:
+    resolution: {integrity: sha512-TmHTmzMqNmVUlRasfaSVsOYnFHHu0L31VGxbk75rk9P7RfOj70kc+Tiuu548koOpB5zs8yiUwW5wsYjeQifHcA==}
+    dependencies:
+      openapi-typescript-helpers: 0.0.2
+    dev: false
+
+  /openapi-typescript-helpers@0.0.2:
+    resolution: {integrity: sha512-r5Z4tlGa2l6jYO1ENT9Giqo/ZWzWPmsYUR41O01kjYr7vg4iBFaMh0W0g8Ef72SpeU2F+TY6CAdKxTv7aq+WXA==}
     dev: false
 
   /optionator@0.9.3:

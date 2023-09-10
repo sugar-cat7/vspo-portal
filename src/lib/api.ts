@@ -9,8 +9,10 @@ import {
   isStatusLive,
   shuffleClips,
 } from "./utils";
-import { API_ROOT, ENVIRONMENT } from "./Const";
+import { API_ROOT, BASE_URL, ENVIRONMENT } from "./Const";
 import { mockFreeChats } from "@/data/freechats";
+import createClient from "openapi-fetch";
+import type { paths } from "./generated/schema";
 
 export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
   try {
@@ -162,3 +164,7 @@ const api = axios.create({
 });
 
 export const fetcher = (url: string) => api.get(url).then((res) => res.data);
+
+export const client = createClient<paths>({
+  baseUrl: BASE_URL,
+});
