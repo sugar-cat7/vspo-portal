@@ -36,7 +36,7 @@
     "react-tweet": "^3.1.1",
     "sass": "^1.66.1",
     "swr": "^2.2.2",
-    "typescript": "^5.1.6"
+    "typescript": "^5.2.2"
   },
   "devDependencies": {
     "@vercel/node": "^2.15.10"
