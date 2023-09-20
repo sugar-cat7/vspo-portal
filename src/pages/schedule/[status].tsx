@@ -112,6 +112,54 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   return (
     <>
       <Container>
+        <Box mt={4} sx={{ display: "none" }}>
+          <TabContext value={tabValue}>
+            {/* Date */}
+            <TabBox>
+              <IconButton
+                onClick={() => moveTab("left")}
+                disabled={tabValue === "0"}
+              >
+                <ArrowBackIos />
+              </IconButton>
+              <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                textColor="primary"
+                indicatorColor="primary"
+                scrollButtons="auto"
+              >
+                {Object.entries(livestreamsByDate).map(([date], index) => (
+                  <Tab
+                    key={date}
+                    label={formatWithTimeZone(
+                      new Date(date),
+                      "ja",
+                      "MM/dd (E)"
+                    )}
+                    value={index.toString()}
+                    sx={{
+                      fontFamily: "Roboto, sans-serif",
+                      textAlign: "center",
+                      fontWeight: "700",
+                    }}
+                  />
+                ))}
+              </Tabs>
+              <IconButton
+                onClick={() => moveTab("right")}
+                disabled={tabValue === (dates.length - 1).toString()}
+              >
+                <ArrowBackIos sx={{ transform: "rotate(180deg)" }} />
+              </IconButton>
+            </TabBox>
+            {/* Stream Content */}
+            <LivestreamCards
+              livestreamsByDate={livestreamsByDate}
+              eventsByDate={eventsByDate}
+            />
+          </TabContext>
+        </Box>
         {isLoading ? (
           <Loading />
         ) : (
