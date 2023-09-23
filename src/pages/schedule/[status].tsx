@@ -217,6 +217,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
 
 HomePage.getLayout = (page, pageProps) => {
   let title = "";
+  let headTitle = "";
   switch (pageProps.liveStatus) {
     case "all":
       title = "配信スケジュール";
@@ -232,6 +233,7 @@ HomePage.getLayout = (page, pageProps) => {
       break;
     default:
       title = "配信スケジュール";
+      headTitle = `配信スケジュール/${pageProps.liveStatus}`;
       break;
   }
   return (
@@ -240,6 +242,7 @@ HomePage.getLayout = (page, pageProps) => {
       description={`ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス)を確認できます。`}
       lastUpdateDate={pageProps.lastUpdateDate}
       footerMessage="※メン限の配信は掲載していません。"
+      headTitle={headTitle}
     >
       {page}
       <CustomBottomNavigation />

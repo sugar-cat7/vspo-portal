@@ -12,6 +12,7 @@ type ContentLayoutProps = {
   description?: string;
   path?: string;
   footerMessage?: string;
+  headTitle?: string;
 };
 
 export const ContentLayout = ({
@@ -21,10 +22,15 @@ export const ContentLayout = ({
   description,
   path,
   footerMessage,
+  headTitle,
 }: ContentLayoutProps) => {
   return (
     <>
-      <CustomHead title={title} description={description} path={path} />
+      <CustomHead
+        title={headTitle ? headTitle : `ぶいすぽっ!${title}`}
+        description={description}
+        path={path}
+      />
       <Header title={title} />
       <main>{children}</main>
       <GoogleAd />
