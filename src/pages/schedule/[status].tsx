@@ -103,7 +103,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const datePaths = [];
 
   const currentDate = new Date();
-  const numberOfDays = 7;
+  const numberOfDays = 5;
   for (let i = -numberOfDays; i <= numberOfDays; i++) {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() + i);
@@ -190,7 +190,12 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
   const today = formatWithTimeZone(new Date(), "ja", "yyyy-MM-dd");
   const tabDates = [...new Set(allDates)].sort().filter((dateStr) => {
     const date = new Date(dateStr);
-    return date >= oneWeekAgo && date <= oneWeekLater;
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    const fiveDaysInMilliseconds = 5 * 24 * 60 * 60 * 1000;
+    const fiveDaysAgo = new Date(now.getTime() - fiveDaysInMilliseconds);
+    const fiveDaysLater = new Date(now.getTime() + fiveDaysInMilliseconds);
+    return date >= fiveDaysAgo && date <= fiveDaysLater;
   });
   let todayIndex = tabDates.indexOf(today);
   if (isDateStatus) {
