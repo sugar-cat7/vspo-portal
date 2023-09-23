@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Container, Box, Tab, Tabs, IconButton } from "@mui/material";
+import React from "react";
+import { Container, Box, Tab, Tabs } from "@mui/material";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { Livestream } from "@/types/streaming";
 import {
@@ -12,16 +12,13 @@ import {
 } from "@/lib/utils";
 import { styled } from "@mui/system";
 import { TabContext } from "@mui/lab";
-import { ArrowBackIos } from "@mui/icons-material";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { NextPageWithLayout } from "./../_app";
-import { Loading, SerarchDialog } from "@/components/Elements";
 import { LivestreamCards } from "@/components/Templates";
 import { freeChatVideoIds } from "@/data/master";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { fetchVspoEvents, fetchVspoLivestreams } from "@/lib/api";
 import { VspoEvent } from "@/types/events";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 type LivestreamsProps = {
@@ -65,6 +62,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
               indicatorColor="primary"
               scrollButtons="auto"
               value={todayIndex.toString()}
+              variant="scrollable"
             >
               {tabDates.map((date, i) => {
                 const d = new Date(date);
@@ -157,7 +155,6 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
       );
     }
   });
-
   // Sort livestreams by scheduled start time in ascending order
   filteredLivestreams.sort((a, b) => {
     return (
