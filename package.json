@@ -18,7 +18,7 @@
     "@mui/lab": "^5.0.0-alpha.145",
     "@mui/material": "^5.14.8",
     "@mui/system": "^5.14.10",
-    "@types/node": "^20.5.9",
+    "@types/node": "^20.7.0",
     "@types/react": "^18.2.21",
     "@types/react-dom": "18.2.7",
     "@vercel/analytics": "^1.0.2",
