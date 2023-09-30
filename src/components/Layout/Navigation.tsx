@@ -23,7 +23,7 @@ export const CustomBottomNavigation: React.FC = () => {
         {bottomNavigationContents.map(({ id, name }) => {
           const link: string =
             id === "live"
-              ? "/"
+              ? "/schedule/all"
               : id === "clip"
               ? "/clips"
               : id === "twitch-clip"

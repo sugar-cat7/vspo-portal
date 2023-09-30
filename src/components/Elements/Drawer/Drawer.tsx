@@ -42,7 +42,7 @@ export const CustomDrawer: React.FC = () => {
         {sideBarContents.map(({ id, name }) => {
           const link =
             id === "list"
-              ? "/"
+              ? "/schedule/all"
               : id === "clip"
               ? "/clips"
               : id === "qa"

@@ -208,7 +208,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
       eventsByDate: fetchEventsByDate,
       lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
       liveStatus: params?.status,
-      todayIndex: todayIndex >= 0 ? todayIndex : 0,
+      todayIndex: todayIndex >= 0 ? todayIndex : tabDates.length - 1,
       tabDates: tabDates,
     },
     revalidate: 30,

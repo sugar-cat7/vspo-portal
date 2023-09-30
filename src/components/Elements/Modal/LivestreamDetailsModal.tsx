@@ -300,7 +300,7 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
               display="flex"
               alignItems="center"
               sx={{ gap: "10px", cursor: "pointer" }}
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/schedule/all")}
             >
               <Image
                 src="/icon-top_transparent.png"

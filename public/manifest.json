@@ -2,7 +2,7 @@
   "name": "すぽじゅーる",
   "short_name": "すぽじゅーる",
   "description": "ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス)を確認できます。",
-  "start_url": "/",
+  "start_url": "/schedule/all",
   "display": "standalone",
   "background_color": "#7266cf",
   "theme_color": "#7266cf",

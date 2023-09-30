@@ -20,7 +20,8 @@ export const Footer: React.FC<Props> = ({ lastUpdateDate, description }) => {
         </Typography>
       )}
       <Typography variant="body2" color="text.secondary" mt={1}>
-        <Link href={"/"}>ホーム</Link> / <Link href={"/terms"}>利用規約</Link> /{" "}
+        <Link href={"/schedule/all"}>ホーム</Link> /{" "}
+        <Link href={"/terms"}>利用規約</Link> /{" "}
         <Link href={"/privacy-policy"}>プライバシーポリシー</Link>
       </Typography>
       <Typography variant="body2" color="text.secondary" mt={1}>
