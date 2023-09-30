@@ -35,7 +35,7 @@
     "react-dom": "^18.2.0",
     "react-tweet": "^3.1.1",
     "sass": "^1.66.1",
-    "swr": "^2.2.2",
+    "swr": "^2.2.4",
     "typescript": "^5.2.2"
   },
   "devDependencies": {
