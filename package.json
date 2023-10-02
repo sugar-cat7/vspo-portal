@@ -39,6 +39,6 @@
     "typescript": "^5.2.2"
   },
   "devDependencies": {
-    "@vercel/node": "^2.15.10"
+    "@vercel/node": "^3.0.6"
   }
 }
