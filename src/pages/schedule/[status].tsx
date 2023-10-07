@@ -17,7 +17,11 @@ import { NextPageWithLayout } from "./../_app";
 import { LivestreamCards } from "@/components/Templates";
 import { freeChatVideoIds } from "@/data/master";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
-import { fetchVspoEvents, fetchVspoLivestreams } from "@/lib/api";
+import {
+  fetchFreeChat,
+  fetchVspoEvents,
+  fetchVspoLivestreams,
+} from "@/lib/api";
 import { VspoEvent } from "@/types/events";
 import Link from "next/link";
 
@@ -116,11 +120,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
 export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
   params,
 }) => {
+  const freeChats = await fetchFreeChat();
+  const freeChatIds = freeChats.map((f) => f.id);
   const pastLivestreams = await fetchVspoLivestreams({ limit: 300 });
 
   const fetchEvents = await fetchVspoEvents();
 
-  const uniqueLivestreams = removeDuplicateTitles(pastLivestreams);
+  const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
+    (l) => !freeChatIds.includes(l.id)
+  );
 
   const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
   const isDateStatus = isValidDate(params?.status as string);
@@ -128,7 +136,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
 
   const todayDateString = formatWithTimeZone(todayDate, "ja", "yyyy-MM-dd");
 
-  const filteredLivestreams = uniqueLivestreams.filter((livestream) => {
+  let filteredLivestreams = uniqueLivestreams.filter((livestream) => {
     const scheduledStartTimeString = formatWithTimeZone(
       new Date(livestream.scheduledStartTime),
       "ja",
@@ -155,6 +163,24 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
       );
     }
   });
+
+  if (filteredLivestreams.length === 0 && params?.status === "all") {
+    filteredLivestreams = uniqueLivestreams.filter((livestream) => {
+      const yesterdayDate = new Date();
+      yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+      const yesterdayDateString = formatWithTimeZone(
+        yesterdayDate,
+        "ja",
+        "yyyy-MM-dd"
+      );
+      const scheduledStartTimeString = formatWithTimeZone(
+        new Date(livestream.scheduledStartTime),
+        "ja",
+        "yyyy-MM-dd"
+      );
+      return scheduledStartTimeString === yesterdayDateString;
+    });
+  }
   // Sort livestreams by scheduled start time in ascending order
   filteredLivestreams.sort((a, b) => {
     return (
