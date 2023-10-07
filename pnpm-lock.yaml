@@ -61,7 +61,7 @@ dependencies:
     version: 13.4.19(eslint@8.49.0)(typescript@5.2.2)
   next:
     specifier: ^13.5.3
-    version: 13.5.3(@babel/core@7.22.10)(react-dom@18.2.0)(react@18.2.0)(sass@1.66.1)
+    version: 13.5.3(@babel/core@7.22.10)(react-dom@18.2.0)(react@18.2.0)(sass@1.68.0)
   next-pwa:
     specifier: ^5.6.0
     version: 5.6.0(@babel/core@7.22.10)(next@13.5.3)(webpack@5.88.2)
@@ -81,8 +81,8 @@ dependencies:
     specifier: ^3.1.1
     version: 3.1.1(react-dom@18.2.0)(react@18.2.0)
   sass:
-    specifier: ^1.66.1
-    version: 1.66.1
+    specifier: ^1.68.0
+    version: 1.68.0
   swr:
     specifier: ^2.2.4
     version: 2.2.4(react@18.2.0)
@@ -4540,7 +4540,7 @@ packages:
       babel-loader: 8.3.0(@babel/core@7.22.10)(webpack@5.88.2)
       clean-webpack-plugin: 4.0.0(webpack@5.88.2)
       globby: 11.1.0
-      next: 13.5.3(@babel/core@7.22.10)(react-dom@18.2.0)(react@18.2.0)(sass@1.66.1)
+      next: 13.5.3(@babel/core@7.22.10)(react-dom@18.2.0)(react@18.2.0)(sass@1.68.0)
       terser-webpack-plugin: 5.3.9(webpack@5.88.2)
       workbox-webpack-plugin: 6.6.0(webpack@5.88.2)
       workbox-window: 6.6.0
@@ -4565,10 +4565,10 @@ packages:
       '@next/env': 13.4.19
       fast-glob: 3.3.1
       minimist: 1.2.8
-      next: 13.5.3(@babel/core@7.22.10)(react-dom@18.2.0)(react@18.2.0)(sass@1.66.1)
+      next: 13.5.3(@babel/core@7.22.10)(react-dom@18.2.0)(react@18.2.0)(sass@1.68.0)
     dev: false
 
-  /next@13.5.3(@babel/core@7.22.10)(react-dom@18.2.0)(react@18.2.0)(sass@1.66.1):
+  /next@13.5.3(@babel/core@7.22.10)(react-dom@18.2.0)(react@18.2.0)(sass@1.68.0):
     resolution: {integrity: sha512-4Nt4HRLYDW/yRpJ/QR2t1v63UOMS55A38dnWv3UDOWGezuY0ZyFO1ABNbD7mulVzs9qVhgy2+ppjdsANpKP1mg==}
     engines: {node: '>=16.14.0'}
     hasBin: true
@@ -4590,7 +4590,7 @@ packages:
       postcss: 8.4.14
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
-      sass: 1.66.1
+      sass: 1.68.0
       styled-jsx: 5.1.1(@babel/core@7.22.10)(react@18.2.0)
       watchpack: 2.4.0
       zod: 3.21.4
@@ -5113,8 +5113,8 @@ packages:
       is-regex: 1.1.4
     dev: false
 
-  /sass@1.66.1:
-    resolution: {integrity: sha512-50c+zTsZOJVgFfTgwwEzkjA3/QACgdNsKueWPyAR0mRINIvLAStVQBbPg14iuqEQ74NPDbXzJARJ/O4SI1zftA==}
+  /sass@1.68.0:
+    resolution: {integrity: sha512-Lmj9lM/fef0nQswm1J2HJcEsBUba4wgNx2fea6yJHODREoMFnwRpZydBnX/RjyXw2REIwdkbqE4hrTo4qfDBUA==}
     engines: {node: '>=14.0.0'}
     hasBin: true
     dependencies:
