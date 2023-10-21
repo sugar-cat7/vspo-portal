@@ -80,6 +80,20 @@ export const LivestreamCards: React.FC<Props> = ({
   eventsByDate,
 }) => {
   const [expanded, setExpanded] = React.useState<boolean>(true);
+  if (Object.keys(livestreamsByDate).length === 0) {
+    return (
+      <Box
+        sx={{
+          margin: "5rem 0",
+        }}
+      >
+        <DateTypography variant="h5" mb={3}>
+          配信情報はありません。 <br />
+          アーカイブ・切り抜きをご覧ください。
+        </DateTypography>
+      </Box>
+    );
+  }
   return (
     <>
       {Object.entries(livestreamsByDate).map(([date, livestreams], index) => {
