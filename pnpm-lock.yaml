@@ -69,8 +69,8 @@ dependencies:
     specifier: ^4.2.3
     version: 4.2.3(next@13.5.6)
   openapi-fetch:
-    specifier: ^0.8.0
-    version: 0.8.0
+    specifier: ^0.8.1
+    version: 0.8.1
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -4979,8 +4979,8 @@ packages:
     dependencies:
       wrappy: 1.0.2
 
-  /openapi-fetch@0.8.0:
-    resolution: {integrity: sha512-4zDTZQIdT3zuKPjjOwrqYEIaEGqT+f+DDKAOaOh17+dUSQ+9ddivuRMdOVOCVCSy9xOC2/F3k6ag+61dAQi9cg==}
+  /openapi-fetch@0.8.1:
+    resolution: {integrity: sha512-xmzMaBCydPTMd0TKy4P2DYx/JOe9yjXtPIky1n1GV7nJJdZ3IZgSHvAWVbe06WsPD8EreR7E97IAiskPr6sa2g==}
     dependencies:
       openapi-typescript-helpers: 0.0.4
     dev: false
