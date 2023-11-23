@@ -185,6 +185,13 @@ export const members = [
     iconUrl:
       "https://yt3.googleusercontent.com/dgFxRY6ACT5Qi3lM1j8YZPe_ZGH_pCRy2N_p5znoAE9mYTYYqUN64RGQvMnMqF4MDr-PKEQJyU8=s88-c-k-c0x00ffffff-no-rj",
   },
+  {
+    id: 20,
+    name: "夜乃くろむ / Yano Kuromu",
+    channelId: "UCX4WL24YEOUYd7qDsFSLDOw",
+    iconUrl:
+      "https://yt3.googleusercontent.com/s5yBpdTfsald7IesR0XOLBAE49k5P9e5aLqE6AsmPf2pb8GSQ9-srQz-eSiAUWrkfCTTcDZWZA=s176-c-k-c0x00ffffff-no-rj",
+  },
 ];
 
 export const memberNames = [
@@ -208,4 +215,5 @@ export const memberNames = [
   "ぶいすぽ",
   "夢野あかり",
   "あかりん",
+  "夜乃くろむ",
 ];
