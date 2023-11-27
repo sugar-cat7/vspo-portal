@@ -69,8 +69,8 @@ dependencies:
     specifier: ^4.2.3
     version: 4.2.3(next@14.0.3)
   openapi-fetch:
-    specifier: ^0.8.0
-    version: 0.8.0
+    specifier: ^0.8.2
+    version: 0.8.2
   react:
     specifier: ^18.2.0
     version: 18.2.0
@@ -5009,14 +5009,14 @@ packages:
     dependencies:
       wrappy: 1.0.2
 
-  /openapi-fetch@0.8.0:
-    resolution: {integrity: sha512-4zDTZQIdT3zuKPjjOwrqYEIaEGqT+f+DDKAOaOh17+dUSQ+9ddivuRMdOVOCVCSy9xOC2/F3k6ag+61dAQi9cg==}
+  /openapi-fetch@0.8.2:
+    resolution: {integrity: sha512-4g+NLK8FmQ51RW6zLcCBOVy/lwYmFJiiT+ckYZxJWxUxH4XFhsNcX2eeqVMfVOi+mDNFja6qDXIZAz2c5J/RVw==}
     dependencies:
-      openapi-typescript-helpers: 0.0.4
+      openapi-typescript-helpers: 0.0.5
     dev: false
 
-  /openapi-typescript-helpers@0.0.4:
-    resolution: {integrity: sha512-Q0MTapapFAG993+dx8lNw33X6P/6EbFr31yNymJHq56fNc6dODyRm8tWyRnGxuC74lyl1iCRMV6nQCGQsfVNKg==}
+  /openapi-typescript-helpers@0.0.5:
+    resolution: {integrity: sha512-MRffg93t0hgGZbYTxg60hkRIK2sRuEOHEtCUgMuLgbCC33TMQ68AmxskzUlauzZYD47+ENeGV/ElI7qnWqrAxA==}
     dev: false
 
   /optionator@0.9.3:
