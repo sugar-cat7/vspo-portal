@@ -130,7 +130,7 @@ export const Header: React.FC<Props> = ({ title }) => {
                 alignItems: "center",
               }}
             >
-              <a
+              {/* <a
                 href="https://github.com/sugar-cat7/vspo-schedule-web"
                 style={{
                   display: "inline-flex",
@@ -150,7 +150,7 @@ export const Header: React.FC<Props> = ({ title }) => {
                     paddingTop: "5px",
                   }}
                 />
-              </a>
+              </a> */}
               <a
                 href="https://twitter.com/vspodule"
                 style={{
