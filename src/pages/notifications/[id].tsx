@@ -7,6 +7,7 @@ import { Container, Typography, Chip, Box } from "@mui/material";
 import { Breadcrumb, TweetEmbed } from "@/components/Elements";
 import { notifications } from "@/data/notifications";
 import { getColor } from "@/lib/utils";
+import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 
 type Props = {
   notice: Notice;
@@ -55,6 +56,7 @@ NoticePage.getLayout = (page, pageProps) => {
       path={`/notification/${pageProps.notice.id}`}
     >
       {page}
+      <CustomBottomNavigation />
     </ContentLayout>
   );
 };
