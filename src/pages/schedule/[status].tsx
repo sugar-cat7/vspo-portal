@@ -62,6 +62,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
           {/* Date */}
           <TabBox>
             <Tabs
+              aria-label="配信日スケジュール"
               textColor="primary"
               indicatorColor="primary"
               scrollButtons="auto"
@@ -73,6 +74,8 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
                 const label = formatWithTimeZone(d, "ja", "MM/dd (E)");
                 return (
                   <Tab
+                    role="tab"
+                    aria-selected={todayIndex === i}
                     label={label}
                     value={i.toString()}
                     key={date}
@@ -265,9 +268,9 @@ HomePage.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
       title={`ぶいすぽっ!${title}`}
-      description={`ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス)を確認できます。`}
+      description={`ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス/ニコニコ)を確認できます。`}
       lastUpdateDate={pageProps.lastUpdateDate}
-      footerMessage="※メン限の配信は掲載していません。"
+      footerMessage="※メン限の配信は掲載しておりません。"
       headTitle={headTitle}
     >
       {page}
