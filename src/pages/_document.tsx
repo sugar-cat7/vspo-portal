@@ -13,7 +13,6 @@ class MyDocument extends Document {
             />
           )}
           <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
           <meta name="keywords" content="ぶいすぽ 配信スケジュール" />
           <meta property="og:type" content="website" />
           <meta

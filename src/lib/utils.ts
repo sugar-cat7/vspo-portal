@@ -2,7 +2,7 @@ import { members } from "@/data/members";
 import { Clip, Livestream, MemberKeyword, Platform } from "@/types/streaming";
 import { format, utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
-import { differenceInMinutes } from "date-fns";
+import { Locale, differenceInMinutes } from "date-fns";
 import { TEMP_TIMESTAMP } from "./Const";
 import { freeChatVideoIds, membersKeyWords } from "@/data/master";
 import { VspoEvent } from "@/types/events";
