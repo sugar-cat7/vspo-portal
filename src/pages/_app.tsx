@@ -7,7 +7,6 @@ import { NextPage } from "next";
 import { ThemeModeProvider } from "@/context/Theme";
 import { EmbedModeProvider } from "@/context/EmbedMode";
 import { GoogleAnalytics } from "@/components/Elements";
-import Head from "next/head";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement, pageProps: P) => ReactNode;
@@ -22,9 +21,6 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <>
-      <Head>
-        <meta name="viewport" content="viewport-fit=cover" />
-      </Head>
       <EmbedModeProvider>
         <ThemeModeProvider>
           {getLayout(<Component {...pageProps} />, pageProps)}
