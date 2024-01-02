@@ -1,23 +1,23 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
-.pnp.js
+**/node_modules
+**/.pnp
+**.pnp.js
 
 # testing
-/coverage
+**/coverage
 
 # next.js
-/.next/
-/out/
+**/.next/
+**/out/
 
 # production
-/build
+**/build
 
 # misc
-.DS_Store
-*.pem
+**/.DS_Store
+**/*.pem
 
 # debug
 npm-debug.log*
@@ -43,11 +43,11 @@ next-env.d.ts
 **/public/worker-*.js.map
 
 
-/.gradle
-/gradle
+**/.gradle
+**//gradle
 **/android*
 **/app-release*
 **/*gradle*
-manifest-checksum.txt
-store_icon.png
-twa-manifest.json
+**/manifest-checksum.txt
+**/store_icon.png
+**/twa-manifest.json
