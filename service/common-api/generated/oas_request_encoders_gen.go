@@ -11,6 +11,48 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
+func encodeChannelsChannelIDClipsPutRequest(
+	req *ChannelsChannelIDClipsPutReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeChannelsChannelIDSongsPostRequest(
+	req *ChannelsChannelIDSongsPostReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
+func encodeChannelsChannelIDSongsPutRequest(
+	req *ChannelsChannelIDSongsPutReq,
+	r *http.Request,
+) error {
+	const contentType = "application/json"
+	e := new(jx.Encoder)
+	{
+		req.Encode(e)
+	}
+	encoded := e.Bytes()
+	ht.SetBody(r, bytes.NewReader(encoded), contentType)
+	return nil
+}
+
 func encodeChannelsPostRequest(
 	req *ChannelsPostReq,
 	r *http.Request,
@@ -27,48 +69,6 @@ func encodeChannelsPostRequest(
 
 func encodeChannelsPutRequest(
 	req *ChannelsPutReq,
-	r *http.Request,
-) error {
-	const contentType = "application/json"
-	e := new(jx.Encoder)
-	{
-		req.Encode(e)
-	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
-}
-
-func encodeClipsPutRequest(
-	req *ClipsPutReq,
-	r *http.Request,
-) error {
-	const contentType = "application/json"
-	e := new(jx.Encoder)
-	{
-		req.Encode(e)
-	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
-}
-
-func encodeSongsPostRequest(
-	req *SongsPostReq,
-	r *http.Request,
-) error {
-	const contentType = "application/json"
-	e := new(jx.Encoder)
-	{
-		req.Encode(e)
-	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
-}
-
-func encodeSongsPutRequest(
-	req *SongsPutReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

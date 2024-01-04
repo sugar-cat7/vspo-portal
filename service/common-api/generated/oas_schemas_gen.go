@@ -164,6 +164,282 @@ func (s *ChannelStatisticsResponse) SetViewCount(val OptString) {
 	s.ViewCount = val
 }
 
+// ChannelsChannelIDClipsGetBadRequest is response for ChannelsChannelIDClipsGet operation.
+type ChannelsChannelIDClipsGetBadRequest struct{}
+
+func (*ChannelsChannelIDClipsGetBadRequest) channelsChannelIDClipsGetRes() {}
+
+// ChannelsChannelIDClipsGetForbidden is response for ChannelsChannelIDClipsGet operation.
+type ChannelsChannelIDClipsGetForbidden struct{}
+
+func (*ChannelsChannelIDClipsGetForbidden) channelsChannelIDClipsGetRes() {}
+
+// ChannelsChannelIDClipsGetInternalServerError is response for ChannelsChannelIDClipsGet operation.
+type ChannelsChannelIDClipsGetInternalServerError struct{}
+
+func (*ChannelsChannelIDClipsGetInternalServerError) channelsChannelIDClipsGetRes() {}
+
+// ChannelsChannelIDClipsGetNotFound is response for ChannelsChannelIDClipsGet operation.
+type ChannelsChannelIDClipsGetNotFound struct{}
+
+func (*ChannelsChannelIDClipsGetNotFound) channelsChannelIDClipsGetRes() {}
+
+// ChannelsChannelIDClipsGetUnauthorized is response for ChannelsChannelIDClipsGet operation.
+type ChannelsChannelIDClipsGetUnauthorized struct{}
+
+func (*ChannelsChannelIDClipsGetUnauthorized) channelsChannelIDClipsGetRes() {}
+
+// ChannelsChannelIDClipsPutBadRequest is response for ChannelsChannelIDClipsPut operation.
+type ChannelsChannelIDClipsPutBadRequest struct{}
+
+func (*ChannelsChannelIDClipsPutBadRequest) channelsChannelIDClipsPutRes() {}
+
+// ChannelsChannelIDClipsPutForbidden is response for ChannelsChannelIDClipsPut operation.
+type ChannelsChannelIDClipsPutForbidden struct{}
+
+func (*ChannelsChannelIDClipsPutForbidden) channelsChannelIDClipsPutRes() {}
+
+// ChannelsChannelIDClipsPutInternalServerError is response for ChannelsChannelIDClipsPut operation.
+type ChannelsChannelIDClipsPutInternalServerError struct{}
+
+func (*ChannelsChannelIDClipsPutInternalServerError) channelsChannelIDClipsPutRes() {}
+
+// ChannelsChannelIDClipsPutNotFound is response for ChannelsChannelIDClipsPut operation.
+type ChannelsChannelIDClipsPutNotFound struct{}
+
+func (*ChannelsChannelIDClipsPutNotFound) channelsChannelIDClipsPutRes() {}
+
+type ChannelsChannelIDClipsPutOKApplicationJSON string
+
+func (*ChannelsChannelIDClipsPutOKApplicationJSON) channelsChannelIDClipsPutRes() {}
+
+type ChannelsChannelIDClipsPutReq struct {
+	CronType OptChannelsChannelIDClipsPutReqCronType `json:"cronType"`
+}
+
+// GetCronType returns the value of CronType.
+func (s *ChannelsChannelIDClipsPutReq) GetCronType() OptChannelsChannelIDClipsPutReqCronType {
+	return s.CronType
+}
+
+// SetCronType sets the value of CronType.
+func (s *ChannelsChannelIDClipsPutReq) SetCronType(val OptChannelsChannelIDClipsPutReqCronType) {
+	s.CronType = val
+}
+
+type ChannelsChannelIDClipsPutReqCronType string
+
+const (
+	ChannelsChannelIDClipsPutReqCronTypeDaily   ChannelsChannelIDClipsPutReqCronType = "daily"
+	ChannelsChannelIDClipsPutReqCronTypeWeekly  ChannelsChannelIDClipsPutReqCronType = "weekly"
+	ChannelsChannelIDClipsPutReqCronTypeMonthly ChannelsChannelIDClipsPutReqCronType = "monthly"
+)
+
+// AllValues returns all ChannelsChannelIDClipsPutReqCronType values.
+func (ChannelsChannelIDClipsPutReqCronType) AllValues() []ChannelsChannelIDClipsPutReqCronType {
+	return []ChannelsChannelIDClipsPutReqCronType{
+		ChannelsChannelIDClipsPutReqCronTypeDaily,
+		ChannelsChannelIDClipsPutReqCronTypeWeekly,
+		ChannelsChannelIDClipsPutReqCronTypeMonthly,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ChannelsChannelIDClipsPutReqCronType) MarshalText() ([]byte, error) {
+	switch s {
+	case ChannelsChannelIDClipsPutReqCronTypeDaily:
+		return []byte(s), nil
+	case ChannelsChannelIDClipsPutReqCronTypeWeekly:
+		return []byte(s), nil
+	case ChannelsChannelIDClipsPutReqCronTypeMonthly:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ChannelsChannelIDClipsPutReqCronType) UnmarshalText(data []byte) error {
+	switch ChannelsChannelIDClipsPutReqCronType(data) {
+	case ChannelsChannelIDClipsPutReqCronTypeDaily:
+		*s = ChannelsChannelIDClipsPutReqCronTypeDaily
+		return nil
+	case ChannelsChannelIDClipsPutReqCronTypeWeekly:
+		*s = ChannelsChannelIDClipsPutReqCronTypeWeekly
+		return nil
+	case ChannelsChannelIDClipsPutReqCronTypeMonthly:
+		*s = ChannelsChannelIDClipsPutReqCronTypeMonthly
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// ChannelsChannelIDClipsPutUnauthorized is response for ChannelsChannelIDClipsPut operation.
+type ChannelsChannelIDClipsPutUnauthorized struct{}
+
+func (*ChannelsChannelIDClipsPutUnauthorized) channelsChannelIDClipsPutRes() {}
+
+// ChannelsChannelIDSongsGetBadRequest is response for ChannelsChannelIDSongsGet operation.
+type ChannelsChannelIDSongsGetBadRequest struct{}
+
+func (*ChannelsChannelIDSongsGetBadRequest) channelsChannelIDSongsGetRes() {}
+
+// ChannelsChannelIDSongsGetForbidden is response for ChannelsChannelIDSongsGet operation.
+type ChannelsChannelIDSongsGetForbidden struct{}
+
+func (*ChannelsChannelIDSongsGetForbidden) channelsChannelIDSongsGetRes() {}
+
+// ChannelsChannelIDSongsGetInternalServerError is response for ChannelsChannelIDSongsGet operation.
+type ChannelsChannelIDSongsGetInternalServerError struct{}
+
+func (*ChannelsChannelIDSongsGetInternalServerError) channelsChannelIDSongsGetRes() {}
+
+// ChannelsChannelIDSongsGetNotFound is response for ChannelsChannelIDSongsGet operation.
+type ChannelsChannelIDSongsGetNotFound struct{}
+
+func (*ChannelsChannelIDSongsGetNotFound) channelsChannelIDSongsGetRes() {}
+
+// ChannelsChannelIDSongsGetUnauthorized is response for ChannelsChannelIDSongsGet operation.
+type ChannelsChannelIDSongsGetUnauthorized struct{}
+
+func (*ChannelsChannelIDSongsGetUnauthorized) channelsChannelIDSongsGetRes() {}
+
+// ChannelsChannelIDSongsPostBadRequest is response for ChannelsChannelIDSongsPost operation.
+type ChannelsChannelIDSongsPostBadRequest struct{}
+
+func (*ChannelsChannelIDSongsPostBadRequest) channelsChannelIDSongsPostRes() {}
+
+// ChannelsChannelIDSongsPostForbidden is response for ChannelsChannelIDSongsPost operation.
+type ChannelsChannelIDSongsPostForbidden struct{}
+
+func (*ChannelsChannelIDSongsPostForbidden) channelsChannelIDSongsPostRes() {}
+
+// ChannelsChannelIDSongsPostInternalServerError is response for ChannelsChannelIDSongsPost operation.
+type ChannelsChannelIDSongsPostInternalServerError struct{}
+
+func (*ChannelsChannelIDSongsPostInternalServerError) channelsChannelIDSongsPostRes() {}
+
+// ChannelsChannelIDSongsPostNotFound is response for ChannelsChannelIDSongsPost operation.
+type ChannelsChannelIDSongsPostNotFound struct{}
+
+func (*ChannelsChannelIDSongsPostNotFound) channelsChannelIDSongsPostRes() {}
+
+type ChannelsChannelIDSongsPostOKApplicationJSON string
+
+func (*ChannelsChannelIDSongsPostOKApplicationJSON) channelsChannelIDSongsPostRes() {}
+
+type ChannelsChannelIDSongsPostReq struct {
+	// Array of Song IDs.
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns the value of Ids.
+func (s *ChannelsChannelIDSongsPostReq) GetIds() []string {
+	return s.Ids
+}
+
+// SetIds sets the value of Ids.
+func (s *ChannelsChannelIDSongsPostReq) SetIds(val []string) {
+	s.Ids = val
+}
+
+// ChannelsChannelIDSongsPostUnauthorized is response for ChannelsChannelIDSongsPost operation.
+type ChannelsChannelIDSongsPostUnauthorized struct{}
+
+func (*ChannelsChannelIDSongsPostUnauthorized) channelsChannelIDSongsPostRes() {}
+
+// ChannelsChannelIDSongsPutBadRequest is response for ChannelsChannelIDSongsPut operation.
+type ChannelsChannelIDSongsPutBadRequest struct{}
+
+func (*ChannelsChannelIDSongsPutBadRequest) channelsChannelIDSongsPutRes() {}
+
+// ChannelsChannelIDSongsPutForbidden is response for ChannelsChannelIDSongsPut operation.
+type ChannelsChannelIDSongsPutForbidden struct{}
+
+func (*ChannelsChannelIDSongsPutForbidden) channelsChannelIDSongsPutRes() {}
+
+// ChannelsChannelIDSongsPutInternalServerError is response for ChannelsChannelIDSongsPut operation.
+type ChannelsChannelIDSongsPutInternalServerError struct{}
+
+func (*ChannelsChannelIDSongsPutInternalServerError) channelsChannelIDSongsPutRes() {}
+
+// ChannelsChannelIDSongsPutNotFound is response for ChannelsChannelIDSongsPut operation.
+type ChannelsChannelIDSongsPutNotFound struct{}
+
+func (*ChannelsChannelIDSongsPutNotFound) channelsChannelIDSongsPutRes() {}
+
+type ChannelsChannelIDSongsPutOKApplicationJSON string
+
+func (*ChannelsChannelIDSongsPutOKApplicationJSON) channelsChannelIDSongsPutRes() {}
+
+type ChannelsChannelIDSongsPutReq struct {
+	CronType OptChannelsChannelIDSongsPutReqCronType `json:"cronType"`
+}
+
+// GetCronType returns the value of CronType.
+func (s *ChannelsChannelIDSongsPutReq) GetCronType() OptChannelsChannelIDSongsPutReqCronType {
+	return s.CronType
+}
+
+// SetCronType sets the value of CronType.
+func (s *ChannelsChannelIDSongsPutReq) SetCronType(val OptChannelsChannelIDSongsPutReqCronType) {
+	s.CronType = val
+}
+
+type ChannelsChannelIDSongsPutReqCronType string
+
+const (
+	ChannelsChannelIDSongsPutReqCronTypeDaily   ChannelsChannelIDSongsPutReqCronType = "daily"
+	ChannelsChannelIDSongsPutReqCronTypeWeekly  ChannelsChannelIDSongsPutReqCronType = "weekly"
+	ChannelsChannelIDSongsPutReqCronTypeMonthly ChannelsChannelIDSongsPutReqCronType = "monthly"
+)
+
+// AllValues returns all ChannelsChannelIDSongsPutReqCronType values.
+func (ChannelsChannelIDSongsPutReqCronType) AllValues() []ChannelsChannelIDSongsPutReqCronType {
+	return []ChannelsChannelIDSongsPutReqCronType{
+		ChannelsChannelIDSongsPutReqCronTypeDaily,
+		ChannelsChannelIDSongsPutReqCronTypeWeekly,
+		ChannelsChannelIDSongsPutReqCronTypeMonthly,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ChannelsChannelIDSongsPutReqCronType) MarshalText() ([]byte, error) {
+	switch s {
+	case ChannelsChannelIDSongsPutReqCronTypeDaily:
+		return []byte(s), nil
+	case ChannelsChannelIDSongsPutReqCronTypeWeekly:
+		return []byte(s), nil
+	case ChannelsChannelIDSongsPutReqCronTypeMonthly:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ChannelsChannelIDSongsPutReqCronType) UnmarshalText(data []byte) error {
+	switch ChannelsChannelIDSongsPutReqCronType(data) {
+	case ChannelsChannelIDSongsPutReqCronTypeDaily:
+		*s = ChannelsChannelIDSongsPutReqCronTypeDaily
+		return nil
+	case ChannelsChannelIDSongsPutReqCronTypeWeekly:
+		*s = ChannelsChannelIDSongsPutReqCronTypeWeekly
+		return nil
+	case ChannelsChannelIDSongsPutReqCronTypeMonthly:
+		*s = ChannelsChannelIDSongsPutReqCronTypeMonthly
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// ChannelsChannelIDSongsPutUnauthorized is response for ChannelsChannelIDSongsPut operation.
+type ChannelsChannelIDSongsPutUnauthorized struct{}
+
+func (*ChannelsChannelIDSongsPutUnauthorized) channelsChannelIDSongsPutRes() {}
+
 // ChannelsGetBadRequest is response for ChannelsGet operation.
 type ChannelsGetBadRequest struct{}
 
@@ -293,122 +569,6 @@ func (s *ChannelsResponse) SetChannels(val []ChannelResponse) {
 }
 
 func (*ChannelsResponse) channelsGetRes() {}
-
-// ClipsGetBadRequest is response for ClipsGet operation.
-type ClipsGetBadRequest struct{}
-
-func (*ClipsGetBadRequest) clipsGetRes() {}
-
-// ClipsGetForbidden is response for ClipsGet operation.
-type ClipsGetForbidden struct{}
-
-func (*ClipsGetForbidden) clipsGetRes() {}
-
-// ClipsGetInternalServerError is response for ClipsGet operation.
-type ClipsGetInternalServerError struct{}
-
-func (*ClipsGetInternalServerError) clipsGetRes() {}
-
-// ClipsGetNotFound is response for ClipsGet operation.
-type ClipsGetNotFound struct{}
-
-func (*ClipsGetNotFound) clipsGetRes() {}
-
-// ClipsGetUnauthorized is response for ClipsGet operation.
-type ClipsGetUnauthorized struct{}
-
-func (*ClipsGetUnauthorized) clipsGetRes() {}
-
-// ClipsPutBadRequest is response for ClipsPut operation.
-type ClipsPutBadRequest struct{}
-
-func (*ClipsPutBadRequest) clipsPutRes() {}
-
-// ClipsPutForbidden is response for ClipsPut operation.
-type ClipsPutForbidden struct{}
-
-func (*ClipsPutForbidden) clipsPutRes() {}
-
-// ClipsPutInternalServerError is response for ClipsPut operation.
-type ClipsPutInternalServerError struct{}
-
-func (*ClipsPutInternalServerError) clipsPutRes() {}
-
-// ClipsPutNotFound is response for ClipsPut operation.
-type ClipsPutNotFound struct{}
-
-func (*ClipsPutNotFound) clipsPutRes() {}
-
-type ClipsPutOKApplicationJSON string
-
-func (*ClipsPutOKApplicationJSON) clipsPutRes() {}
-
-type ClipsPutReq struct {
-	CronType OptClipsPutReqCronType `json:"cronType"`
-}
-
-// GetCronType returns the value of CronType.
-func (s *ClipsPutReq) GetCronType() OptClipsPutReqCronType {
-	return s.CronType
-}
-
-// SetCronType sets the value of CronType.
-func (s *ClipsPutReq) SetCronType(val OptClipsPutReqCronType) {
-	s.CronType = val
-}
-
-type ClipsPutReqCronType string
-
-const (
-	ClipsPutReqCronTypeDaily   ClipsPutReqCronType = "daily"
-	ClipsPutReqCronTypeWeekly  ClipsPutReqCronType = "weekly"
-	ClipsPutReqCronTypeMonthly ClipsPutReqCronType = "monthly"
-)
-
-// AllValues returns all ClipsPutReqCronType values.
-func (ClipsPutReqCronType) AllValues() []ClipsPutReqCronType {
-	return []ClipsPutReqCronType{
-		ClipsPutReqCronTypeDaily,
-		ClipsPutReqCronTypeWeekly,
-		ClipsPutReqCronTypeMonthly,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s ClipsPutReqCronType) MarshalText() ([]byte, error) {
-	switch s {
-	case ClipsPutReqCronTypeDaily:
-		return []byte(s), nil
-	case ClipsPutReqCronTypeWeekly:
-		return []byte(s), nil
-	case ClipsPutReqCronTypeMonthly:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ClipsPutReqCronType) UnmarshalText(data []byte) error {
-	switch ClipsPutReqCronType(data) {
-	case ClipsPutReqCronTypeDaily:
-		*s = ClipsPutReqCronTypeDaily
-		return nil
-	case ClipsPutReqCronTypeWeekly:
-		*s = ClipsPutReqCronTypeWeekly
-		return nil
-	case ClipsPutReqCronTypeMonthly:
-		*s = ClipsPutReqCronTypeMonthly
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-// ClipsPutUnauthorized is response for ClipsPut operation.
-type ClipsPutUnauthorized struct{}
-
-func (*ClipsPutUnauthorized) clipsPutRes() {}
 
 // NewOptBool returns new OptBool with value set to v.
 func NewOptBool(v bool) OptBool {
@@ -548,38 +708,38 @@ func (o OptChannelStatisticsResponse) Or(d ChannelStatisticsResponse) ChannelSta
 	return d
 }
 
-// NewOptClipsPutReqCronType returns new OptClipsPutReqCronType with value set to v.
-func NewOptClipsPutReqCronType(v ClipsPutReqCronType) OptClipsPutReqCronType {
-	return OptClipsPutReqCronType{
+// NewOptChannelsChannelIDClipsPutReqCronType returns new OptChannelsChannelIDClipsPutReqCronType with value set to v.
+func NewOptChannelsChannelIDClipsPutReqCronType(v ChannelsChannelIDClipsPutReqCronType) OptChannelsChannelIDClipsPutReqCronType {
+	return OptChannelsChannelIDClipsPutReqCronType{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptClipsPutReqCronType is optional ClipsPutReqCronType.
-type OptClipsPutReqCronType struct {
-	Value ClipsPutReqCronType
+// OptChannelsChannelIDClipsPutReqCronType is optional ChannelsChannelIDClipsPutReqCronType.
+type OptChannelsChannelIDClipsPutReqCronType struct {
+	Value ChannelsChannelIDClipsPutReqCronType
 	Set   bool
 }
 
-// IsSet returns true if OptClipsPutReqCronType was set.
-func (o OptClipsPutReqCronType) IsSet() bool { return o.Set }
+// IsSet returns true if OptChannelsChannelIDClipsPutReqCronType was set.
+func (o OptChannelsChannelIDClipsPutReqCronType) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptClipsPutReqCronType) Reset() {
-	var v ClipsPutReqCronType
+func (o *OptChannelsChannelIDClipsPutReqCronType) Reset() {
+	var v ChannelsChannelIDClipsPutReqCronType
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptClipsPutReqCronType) SetTo(v ClipsPutReqCronType) {
+func (o *OptChannelsChannelIDClipsPutReqCronType) SetTo(v ChannelsChannelIDClipsPutReqCronType) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptClipsPutReqCronType) Get() (v ClipsPutReqCronType, ok bool) {
+func (o OptChannelsChannelIDClipsPutReqCronType) Get() (v ChannelsChannelIDClipsPutReqCronType, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -587,7 +747,53 @@ func (o OptClipsPutReqCronType) Get() (v ClipsPutReqCronType, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptClipsPutReqCronType) Or(d ClipsPutReqCronType) ClipsPutReqCronType {
+func (o OptChannelsChannelIDClipsPutReqCronType) Or(d ChannelsChannelIDClipsPutReqCronType) ChannelsChannelIDClipsPutReqCronType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptChannelsChannelIDSongsPutReqCronType returns new OptChannelsChannelIDSongsPutReqCronType with value set to v.
+func NewOptChannelsChannelIDSongsPutReqCronType(v ChannelsChannelIDSongsPutReqCronType) OptChannelsChannelIDSongsPutReqCronType {
+	return OptChannelsChannelIDSongsPutReqCronType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptChannelsChannelIDSongsPutReqCronType is optional ChannelsChannelIDSongsPutReqCronType.
+type OptChannelsChannelIDSongsPutReqCronType struct {
+	Value ChannelsChannelIDSongsPutReqCronType
+	Set   bool
+}
+
+// IsSet returns true if OptChannelsChannelIDSongsPutReqCronType was set.
+func (o OptChannelsChannelIDSongsPutReqCronType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptChannelsChannelIDSongsPutReqCronType) Reset() {
+	var v ChannelsChannelIDSongsPutReqCronType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptChannelsChannelIDSongsPutReqCronType) SetTo(v ChannelsChannelIDSongsPutReqCronType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptChannelsChannelIDSongsPutReqCronType) Get() (v ChannelsChannelIDSongsPutReqCronType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptChannelsChannelIDSongsPutReqCronType) Or(d ChannelsChannelIDSongsPutReqCronType) ChannelsChannelIDSongsPutReqCronType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -634,52 +840,6 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptSongsPutReqCronType returns new OptSongsPutReqCronType with value set to v.
-func NewOptSongsPutReqCronType(v SongsPutReqCronType) OptSongsPutReqCronType {
-	return OptSongsPutReqCronType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptSongsPutReqCronType is optional SongsPutReqCronType.
-type OptSongsPutReqCronType struct {
-	Value SongsPutReqCronType
-	Set   bool
-}
-
-// IsSet returns true if OptSongsPutReqCronType was set.
-func (o OptSongsPutReqCronType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptSongsPutReqCronType) Reset() {
-	var v SongsPutReqCronType
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptSongsPutReqCronType) SetTo(v SongsPutReqCronType) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptSongsPutReqCronType) Get() (v SongsPutReqCronType, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptSongsPutReqCronType) Or(d SongsPutReqCronType) SongsPutReqCronType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -823,166 +983,6 @@ func (o OptThumbnailsResponse) Or(d ThumbnailsResponse) ThumbnailsResponse {
 	}
 	return d
 }
-
-// SongsGetBadRequest is response for SongsGet operation.
-type SongsGetBadRequest struct{}
-
-func (*SongsGetBadRequest) songsGetRes() {}
-
-// SongsGetForbidden is response for SongsGet operation.
-type SongsGetForbidden struct{}
-
-func (*SongsGetForbidden) songsGetRes() {}
-
-// SongsGetInternalServerError is response for SongsGet operation.
-type SongsGetInternalServerError struct{}
-
-func (*SongsGetInternalServerError) songsGetRes() {}
-
-// SongsGetNotFound is response for SongsGet operation.
-type SongsGetNotFound struct{}
-
-func (*SongsGetNotFound) songsGetRes() {}
-
-// SongsGetUnauthorized is response for SongsGet operation.
-type SongsGetUnauthorized struct{}
-
-func (*SongsGetUnauthorized) songsGetRes() {}
-
-// SongsPostBadRequest is response for SongsPost operation.
-type SongsPostBadRequest struct{}
-
-func (*SongsPostBadRequest) songsPostRes() {}
-
-// SongsPostForbidden is response for SongsPost operation.
-type SongsPostForbidden struct{}
-
-func (*SongsPostForbidden) songsPostRes() {}
-
-// SongsPostInternalServerError is response for SongsPost operation.
-type SongsPostInternalServerError struct{}
-
-func (*SongsPostInternalServerError) songsPostRes() {}
-
-// SongsPostNotFound is response for SongsPost operation.
-type SongsPostNotFound struct{}
-
-func (*SongsPostNotFound) songsPostRes() {}
-
-type SongsPostOKApplicationJSON string
-
-func (*SongsPostOKApplicationJSON) songsPostRes() {}
-
-type SongsPostReq struct {
-	// Array of Song IDs.
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns the value of Ids.
-func (s *SongsPostReq) GetIds() []string {
-	return s.Ids
-}
-
-// SetIds sets the value of Ids.
-func (s *SongsPostReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// SongsPostUnauthorized is response for SongsPost operation.
-type SongsPostUnauthorized struct{}
-
-func (*SongsPostUnauthorized) songsPostRes() {}
-
-// SongsPutBadRequest is response for SongsPut operation.
-type SongsPutBadRequest struct{}
-
-func (*SongsPutBadRequest) songsPutRes() {}
-
-// SongsPutForbidden is response for SongsPut operation.
-type SongsPutForbidden struct{}
-
-func (*SongsPutForbidden) songsPutRes() {}
-
-// SongsPutInternalServerError is response for SongsPut operation.
-type SongsPutInternalServerError struct{}
-
-func (*SongsPutInternalServerError) songsPutRes() {}
-
-// SongsPutNotFound is response for SongsPut operation.
-type SongsPutNotFound struct{}
-
-func (*SongsPutNotFound) songsPutRes() {}
-
-type SongsPutOKApplicationJSON string
-
-func (*SongsPutOKApplicationJSON) songsPutRes() {}
-
-type SongsPutReq struct {
-	CronType OptSongsPutReqCronType `json:"cronType"`
-}
-
-// GetCronType returns the value of CronType.
-func (s *SongsPutReq) GetCronType() OptSongsPutReqCronType {
-	return s.CronType
-}
-
-// SetCronType sets the value of CronType.
-func (s *SongsPutReq) SetCronType(val OptSongsPutReqCronType) {
-	s.CronType = val
-}
-
-type SongsPutReqCronType string
-
-const (
-	SongsPutReqCronTypeDaily   SongsPutReqCronType = "daily"
-	SongsPutReqCronTypeWeekly  SongsPutReqCronType = "weekly"
-	SongsPutReqCronTypeMonthly SongsPutReqCronType = "monthly"
-)
-
-// AllValues returns all SongsPutReqCronType values.
-func (SongsPutReqCronType) AllValues() []SongsPutReqCronType {
-	return []SongsPutReqCronType{
-		SongsPutReqCronTypeDaily,
-		SongsPutReqCronTypeWeekly,
-		SongsPutReqCronTypeMonthly,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s SongsPutReqCronType) MarshalText() ([]byte, error) {
-	switch s {
-	case SongsPutReqCronTypeDaily:
-		return []byte(s), nil
-	case SongsPutReqCronTypeWeekly:
-		return []byte(s), nil
-	case SongsPutReqCronTypeMonthly:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *SongsPutReqCronType) UnmarshalText(data []byte) error {
-	switch SongsPutReqCronType(data) {
-	case SongsPutReqCronTypeDaily:
-		*s = SongsPutReqCronTypeDaily
-		return nil
-	case SongsPutReqCronTypeWeekly:
-		*s = SongsPutReqCronTypeWeekly
-		return nil
-	case SongsPutReqCronTypeMonthly:
-		*s = SongsPutReqCronTypeMonthly
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-// SongsPutUnauthorized is response for SongsPut operation.
-type SongsPutUnauthorized struct{}
-
-func (*SongsPutUnauthorized) songsPutRes() {}
 
 // Ref: #/components/schemas/ThumbnailResponse
 type ThumbnailResponse struct {
@@ -1187,5 +1187,5 @@ func (s *VideosResponse) SetVideos(val []VideoResponse) {
 	s.Videos = val
 }
 
-func (*VideosResponse) clipsGetRes() {}
-func (*VideosResponse) songsGetRes() {}
+func (*VideosResponse) channelsChannelIDClipsGetRes() {}
+func (*VideosResponse) channelsChannelIDSongsGetRes() {}

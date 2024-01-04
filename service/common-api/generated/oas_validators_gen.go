@@ -8,7 +8,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func (s *ClipsPutReq) Validate() error {
+func (s *ChannelsChannelIDClipsPutReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -38,7 +38,7 @@ func (s *ClipsPutReq) Validate() error {
 	return nil
 }
 
-func (s ClipsPutReqCronType) Validate() error {
+func (s ChannelsChannelIDClipsPutReqCronType) Validate() error {
 	switch s {
 	case "daily":
 		return nil
@@ -51,7 +51,7 @@ func (s ClipsPutReqCronType) Validate() error {
 	}
 }
 
-func (s *SongsPutReq) Validate() error {
+func (s *ChannelsChannelIDSongsPutReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -81,7 +81,7 @@ func (s *SongsPutReq) Validate() error {
 	return nil
 }
 
-func (s SongsPutReqCronType) Validate() error {
+func (s ChannelsChannelIDSongsPutReqCronType) Validate() error {
 	switch s {
 	case "daily":
 		return nil

@@ -349,6 +349,412 @@ func (s *ChannelStatisticsResponse) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes ChannelsChannelIDClipsPutOKApplicationJSON as json.
+func (s ChannelsChannelIDClipsPutOKApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := string(s)
+
+	e.Str(unwrapped)
+}
+
+// Decode decodes ChannelsChannelIDClipsPutOKApplicationJSON from json.
+func (s *ChannelsChannelIDClipsPutOKApplicationJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsChannelIDClipsPutOKApplicationJSON to nil")
+	}
+	var unwrapped string
+	if err := func() error {
+		v, err := d.Str()
+		unwrapped = string(v)
+		if err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = ChannelsChannelIDClipsPutOKApplicationJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ChannelsChannelIDClipsPutOKApplicationJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsChannelIDClipsPutOKApplicationJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ChannelsChannelIDClipsPutReq) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ChannelsChannelIDClipsPutReq) encodeFields(e *jx.Encoder) {
+	{
+		if s.CronType.Set {
+			e.FieldStart("cronType")
+			s.CronType.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfChannelsChannelIDClipsPutReq = [1]string{
+	0: "cronType",
+}
+
+// Decode decodes ChannelsChannelIDClipsPutReq from json.
+func (s *ChannelsChannelIDClipsPutReq) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsChannelIDClipsPutReq to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "cronType":
+			if err := func() error {
+				s.CronType.Reset()
+				if err := s.CronType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"cronType\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ChannelsChannelIDClipsPutReq")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ChannelsChannelIDClipsPutReq) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsChannelIDClipsPutReq) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsChannelIDClipsPutReqCronType as json.
+func (s ChannelsChannelIDClipsPutReqCronType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes ChannelsChannelIDClipsPutReqCronType from json.
+func (s *ChannelsChannelIDClipsPutReqCronType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsChannelIDClipsPutReqCronType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch ChannelsChannelIDClipsPutReqCronType(v) {
+	case ChannelsChannelIDClipsPutReqCronTypeDaily:
+		*s = ChannelsChannelIDClipsPutReqCronTypeDaily
+	case ChannelsChannelIDClipsPutReqCronTypeWeekly:
+		*s = ChannelsChannelIDClipsPutReqCronTypeWeekly
+	case ChannelsChannelIDClipsPutReqCronTypeMonthly:
+		*s = ChannelsChannelIDClipsPutReqCronTypeMonthly
+	default:
+		*s = ChannelsChannelIDClipsPutReqCronType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ChannelsChannelIDClipsPutReqCronType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsChannelIDClipsPutReqCronType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsChannelIDSongsPostOKApplicationJSON as json.
+func (s ChannelsChannelIDSongsPostOKApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := string(s)
+
+	e.Str(unwrapped)
+}
+
+// Decode decodes ChannelsChannelIDSongsPostOKApplicationJSON from json.
+func (s *ChannelsChannelIDSongsPostOKApplicationJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsChannelIDSongsPostOKApplicationJSON to nil")
+	}
+	var unwrapped string
+	if err := func() error {
+		v, err := d.Str()
+		unwrapped = string(v)
+		if err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = ChannelsChannelIDSongsPostOKApplicationJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ChannelsChannelIDSongsPostOKApplicationJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsChannelIDSongsPostOKApplicationJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ChannelsChannelIDSongsPostReq) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ChannelsChannelIDSongsPostReq) encodeFields(e *jx.Encoder) {
+	{
+		if s.Ids != nil {
+			e.FieldStart("ids")
+			e.ArrStart()
+			for _, elem := range s.Ids {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+}
+
+var jsonFieldsNameOfChannelsChannelIDSongsPostReq = [1]string{
+	0: "ids",
+}
+
+// Decode decodes ChannelsChannelIDSongsPostReq from json.
+func (s *ChannelsChannelIDSongsPostReq) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsChannelIDSongsPostReq to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "ids":
+			if err := func() error {
+				s.Ids = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Ids = append(s.Ids, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ids\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ChannelsChannelIDSongsPostReq")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ChannelsChannelIDSongsPostReq) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsChannelIDSongsPostReq) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsChannelIDSongsPutOKApplicationJSON as json.
+func (s ChannelsChannelIDSongsPutOKApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := string(s)
+
+	e.Str(unwrapped)
+}
+
+// Decode decodes ChannelsChannelIDSongsPutOKApplicationJSON from json.
+func (s *ChannelsChannelIDSongsPutOKApplicationJSON) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsChannelIDSongsPutOKApplicationJSON to nil")
+	}
+	var unwrapped string
+	if err := func() error {
+		v, err := d.Str()
+		unwrapped = string(v)
+		if err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = ChannelsChannelIDSongsPutOKApplicationJSON(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ChannelsChannelIDSongsPutOKApplicationJSON) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsChannelIDSongsPutOKApplicationJSON) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ChannelsChannelIDSongsPutReq) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ChannelsChannelIDSongsPutReq) encodeFields(e *jx.Encoder) {
+	{
+		if s.CronType.Set {
+			e.FieldStart("cronType")
+			s.CronType.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfChannelsChannelIDSongsPutReq = [1]string{
+	0: "cronType",
+}
+
+// Decode decodes ChannelsChannelIDSongsPutReq from json.
+func (s *ChannelsChannelIDSongsPutReq) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsChannelIDSongsPutReq to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "cronType":
+			if err := func() error {
+				s.CronType.Reset()
+				if err := s.CronType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"cronType\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ChannelsChannelIDSongsPutReq")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ChannelsChannelIDSongsPutReq) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsChannelIDSongsPutReq) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsChannelIDSongsPutReqCronType as json.
+func (s ChannelsChannelIDSongsPutReqCronType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes ChannelsChannelIDSongsPutReqCronType from json.
+func (s *ChannelsChannelIDSongsPutReqCronType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsChannelIDSongsPutReqCronType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch ChannelsChannelIDSongsPutReqCronType(v) {
+	case ChannelsChannelIDSongsPutReqCronTypeDaily:
+		*s = ChannelsChannelIDSongsPutReqCronTypeDaily
+	case ChannelsChannelIDSongsPutReqCronTypeWeekly:
+		*s = ChannelsChannelIDSongsPutReqCronTypeWeekly
+	case ChannelsChannelIDSongsPutReqCronTypeMonthly:
+		*s = ChannelsChannelIDSongsPutReqCronTypeMonthly
+	default:
+		*s = ChannelsChannelIDSongsPutReqCronType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ChannelsChannelIDSongsPutReqCronType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsChannelIDSongsPutReqCronType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes ChannelsPostOKApplicationJSON as json.
 func (s ChannelsPostOKApplicationJSON) Encode(e *jx.Encoder) {
 	unwrapped := string(s)
@@ -655,151 +1061,6 @@ func (s *ChannelsResponse) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes ClipsPutOKApplicationJSON as json.
-func (s ClipsPutOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := string(s)
-
-	e.Str(unwrapped)
-}
-
-// Decode decodes ClipsPutOKApplicationJSON from json.
-func (s *ClipsPutOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ClipsPutOKApplicationJSON to nil")
-	}
-	var unwrapped string
-	if err := func() error {
-		v, err := d.Str()
-		unwrapped = string(v)
-		if err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = ClipsPutOKApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s ClipsPutOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ClipsPutOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *ClipsPutReq) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *ClipsPutReq) encodeFields(e *jx.Encoder) {
-	{
-		if s.CronType.Set {
-			e.FieldStart("cronType")
-			s.CronType.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfClipsPutReq = [1]string{
-	0: "cronType",
-}
-
-// Decode decodes ClipsPutReq from json.
-func (s *ClipsPutReq) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ClipsPutReq to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "cronType":
-			if err := func() error {
-				s.CronType.Reset()
-				if err := s.CronType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"cronType\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode ClipsPutReq")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *ClipsPutReq) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ClipsPutReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes ClipsPutReqCronType as json.
-func (s ClipsPutReqCronType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes ClipsPutReqCronType from json.
-func (s *ClipsPutReqCronType) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ClipsPutReqCronType to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch ClipsPutReqCronType(v) {
-	case ClipsPutReqCronTypeDaily:
-		*s = ClipsPutReqCronTypeDaily
-	case ClipsPutReqCronTypeWeekly:
-		*s = ClipsPutReqCronTypeWeekly
-	case ClipsPutReqCronTypeMonthly:
-		*s = ClipsPutReqCronTypeMonthly
-	default:
-		*s = ClipsPutReqCronType(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s ClipsPutReqCronType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ClipsPutReqCronType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes bool as json.
 func (o OptBool) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -901,18 +1162,18 @@ func (s *OptChannelStatisticsResponse) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes ClipsPutReqCronType as json.
-func (o OptClipsPutReqCronType) Encode(e *jx.Encoder) {
+// Encode encodes ChannelsChannelIDClipsPutReqCronType as json.
+func (o OptChannelsChannelIDClipsPutReqCronType) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
 	e.Str(string(o.Value))
 }
 
-// Decode decodes ClipsPutReqCronType from json.
-func (o *OptClipsPutReqCronType) Decode(d *jx.Decoder) error {
+// Decode decodes ChannelsChannelIDClipsPutReqCronType from json.
+func (o *OptChannelsChannelIDClipsPutReqCronType) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptClipsPutReqCronType to nil")
+		return errors.New("invalid: unable to decode OptChannelsChannelIDClipsPutReqCronType to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -922,14 +1183,47 @@ func (o *OptClipsPutReqCronType) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptClipsPutReqCronType) MarshalJSON() ([]byte, error) {
+func (s OptChannelsChannelIDClipsPutReqCronType) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptClipsPutReqCronType) UnmarshalJSON(data []byte) error {
+func (s *OptChannelsChannelIDClipsPutReqCronType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsChannelIDSongsPutReqCronType as json.
+func (o OptChannelsChannelIDSongsPutReqCronType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes ChannelsChannelIDSongsPutReqCronType from json.
+func (o *OptChannelsChannelIDSongsPutReqCronType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptChannelsChannelIDSongsPutReqCronType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptChannelsChannelIDSongsPutReqCronType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptChannelsChannelIDSongsPutReqCronType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -965,39 +1259,6 @@ func (s OptInt) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptInt) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes SongsPutReqCronType as json.
-func (o OptSongsPutReqCronType) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes SongsPutReqCronType from json.
-func (o *OptSongsPutReqCronType) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptSongsPutReqCronType to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptSongsPutReqCronType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptSongsPutReqCronType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1099,267 +1360,6 @@ func (s OptThumbnailsResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptThumbnailsResponse) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes SongsPostOKApplicationJSON as json.
-func (s SongsPostOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := string(s)
-
-	e.Str(unwrapped)
-}
-
-// Decode decodes SongsPostOKApplicationJSON from json.
-func (s *SongsPostOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode SongsPostOKApplicationJSON to nil")
-	}
-	var unwrapped string
-	if err := func() error {
-		v, err := d.Str()
-		unwrapped = string(v)
-		if err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = SongsPostOKApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s SongsPostOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SongsPostOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *SongsPostReq) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *SongsPostReq) encodeFields(e *jx.Encoder) {
-	{
-		if s.Ids != nil {
-			e.FieldStart("ids")
-			e.ArrStart()
-			for _, elem := range s.Ids {
-				e.Str(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-}
-
-var jsonFieldsNameOfSongsPostReq = [1]string{
-	0: "ids",
-}
-
-// Decode decodes SongsPostReq from json.
-func (s *SongsPostReq) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode SongsPostReq to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "ids":
-			if err := func() error {
-				s.Ids = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Ids = append(s.Ids, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ids\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode SongsPostReq")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *SongsPostReq) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SongsPostReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes SongsPutOKApplicationJSON as json.
-func (s SongsPutOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := string(s)
-
-	e.Str(unwrapped)
-}
-
-// Decode decodes SongsPutOKApplicationJSON from json.
-func (s *SongsPutOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode SongsPutOKApplicationJSON to nil")
-	}
-	var unwrapped string
-	if err := func() error {
-		v, err := d.Str()
-		unwrapped = string(v)
-		if err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = SongsPutOKApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s SongsPutOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SongsPutOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *SongsPutReq) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *SongsPutReq) encodeFields(e *jx.Encoder) {
-	{
-		if s.CronType.Set {
-			e.FieldStart("cronType")
-			s.CronType.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfSongsPutReq = [1]string{
-	0: "cronType",
-}
-
-// Decode decodes SongsPutReq from json.
-func (s *SongsPutReq) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode SongsPutReq to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "cronType":
-			if err := func() error {
-				s.CronType.Reset()
-				if err := s.CronType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"cronType\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode SongsPutReq")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *SongsPutReq) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SongsPutReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes SongsPutReqCronType as json.
-func (s SongsPutReqCronType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes SongsPutReqCronType from json.
-func (s *SongsPutReqCronType) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode SongsPutReqCronType to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch SongsPutReqCronType(v) {
-	case SongsPutReqCronTypeDaily:
-		*s = SongsPutReqCronTypeDaily
-	case SongsPutReqCronTypeWeekly:
-		*s = SongsPutReqCronTypeWeekly
-	case SongsPutReqCronTypeMonthly:
-		*s = SongsPutReqCronTypeMonthly
-	default:
-		*s = SongsPutReqCronType(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s SongsPutReqCronType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *SongsPutReqCronType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

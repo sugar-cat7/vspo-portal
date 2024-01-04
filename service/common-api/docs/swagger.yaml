@@ -115,13 +115,19 @@ paths:
         "500":
           description: Internal Server Error
       x-codegen-request-body-name: channelIds
-  /clips:
+  /channels/{channel_id}/clips:
     get:
       tags:
         - Clips
-      summary: Get all clips
-      description: Retrieve all clips
+      summary: Get all clips for a specific channel
+      description: Retrieve all clips related to a specific channel
       parameters:
+      - name: channel_id
+        in: path
+        required: true
+        description: Unique identifier of the channel
+        schema:
+          type: string
       - name: start_date
         in: query
         description: Start Date
@@ -150,13 +156,22 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
+
     put:
       tags:
         - Clips
-      summary: Update clips from YouTube
-      description: Update clips based on provided cronType
+      summary: Update clips for a specific channel
+      description: Update clips related to a specific channel based on provided cronType
+      parameters:
+      - name: channel_id
+        in: path
+        required: true
+        description: Unique identifier of the channel
+        schema:
+          type: string
       requestBody:
         description: Type of the cron
+        required: true
         content:
           application/json:
             schema:
@@ -168,7 +183,6 @@ paths:
                     - daily
                     - weekly
                     - monthly
-        required: true
       responses:
         "200":
           description: Clips updated successfully
@@ -186,13 +200,20 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-      x-codegen-request-body-name: cronType
-  /songs:
+
+  /channels/{channel_id}/songs:
     get:
       tags:
         - Songs
-      summary: Get all songs
-      description: Retrieve all songs
+      summary: Get all songs for a specific channel
+      description: Retrieve all songs related to a specific channel
+      parameters:
+      - name: channel_id
+        in: path
+        required: true
+        description: Unique identifier of the channel
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -210,13 +231,22 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
+
     put:
       tags:
         - Songs
-      summary: Update songs from Youtube
-      description: Update songs based on provided cronType
+      summary: Update songs for a specific channel
+      description: Update songs related to a specific channel based on provided cronType
+      parameters:
+      - name: channel_id
+        in: path
+        required: true
+        description: Unique identifier of the channel
+        schema:
+          type: string
       requestBody:
         description: Type of the cron
+        required: true
         content:
           application/json:
             schema:
@@ -228,7 +258,6 @@ paths:
                     - daily
                     - weekly
                     - monthly
-        required: true
       responses:
         "200":
           description: Songs updated successfully
@@ -246,14 +275,22 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-      x-codegen-request-body-name: cronType
+
     post:
       tags:
         - Songs
-      summary: Create Song from Youtube
-      description: Updates songs by fetching from Youtube using provided Video IDs.
+      summary: Create Song for a specific channel
+      description: Creates songs related to a specific channel by fetching from Youtube using provided Video IDs.
+      parameters:
+      - name: channel_id
+        in: path
+        required: true
+        description: Unique identifier of the channel
+        schema:
+          type: string
       requestBody:
         description: Array of Video IDs
+        required: true
         content:
           application/json:
             schema:
@@ -266,7 +303,6 @@ paths:
                   description: Array of Song IDs.
               example:
                 ids: ["UCiMG6VdScBabPhJ1ZtaVmbw", "UC0g1AE0DOjBYnLhkgoRWN1w"]
-        required: true
       responses:
         "200":
           description: Songs updated successfully
@@ -284,7 +320,6 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-      x-codegen-request-body-name: videoIds
 components:
   securitySchemes:
     ApiKeyAuth:

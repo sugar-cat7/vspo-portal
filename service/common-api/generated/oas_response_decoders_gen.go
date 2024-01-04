@@ -14,6 +14,286 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+func decodeChannelsChannelIDClipsGetResponse(resp *http.Response) (res ChannelsChannelIDClipsGetRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response VideosResponse
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 400:
+		// Code 400.
+		return &ChannelsChannelIDClipsGetBadRequest{}, nil
+	case 401:
+		// Code 401.
+		return &ChannelsChannelIDClipsGetUnauthorized{}, nil
+	case 403:
+		// Code 403.
+		return &ChannelsChannelIDClipsGetForbidden{}, nil
+	case 404:
+		// Code 404.
+		return &ChannelsChannelIDClipsGetNotFound{}, nil
+	case 500:
+		// Code 500.
+		return &ChannelsChannelIDClipsGetInternalServerError{}, nil
+	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+}
+
+func decodeChannelsChannelIDClipsPutResponse(resp *http.Response) (res ChannelsChannelIDClipsPutRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ChannelsChannelIDClipsPutOKApplicationJSON
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 400:
+		// Code 400.
+		return &ChannelsChannelIDClipsPutBadRequest{}, nil
+	case 401:
+		// Code 401.
+		return &ChannelsChannelIDClipsPutUnauthorized{}, nil
+	case 403:
+		// Code 403.
+		return &ChannelsChannelIDClipsPutForbidden{}, nil
+	case 404:
+		// Code 404.
+		return &ChannelsChannelIDClipsPutNotFound{}, nil
+	case 500:
+		// Code 500.
+		return &ChannelsChannelIDClipsPutInternalServerError{}, nil
+	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+}
+
+func decodeChannelsChannelIDSongsGetResponse(resp *http.Response) (res ChannelsChannelIDSongsGetRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response VideosResponse
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 400:
+		// Code 400.
+		return &ChannelsChannelIDSongsGetBadRequest{}, nil
+	case 401:
+		// Code 401.
+		return &ChannelsChannelIDSongsGetUnauthorized{}, nil
+	case 403:
+		// Code 403.
+		return &ChannelsChannelIDSongsGetForbidden{}, nil
+	case 404:
+		// Code 404.
+		return &ChannelsChannelIDSongsGetNotFound{}, nil
+	case 500:
+		// Code 500.
+		return &ChannelsChannelIDSongsGetInternalServerError{}, nil
+	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+}
+
+func decodeChannelsChannelIDSongsPostResponse(resp *http.Response) (res ChannelsChannelIDSongsPostRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ChannelsChannelIDSongsPostOKApplicationJSON
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 400:
+		// Code 400.
+		return &ChannelsChannelIDSongsPostBadRequest{}, nil
+	case 401:
+		// Code 401.
+		return &ChannelsChannelIDSongsPostUnauthorized{}, nil
+	case 403:
+		// Code 403.
+		return &ChannelsChannelIDSongsPostForbidden{}, nil
+	case 404:
+		// Code 404.
+		return &ChannelsChannelIDSongsPostNotFound{}, nil
+	case 500:
+		// Code 500.
+		return &ChannelsChannelIDSongsPostInternalServerError{}, nil
+	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+}
+
+func decodeChannelsChannelIDSongsPutResponse(resp *http.Response) (res ChannelsChannelIDSongsPutRes, _ error) {
+	switch resp.StatusCode {
+	case 200:
+		// Code 200.
+		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if err != nil {
+			return res, errors.Wrap(err, "parse media type")
+		}
+		switch {
+		case ct == "application/json":
+			buf, err := io.ReadAll(resp.Body)
+			if err != nil {
+				return res, err
+			}
+			d := jx.DecodeBytes(buf)
+
+			var response ChannelsChannelIDSongsPutOKApplicationJSON
+			if err := func() error {
+				if err := response.Decode(d); err != nil {
+					return err
+				}
+				if err := d.Skip(); err != io.EOF {
+					return errors.New("unexpected trailing data")
+				}
+				return nil
+			}(); err != nil {
+				err = &ogenerrors.DecodeBodyError{
+					ContentType: ct,
+					Body:        buf,
+					Err:         err,
+				}
+				return res, err
+			}
+			return &response, nil
+		default:
+			return res, validate.InvalidContentType(ct)
+		}
+	case 400:
+		// Code 400.
+		return &ChannelsChannelIDSongsPutBadRequest{}, nil
+	case 401:
+		// Code 401.
+		return &ChannelsChannelIDSongsPutUnauthorized{}, nil
+	case 403:
+		// Code 403.
+		return &ChannelsChannelIDSongsPutForbidden{}, nil
+	case 404:
+		// Code 404.
+		return &ChannelsChannelIDSongsPutNotFound{}, nil
+	case 500:
+		// Code 500.
+		return &ChannelsChannelIDSongsPutInternalServerError{}, nil
+	}
+	return res, validate.UnexpectedStatusCode(resp.StatusCode)
+}
+
 func decodeChannelsGetResponse(resp *http.Response) (res ChannelsGetRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
@@ -178,286 +458,6 @@ func decodeChannelsPutResponse(resp *http.Response) (res ChannelsPutRes, _ error
 	case 500:
 		// Code 500.
 		return &ChannelsPutInternalServerError{}, nil
-	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
-}
-
-func decodeClipsGetResponse(resp *http.Response) (res ClipsGetRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response VideosResponse
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 400:
-		// Code 400.
-		return &ClipsGetBadRequest{}, nil
-	case 401:
-		// Code 401.
-		return &ClipsGetUnauthorized{}, nil
-	case 403:
-		// Code 403.
-		return &ClipsGetForbidden{}, nil
-	case 404:
-		// Code 404.
-		return &ClipsGetNotFound{}, nil
-	case 500:
-		// Code 500.
-		return &ClipsGetInternalServerError{}, nil
-	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
-}
-
-func decodeClipsPutResponse(resp *http.Response) (res ClipsPutRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response ClipsPutOKApplicationJSON
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 400:
-		// Code 400.
-		return &ClipsPutBadRequest{}, nil
-	case 401:
-		// Code 401.
-		return &ClipsPutUnauthorized{}, nil
-	case 403:
-		// Code 403.
-		return &ClipsPutForbidden{}, nil
-	case 404:
-		// Code 404.
-		return &ClipsPutNotFound{}, nil
-	case 500:
-		// Code 500.
-		return &ClipsPutInternalServerError{}, nil
-	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
-}
-
-func decodeSongsGetResponse(resp *http.Response) (res SongsGetRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response VideosResponse
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 400:
-		// Code 400.
-		return &SongsGetBadRequest{}, nil
-	case 401:
-		// Code 401.
-		return &SongsGetUnauthorized{}, nil
-	case 403:
-		// Code 403.
-		return &SongsGetForbidden{}, nil
-	case 404:
-		// Code 404.
-		return &SongsGetNotFound{}, nil
-	case 500:
-		// Code 500.
-		return &SongsGetInternalServerError{}, nil
-	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
-}
-
-func decodeSongsPostResponse(resp *http.Response) (res SongsPostRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response SongsPostOKApplicationJSON
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 400:
-		// Code 400.
-		return &SongsPostBadRequest{}, nil
-	case 401:
-		// Code 401.
-		return &SongsPostUnauthorized{}, nil
-	case 403:
-		// Code 403.
-		return &SongsPostForbidden{}, nil
-	case 404:
-		// Code 404.
-		return &SongsPostNotFound{}, nil
-	case 500:
-		// Code 500.
-		return &SongsPostInternalServerError{}, nil
-	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
-}
-
-func decodeSongsPutResponse(resp *http.Response) (res SongsPutRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response SongsPutOKApplicationJSON
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 400:
-		// Code 400.
-		return &SongsPutBadRequest{}, nil
-	case 401:
-		// Code 401.
-		return &SongsPutUnauthorized{}, nil
-	case 403:
-		// Code 403.
-		return &SongsPutForbidden{}, nil
-	case 404:
-		// Code 404.
-		return &SongsPutNotFound{}, nil
-	case 500:
-		// Code 500.
-		return &SongsPutInternalServerError{}, nil
 	}
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
