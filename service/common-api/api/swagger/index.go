@@ -3,16 +3,17 @@ package main
 import (
 	"net/http"
 
-	"github.com/swaggest/swgui/v5emb"
+	"github.com/go-openapi/runtime/middleware"
 )
 
-// Handler is the entry point for the serverless function
+// Handler SwaggerUI
 func Handler(w http.ResponseWriter, r *http.Request) {
-	http.Handle("/api1/docs/", v5emb.New(
-		"Vspo Portal API",
-		"https://petstore3.swagger.io/api/v3/openapi.json",
-		"/api/docs/",
-	))
+	swaggerJSONURL := "https://raw.githubusercontent.com/sugar-cat7/vspo-portal/main/service/common-api/docs/swagger.json"
 
-	http.ListenAndServe(":3000", nil)
+	opts := middleware.SwaggerUIOpts{
+		SpecURL: swaggerJSONURL,
+		Path:    "/api/swagger",
+	}
+
+	middleware.SwaggerUI(opts, nil).ServeHTTP(w, r)
 }
