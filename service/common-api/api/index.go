@@ -9,7 +9,7 @@ import (
 
 // Handler is the entry point for the serverless function
 func Handler(w http.ResponseWriter, r *http.Request) {
-	s, err := api.NewServer(handler.NewHandler(), handler.NewSecurityHandler())
+	s, err := api.NewServer(handler.NewRootHandler(), handler.NewSecurityHandler())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

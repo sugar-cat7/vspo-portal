@@ -11,7 +11,7 @@ import (
 
 // debug
 func main() {
-	s, err := api.NewServer(handler.NewHandler(), handler.NewSecurityHandler())
+	s, err := api.NewServer(handler.NewRootHandler(), handler.NewSecurityHandler())
 	if err != nil {
 		fmt.Println(err)
 		return

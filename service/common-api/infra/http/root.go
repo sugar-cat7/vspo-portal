@@ -15,7 +15,7 @@ type RootHandler struct {
 	video.VH
 }
 
-// NewHandler returns a new Handler.
-func NewHandler() *RootHandler {
+// NewRootHandler returns a new Handler.
+func NewRootHandler() *RootHandler {
 	return &RootHandler{}
 }
