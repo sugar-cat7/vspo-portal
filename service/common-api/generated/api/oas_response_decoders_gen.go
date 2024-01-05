@@ -86,7 +86,7 @@ func decodeChannelsChannelIDVideosPostResponse(resp *http.Response) (res Channel
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsChannelIDVideosPostOKApplicationJSON
+			var response VideosResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -142,7 +142,7 @@ func decodeChannelsChannelIDVideosPutResponse(resp *http.Response) (res Channels
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsChannelIDVideosPutOKApplicationJSON
+			var response VideosResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -254,7 +254,7 @@ func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsPostOKApplicationJSON
+			var response ChannelsResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -310,7 +310,7 @@ func decodeChannelsPutResponse(resp *http.Response) (res ChannelsPutRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsPutOKApplicationJSON
+			var response ChannelsResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

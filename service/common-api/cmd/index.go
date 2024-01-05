@@ -1,20 +1,22 @@
-package api
+package main
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 
 	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/api"
 	handler "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http"
 )
 
-// Handler is the entry point for the serverless function
-func Handler(w http.ResponseWriter, r *http.Request) {
+// debug
+func main() {
 	s, err := api.NewServer(handler.NewHandler(), handler.NewSecurityHandler())
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println(err)
 		return
 	}
-	// prefix /api remove
-	r.URL.Path = r.URL.Path[4:]
-	s.ServeHTTP(w, r)
+	if err := http.ListenAndServe(":8080", s); err != nil {
+		log.Fatalln(err)
+	}
 }

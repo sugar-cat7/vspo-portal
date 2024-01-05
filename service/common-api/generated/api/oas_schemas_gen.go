@@ -205,10 +205,6 @@ type ChannelsChannelIDVideosPostNotFound struct{}
 
 func (*ChannelsChannelIDVideosPostNotFound) channelsChannelIDVideosPostRes() {}
 
-type ChannelsChannelIDVideosPostOKApplicationJSON string
-
-func (*ChannelsChannelIDVideosPostOKApplicationJSON) channelsChannelIDVideosPostRes() {}
-
 type ChannelsChannelIDVideosPostReq struct {
 	// Array of YouTube Video IDs.
 	Ids []string `json:"ids"`
@@ -248,10 +244,6 @@ func (*ChannelsChannelIDVideosPutInternalServerError) channelsChannelIDVideosPut
 type ChannelsChannelIDVideosPutNotFound struct{}
 
 func (*ChannelsChannelIDVideosPutNotFound) channelsChannelIDVideosPutRes() {}
-
-type ChannelsChannelIDVideosPutOKApplicationJSON string
-
-func (*ChannelsChannelIDVideosPutOKApplicationJSON) channelsChannelIDVideosPutRes() {}
 
 type ChannelsChannelIDVideosPutReq struct {
 	// Array of YouTube Video IDs.
@@ -318,10 +310,6 @@ type ChannelsPostNotFound struct{}
 
 func (*ChannelsPostNotFound) channelsPostRes() {}
 
-type ChannelsPostOKApplicationJSON string
-
-func (*ChannelsPostOKApplicationJSON) channelsPostRes() {}
-
 type ChannelsPostReq struct {
 	// Array of YouTube channel IDs.
 	Ids []string `json:"ids"`
@@ -362,10 +350,6 @@ type ChannelsPutNotFound struct{}
 
 func (*ChannelsPutNotFound) channelsPutRes() {}
 
-type ChannelsPutOKApplicationJSON string
-
-func (*ChannelsPutOKApplicationJSON) channelsPutRes() {}
-
 type ChannelsPutReq struct {
 	// Array of YouTube channel IDs.
 	Ids []string `json:"ids"`
@@ -401,7 +385,9 @@ func (s *ChannelsResponse) SetChannels(val []ChannelResponse) {
 	s.Channels = val
 }
 
-func (*ChannelsResponse) channelsGetRes() {}
+func (*ChannelsResponse) channelsGetRes()  {}
+func (*ChannelsResponse) channelsPostRes() {}
+func (*ChannelsResponse) channelsPutRes()  {}
 
 // NewOptBool returns new OptBool with value set to v.
 func NewOptBool(v bool) OptBool {
@@ -928,4 +914,6 @@ func (s *VideosResponse) SetVideos(val []VideoResponse) {
 	s.Videos = val
 }
 
-func (*VideosResponse) channelsChannelIDVideosGetRes() {}
+func (*VideosResponse) channelsChannelIDVideosGetRes()  {}
+func (*VideosResponse) channelsChannelIDVideosPostRes() {}
+func (*VideosResponse) channelsChannelIDVideosPutRes()  {}

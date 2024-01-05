@@ -61,11 +61,11 @@ paths:
         required: true
       responses:
         "200":
-          description: Channels updated successfully
+          description: OK
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ChannelsResponse'
         "400":
           description: Bad Request
         "401":
@@ -99,11 +99,11 @@ paths:
         required: true
       responses:
         "200":
-          description: Channels created successfully
+          description: OK
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/ChannelsResponse'
         "400":
           description: Bad Request
         "401":
@@ -190,11 +190,11 @@ paths:
                   description: Array of YouTube Video IDs.
       responses:
         "200":
-          description: Videos updated successfully
+          description: OK
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/VideosResponse'
         "400":
           description: Bad Request
         "401":
@@ -232,11 +232,11 @@ paths:
                   description: Array of YouTube Video IDs.
       responses:
         "200":
-          description: Videos updated successfully
+          description: OK
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/VideosResponse'
         "400":
           description: Bad Request
         "401":

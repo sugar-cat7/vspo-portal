@@ -63,7 +63,7 @@ func encodeChannelsChannelIDVideosGetResponse(response ChannelsChannelIDVideosGe
 
 func encodeChannelsChannelIDVideosPostResponse(response ChannelsChannelIDVideosPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ChannelsChannelIDVideosPostOKApplicationJSON:
+	case *VideosResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -113,7 +113,7 @@ func encodeChannelsChannelIDVideosPostResponse(response ChannelsChannelIDVideosP
 
 func encodeChannelsChannelIDVideosPutResponse(response ChannelsChannelIDVideosPutRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ChannelsChannelIDVideosPutOKApplicationJSON:
+	case *VideosResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -213,7 +213,7 @@ func encodeChannelsGetResponse(response ChannelsGetRes, w http.ResponseWriter, s
 
 func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ChannelsPostOKApplicationJSON:
+	case *ChannelsResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -263,7 +263,7 @@ func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter,
 
 func encodeChannelsPutResponse(response ChannelsPutRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ChannelsPutOKApplicationJSON:
+	case *ChannelsResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
