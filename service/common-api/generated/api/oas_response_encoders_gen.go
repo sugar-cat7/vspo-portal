@@ -13,7 +13,7 @@ import (
 
 func encodeChannelsChannelIDVideosGetResponse(response ChannelsChannelIDVideosGetRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *VideosResponse:
+	case *ChannelsChannelIDVideosGetOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -163,7 +163,7 @@ func encodeChannelsChannelIDVideosPutResponse(response ChannelsChannelIDVideosPu
 
 func encodeChannelsGetResponse(response ChannelsGetRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ChannelsResponse:
+	case *ChannelsGetOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))

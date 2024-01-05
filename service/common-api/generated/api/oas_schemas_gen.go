@@ -2,6 +2,10 @@
 
 package api
 
+import (
+	"time"
+)
+
 type ApiKeyAuth struct {
 	APIKey string
 }
@@ -55,109 +59,98 @@ func (s *ChannelResponse) SetStatistics(val OptChannelStatisticsResponse) {
 
 // Ref: #/components/schemas/ChannelSnippetResponse
 type ChannelSnippetResponse struct {
-	CustomUrl   OptString             `json:"customUrl"`
-	Description OptString             `json:"description"`
-	PublishedAt OptString             `json:"publishedAt"`
-	Thumbnails  OptThumbnailsResponse `json:"thumbnails"`
-	Title       OptString             `json:"title"`
+	Youtube     OptPlatformSnippet `json:"Youtube"`
+	Twitch      OptPlatformSnippet `json:"Twitch"`
+	TwitCasting OptPlatformSnippet `json:"TwitCasting"`
+	Niconico    OptPlatformSnippet `json:"Niconico"`
 }
 
-// GetCustomUrl returns the value of CustomUrl.
-func (s *ChannelSnippetResponse) GetCustomUrl() OptString {
-	return s.CustomUrl
+// GetYoutube returns the value of Youtube.
+func (s *ChannelSnippetResponse) GetYoutube() OptPlatformSnippet {
+	return s.Youtube
 }
 
-// GetDescription returns the value of Description.
-func (s *ChannelSnippetResponse) GetDescription() OptString {
-	return s.Description
+// GetTwitch returns the value of Twitch.
+func (s *ChannelSnippetResponse) GetTwitch() OptPlatformSnippet {
+	return s.Twitch
 }
 
-// GetPublishedAt returns the value of PublishedAt.
-func (s *ChannelSnippetResponse) GetPublishedAt() OptString {
-	return s.PublishedAt
+// GetTwitCasting returns the value of TwitCasting.
+func (s *ChannelSnippetResponse) GetTwitCasting() OptPlatformSnippet {
+	return s.TwitCasting
 }
 
-// GetThumbnails returns the value of Thumbnails.
-func (s *ChannelSnippetResponse) GetThumbnails() OptThumbnailsResponse {
-	return s.Thumbnails
+// GetNiconico returns the value of Niconico.
+func (s *ChannelSnippetResponse) GetNiconico() OptPlatformSnippet {
+	return s.Niconico
 }
 
-// GetTitle returns the value of Title.
-func (s *ChannelSnippetResponse) GetTitle() OptString {
-	return s.Title
+// SetYoutube sets the value of Youtube.
+func (s *ChannelSnippetResponse) SetYoutube(val OptPlatformSnippet) {
+	s.Youtube = val
 }
 
-// SetCustomUrl sets the value of CustomUrl.
-func (s *ChannelSnippetResponse) SetCustomUrl(val OptString) {
-	s.CustomUrl = val
+// SetTwitch sets the value of Twitch.
+func (s *ChannelSnippetResponse) SetTwitch(val OptPlatformSnippet) {
+	s.Twitch = val
 }
 
-// SetDescription sets the value of Description.
-func (s *ChannelSnippetResponse) SetDescription(val OptString) {
-	s.Description = val
+// SetTwitCasting sets the value of TwitCasting.
+func (s *ChannelSnippetResponse) SetTwitCasting(val OptPlatformSnippet) {
+	s.TwitCasting = val
 }
 
-// SetPublishedAt sets the value of PublishedAt.
-func (s *ChannelSnippetResponse) SetPublishedAt(val OptString) {
-	s.PublishedAt = val
-}
-
-// SetThumbnails sets the value of Thumbnails.
-func (s *ChannelSnippetResponse) SetThumbnails(val OptThumbnailsResponse) {
-	s.Thumbnails = val
-}
-
-// SetTitle sets the value of Title.
-func (s *ChannelSnippetResponse) SetTitle(val OptString) {
-	s.Title = val
+// SetNiconico sets the value of Niconico.
+func (s *ChannelSnippetResponse) SetNiconico(val OptPlatformSnippet) {
+	s.Niconico = val
 }
 
 // Ref: #/components/schemas/ChannelStatisticsResponse
 type ChannelStatisticsResponse struct {
-	HiddenSubscriberCount OptBool   `json:"hiddenSubscriberCount"`
-	SubscriberCount       OptString `json:"subscriberCount"`
-	VideoCount            OptString `json:"videoCount"`
-	ViewCount             OptString `json:"viewCount"`
+	Youtube     OptPlatformStatistics `json:"Youtube"`
+	Twitch      OptPlatformStatistics `json:"Twitch"`
+	TwitCasting OptPlatformStatistics `json:"TwitCasting"`
+	Niconico    OptPlatformStatistics `json:"Niconico"`
 }
 
-// GetHiddenSubscriberCount returns the value of HiddenSubscriberCount.
-func (s *ChannelStatisticsResponse) GetHiddenSubscriberCount() OptBool {
-	return s.HiddenSubscriberCount
+// GetYoutube returns the value of Youtube.
+func (s *ChannelStatisticsResponse) GetYoutube() OptPlatformStatistics {
+	return s.Youtube
 }
 
-// GetSubscriberCount returns the value of SubscriberCount.
-func (s *ChannelStatisticsResponse) GetSubscriberCount() OptString {
-	return s.SubscriberCount
+// GetTwitch returns the value of Twitch.
+func (s *ChannelStatisticsResponse) GetTwitch() OptPlatformStatistics {
+	return s.Twitch
 }
 
-// GetVideoCount returns the value of VideoCount.
-func (s *ChannelStatisticsResponse) GetVideoCount() OptString {
-	return s.VideoCount
+// GetTwitCasting returns the value of TwitCasting.
+func (s *ChannelStatisticsResponse) GetTwitCasting() OptPlatformStatistics {
+	return s.TwitCasting
 }
 
-// GetViewCount returns the value of ViewCount.
-func (s *ChannelStatisticsResponse) GetViewCount() OptString {
-	return s.ViewCount
+// GetNiconico returns the value of Niconico.
+func (s *ChannelStatisticsResponse) GetNiconico() OptPlatformStatistics {
+	return s.Niconico
 }
 
-// SetHiddenSubscriberCount sets the value of HiddenSubscriberCount.
-func (s *ChannelStatisticsResponse) SetHiddenSubscriberCount(val OptBool) {
-	s.HiddenSubscriberCount = val
+// SetYoutube sets the value of Youtube.
+func (s *ChannelStatisticsResponse) SetYoutube(val OptPlatformStatistics) {
+	s.Youtube = val
 }
 
-// SetSubscriberCount sets the value of SubscriberCount.
-func (s *ChannelStatisticsResponse) SetSubscriberCount(val OptString) {
-	s.SubscriberCount = val
+// SetTwitch sets the value of Twitch.
+func (s *ChannelStatisticsResponse) SetTwitch(val OptPlatformStatistics) {
+	s.Twitch = val
 }
 
-// SetVideoCount sets the value of VideoCount.
-func (s *ChannelStatisticsResponse) SetVideoCount(val OptString) {
-	s.VideoCount = val
+// SetTwitCasting sets the value of TwitCasting.
+func (s *ChannelStatisticsResponse) SetTwitCasting(val OptPlatformStatistics) {
+	s.TwitCasting = val
 }
 
-// SetViewCount sets the value of ViewCount.
-func (s *ChannelStatisticsResponse) SetViewCount(val OptString) {
-	s.ViewCount = val
+// SetNiconico sets the value of Niconico.
+func (s *ChannelStatisticsResponse) SetNiconico(val OptPlatformStatistics) {
+	s.Niconico = val
 }
 
 // ChannelsChannelIDVideosGetBadRequest is response for ChannelsChannelIDVideosGet operation.
@@ -179,6 +172,33 @@ func (*ChannelsChannelIDVideosGetInternalServerError) channelsChannelIDVideosGet
 type ChannelsChannelIDVideosGetNotFound struct{}
 
 func (*ChannelsChannelIDVideosGetNotFound) channelsChannelIDVideosGetRes() {}
+
+type ChannelsChannelIDVideosGetOK struct {
+	Data       OptVideosResponse `json:"data"`
+	Pagination OptPagination     `json:"pagination"`
+}
+
+// GetData returns the value of Data.
+func (s *ChannelsChannelIDVideosGetOK) GetData() OptVideosResponse {
+	return s.Data
+}
+
+// GetPagination returns the value of Pagination.
+func (s *ChannelsChannelIDVideosGetOK) GetPagination() OptPagination {
+	return s.Pagination
+}
+
+// SetData sets the value of Data.
+func (s *ChannelsChannelIDVideosGetOK) SetData(val OptVideosResponse) {
+	s.Data = val
+}
+
+// SetPagination sets the value of Pagination.
+func (s *ChannelsChannelIDVideosGetOK) SetPagination(val OptPagination) {
+	s.Pagination = val
+}
+
+func (*ChannelsChannelIDVideosGetOK) channelsChannelIDVideosGetRes() {}
 
 // ChannelsChannelIDVideosGetUnauthorized is response for ChannelsChannelIDVideosGet operation.
 type ChannelsChannelIDVideosGetUnauthorized struct{}
@@ -285,6 +305,33 @@ type ChannelsGetNotFound struct{}
 
 func (*ChannelsGetNotFound) channelsGetRes() {}
 
+type ChannelsGetOK struct {
+	Data       OptChannelsResponse `json:"data"`
+	Pagination OptPagination       `json:"pagination"`
+}
+
+// GetData returns the value of Data.
+func (s *ChannelsGetOK) GetData() OptChannelsResponse {
+	return s.Data
+}
+
+// GetPagination returns the value of Pagination.
+func (s *ChannelsGetOK) GetPagination() OptPagination {
+	return s.Pagination
+}
+
+// SetData sets the value of Data.
+func (s *ChannelsGetOK) SetData(val OptChannelsResponse) {
+	s.Data = val
+}
+
+// SetPagination sets the value of Pagination.
+func (s *ChannelsGetOK) SetPagination(val OptPagination) {
+	s.Pagination = val
+}
+
+func (*ChannelsGetOK) channelsGetRes() {}
+
 // ChannelsGetUnauthorized is response for ChannelsGet operation.
 type ChannelsGetUnauthorized struct{}
 
@@ -385,7 +432,6 @@ func (s *ChannelsResponse) SetChannels(val []ChannelResponse) {
 	s.Channels = val
 }
 
-func (*ChannelsResponse) channelsGetRes()  {}
 func (*ChannelsResponse) channelsPostRes() {}
 func (*ChannelsResponse) channelsPutRes()  {}
 
@@ -527,6 +573,98 @@ func (o OptChannelStatisticsResponse) Or(d ChannelStatisticsResponse) ChannelSta
 	return d
 }
 
+// NewOptChannelsResponse returns new OptChannelsResponse with value set to v.
+func NewOptChannelsResponse(v ChannelsResponse) OptChannelsResponse {
+	return OptChannelsResponse{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptChannelsResponse is optional ChannelsResponse.
+type OptChannelsResponse struct {
+	Value ChannelsResponse
+	Set   bool
+}
+
+// IsSet returns true if OptChannelsResponse was set.
+func (o OptChannelsResponse) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptChannelsResponse) Reset() {
+	var v ChannelsResponse
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptChannelsResponse) SetTo(v ChannelsResponse) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptChannelsResponse) Get() (v ChannelsResponse, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptChannelsResponse) Or(d ChannelsResponse) ChannelsResponse {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptDateTime returns new OptDateTime with value set to v.
+func NewOptDateTime(v time.Time) OptDateTime {
+	return OptDateTime{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDateTime is optional time.Time.
+type OptDateTime struct {
+	Value time.Time
+	Set   bool
+}
+
+// IsSet returns true if OptDateTime was set.
+func (o OptDateTime) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDateTime) Reset() {
+	var v time.Time
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDateTime) SetTo(v time.Time) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDateTime) Get() (v time.Time, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDateTime) Or(d time.Time) time.Time {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptInt returns new OptInt with value set to v.
 func NewOptInt(v int) OptInt {
 	return OptInt{
@@ -567,6 +705,190 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptInt64 returns new OptInt64 with value set to v.
+func NewOptInt64(v int64) OptInt64 {
+	return OptInt64{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt64 is optional int64.
+type OptInt64 struct {
+	Value int64
+	Set   bool
+}
+
+// IsSet returns true if OptInt64 was set.
+func (o OptInt64) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt64) Reset() {
+	var v int64
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt64) SetTo(v int64) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt64) Get() (v int64, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt64) Or(d int64) int64 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptPagination returns new OptPagination with value set to v.
+func NewOptPagination(v Pagination) OptPagination {
+	return OptPagination{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPagination is optional Pagination.
+type OptPagination struct {
+	Value Pagination
+	Set   bool
+}
+
+// IsSet returns true if OptPagination was set.
+func (o OptPagination) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPagination) Reset() {
+	var v Pagination
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPagination) SetTo(v Pagination) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPagination) Get() (v Pagination, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPagination) Or(d Pagination) Pagination {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptPlatformSnippet returns new OptPlatformSnippet with value set to v.
+func NewOptPlatformSnippet(v PlatformSnippet) OptPlatformSnippet {
+	return OptPlatformSnippet{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPlatformSnippet is optional PlatformSnippet.
+type OptPlatformSnippet struct {
+	Value PlatformSnippet
+	Set   bool
+}
+
+// IsSet returns true if OptPlatformSnippet was set.
+func (o OptPlatformSnippet) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPlatformSnippet) Reset() {
+	var v PlatformSnippet
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPlatformSnippet) SetTo(v PlatformSnippet) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPlatformSnippet) Get() (v PlatformSnippet, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPlatformSnippet) Or(d PlatformSnippet) PlatformSnippet {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptPlatformStatistics returns new OptPlatformStatistics with value set to v.
+func NewOptPlatformStatistics(v PlatformStatistics) OptPlatformStatistics {
+	return OptPlatformStatistics{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPlatformStatistics is optional PlatformStatistics.
+type OptPlatformStatistics struct {
+	Value PlatformStatistics
+	Set   bool
+}
+
+// IsSet returns true if OptPlatformStatistics was set.
+func (o OptPlatformStatistics) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPlatformStatistics) Reset() {
+	var v PlatformStatistics
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPlatformStatistics) SetTo(v PlatformStatistics) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPlatformStatistics) Get() (v PlatformStatistics, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPlatformStatistics) Or(d PlatformStatistics) PlatformStatistics {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -709,6 +1031,229 @@ func (o OptThumbnailsResponse) Or(d ThumbnailsResponse) ThumbnailsResponse {
 		return v
 	}
 	return d
+}
+
+// NewOptVideosResponse returns new OptVideosResponse with value set to v.
+func NewOptVideosResponse(v VideosResponse) OptVideosResponse {
+	return OptVideosResponse{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptVideosResponse is optional VideosResponse.
+type OptVideosResponse struct {
+	Value VideosResponse
+	Set   bool
+}
+
+// IsSet returns true if OptVideosResponse was set.
+func (o OptVideosResponse) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptVideosResponse) Reset() {
+	var v VideosResponse
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptVideosResponse) SetTo(v VideosResponse) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptVideosResponse) Get() (v VideosResponse, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptVideosResponse) Or(d VideosResponse) VideosResponse {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// Ref: #/components/schemas/Pagination
+type Pagination struct {
+	CurrentPage OptInt64 `json:"CurrentPage"`
+	PrevPage    OptInt64 `json:"PrevPage"`
+	NextPage    OptInt64 `json:"NextPage"`
+	TotalPage   OptInt64 `json:"TotalPage"`
+	TotalCount  OptInt64 `json:"TotalCount"`
+	HasNext     OptBool  `json:"HasNext"`
+}
+
+// GetCurrentPage returns the value of CurrentPage.
+func (s *Pagination) GetCurrentPage() OptInt64 {
+	return s.CurrentPage
+}
+
+// GetPrevPage returns the value of PrevPage.
+func (s *Pagination) GetPrevPage() OptInt64 {
+	return s.PrevPage
+}
+
+// GetNextPage returns the value of NextPage.
+func (s *Pagination) GetNextPage() OptInt64 {
+	return s.NextPage
+}
+
+// GetTotalPage returns the value of TotalPage.
+func (s *Pagination) GetTotalPage() OptInt64 {
+	return s.TotalPage
+}
+
+// GetTotalCount returns the value of TotalCount.
+func (s *Pagination) GetTotalCount() OptInt64 {
+	return s.TotalCount
+}
+
+// GetHasNext returns the value of HasNext.
+func (s *Pagination) GetHasNext() OptBool {
+	return s.HasNext
+}
+
+// SetCurrentPage sets the value of CurrentPage.
+func (s *Pagination) SetCurrentPage(val OptInt64) {
+	s.CurrentPage = val
+}
+
+// SetPrevPage sets the value of PrevPage.
+func (s *Pagination) SetPrevPage(val OptInt64) {
+	s.PrevPage = val
+}
+
+// SetNextPage sets the value of NextPage.
+func (s *Pagination) SetNextPage(val OptInt64) {
+	s.NextPage = val
+}
+
+// SetTotalPage sets the value of TotalPage.
+func (s *Pagination) SetTotalPage(val OptInt64) {
+	s.TotalPage = val
+}
+
+// SetTotalCount sets the value of TotalCount.
+func (s *Pagination) SetTotalCount(val OptInt64) {
+	s.TotalCount = val
+}
+
+// SetHasNext sets the value of HasNext.
+func (s *Pagination) SetHasNext(val OptBool) {
+	s.HasNext = val
+}
+
+// Ref: #/components/schemas/PlatformSnippet
+type PlatformSnippet struct {
+	Title       OptString             `json:"Title"`
+	Description OptString             `json:"Description"`
+	CustomURL   OptString             `json:"CustomURL"`
+	PublishedAt OptDateTime           `json:"PublishedAt"`
+	Thumbnails  OptThumbnailsResponse `json:"Thumbnails"`
+}
+
+// GetTitle returns the value of Title.
+func (s *PlatformSnippet) GetTitle() OptString {
+	return s.Title
+}
+
+// GetDescription returns the value of Description.
+func (s *PlatformSnippet) GetDescription() OptString {
+	return s.Description
+}
+
+// GetCustomURL returns the value of CustomURL.
+func (s *PlatformSnippet) GetCustomURL() OptString {
+	return s.CustomURL
+}
+
+// GetPublishedAt returns the value of PublishedAt.
+func (s *PlatformSnippet) GetPublishedAt() OptDateTime {
+	return s.PublishedAt
+}
+
+// GetThumbnails returns the value of Thumbnails.
+func (s *PlatformSnippet) GetThumbnails() OptThumbnailsResponse {
+	return s.Thumbnails
+}
+
+// SetTitle sets the value of Title.
+func (s *PlatformSnippet) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetDescription sets the value of Description.
+func (s *PlatformSnippet) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetCustomURL sets the value of CustomURL.
+func (s *PlatformSnippet) SetCustomURL(val OptString) {
+	s.CustomURL = val
+}
+
+// SetPublishedAt sets the value of PublishedAt.
+func (s *PlatformSnippet) SetPublishedAt(val OptDateTime) {
+	s.PublishedAt = val
+}
+
+// SetThumbnails sets the value of Thumbnails.
+func (s *PlatformSnippet) SetThumbnails(val OptThumbnailsResponse) {
+	s.Thumbnails = val
+}
+
+// Ref: #/components/schemas/PlatformStatistics
+type PlatformStatistics struct {
+	ViewCount             OptString `json:"ViewCount"`
+	SubscriberCount       OptString `json:"SubscriberCount"`
+	HiddenSubscriberCount OptBool   `json:"HiddenSubscriberCount"`
+	VideoCount            OptString `json:"VideoCount"`
+}
+
+// GetViewCount returns the value of ViewCount.
+func (s *PlatformStatistics) GetViewCount() OptString {
+	return s.ViewCount
+}
+
+// GetSubscriberCount returns the value of SubscriberCount.
+func (s *PlatformStatistics) GetSubscriberCount() OptString {
+	return s.SubscriberCount
+}
+
+// GetHiddenSubscriberCount returns the value of HiddenSubscriberCount.
+func (s *PlatformStatistics) GetHiddenSubscriberCount() OptBool {
+	return s.HiddenSubscriberCount
+}
+
+// GetVideoCount returns the value of VideoCount.
+func (s *PlatformStatistics) GetVideoCount() OptString {
+	return s.VideoCount
+}
+
+// SetViewCount sets the value of ViewCount.
+func (s *PlatformStatistics) SetViewCount(val OptString) {
+	s.ViewCount = val
+}
+
+// SetSubscriberCount sets the value of SubscriberCount.
+func (s *PlatformStatistics) SetSubscriberCount(val OptString) {
+	s.SubscriberCount = val
+}
+
+// SetHiddenSubscriberCount sets the value of HiddenSubscriberCount.
+func (s *PlatformStatistics) SetHiddenSubscriberCount(val OptBool) {
+	s.HiddenSubscriberCount = val
+}
+
+// SetVideoCount sets the value of VideoCount.
+func (s *PlatformStatistics) SetVideoCount(val OptString) {
+	s.VideoCount = val
 }
 
 // Ref: #/components/schemas/ThumbnailResponse
@@ -914,6 +1459,5 @@ func (s *VideosResponse) SetVideos(val []VideoResponse) {
 	s.Videos = val
 }
 
-func (*VideosResponse) channelsChannelIDVideosGetRes()  {}
 func (*VideosResponse) channelsChannelIDVideosPostRes() {}
 func (*VideosResponse) channelsChannelIDVideosPutRes()  {}

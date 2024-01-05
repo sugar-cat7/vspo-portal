@@ -2,6 +2,7 @@ package http
 
 import (
 	oas "github.com/sugar-cat7/vspo-portal/service/common-api/generated/api"
+	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/dependency"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/internal/handler/channel"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/internal/handler/video"
 )
@@ -17,5 +18,9 @@ type RootHandler struct {
 
 // NewRootHandler returns a new Handler.
 func NewRootHandler() *RootHandler {
-	return &RootHandler{}
+	di := dependency.Inject()
+
+	return &RootHandler{
+		CH: channel.NewHandler(di.ChannelInteractor),
+	}
 }

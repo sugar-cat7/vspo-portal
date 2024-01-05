@@ -30,7 +30,7 @@ func decodeChannelsChannelIDVideosGetResponse(resp *http.Response) (res Channels
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response VideosResponse
+			var response ChannelsChannelIDVideosGetOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -198,7 +198,7 @@ func decodeChannelsGetResponse(resp *http.Response) (res ChannelsGetRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsResponse
+			var response ChannelsGetOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

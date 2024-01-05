@@ -3,8 +3,12 @@
 package api
 
 import (
+	"time"
+
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
+
+	"github.com/ogen-go/ogen/json"
 )
 
 // Encode implements json.Marshaler.
@@ -114,43 +118,36 @@ func (s *ChannelSnippetResponse) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *ChannelSnippetResponse) encodeFields(e *jx.Encoder) {
 	{
-		if s.CustomUrl.Set {
-			e.FieldStart("customUrl")
-			s.CustomUrl.Encode(e)
+		if s.Youtube.Set {
+			e.FieldStart("Youtube")
+			s.Youtube.Encode(e)
 		}
 	}
 	{
-		if s.Description.Set {
-			e.FieldStart("description")
-			s.Description.Encode(e)
+		if s.Twitch.Set {
+			e.FieldStart("Twitch")
+			s.Twitch.Encode(e)
 		}
 	}
 	{
-		if s.PublishedAt.Set {
-			e.FieldStart("publishedAt")
-			s.PublishedAt.Encode(e)
+		if s.TwitCasting.Set {
+			e.FieldStart("TwitCasting")
+			s.TwitCasting.Encode(e)
 		}
 	}
 	{
-		if s.Thumbnails.Set {
-			e.FieldStart("thumbnails")
-			s.Thumbnails.Encode(e)
-		}
-	}
-	{
-		if s.Title.Set {
-			e.FieldStart("title")
-			s.Title.Encode(e)
+		if s.Niconico.Set {
+			e.FieldStart("Niconico")
+			s.Niconico.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfChannelSnippetResponse = [5]string{
-	0: "customUrl",
-	1: "description",
-	2: "publishedAt",
-	3: "thumbnails",
-	4: "title",
+var jsonFieldsNameOfChannelSnippetResponse = [4]string{
+	0: "Youtube",
+	1: "Twitch",
+	2: "TwitCasting",
+	3: "Niconico",
 }
 
 // Decode decodes ChannelSnippetResponse from json.
@@ -161,55 +158,45 @@ func (s *ChannelSnippetResponse) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "customUrl":
+		case "Youtube":
 			if err := func() error {
-				s.CustomUrl.Reset()
-				if err := s.CustomUrl.Decode(d); err != nil {
+				s.Youtube.Reset()
+				if err := s.Youtube.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"customUrl\"")
+				return errors.Wrap(err, "decode field \"Youtube\"")
 			}
-		case "description":
+		case "Twitch":
 			if err := func() error {
-				s.Description.Reset()
-				if err := s.Description.Decode(d); err != nil {
+				s.Twitch.Reset()
+				if err := s.Twitch.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"description\"")
+				return errors.Wrap(err, "decode field \"Twitch\"")
 			}
-		case "publishedAt":
+		case "TwitCasting":
 			if err := func() error {
-				s.PublishedAt.Reset()
-				if err := s.PublishedAt.Decode(d); err != nil {
+				s.TwitCasting.Reset()
+				if err := s.TwitCasting.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"publishedAt\"")
+				return errors.Wrap(err, "decode field \"TwitCasting\"")
 			}
-		case "thumbnails":
+		case "Niconico":
 			if err := func() error {
-				s.Thumbnails.Reset()
-				if err := s.Thumbnails.Decode(d); err != nil {
+				s.Niconico.Reset()
+				if err := s.Niconico.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"thumbnails\"")
-			}
-		case "title":
-			if err := func() error {
-				s.Title.Reset()
-				if err := s.Title.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"title\"")
+				return errors.Wrap(err, "decode field \"Niconico\"")
 			}
 		default:
 			return d.Skip()
@@ -245,36 +232,36 @@ func (s *ChannelStatisticsResponse) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *ChannelStatisticsResponse) encodeFields(e *jx.Encoder) {
 	{
-		if s.HiddenSubscriberCount.Set {
-			e.FieldStart("hiddenSubscriberCount")
-			s.HiddenSubscriberCount.Encode(e)
+		if s.Youtube.Set {
+			e.FieldStart("Youtube")
+			s.Youtube.Encode(e)
 		}
 	}
 	{
-		if s.SubscriberCount.Set {
-			e.FieldStart("subscriberCount")
-			s.SubscriberCount.Encode(e)
+		if s.Twitch.Set {
+			e.FieldStart("Twitch")
+			s.Twitch.Encode(e)
 		}
 	}
 	{
-		if s.VideoCount.Set {
-			e.FieldStart("videoCount")
-			s.VideoCount.Encode(e)
+		if s.TwitCasting.Set {
+			e.FieldStart("TwitCasting")
+			s.TwitCasting.Encode(e)
 		}
 	}
 	{
-		if s.ViewCount.Set {
-			e.FieldStart("viewCount")
-			s.ViewCount.Encode(e)
+		if s.Niconico.Set {
+			e.FieldStart("Niconico")
+			s.Niconico.Encode(e)
 		}
 	}
 }
 
 var jsonFieldsNameOfChannelStatisticsResponse = [4]string{
-	0: "hiddenSubscriberCount",
-	1: "subscriberCount",
-	2: "videoCount",
-	3: "viewCount",
+	0: "Youtube",
+	1: "Twitch",
+	2: "TwitCasting",
+	3: "Niconico",
 }
 
 // Decode decodes ChannelStatisticsResponse from json.
@@ -285,45 +272,45 @@ func (s *ChannelStatisticsResponse) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "hiddenSubscriberCount":
+		case "Youtube":
 			if err := func() error {
-				s.HiddenSubscriberCount.Reset()
-				if err := s.HiddenSubscriberCount.Decode(d); err != nil {
+				s.Youtube.Reset()
+				if err := s.Youtube.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hiddenSubscriberCount\"")
+				return errors.Wrap(err, "decode field \"Youtube\"")
 			}
-		case "subscriberCount":
+		case "Twitch":
 			if err := func() error {
-				s.SubscriberCount.Reset()
-				if err := s.SubscriberCount.Decode(d); err != nil {
+				s.Twitch.Reset()
+				if err := s.Twitch.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"subscriberCount\"")
+				return errors.Wrap(err, "decode field \"Twitch\"")
 			}
-		case "videoCount":
+		case "TwitCasting":
 			if err := func() error {
-				s.VideoCount.Reset()
-				if err := s.VideoCount.Decode(d); err != nil {
+				s.TwitCasting.Reset()
+				if err := s.TwitCasting.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"videoCount\"")
+				return errors.Wrap(err, "decode field \"TwitCasting\"")
 			}
-		case "viewCount":
+		case "Niconico":
 			if err := func() error {
-				s.ViewCount.Reset()
-				if err := s.ViewCount.Decode(d); err != nil {
+				s.Niconico.Reset()
+				if err := s.Niconico.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"viewCount\"")
+				return errors.Wrap(err, "decode field \"Niconico\"")
 			}
 		default:
 			return d.Skip()
@@ -345,6 +332,86 @@ func (s *ChannelStatisticsResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ChannelStatisticsResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ChannelsChannelIDVideosGetOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ChannelsChannelIDVideosGetOK) encodeFields(e *jx.Encoder) {
+	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
+		if s.Pagination.Set {
+			e.FieldStart("pagination")
+			s.Pagination.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfChannelsChannelIDVideosGetOK = [2]string{
+	0: "data",
+	1: "pagination",
+}
+
+// Decode decodes ChannelsChannelIDVideosGetOK from json.
+func (s *ChannelsChannelIDVideosGetOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsChannelIDVideosGetOK to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
+		case "pagination":
+			if err := func() error {
+				s.Pagination.Reset()
+				if err := s.Pagination.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pagination\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ChannelsChannelIDVideosGetOK")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ChannelsChannelIDVideosGetOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsChannelIDVideosGetOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -497,6 +564,86 @@ func (s *ChannelsChannelIDVideosPutReq) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ChannelsChannelIDVideosPutReq) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ChannelsGetOK) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ChannelsGetOK) encodeFields(e *jx.Encoder) {
+	{
+		if s.Data.Set {
+			e.FieldStart("data")
+			s.Data.Encode(e)
+		}
+	}
+	{
+		if s.Pagination.Set {
+			e.FieldStart("pagination")
+			s.Pagination.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfChannelsGetOK = [2]string{
+	0: "data",
+	1: "pagination",
+}
+
+// Decode decodes ChannelsGetOK from json.
+func (s *ChannelsGetOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsGetOK to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "data":
+			if err := func() error {
+				s.Data.Reset()
+				if err := s.Data.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"data\"")
+			}
+		case "pagination":
+			if err := func() error {
+				s.Pagination.Reset()
+				if err := s.Pagination.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pagination\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ChannelsGetOK")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ChannelsGetOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsGetOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -828,6 +975,74 @@ func (s *OptChannelStatisticsResponse) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes ChannelsResponse as json.
+func (o OptChannelsResponse) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes ChannelsResponse from json.
+func (o *OptChannelsResponse) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptChannelsResponse to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptChannelsResponse) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptChannelsResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes time.Time as json.
+func (o OptDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
+	if !o.Set {
+		return
+	}
+	format(e, o.Value)
+}
+
+// Decode decodes time.Time from json.
+func (o *OptDateTime) Decode(d *jx.Decoder, format func(*jx.Decoder) (time.Time, error)) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptDateTime to nil")
+	}
+	o.Set = true
+	v, err := format(d)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptDateTime) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e, json.EncodeDateTime)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptDateTime) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d, json.DecodeDateTime)
+}
+
 // Encode encodes int as json.
 func (o OptInt) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -859,6 +1074,140 @@ func (s OptInt) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptInt) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes int64 as json.
+func (o OptInt64) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Int64(int64(o.Value))
+}
+
+// Decode decodes int64 from json.
+func (o *OptInt64) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptInt64 to nil")
+	}
+	o.Set = true
+	v, err := d.Int64()
+	if err != nil {
+		return err
+	}
+	o.Value = int64(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptInt64) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptInt64) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes Pagination as json.
+func (o OptPagination) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes Pagination from json.
+func (o *OptPagination) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptPagination to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptPagination) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptPagination) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes PlatformSnippet as json.
+func (o OptPlatformSnippet) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes PlatformSnippet from json.
+func (o *OptPlatformSnippet) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptPlatformSnippet to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptPlatformSnippet) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptPlatformSnippet) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes PlatformStatistics as json.
+func (o OptPlatformStatistics) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes PlatformStatistics from json.
+func (o *OptPlatformStatistics) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptPlatformStatistics to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptPlatformStatistics) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptPlatformStatistics) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -960,6 +1309,432 @@ func (s OptThumbnailsResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptThumbnailsResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes VideosResponse as json.
+func (o OptVideosResponse) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes VideosResponse from json.
+func (o *OptVideosResponse) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptVideosResponse to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptVideosResponse) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptVideosResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *Pagination) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *Pagination) encodeFields(e *jx.Encoder) {
+	{
+		if s.CurrentPage.Set {
+			e.FieldStart("CurrentPage")
+			s.CurrentPage.Encode(e)
+		}
+	}
+	{
+		if s.PrevPage.Set {
+			e.FieldStart("PrevPage")
+			s.PrevPage.Encode(e)
+		}
+	}
+	{
+		if s.NextPage.Set {
+			e.FieldStart("NextPage")
+			s.NextPage.Encode(e)
+		}
+	}
+	{
+		if s.TotalPage.Set {
+			e.FieldStart("TotalPage")
+			s.TotalPage.Encode(e)
+		}
+	}
+	{
+		if s.TotalCount.Set {
+			e.FieldStart("TotalCount")
+			s.TotalCount.Encode(e)
+		}
+	}
+	{
+		if s.HasNext.Set {
+			e.FieldStart("HasNext")
+			s.HasNext.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfPagination = [6]string{
+	0: "CurrentPage",
+	1: "PrevPage",
+	2: "NextPage",
+	3: "TotalPage",
+	4: "TotalCount",
+	5: "HasNext",
+}
+
+// Decode decodes Pagination from json.
+func (s *Pagination) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode Pagination to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "CurrentPage":
+			if err := func() error {
+				s.CurrentPage.Reset()
+				if err := s.CurrentPage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"CurrentPage\"")
+			}
+		case "PrevPage":
+			if err := func() error {
+				s.PrevPage.Reset()
+				if err := s.PrevPage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PrevPage\"")
+			}
+		case "NextPage":
+			if err := func() error {
+				s.NextPage.Reset()
+				if err := s.NextPage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"NextPage\"")
+			}
+		case "TotalPage":
+			if err := func() error {
+				s.TotalPage.Reset()
+				if err := s.TotalPage.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"TotalPage\"")
+			}
+		case "TotalCount":
+			if err := func() error {
+				s.TotalCount.Reset()
+				if err := s.TotalCount.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"TotalCount\"")
+			}
+		case "HasNext":
+			if err := func() error {
+				s.HasNext.Reset()
+				if err := s.HasNext.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"HasNext\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode Pagination")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *Pagination) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *Pagination) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PlatformSnippet) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PlatformSnippet) encodeFields(e *jx.Encoder) {
+	{
+		if s.Title.Set {
+			e.FieldStart("Title")
+			s.Title.Encode(e)
+		}
+	}
+	{
+		if s.Description.Set {
+			e.FieldStart("Description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.CustomURL.Set {
+			e.FieldStart("CustomURL")
+			s.CustomURL.Encode(e)
+		}
+	}
+	{
+		if s.PublishedAt.Set {
+			e.FieldStart("PublishedAt")
+			s.PublishedAt.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.Thumbnails.Set {
+			e.FieldStart("Thumbnails")
+			s.Thumbnails.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfPlatformSnippet = [5]string{
+	0: "Title",
+	1: "Description",
+	2: "CustomURL",
+	3: "PublishedAt",
+	4: "Thumbnails",
+}
+
+// Decode decodes PlatformSnippet from json.
+func (s *PlatformSnippet) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PlatformSnippet to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "Title":
+			if err := func() error {
+				s.Title.Reset()
+				if err := s.Title.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Title\"")
+			}
+		case "Description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Description\"")
+			}
+		case "CustomURL":
+			if err := func() error {
+				s.CustomURL.Reset()
+				if err := s.CustomURL.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"CustomURL\"")
+			}
+		case "PublishedAt":
+			if err := func() error {
+				s.PublishedAt.Reset()
+				if err := s.PublishedAt.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"PublishedAt\"")
+			}
+		case "Thumbnails":
+			if err := func() error {
+				s.Thumbnails.Reset()
+				if err := s.Thumbnails.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"Thumbnails\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PlatformSnippet")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PlatformSnippet) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PlatformSnippet) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PlatformStatistics) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PlatformStatistics) encodeFields(e *jx.Encoder) {
+	{
+		if s.ViewCount.Set {
+			e.FieldStart("ViewCount")
+			s.ViewCount.Encode(e)
+		}
+	}
+	{
+		if s.SubscriberCount.Set {
+			e.FieldStart("SubscriberCount")
+			s.SubscriberCount.Encode(e)
+		}
+	}
+	{
+		if s.HiddenSubscriberCount.Set {
+			e.FieldStart("HiddenSubscriberCount")
+			s.HiddenSubscriberCount.Encode(e)
+		}
+	}
+	{
+		if s.VideoCount.Set {
+			e.FieldStart("VideoCount")
+			s.VideoCount.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfPlatformStatistics = [4]string{
+	0: "ViewCount",
+	1: "SubscriberCount",
+	2: "HiddenSubscriberCount",
+	3: "VideoCount",
+}
+
+// Decode decodes PlatformStatistics from json.
+func (s *PlatformStatistics) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PlatformStatistics to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "ViewCount":
+			if err := func() error {
+				s.ViewCount.Reset()
+				if err := s.ViewCount.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ViewCount\"")
+			}
+		case "SubscriberCount":
+			if err := func() error {
+				s.SubscriberCount.Reset()
+				if err := s.SubscriberCount.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"SubscriberCount\"")
+			}
+		case "HiddenSubscriberCount":
+			if err := func() error {
+				s.HiddenSubscriberCount.Reset()
+				if err := s.HiddenSubscriberCount.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"HiddenSubscriberCount\"")
+			}
+		case "VideoCount":
+			if err := func() error {
+				s.VideoCount.Reset()
+				if err := s.VideoCount.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"VideoCount\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PlatformStatistics")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PlatformStatistics) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PlatformStatistics) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

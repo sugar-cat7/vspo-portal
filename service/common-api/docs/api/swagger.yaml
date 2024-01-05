@@ -22,13 +22,28 @@ paths:
         schema:
           type: string
         example: abc,cde
+      - name: page
+        in: query
+        description: page
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: page limit
+        schema:
+          type: integer
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChannelsResponse'
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ChannelsResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
         "400":
           description: Bad Request
         "401":
@@ -146,13 +161,28 @@ paths:
         required: true
         schema:
           type: string
+      - name: page
+        in: query
+        description: page
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: page limit
+        schema:
+          type: integer
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VideosResponse'
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/VideosResponse'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
         "400":
           description: Bad Request
         "401":
@@ -281,35 +311,26 @@ components:
     ChannelSnippetResponse:
       type: object
       properties:
-        customUrl:
-          type: string
-          example: '@nazunakaga'
-        description:
-          type: string
-          example: ぶいすぽ所属　最年少！５歳可愛い担当花芽なずなです♡ 好きなゲームはFPS全般！
-        publishedAt:
-          type: string
-          example: 2018-09-20T11:41:24Z
-        thumbnails:
-          $ref: '#/components/schemas/ThumbnailsResponse'
-        title:
-          type: string
-          example: 花芽なずな / Nazuna Kaga
+        Youtube:
+          $ref: '#/components/schemas/PlatformSnippet'
+        Twitch:
+          $ref: '#/components/schemas/PlatformSnippet'
+        TwitCasting:
+          $ref: '#/components/schemas/PlatformSnippet'
+        Niconico:
+          $ref: '#/components/schemas/PlatformSnippet'
+
     ChannelStatisticsResponse:
       type: object
       properties:
-        hiddenSubscriberCount:
-          type: boolean
-          example: false
-        subscriberCount:
-          type: string
-          example: "357000"
-        videoCount:
-          type: string
-          example: "1183"
-        viewCount:
-          type: string
-          example: "59373115"
+        Youtube:
+          $ref: '#/components/schemas/PlatformStatistics'
+        Twitch:
+          $ref: '#/components/schemas/PlatformStatistics'
+        TwitCasting:
+          $ref: '#/components/schemas/PlatformStatistics'
+        Niconico:
+          $ref: '#/components/schemas/PlatformStatistics'
     ThumbnailResponse:
       type: object
       properties:
@@ -377,7 +398,51 @@ components:
         weekly:
           type: string
           example: "10000"
-
+    Pagination:
+      type: object
+      properties:
+        CurrentPage:
+          type: integer
+          format: int64
+        PrevPage:
+          type: integer
+          format: int64
+        NextPage:
+          type: integer
+          format: int64
+        TotalPage:
+          type: integer
+          format: int64
+        TotalCount:
+          type: integer
+          format: int64
+        HasNext:
+          type: boolean
+    PlatformSnippet:
+      type: object
+      properties:
+        Title:
+          type: string
+        Description:
+          type: string
+        CustomURL:
+          type: string
+        PublishedAt:
+          type: string
+          format: date-time
+        Thumbnails:
+          $ref: '#/components/schemas/ThumbnailsResponse'
+    PlatformStatistics:
+      type: object
+      properties:
+        ViewCount:
+          type: string
+        SubscriberCount:
+          type: string
+        HiddenSubscriberCount:
+          type: boolean
+        VideoCount:
+          type: string
 security:
   - ApiKeyAuth: []
 

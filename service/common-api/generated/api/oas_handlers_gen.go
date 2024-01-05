@@ -140,6 +140,14 @@ func (s *Server) handleChannelsChannelIDVideosGetRequest(args [1]string, argsEsc
 					Name: "end_date",
 					In:   "query",
 				}: params.EndDate,
+				{
+					Name: "page",
+					In:   "query",
+				}: params.Page,
+				{
+					Name: "limit",
+					In:   "query",
+				}: params.Limit,
 			},
 			Raw: r,
 		}
@@ -617,6 +625,14 @@ func (s *Server) handleChannelsGetRequest(args [0]string, argsEscaped bool, w ht
 					Name: "ids",
 					In:   "query",
 				}: params.Ids,
+				{
+					Name: "page",
+					In:   "query",
+				}: params.Page,
+				{
+					Name: "limit",
+					In:   "query",
+				}: params.Limit,
 			},
 			Raw: r,
 		}

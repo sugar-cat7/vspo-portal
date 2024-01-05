@@ -9,7 +9,7 @@ import (
 // ChannelsChannelIDVideosGet implements the GET /channels/{channel_id}/videos endpoint.
 func (h *VH) ChannelsChannelIDVideosGet(ctx context.Context, params api.ChannelsChannelIDVideosGetParams) (api.ChannelsChannelIDVideosGetRes, error) {
 	// FIXME: implement
-	return &api.VideosResponse{}, nil
+	return &api.ChannelsChannelIDVideosGetOK{}, nil
 }
 
 // ChannelsChannelIDVideosPut implements the PUT /channels/{channel_id}/videos endpoint.

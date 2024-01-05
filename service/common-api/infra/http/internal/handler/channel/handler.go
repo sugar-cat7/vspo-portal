@@ -4,6 +4,7 @@ import (
 	"context"
 
 	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/api"
+	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase"
 )
 
 // Handler is an interface for handling channel operations.
@@ -14,9 +15,13 @@ type Handler interface {
 }
 
 // CH is Handler implementation.
-type CH struct{}
+type CH struct {
+	channelInteractor usecase.ChannelInteractor
+}
 
 // NewHandler returns a new instance of a channel handler.
-func NewHandler() Handler {
-	return &CH{}
+func NewHandler(channelInteractor usecase.ChannelInteractor) CH {
+	return CH{
+		channelInteractor: channelInteractor,
+	}
 }
