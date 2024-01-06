@@ -131,7 +131,7 @@ export const Header: React.FC<Props> = ({ title }) => {
               }}
             >
               <a
-                href="https://github.com/sugar-cat7/vspo-schedule-web"
+                href="https://github.com/sugar-cat7/vspo-portal"
                 style={{
                   display: "inline-flex",
                   alignItems: "center",
