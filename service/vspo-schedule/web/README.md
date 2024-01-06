@@ -1,19 +1,17 @@
-## すぽじゅーる
+## [Spodule](https://www.vspo-schedule.com/schedule/all)
 
-すぽじゅーるは、ぶいすぽっ!メンバーの配信(Youtube/Twitch/ツイキャス/ニコニコ)や切り抜きを一覧で確認できる非公式サイトです。
-[Twitter](https://twitter.com/vspodule)で更新情報をお知らせしています。
-
-### 関連リンク
-
-- [すぽじゅーる](https://www.vspo-schedule.com/)
-- [共通 API](https://github.com/sugar-cat7/vspo-common-api)
+A site where you can check the broadcasts (YouTube/Twitch/Twitcasting/Niconico) and clips of Vspo members. Follow us on [X](https://twitter.com/vspodule) for updates.
 
 ### Quick Start
 
+Requirements:
 - Node: v18.17.1
 - pnpm: 8.6.12
+
+To set up the development environment, run the following commands:
 
 ```bash
 pnpm i
 pnpm dev
 ```
+
