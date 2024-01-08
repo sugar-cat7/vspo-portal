@@ -9,3 +9,7 @@ updates:
     directory: "/service/vspo-schedule/web/" # Location of package manifests
     schedule:
       interval: "weekly"
+  - package-ecosystem: gomod
+    directory: "/service/common-api/"
+    schedule:
+      interval: weekly
