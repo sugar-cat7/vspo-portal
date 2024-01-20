@@ -1,5 +1,7 @@
 # Vspo Portal
 
+Join the Spodule Discord for developers by clicking [here](https://discord.gg/Q7Hm8h3HAG)!
+
 ⚠️ Currently, this repository is under the process of refactoring from the old Vspo Schedule, hence the development of new features has been halted.Refactoring is expected to be completed around February, followed by the resumption of feature development.
 
 Vspo Portal is a repository for providing fan-made services related to Vspo. ([X](https://twitter.com/vspodule))
