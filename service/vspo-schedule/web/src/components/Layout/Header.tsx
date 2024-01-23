@@ -16,7 +16,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Box, styled } from "@mui/system";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGithub, faTwitter } from "@fortawesome/free-brands-svg-icons";
+import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
 import { CustomDrawer } from "../Elements/Drawer/Drawer";
 import Link from "next/link";
 import { ThemeToggleButton, EmbedModeToggleButton } from "../Elements";
@@ -162,7 +162,7 @@ export const Header: React.FC<Props> = ({ title }) => {
                 rel="noopener noreferrer"
               >
                 <FontAwesomeIcon
-                  icon={faTwitter}
+                  icon={faXTwitter}
                   size="lg"
                   style={{
                     color: "white",
