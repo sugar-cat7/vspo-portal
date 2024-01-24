@@ -6,7 +6,6 @@ import {
   Menu,
   MenuItem,
   Snackbar,
-  // Snackbar,
   SwipeableDrawer,
   Toolbar,
   Typography,
@@ -17,9 +16,8 @@ import { Box, styled } from "@mui/system";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
-import { CustomDrawer } from "../Elements/Drawer/Drawer";
 import Link from "next/link";
-import { ThemeToggleButton, EmbedModeToggleButton } from "../Elements";
+import { CustomDrawer, ThemeToggleButton } from "../Elements";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
@@ -45,6 +43,27 @@ const StyledAlert = styled(Alert)(({ theme }) => ({
   backgroundColor: theme.palette.mode === "dark" ? "#e5f6fd" : "primary",
   color: theme.palette.mode === "dark" ? "#014361" : "primary",
 }));
+
+const SocialIconLink: React.FC<{ url: string, icon: React.ReactNode }> = ({ url, icon }) => {
+  const clickTargetSize = "24px";
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{
+        width: clickTargetSize,
+        height: clickTargetSize,
+        fontSize: "20px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {icon}
+    </a>
+  );
+}
 
 type Props = {
   title: string;
@@ -89,7 +108,6 @@ export const Header: React.FC<Props> = ({ title }) => {
           <div
             style={{
               display: "flex",
-              justifyContent: "space-between",
               alignItems: "center",
               width: "100%",
             }}
@@ -106,9 +124,6 @@ export const Header: React.FC<Props> = ({ title }) => {
             <Link
               style={{
                 display: "flex",
-                // flexDirection: "column",
-                // alignItems: "flex-start",
-                // justifyContent: "center",
                 width: "100%",
               }}
               href="/schedule/all"
@@ -128,50 +143,18 @@ export const Header: React.FC<Props> = ({ title }) => {
               style={{
                 display: "flex",
                 alignItems: "center",
+                gap: "12px",
+                marginLeft: "12px",
               }}
             >
-              <a
-                href="https://github.com/sugar-cat7/vspo-portal"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  marginLeft: "12px",
-                }}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FontAwesomeIcon
-                  icon={faGithub}
-                  size="lg"
-                  style={{
-                    color: "white",
-                    borderRadius: "50%",
-                    padding: "3px",
-                    paddingTop: "5px",
-                  }}
-                />
-              </a>
-              <a
-                href="https://twitter.com/vspodule"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  marginLeft: "12px",
-                }}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <FontAwesomeIcon
-                  icon={faXTwitter}
-                  size="lg"
-                  style={{
-                    color: "white",
-                    borderRadius: "50%",
-                    padding: "3px",
-                    paddingTop: "5px",
-                  }}
-                />
-              </a>
+              <SocialIconLink
+                url="https://github.com/sugar-cat7/vspo-portal"
+                icon={<FontAwesomeIcon icon={faGithub} />}
+              />
+              <SocialIconLink
+                url="https://twitter.com/vspodule"
+                icon={<FontAwesomeIcon icon={faXTwitter} />}
+              />
             </Box>
           </div>
         </Toolbar>
