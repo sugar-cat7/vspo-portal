@@ -176,10 +176,6 @@ export const Header: React.FC<Props> = ({ title }) => {
           </div>
         </Toolbar>
       </StyledAppBar>
-      {/* SEO */}
-      <Box id="nonevisible" sx={{ display: "none" }}>
-        <CustomDrawer />
-      </Box>
 
       <SwipeableDrawer
         anchor="left"
@@ -194,6 +190,10 @@ export const Header: React.FC<Props> = ({ title }) => {
             flexDirection: "column",
             justifyContent: "space-between",
           },
+        }}
+        ModalProps={{
+          keepMounted: true,
+          disablePortal: true,
         }}
       >
         <CustomDrawer />
