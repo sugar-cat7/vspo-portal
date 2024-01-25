@@ -3,13 +3,11 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Typography,
   Box,
   Avatar,
   Button,
   IconButton,
-  CardMedia,
   Link,
   Tab,
   Tabs,
@@ -47,7 +45,7 @@ const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
 }));
 
 const LiveLabel = styled("div")<{ isUpcoming?: boolean }>(
-  ({ theme, isUpcoming }) => ({
+  ({ isUpcoming }) => ({
     width: "78px",
     color: "rgb(255, 255, 255)",
     fontSize: "15px",
@@ -61,29 +59,10 @@ const LiveLabel = styled("div")<{ isUpcoming?: boolean }>(
   })
 );
 
-const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
+const StyledDialogContent = styled(DialogContent)({
   overflow: "hidden",
   padding: "0",
-}));
-
-const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
-  position: "sticky",
-  bottom: 0,
-  backgroundColor: "rgba(0, 0, 0, 0.75)",
-  borderTop: `1px solid ${theme.palette.divider}`,
-  padding: theme.spacing(2),
-}));
-
-const StyledButton = styled(Button)(({ theme }) => ({
-  width: "120px",
-  margin: theme.spacing(0, 1),
-}));
-
-const ModalWrapper = styled(Box)(({ theme }) => ({
-  position: "relative",
-  display: "flex",
-  flexDirection: "column", // stack children vertically
-}));
+});
 
 const TypographySmallOnMobile = styled(Typography)(({ theme }) => ({
   // メディアクエリ: 幅600px以下の場合
@@ -122,28 +101,20 @@ const ResponsiveChatIframe = styled("iframe")({
   border: "0",
 });
 
-const StyledCardMedia = styled(CardMedia)({
-  paddingTop: "56.25%", // 16:9 aspect ratio
-  objectFit: "contain",
-});
-
 const VideoPlayerOrLinkComponent: React.FC<{
   url: string;
   livestream?: Livestream;
   clip?: Clip;
-  isEmbedMode: boolean;
-}> = ({ url, livestream, clip, isEmbedMode }) => {
+}> = ({ url, livestream, clip }) => {
   if (!livestream && !clip) return <></>;
   let embedUrl;
   if (livestream) {
     if (livestream.platform === Platform.YouTube) {
-      const c = isStatusLive(livestream) === "live" ? "?controls=0" : "";
       embedUrl = url.replace("watch?v=", "embed/");
     } else if (livestream.platform === Platform.Twitch) {
       const tid = !livestream?.twitchPastVideoId
         ? `channel=${livestream.twitchName}`
         : `video=${livestream.twitchPastVideoId}`;
-      const c = isStatusLive(livestream) === "live" ? "&controls=false" : "";
       embedUrl = `https://player.twitch.tv/?${tid}&parent=${document.location.hostname}&autoplay=false`;
     } else if (livestream.platform === Platform.TwitCasting) {
       // Assuming livestream.id is the Twitcasting live id
@@ -159,31 +130,17 @@ const VideoPlayerOrLinkComponent: React.FC<{
       embedUrl = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${document.location.hostname}&autoplay=false`;
     }
   }
-  if (isEmbedMode) {
-    return (
-      <ResponsiveIframeWrapper>
-        <ResponsiveIframe
-          key={embedUrl}
-          src={embedUrl}
-          title={`${livestream?.platform || clip?.platform} video player`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          loading="lazy"
-        />
-      </ResponsiveIframeWrapper>
-    );
-  } else {
-    const thumbnailUrl = livestream?.thumbnailUrl || clip?.thumbnailUrl || "";
-    return (
-      <StyledCardMedia
-        image={thumbnailUrl
-          .replace("%{width}", "320")
-          .replace("%{height}", "180")
-          .replace("-{width}x{height}", "-320x180")}
-        title={livestream?.title || clip?.title}
+  return (
+    <ResponsiveIframeWrapper>
+      <ResponsiveIframe
+        key={embedUrl}
+        src={embedUrl}
+        title={`${livestream?.platform || clip?.platform} video player`}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture"
+        loading="lazy"
       />
-    );
-  }
+    </ResponsiveIframeWrapper>
+  );
 };
 
 const VideoPlayerOrLink = React.memo(VideoPlayerOrLinkComponent);
@@ -197,7 +154,6 @@ const YoutubeChatEmbed: React.FC<{ videoId: string }> = ({ videoId }) => {
         key={chatEmbedUrl}
         src={chatEmbedUrl}
         title="Youtube chat embed"
-        allowFullScreen
         loading="lazy"
       />
     </ResponsiveChatIframeWrapper>
@@ -217,7 +173,6 @@ const TwitchChatEmbed: React.FC<TwitchChatEmbedProps> = ({ channelName }) => {
         key={chatEmbedUrl}
         src={chatEmbedUrl}
         title="Twitch chat embed"
-        allowFullScreen
         loading="lazy"
       />
     </ResponsiveChatIframeWrapper>
@@ -263,107 +218,104 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
     : clip?.iconUrl;
 
   return (
-    <ModalWrapper>
-      <Dialog
-        open={open}
-        onClose={onClose}
-        fullScreen
-      >
-        <StyledDialogTitle>
-          <Box display="flex" alignItems="center">
-            {/* <NextLink href="/"> */}
-            <Box
-              flexGrow={1}
-              display="flex"
-              alignItems="center"
-              sx={{ gap: "10px", cursor: "pointer" }}
-              onClick={() => router.push("/schedule/all")}
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullScreen
+    >
+      <StyledDialogTitle>
+        <Box display="flex" alignItems="center">
+          {/* <NextLink href="/"> */}
+          <Box
+            flexGrow={1}
+            display="flex"
+            alignItems="center"
+            sx={{ gap: "10px", cursor: "pointer" }}
+            onClick={() => router.push("/schedule/all")}
+          >
+            <Image
+              src="/icon-top_transparent.png"
+              alt="Page Icon"
+              width={30}
+              height={30}
+            />
+            <TypographySmallOnMobile
+              sx={{ fontWeight: "bold", paddingTop: "3px" }}
             >
-              <Image
-                src="/icon-top_transparent.png"
-                alt="Page Icon"
-                width={30}
-                height={30}
-              />
-              <TypographySmallOnMobile
-                sx={{ fontWeight: "bold", paddingTop: "3px" }}
-              >
-                すぽじゅーる
-              </TypographySmallOnMobile>
-            </Box>
-            {/* </NextLink> */}
+              すぽじゅーる
+            </TypographySmallOnMobile>
           </Box>
-        </StyledDialogTitle>
-        <StyledDialogContent
-          sx={{
-            display: "grid",
-            grid: {
-              // 2 rows, 1 col
-              // InfoTabs fills vertical space left below VideoPlayerOrLink
-              xs: "auto minmax(0, 1fr) / 1fr",
-              // 1 row, 2 cols
-              // VideoPlayerOrLink spans 2/3 dialog width, InfoTabs spans 1/3
-              md: "minmax(0, 1fr) / 2fr 1fr",
-            },
-          }}
-        >
-          <VideoPlayerOrLink
-            url={url}
-            livestream={livestream}
-            clip={clip}
-            isEmbedMode
-          />
-          <InfoTabs videoInfo={videoInfo} iconUrl={iconUrl} url={url} />
-        </StyledDialogContent>
-        <Box
-          sx={{
-            position: "absolute",
-            top: 3,
-            right: 0,
-          }}
-        >
-          <IconButton
-            onClick={() => {
-              onClose();
-              router.push("/");
-            }}
-          >
-            <CloseIcon style={{ color: "white" }} />
-          </IconButton>
+          {/* </NextLink> */}
         </Box>
-        <BottomNavigation
-          sx={{
-            flex: "none",
-            borderTop: "1px solid #ddd",
-            height: "60px",
-            display: "flex",
-            justifyContent: "flex-start",
-            alignItems: "center",
+      </StyledDialogTitle>
+      <StyledDialogContent
+        sx={{
+          display: "grid",
+          grid: {
+            // 2 rows, 1 col
+            // InfoTabs fills vertical space left below VideoPlayerOrLink
+            xs: "auto minmax(0, 1fr) / 1fr",
+            // 1 row, 2 cols
+            // VideoPlayerOrLink spans 2/3 dialog width, InfoTabs spans 1/3
+            md: "minmax(0, 1fr) / 2fr 1fr",
+          },
+        }}
+      >
+        <VideoPlayerOrLink
+          url={url}
+          livestream={livestream}
+          clip={clip}
+        />
+        <InfoTabs videoInfo={videoInfo} iconUrl={iconUrl} url={url} />
+      </StyledDialogContent>
+      <Box
+        sx={{
+          position: "absolute",
+          top: 3,
+          right: 0,
+        }}
+      >
+        <IconButton
+          onClick={() => {
+            onClose();
+            router.push("/");
           }}
         >
-          <IconButton onClick={onClose} color="inherit">
-            <ArrowBackIcon />
-            <Typography>戻る</Typography>
-          </IconButton>
-          <Typography
-            variant="body1"
-            sx={{
-              display: "-webkit-box",
-              "-webkit-line-clamp": "2",
-              "-webkit-box-orient": "vertical",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              width: "80%", // 適宜調整してください
-              textAlign: "left",
-              paddingLeft: "8px",
-              paddingRight: "8px",
-            }}
-          >
-            {videoInfo.title}
-          </Typography>
-        </BottomNavigation>
-      </Dialog>
-    </ModalWrapper>
+          <CloseIcon style={{ color: "white" }} />
+        </IconButton>
+      </Box>
+      <BottomNavigation
+        sx={{
+          flex: "none",
+          borderTop: "1px solid #ddd",
+          height: "60px",
+          display: "flex",
+          justifyContent: "flex-start",
+          alignItems: "center",
+        }}
+      >
+        <IconButton onClick={onClose} color="inherit">
+          <ArrowBackIcon />
+          <Typography>戻る</Typography>
+        </IconButton>
+        <Typography
+          variant="body1"
+          sx={{
+            display: "-webkit-box",
+            "-webkit-line-clamp": "2",
+            "-webkit-box-orient": "vertical",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            width: "80%", // 適宜調整してください
+            textAlign: "left",
+            paddingLeft: "8px",
+            paddingRight: "8px",
+          }}
+        >
+          {videoInfo.title}
+        </Typography>
+      </BottomNavigation>
+    </Dialog>
   );
 };
 
@@ -373,7 +325,7 @@ interface TabPanelProps {
   children: React.ReactNode;
 }
 
-const ScrollableTabPanel = styled("div")(({ theme }) => ({
+const ScrollableTabPanel = styled("div")({
   flex: "1",
   display: "flex",
   flexDirection: "column",
@@ -383,7 +335,7 @@ const ScrollableTabPanel = styled("div")(({ theme }) => ({
   "&::-webkit-scrollbar": {
     display: "none",
   },
-}));
+});
 
 const TabPanel: React.FC<TabPanelProps> = ({ value, index, children }) => {
   return (
@@ -564,7 +516,6 @@ const InfoTabs: React.FC<{
             <YoutubeChatEmbed videoId={videoInfo?.id} />
           </TabPanel>
         )}
-
       {videoInfo?.platform === Platform.Twitch &&
         "actualEndTime" in videoInfo && (
           <TabPanel value={value} index={2}>
