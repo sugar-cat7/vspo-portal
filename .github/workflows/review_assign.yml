@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: hkusu/review-assign-action@v1
-        id: sugar-cat7
         with:
           assignees: ${{ github.actor }}
+          reviewers: sugar-cat7
           github-token: ${{ secrets.ACTION_SECRET }}
