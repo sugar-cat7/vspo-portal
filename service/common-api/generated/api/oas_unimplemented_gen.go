@@ -13,56 +13,38 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
-// ChannelsChannelIDVideosGet implements GET /channels/{channel_id}/videos operation.
+// CreatorsGet implements GET /creators operation.
 //
-// Retrieve all videos related to a specific channel.
+// Retrieves all creators based on provided IDs.
 //
-// GET /channels/{channel_id}/videos
-func (UnimplementedHandler) ChannelsChannelIDVideosGet(ctx context.Context, params ChannelsChannelIDVideosGetParams) (r ChannelsChannelIDVideosGetRes, _ error) {
+// GET /creators
+func (UnimplementedHandler) CreatorsGet(ctx context.Context, params CreatorsGetParams) (r CreatorsGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// ChannelsChannelIDVideosPost implements POST /channels/{channel_id}/videos operation.
+// VideosGet implements GET /videos operation.
 //
-// Update videos related to a specific channel based on provided cronType.
+// Retrieve all videos related to a specific creator.
 //
-// POST /channels/{channel_id}/videos
-func (UnimplementedHandler) ChannelsChannelIDVideosPost(ctx context.Context, req *ChannelsChannelIDVideosPostReq, params ChannelsChannelIDVideosPostParams) (r ChannelsChannelIDVideosPostRes, _ error) {
+// GET /videos
+func (UnimplementedHandler) VideosGet(ctx context.Context, params VideosGetParams) (r VideosGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// ChannelsChannelIDVideosPut implements PUT /channels/{channel_id}/videos operation.
+// VideosPost implements POST /videos operation.
 //
-// Update videos related to a specific channel based on provided cronType.
+// Update videos related to a specific creator based on provided cronType.
 //
-// PUT /channels/{channel_id}/videos
-func (UnimplementedHandler) ChannelsChannelIDVideosPut(ctx context.Context, req *ChannelsChannelIDVideosPutReq, params ChannelsChannelIDVideosPutParams) (r ChannelsChannelIDVideosPutRes, _ error) {
+// POST /videos
+func (UnimplementedHandler) VideosPost(ctx context.Context, req *VideosPostReq) (r VideosPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// ChannelsGet implements GET /channels operation.
+// VideosPut implements PUT /videos operation.
 //
-// Retrieves all channels based on provided IDs.
+// Update videos related to a specific creator based on provided cronType.
 //
-// GET /channels
-func (UnimplementedHandler) ChannelsGet(ctx context.Context, params ChannelsGetParams) (r ChannelsGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// ChannelsPost implements POST /channels operation.
-//
-// Creates channels by fetching from Youtube using provided Channel IDs.
-//
-// POST /channels
-func (UnimplementedHandler) ChannelsPost(ctx context.Context, req *ChannelsPostReq) (r ChannelsPostRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// ChannelsPut implements PUT /channels operation.
-//
-// Updates channels by fetching from Youtube using provided Channel IDs.
-//
-// PUT /channels
-func (UnimplementedHandler) ChannelsPut(ctx context.Context, req *ChannelsPutReq) (r ChannelsPutRes, _ error) {
+// PUT /videos
+func (UnimplementedHandler) VideosPut(ctx context.Context, req *VideosPutReq) (r VideosPutRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

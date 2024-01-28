@@ -25,6 +25,7 @@ type ChannelResponse struct {
 	ID         OptString                    `json:"id"`
 	Snippet    OptChannelSnippetResponse    `json:"snippet"`
 	Statistics OptChannelStatisticsResponse `json:"statistics"`
+	Videos     []VideoResponse              `json:"videos"`
 }
 
 // GetID returns the value of ID.
@@ -42,6 +43,11 @@ func (s *ChannelResponse) GetStatistics() OptChannelStatisticsResponse {
 	return s.Statistics
 }
 
+// GetVideos returns the value of Videos.
+func (s *ChannelResponse) GetVideos() []VideoResponse {
+	return s.Videos
+}
+
 // SetID sets the value of ID.
 func (s *ChannelResponse) SetID(val OptString) {
 	s.ID = val
@@ -55,6 +61,11 @@ func (s *ChannelResponse) SetSnippet(val OptChannelSnippetResponse) {
 // SetStatistics sets the value of Statistics.
 func (s *ChannelResponse) SetStatistics(val OptChannelStatisticsResponse) {
 	s.Statistics = val
+}
+
+// SetVideos sets the value of Videos.
+func (s *ChannelResponse) SetVideos(val []VideoResponse) {
+	s.Videos = val
 }
 
 // Ref: #/components/schemas/ChannelSnippetResponse
@@ -153,287 +164,93 @@ func (s *ChannelStatisticsResponse) SetNiconico(val OptPlatformStatistics) {
 	s.Niconico = val
 }
 
-// ChannelsChannelIDVideosGetBadRequest is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetBadRequest struct{}
+// CreatorsGetBadRequest is response for CreatorsGet operation.
+type CreatorsGetBadRequest struct{}
 
-func (*ChannelsChannelIDVideosGetBadRequest) channelsChannelIDVideosGetRes() {}
+func (*CreatorsGetBadRequest) creatorsGetRes() {}
 
-// ChannelsChannelIDVideosGetForbidden is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetForbidden struct{}
+// CreatorsGetForbidden is response for CreatorsGet operation.
+type CreatorsGetForbidden struct{}
 
-func (*ChannelsChannelIDVideosGetForbidden) channelsChannelIDVideosGetRes() {}
+func (*CreatorsGetForbidden) creatorsGetRes() {}
 
-// ChannelsChannelIDVideosGetInternalServerError is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetInternalServerError struct{}
+// CreatorsGetInternalServerError is response for CreatorsGet operation.
+type CreatorsGetInternalServerError struct{}
 
-func (*ChannelsChannelIDVideosGetInternalServerError) channelsChannelIDVideosGetRes() {}
+func (*CreatorsGetInternalServerError) creatorsGetRes() {}
 
-// ChannelsChannelIDVideosGetNotFound is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetNotFound struct{}
+// CreatorsGetNotFound is response for CreatorsGet operation.
+type CreatorsGetNotFound struct{}
 
-func (*ChannelsChannelIDVideosGetNotFound) channelsChannelIDVideosGetRes() {}
+func (*CreatorsGetNotFound) creatorsGetRes() {}
 
-type ChannelsChannelIDVideosGetOK struct {
-	Data       OptVideosResponse `json:"data"`
-	Pagination OptPagination     `json:"pagination"`
+type CreatorsGetOK struct {
+	Creators   []CreatorsGetOKCreatorsItem `json:"creators"`
+	Pagination OptPagination               `json:"pagination"`
 }
 
-// GetData returns the value of Data.
-func (s *ChannelsChannelIDVideosGetOK) GetData() OptVideosResponse {
-	return s.Data
-}
-
-// GetPagination returns the value of Pagination.
-func (s *ChannelsChannelIDVideosGetOK) GetPagination() OptPagination {
-	return s.Pagination
-}
-
-// SetData sets the value of Data.
-func (s *ChannelsChannelIDVideosGetOK) SetData(val OptVideosResponse) {
-	s.Data = val
-}
-
-// SetPagination sets the value of Pagination.
-func (s *ChannelsChannelIDVideosGetOK) SetPagination(val OptPagination) {
-	s.Pagination = val
-}
-
-func (*ChannelsChannelIDVideosGetOK) channelsChannelIDVideosGetRes() {}
-
-// ChannelsChannelIDVideosGetUnauthorized is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetUnauthorized struct{}
-
-func (*ChannelsChannelIDVideosGetUnauthorized) channelsChannelIDVideosGetRes() {}
-
-// ChannelsChannelIDVideosPostBadRequest is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostBadRequest struct{}
-
-func (*ChannelsChannelIDVideosPostBadRequest) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPostForbidden is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostForbidden struct{}
-
-func (*ChannelsChannelIDVideosPostForbidden) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPostInternalServerError is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostInternalServerError struct{}
-
-func (*ChannelsChannelIDVideosPostInternalServerError) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPostNotFound is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostNotFound struct{}
-
-func (*ChannelsChannelIDVideosPostNotFound) channelsChannelIDVideosPostRes() {}
-
-type ChannelsChannelIDVideosPostReq struct {
-	// Array of YouTube Video IDs.
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsChannelIDVideosPostReq) GetIds() []string {
-	return s.Ids
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsChannelIDVideosPostReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// ChannelsChannelIDVideosPostUnauthorized is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostUnauthorized struct{}
-
-func (*ChannelsChannelIDVideosPostUnauthorized) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPutBadRequest is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutBadRequest struct{}
-
-func (*ChannelsChannelIDVideosPutBadRequest) channelsChannelIDVideosPutRes() {}
-
-// ChannelsChannelIDVideosPutForbidden is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutForbidden struct{}
-
-func (*ChannelsChannelIDVideosPutForbidden) channelsChannelIDVideosPutRes() {}
-
-// ChannelsChannelIDVideosPutInternalServerError is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutInternalServerError struct{}
-
-func (*ChannelsChannelIDVideosPutInternalServerError) channelsChannelIDVideosPutRes() {}
-
-// ChannelsChannelIDVideosPutNotFound is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutNotFound struct{}
-
-func (*ChannelsChannelIDVideosPutNotFound) channelsChannelIDVideosPutRes() {}
-
-type ChannelsChannelIDVideosPutReq struct {
-	// Array of YouTube Video IDs.
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsChannelIDVideosPutReq) GetIds() []string {
-	return s.Ids
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsChannelIDVideosPutReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// ChannelsChannelIDVideosPutUnauthorized is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutUnauthorized struct{}
-
-func (*ChannelsChannelIDVideosPutUnauthorized) channelsChannelIDVideosPutRes() {}
-
-// ChannelsGetBadRequest is response for ChannelsGet operation.
-type ChannelsGetBadRequest struct{}
-
-func (*ChannelsGetBadRequest) channelsGetRes() {}
-
-// ChannelsGetForbidden is response for ChannelsGet operation.
-type ChannelsGetForbidden struct{}
-
-func (*ChannelsGetForbidden) channelsGetRes() {}
-
-// ChannelsGetInternalServerError is response for ChannelsGet operation.
-type ChannelsGetInternalServerError struct{}
-
-func (*ChannelsGetInternalServerError) channelsGetRes() {}
-
-// ChannelsGetNotFound is response for ChannelsGet operation.
-type ChannelsGetNotFound struct{}
-
-func (*ChannelsGetNotFound) channelsGetRes() {}
-
-type ChannelsGetOK struct {
-	Data       OptChannelsResponse `json:"data"`
-	Pagination OptPagination       `json:"pagination"`
-}
-
-// GetData returns the value of Data.
-func (s *ChannelsGetOK) GetData() OptChannelsResponse {
-	return s.Data
+// GetCreators returns the value of Creators.
+func (s *CreatorsGetOK) GetCreators() []CreatorsGetOKCreatorsItem {
+	return s.Creators
 }
 
 // GetPagination returns the value of Pagination.
-func (s *ChannelsGetOK) GetPagination() OptPagination {
+func (s *CreatorsGetOK) GetPagination() OptPagination {
 	return s.Pagination
 }
 
-// SetData sets the value of Data.
-func (s *ChannelsGetOK) SetData(val OptChannelsResponse) {
-	s.Data = val
+// SetCreators sets the value of Creators.
+func (s *CreatorsGetOK) SetCreators(val []CreatorsGetOKCreatorsItem) {
+	s.Creators = val
 }
 
 // SetPagination sets the value of Pagination.
-func (s *ChannelsGetOK) SetPagination(val OptPagination) {
+func (s *CreatorsGetOK) SetPagination(val OptPagination) {
 	s.Pagination = val
 }
 
-func (*ChannelsGetOK) channelsGetRes() {}
+func (*CreatorsGetOK) creatorsGetRes() {}
 
-// ChannelsGetUnauthorized is response for ChannelsGet operation.
-type ChannelsGetUnauthorized struct{}
-
-func (*ChannelsGetUnauthorized) channelsGetRes() {}
-
-// ChannelsPostBadRequest is response for ChannelsPost operation.
-type ChannelsPostBadRequest struct{}
-
-func (*ChannelsPostBadRequest) channelsPostRes() {}
-
-// ChannelsPostForbidden is response for ChannelsPost operation.
-type ChannelsPostForbidden struct{}
-
-func (*ChannelsPostForbidden) channelsPostRes() {}
-
-// ChannelsPostInternalServerError is response for ChannelsPost operation.
-type ChannelsPostInternalServerError struct{}
-
-func (*ChannelsPostInternalServerError) channelsPostRes() {}
-
-// ChannelsPostNotFound is response for ChannelsPost operation.
-type ChannelsPostNotFound struct{}
-
-func (*ChannelsPostNotFound) channelsPostRes() {}
-
-type ChannelsPostReq struct {
-	// Array of YouTube channel IDs.
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsPostReq) GetIds() []string {
-	return s.Ids
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsPostReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// ChannelsPostUnauthorized is response for ChannelsPost operation.
-type ChannelsPostUnauthorized struct{}
-
-func (*ChannelsPostUnauthorized) channelsPostRes() {}
-
-// ChannelsPutBadRequest is response for ChannelsPut operation.
-type ChannelsPutBadRequest struct{}
-
-func (*ChannelsPutBadRequest) channelsPutRes() {}
-
-// ChannelsPutForbidden is response for ChannelsPut operation.
-type ChannelsPutForbidden struct{}
-
-func (*ChannelsPutForbidden) channelsPutRes() {}
-
-// ChannelsPutInternalServerError is response for ChannelsPut operation.
-type ChannelsPutInternalServerError struct{}
-
-func (*ChannelsPutInternalServerError) channelsPutRes() {}
-
-// ChannelsPutNotFound is response for ChannelsPut operation.
-type ChannelsPutNotFound struct{}
-
-func (*ChannelsPutNotFound) channelsPutRes() {}
-
-type ChannelsPutReq struct {
-	// Array of YouTube channel IDs.
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsPutReq) GetIds() []string {
-	return s.Ids
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsPutReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// ChannelsPutUnauthorized is response for ChannelsPut operation.
-type ChannelsPutUnauthorized struct{}
-
-func (*ChannelsPutUnauthorized) channelsPutRes() {}
-
-// Ref: #/components/schemas/ChannelsResponse
-type ChannelsResponse struct {
+type CreatorsGetOKCreatorsItem struct {
+	ID       OptString         `json:"id"`
+	Name     OptString         `json:"name"`
 	Channels []ChannelResponse `json:"channels"`
 }
 
+// GetID returns the value of ID.
+func (s *CreatorsGetOKCreatorsItem) GetID() OptString {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *CreatorsGetOKCreatorsItem) GetName() OptString {
+	return s.Name
+}
+
 // GetChannels returns the value of Channels.
-func (s *ChannelsResponse) GetChannels() []ChannelResponse {
+func (s *CreatorsGetOKCreatorsItem) GetChannels() []ChannelResponse {
 	return s.Channels
 }
 
+// SetID sets the value of ID.
+func (s *CreatorsGetOKCreatorsItem) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *CreatorsGetOKCreatorsItem) SetName(val OptString) {
+	s.Name = val
+}
+
 // SetChannels sets the value of Channels.
-func (s *ChannelsResponse) SetChannels(val []ChannelResponse) {
+func (s *CreatorsGetOKCreatorsItem) SetChannels(val []ChannelResponse) {
 	s.Channels = val
 }
 
-func (*ChannelsResponse) channelsPostRes() {}
-func (*ChannelsResponse) channelsPutRes()  {}
+// CreatorsGetUnauthorized is response for CreatorsGet operation.
+type CreatorsGetUnauthorized struct{}
+
+func (*CreatorsGetUnauthorized) creatorsGetRes() {}
 
 // NewOptBool returns new OptBool with value set to v.
 func NewOptBool(v bool) OptBool {
@@ -567,52 +384,6 @@ func (o OptChannelStatisticsResponse) Get() (v ChannelStatisticsResponse, ok boo
 
 // Or returns value if set, or given parameter if does not.
 func (o OptChannelStatisticsResponse) Or(d ChannelStatisticsResponse) ChannelStatisticsResponse {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptChannelsResponse returns new OptChannelsResponse with value set to v.
-func NewOptChannelsResponse(v ChannelsResponse) OptChannelsResponse {
-	return OptChannelsResponse{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptChannelsResponse is optional ChannelsResponse.
-type OptChannelsResponse struct {
-	Value ChannelsResponse
-	Set   bool
-}
-
-// IsSet returns true if OptChannelsResponse was set.
-func (o OptChannelsResponse) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptChannelsResponse) Reset() {
-	var v ChannelsResponse
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptChannelsResponse) SetTo(v ChannelsResponse) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptChannelsResponse) Get() (v ChannelsResponse, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptChannelsResponse) Or(d ChannelsResponse) ChannelsResponse {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1354,8 +1125,8 @@ func (s *ThumbnailsResponse) SetStandard(val OptThumbnailResponse) {
 
 // Ref: #/components/schemas/VideoResponse
 type VideoResponse struct {
-	ChannelId    OptString             `json:"channelId"`
-	ChannelTitle OptString             `json:"channelTitle"`
+	CreatorId    OptString             `json:"creatorId"`
+	CreatorTitle OptString             `json:"creatorTitle"`
 	Description  OptString             `json:"description"`
 	ID           OptString             `json:"id"`
 	PublishedAt  OptString             `json:"publishedAt"`
@@ -1364,14 +1135,14 @@ type VideoResponse struct {
 	Title        OptString             `json:"title"`
 }
 
-// GetChannelId returns the value of ChannelId.
-func (s *VideoResponse) GetChannelId() OptString {
-	return s.ChannelId
+// GetCreatorId returns the value of CreatorId.
+func (s *VideoResponse) GetCreatorId() OptString {
+	return s.CreatorId
 }
 
-// GetChannelTitle returns the value of ChannelTitle.
-func (s *VideoResponse) GetChannelTitle() OptString {
-	return s.ChannelTitle
+// GetCreatorTitle returns the value of CreatorTitle.
+func (s *VideoResponse) GetCreatorTitle() OptString {
+	return s.CreatorTitle
 }
 
 // GetDescription returns the value of Description.
@@ -1404,14 +1175,14 @@ func (s *VideoResponse) GetTitle() OptString {
 	return s.Title
 }
 
-// SetChannelId sets the value of ChannelId.
-func (s *VideoResponse) SetChannelId(val OptString) {
-	s.ChannelId = val
+// SetCreatorId sets the value of CreatorId.
+func (s *VideoResponse) SetCreatorId(val OptString) {
+	s.CreatorId = val
 }
 
-// SetChannelTitle sets the value of ChannelTitle.
-func (s *VideoResponse) SetChannelTitle(val OptString) {
-	s.ChannelTitle = val
+// SetCreatorTitle sets the value of CreatorTitle.
+func (s *VideoResponse) SetCreatorTitle(val OptString) {
+	s.CreatorTitle = val
 }
 
 // SetDescription sets the value of Description.
@@ -1444,6 +1215,138 @@ func (s *VideoResponse) SetTitle(val OptString) {
 	s.Title = val
 }
 
+// VideosGetBadRequest is response for VideosGet operation.
+type VideosGetBadRequest struct{}
+
+func (*VideosGetBadRequest) videosGetRes() {}
+
+// VideosGetForbidden is response for VideosGet operation.
+type VideosGetForbidden struct{}
+
+func (*VideosGetForbidden) videosGetRes() {}
+
+// VideosGetInternalServerError is response for VideosGet operation.
+type VideosGetInternalServerError struct{}
+
+func (*VideosGetInternalServerError) videosGetRes() {}
+
+// VideosGetNotFound is response for VideosGet operation.
+type VideosGetNotFound struct{}
+
+func (*VideosGetNotFound) videosGetRes() {}
+
+type VideosGetOK struct {
+	Data       OptVideosResponse `json:"data"`
+	Pagination OptPagination     `json:"pagination"`
+}
+
+// GetData returns the value of Data.
+func (s *VideosGetOK) GetData() OptVideosResponse {
+	return s.Data
+}
+
+// GetPagination returns the value of Pagination.
+func (s *VideosGetOK) GetPagination() OptPagination {
+	return s.Pagination
+}
+
+// SetData sets the value of Data.
+func (s *VideosGetOK) SetData(val OptVideosResponse) {
+	s.Data = val
+}
+
+// SetPagination sets the value of Pagination.
+func (s *VideosGetOK) SetPagination(val OptPagination) {
+	s.Pagination = val
+}
+
+func (*VideosGetOK) videosGetRes() {}
+
+// VideosGetUnauthorized is response for VideosGet operation.
+type VideosGetUnauthorized struct{}
+
+func (*VideosGetUnauthorized) videosGetRes() {}
+
+// VideosPostBadRequest is response for VideosPost operation.
+type VideosPostBadRequest struct{}
+
+func (*VideosPostBadRequest) videosPostRes() {}
+
+// VideosPostForbidden is response for VideosPost operation.
+type VideosPostForbidden struct{}
+
+func (*VideosPostForbidden) videosPostRes() {}
+
+// VideosPostInternalServerError is response for VideosPost operation.
+type VideosPostInternalServerError struct{}
+
+func (*VideosPostInternalServerError) videosPostRes() {}
+
+// VideosPostNotFound is response for VideosPost operation.
+type VideosPostNotFound struct{}
+
+func (*VideosPostNotFound) videosPostRes() {}
+
+type VideosPostReq struct {
+	// Array of YouTube Video IDs.
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns the value of Ids.
+func (s *VideosPostReq) GetIds() []string {
+	return s.Ids
+}
+
+// SetIds sets the value of Ids.
+func (s *VideosPostReq) SetIds(val []string) {
+	s.Ids = val
+}
+
+// VideosPostUnauthorized is response for VideosPost operation.
+type VideosPostUnauthorized struct{}
+
+func (*VideosPostUnauthorized) videosPostRes() {}
+
+// VideosPutBadRequest is response for VideosPut operation.
+type VideosPutBadRequest struct{}
+
+func (*VideosPutBadRequest) videosPutRes() {}
+
+// VideosPutForbidden is response for VideosPut operation.
+type VideosPutForbidden struct{}
+
+func (*VideosPutForbidden) videosPutRes() {}
+
+// VideosPutInternalServerError is response for VideosPut operation.
+type VideosPutInternalServerError struct{}
+
+func (*VideosPutInternalServerError) videosPutRes() {}
+
+// VideosPutNotFound is response for VideosPut operation.
+type VideosPutNotFound struct{}
+
+func (*VideosPutNotFound) videosPutRes() {}
+
+type VideosPutReq struct {
+	// Array of YouTube Video IDs.
+	Ids []string `json:"ids"`
+}
+
+// GetIds returns the value of Ids.
+func (s *VideosPutReq) GetIds() []string {
+	return s.Ids
+}
+
+// SetIds sets the value of Ids.
+func (s *VideosPutReq) SetIds(val []string) {
+	s.Ids = val
+}
+
+// VideosPutUnauthorized is response for VideosPut operation.
+type VideosPutUnauthorized struct{}
+
+func (*VideosPutUnauthorized) videosPutRes() {}
+
 // Ref: #/components/schemas/VideosResponse
 type VideosResponse struct {
 	Videos []VideoResponse `json:"videos"`
@@ -1459,5 +1362,5 @@ func (s *VideosResponse) SetVideos(val []VideoResponse) {
 	s.Videos = val
 }
 
-func (*VideosResponse) channelsChannelIDVideosPostRes() {}
-func (*VideosResponse) channelsChannelIDVideosPutRes()  {}
+func (*VideosResponse) videosPostRes() {}
+func (*VideosResponse) videosPutRes()  {}

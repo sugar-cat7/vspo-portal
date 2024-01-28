@@ -50,6 +50,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		switch elem[0] {
 		case '/': // Prefix: "/channels"
+			origElem := elem
 			if l := len("/channels"); len(elem) >= l && elem[0:l] == "/channels" {
 				elem = elem[l:]
 			} else {
@@ -70,6 +71,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 			switch elem[0] {
 			case '/': // Prefix: "/"
+				origElem := elem
 				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 					elem = elem[l:]
 				} else {
@@ -90,6 +92,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				switch elem[0] {
 				case '/': // Prefix: "/videos"
+					origElem := elem
 					if l := len("/videos"); len(elem) >= l && elem[0:l] == "/videos" {
 						elem = elem[l:]
 					} else {
@@ -113,8 +116,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 						return
 					}
+
+					elem = origElem
 				}
+
+				elem = origElem
 			}
+
+			elem = origElem
 		}
 	}
 	s.notFound(w, r)
@@ -196,6 +205,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 		}
 		switch elem[0] {
 		case '/': // Prefix: "/channels"
+			origElem := elem
 			if l := len("/channels"); len(elem) >= l && elem[0:l] == "/channels" {
 				elem = elem[l:]
 			} else {
@@ -226,6 +236,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			}
 			switch elem[0] {
 			case '/': // Prefix: "/"
+				origElem := elem
 				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 					elem = elem[l:]
 				} else {
@@ -246,6 +257,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				}
 				switch elem[0] {
 				case '/': // Prefix: "/videos"
+					origElem := elem
 					if l := len("/videos"); len(elem) >= l && elem[0:l] == "/videos" {
 						elem = elem[l:]
 					} else {
@@ -276,8 +288,14 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							return
 						}
 					}
+
+					elem = origElem
 				}
+
+				elem = origElem
 			}
+
+			elem = origElem
 		}
 	}
 	return r, false
