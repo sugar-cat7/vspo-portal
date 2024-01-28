@@ -11,9 +11,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func encodeChannelsChannelIDVideosGetResponse(response ChannelsChannelIDVideosGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeCreatorsGetResponse(response CreatorsGetRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ChannelsChannelIDVideosGetOK:
+	case *CreatorsGetOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -26,31 +26,31 @@ func encodeChannelsChannelIDVideosGetResponse(response ChannelsChannelIDVideosGe
 
 		return nil
 
-	case *ChannelsChannelIDVideosGetBadRequest:
+	case *CreatorsGetBadRequest:
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
 
 		return nil
 
-	case *ChannelsChannelIDVideosGetUnauthorized:
+	case *CreatorsGetUnauthorized:
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
-	case *ChannelsChannelIDVideosGetForbidden:
+	case *CreatorsGetForbidden:
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
-	case *ChannelsChannelIDVideosGetNotFound:
+	case *CreatorsGetNotFound:
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
 
 		return nil
 
-	case *ChannelsChannelIDVideosGetInternalServerError:
+	case *CreatorsGetInternalServerError:
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
 
@@ -61,7 +61,57 @@ func encodeChannelsChannelIDVideosGetResponse(response ChannelsChannelIDVideosGe
 	}
 }
 
-func encodeChannelsChannelIDVideosPostResponse(response ChannelsChannelIDVideosPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeVideosGetResponse(response VideosGetRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *VideosGetOK:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *VideosGetBadRequest:
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		return nil
+
+	case *VideosGetUnauthorized:
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		return nil
+
+	case *VideosGetForbidden:
+		w.WriteHeader(403)
+		span.SetStatus(codes.Error, http.StatusText(403))
+
+		return nil
+
+	case *VideosGetNotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		return nil
+
+	case *VideosGetInternalServerError:
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeVideosPostResponse(response VideosPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *VideosResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -76,31 +126,31 @@ func encodeChannelsChannelIDVideosPostResponse(response ChannelsChannelIDVideosP
 
 		return nil
 
-	case *ChannelsChannelIDVideosPostBadRequest:
+	case *VideosPostBadRequest:
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
 
 		return nil
 
-	case *ChannelsChannelIDVideosPostUnauthorized:
+	case *VideosPostUnauthorized:
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
-	case *ChannelsChannelIDVideosPostForbidden:
+	case *VideosPostForbidden:
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
-	case *ChannelsChannelIDVideosPostNotFound:
+	case *VideosPostNotFound:
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
 
 		return nil
 
-	case *ChannelsChannelIDVideosPostInternalServerError:
+	case *VideosPostInternalServerError:
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
 
@@ -111,7 +161,7 @@ func encodeChannelsChannelIDVideosPostResponse(response ChannelsChannelIDVideosP
 	}
 }
 
-func encodeChannelsChannelIDVideosPutResponse(response ChannelsChannelIDVideosPutRes, w http.ResponseWriter, span trace.Span) error {
+func encodeVideosPutResponse(response VideosPutRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
 	case *VideosResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -126,181 +176,31 @@ func encodeChannelsChannelIDVideosPutResponse(response ChannelsChannelIDVideosPu
 
 		return nil
 
-	case *ChannelsChannelIDVideosPutBadRequest:
+	case *VideosPutBadRequest:
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
 
 		return nil
 
-	case *ChannelsChannelIDVideosPutUnauthorized:
+	case *VideosPutUnauthorized:
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
 
 		return nil
 
-	case *ChannelsChannelIDVideosPutForbidden:
+	case *VideosPutForbidden:
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
 
 		return nil
 
-	case *ChannelsChannelIDVideosPutNotFound:
+	case *VideosPutNotFound:
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
 
 		return nil
 
-	case *ChannelsChannelIDVideosPutInternalServerError:
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeChannelsGetResponse(response ChannelsGetRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *ChannelsGetOK:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *ChannelsGetBadRequest:
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		return nil
-
-	case *ChannelsGetUnauthorized:
-		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
-
-		return nil
-
-	case *ChannelsGetForbidden:
-		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
-
-		return nil
-
-	case *ChannelsGetNotFound:
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		return nil
-
-	case *ChannelsGetInternalServerError:
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *ChannelsResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *ChannelsPostBadRequest:
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		return nil
-
-	case *ChannelsPostUnauthorized:
-		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
-
-		return nil
-
-	case *ChannelsPostForbidden:
-		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
-
-		return nil
-
-	case *ChannelsPostNotFound:
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		return nil
-
-	case *ChannelsPostInternalServerError:
-		w.WriteHeader(500)
-		span.SetStatus(codes.Error, http.StatusText(500))
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeChannelsPutResponse(response ChannelsPutRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *ChannelsResponse:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *ChannelsPutBadRequest:
-		w.WriteHeader(400)
-		span.SetStatus(codes.Error, http.StatusText(400))
-
-		return nil
-
-	case *ChannelsPutUnauthorized:
-		w.WriteHeader(401)
-		span.SetStatus(codes.Error, http.StatusText(401))
-
-		return nil
-
-	case *ChannelsPutForbidden:
-		w.WriteHeader(403)
-		span.SetStatus(codes.Error, http.StatusText(403))
-
-		return nil
-
-	case *ChannelsPutNotFound:
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		return nil
-
-	case *ChannelsPutInternalServerError:
+	case *VideosPutInternalServerError:
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
 
