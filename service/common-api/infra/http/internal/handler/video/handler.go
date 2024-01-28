@@ -8,15 +8,15 @@ import (
 
 // Handler is an interface for handling clip operations.
 type Handler interface {
-	ChannelsChannelIDVideosGet(ctx context.Context, params api.ChannelsChannelIDVideosGetParams) (api.ChannelsChannelIDVideosGetRes, error)
-	ChannelsChannelIDVideosPut(ctx context.Context, req *api.ChannelsChannelIDVideosPutReq, params api.ChannelsChannelIDVideosPutParams) (api.ChannelsChannelIDVideosPutRes, error)
-	ChannelsChannelIDVideosPost(ctx context.Context, req *api.ChannelsChannelIDVideosPostReq, params api.ChannelsChannelIDVideosPostParams) (api.ChannelsChannelIDVideosPostRes, error)
+	VideosGet(ctx context.Context, params api.VideosGetParams) (api.VideosGetRes, error)
+	VideosPut(ctx context.Context, req *api.VideosPutReq) (api.VideosPutRes, error)
+	VideosPost(ctx context.Context, req *api.VideosPostReq) (api.VideosPostRes, error)
 }
 
 // VH is Handler implementation.
 type VH struct{}
 
 // NewHandler returns a new instance of a clip handler.
-func NewHandler() Handler {
-	return &VH{}
+func NewHandler() VH {
+	return VH{}
 }

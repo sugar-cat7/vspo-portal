@@ -4,6 +4,8 @@ package api
 
 import (
 	"time"
+
+	"github.com/go-faster/errors"
 )
 
 type ApiKeyAuth struct {
@@ -164,6 +166,43 @@ func (s *ChannelStatisticsResponse) SetNiconico(val OptPlatformStatistics) {
 	s.Niconico = val
 }
 
+// Ref: #/components/schemas/CreatorResponse
+type CreatorResponse struct {
+	ID       OptString         `json:"id"`
+	Name     OptString         `json:"name"`
+	Channels []ChannelResponse `json:"channels"`
+}
+
+// GetID returns the value of ID.
+func (s *CreatorResponse) GetID() OptString {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *CreatorResponse) GetName() OptString {
+	return s.Name
+}
+
+// GetChannels returns the value of Channels.
+func (s *CreatorResponse) GetChannels() []ChannelResponse {
+	return s.Channels
+}
+
+// SetID sets the value of ID.
+func (s *CreatorResponse) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *CreatorResponse) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetChannels sets the value of Channels.
+func (s *CreatorResponse) SetChannels(val []ChannelResponse) {
+	s.Channels = val
+}
+
 // CreatorsGetBadRequest is response for CreatorsGet operation.
 type CreatorsGetBadRequest struct{}
 
@@ -184,73 +223,38 @@ type CreatorsGetNotFound struct{}
 
 func (*CreatorsGetNotFound) creatorsGetRes() {}
 
-type CreatorsGetOK struct {
-	Creators   []CreatorsGetOKCreatorsItem `json:"creators"`
-	Pagination OptPagination               `json:"pagination"`
-}
-
-// GetCreators returns the value of Creators.
-func (s *CreatorsGetOK) GetCreators() []CreatorsGetOKCreatorsItem {
-	return s.Creators
-}
-
-// GetPagination returns the value of Pagination.
-func (s *CreatorsGetOK) GetPagination() OptPagination {
-	return s.Pagination
-}
-
-// SetCreators sets the value of Creators.
-func (s *CreatorsGetOK) SetCreators(val []CreatorsGetOKCreatorsItem) {
-	s.Creators = val
-}
-
-// SetPagination sets the value of Pagination.
-func (s *CreatorsGetOK) SetPagination(val OptPagination) {
-	s.Pagination = val
-}
-
-func (*CreatorsGetOK) creatorsGetRes() {}
-
-type CreatorsGetOKCreatorsItem struct {
-	ID       OptString         `json:"id"`
-	Name     OptString         `json:"name"`
-	Channels []ChannelResponse `json:"channels"`
-}
-
-// GetID returns the value of ID.
-func (s *CreatorsGetOKCreatorsItem) GetID() OptString {
-	return s.ID
-}
-
-// GetName returns the value of Name.
-func (s *CreatorsGetOKCreatorsItem) GetName() OptString {
-	return s.Name
-}
-
-// GetChannels returns the value of Channels.
-func (s *CreatorsGetOKCreatorsItem) GetChannels() []ChannelResponse {
-	return s.Channels
-}
-
-// SetID sets the value of ID.
-func (s *CreatorsGetOKCreatorsItem) SetID(val OptString) {
-	s.ID = val
-}
-
-// SetName sets the value of Name.
-func (s *CreatorsGetOKCreatorsItem) SetName(val OptString) {
-	s.Name = val
-}
-
-// SetChannels sets the value of Channels.
-func (s *CreatorsGetOKCreatorsItem) SetChannels(val []ChannelResponse) {
-	s.Channels = val
-}
-
 // CreatorsGetUnauthorized is response for CreatorsGet operation.
 type CreatorsGetUnauthorized struct{}
 
 func (*CreatorsGetUnauthorized) creatorsGetRes() {}
+
+// Ref: #/components/schemas/CreatorsResponse
+type CreatorsResponse struct {
+	Creators   []CreatorResponse `json:"creators"`
+	Pagination OptPagination     `json:"pagination"`
+}
+
+// GetCreators returns the value of Creators.
+func (s *CreatorsResponse) GetCreators() []CreatorResponse {
+	return s.Creators
+}
+
+// GetPagination returns the value of Pagination.
+func (s *CreatorsResponse) GetPagination() OptPagination {
+	return s.Pagination
+}
+
+// SetCreators sets the value of Creators.
+func (s *CreatorsResponse) SetCreators(val []CreatorResponse) {
+	s.Creators = val
+}
+
+// SetPagination sets the value of Pagination.
+func (s *CreatorsResponse) SetPagination(val OptPagination) {
+	s.Pagination = val
+}
+
+func (*CreatorsResponse) creatorsGetRes() {}
 
 // NewOptBool returns new OptBool with value set to v.
 func NewOptBool(v bool) OptBool {
@@ -804,38 +808,38 @@ func (o OptThumbnailsResponse) Or(d ThumbnailsResponse) ThumbnailsResponse {
 	return d
 }
 
-// NewOptVideosResponse returns new OptVideosResponse with value set to v.
-func NewOptVideosResponse(v VideosResponse) OptVideosResponse {
-	return OptVideosResponse{
+// NewOptVideoResponsePlatform returns new OptVideoResponsePlatform with value set to v.
+func NewOptVideoResponsePlatform(v VideoResponsePlatform) OptVideoResponsePlatform {
+	return OptVideoResponsePlatform{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptVideosResponse is optional VideosResponse.
-type OptVideosResponse struct {
-	Value VideosResponse
+// OptVideoResponsePlatform is optional VideoResponsePlatform.
+type OptVideoResponsePlatform struct {
+	Value VideoResponsePlatform
 	Set   bool
 }
 
-// IsSet returns true if OptVideosResponse was set.
-func (o OptVideosResponse) IsSet() bool { return o.Set }
+// IsSet returns true if OptVideoResponsePlatform was set.
+func (o OptVideoResponsePlatform) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptVideosResponse) Reset() {
-	var v VideosResponse
+func (o *OptVideoResponsePlatform) Reset() {
+	var v VideoResponsePlatform
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptVideosResponse) SetTo(v VideosResponse) {
+func (o *OptVideoResponsePlatform) SetTo(v VideoResponsePlatform) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptVideosResponse) Get() (v VideosResponse, ok bool) {
+func (o OptVideoResponsePlatform) Get() (v VideoResponsePlatform, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -843,7 +847,7 @@ func (o OptVideosResponse) Get() (v VideosResponse, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptVideosResponse) Or(d VideosResponse) VideosResponse {
+func (o OptVideoResponsePlatform) Or(d VideoResponsePlatform) VideoResponsePlatform {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1125,24 +1129,27 @@ func (s *ThumbnailsResponse) SetStandard(val OptThumbnailResponse) {
 
 // Ref: #/components/schemas/VideoResponse
 type VideoResponse struct {
-	CreatorId    OptString             `json:"creatorId"`
-	CreatorTitle OptString             `json:"creatorTitle"`
-	Description  OptString             `json:"description"`
-	ID           OptString             `json:"id"`
-	PublishedAt  OptString             `json:"publishedAt"`
-	Tags         []string              `json:"tags"`
-	Thumbnails   OptThumbnailsResponse `json:"thumbnails"`
-	Title        OptString             `json:"title"`
+	ChannelId    OptString                `json:"channelId"`
+	ChannelTitle OptString                `json:"channelTitle"`
+	Description  OptString                `json:"description"`
+	ID           OptString                `json:"id"`
+	PublishedAt  OptDateTime              `json:"publishedAt"`
+	StartAt      OptDateTime              `json:"startAt"`
+	EndAt        OptDateTime              `json:"endAt"`
+	Tags         []string                 `json:"tags"`
+	Thumbnails   OptThumbnailsResponse    `json:"thumbnails"`
+	Title        OptString                `json:"title"`
+	Platform     OptVideoResponsePlatform `json:"platform"`
 }
 
-// GetCreatorId returns the value of CreatorId.
-func (s *VideoResponse) GetCreatorId() OptString {
-	return s.CreatorId
+// GetChannelId returns the value of ChannelId.
+func (s *VideoResponse) GetChannelId() OptString {
+	return s.ChannelId
 }
 
-// GetCreatorTitle returns the value of CreatorTitle.
-func (s *VideoResponse) GetCreatorTitle() OptString {
-	return s.CreatorTitle
+// GetChannelTitle returns the value of ChannelTitle.
+func (s *VideoResponse) GetChannelTitle() OptString {
+	return s.ChannelTitle
 }
 
 // GetDescription returns the value of Description.
@@ -1156,8 +1163,18 @@ func (s *VideoResponse) GetID() OptString {
 }
 
 // GetPublishedAt returns the value of PublishedAt.
-func (s *VideoResponse) GetPublishedAt() OptString {
+func (s *VideoResponse) GetPublishedAt() OptDateTime {
 	return s.PublishedAt
+}
+
+// GetStartAt returns the value of StartAt.
+func (s *VideoResponse) GetStartAt() OptDateTime {
+	return s.StartAt
+}
+
+// GetEndAt returns the value of EndAt.
+func (s *VideoResponse) GetEndAt() OptDateTime {
+	return s.EndAt
 }
 
 // GetTags returns the value of Tags.
@@ -1175,14 +1192,19 @@ func (s *VideoResponse) GetTitle() OptString {
 	return s.Title
 }
 
-// SetCreatorId sets the value of CreatorId.
-func (s *VideoResponse) SetCreatorId(val OptString) {
-	s.CreatorId = val
+// GetPlatform returns the value of Platform.
+func (s *VideoResponse) GetPlatform() OptVideoResponsePlatform {
+	return s.Platform
 }
 
-// SetCreatorTitle sets the value of CreatorTitle.
-func (s *VideoResponse) SetCreatorTitle(val OptString) {
-	s.CreatorTitle = val
+// SetChannelId sets the value of ChannelId.
+func (s *VideoResponse) SetChannelId(val OptString) {
+	s.ChannelId = val
+}
+
+// SetChannelTitle sets the value of ChannelTitle.
+func (s *VideoResponse) SetChannelTitle(val OptString) {
+	s.ChannelTitle = val
 }
 
 // SetDescription sets the value of Description.
@@ -1196,8 +1218,18 @@ func (s *VideoResponse) SetID(val OptString) {
 }
 
 // SetPublishedAt sets the value of PublishedAt.
-func (s *VideoResponse) SetPublishedAt(val OptString) {
+func (s *VideoResponse) SetPublishedAt(val OptDateTime) {
 	s.PublishedAt = val
+}
+
+// SetStartAt sets the value of StartAt.
+func (s *VideoResponse) SetStartAt(val OptDateTime) {
+	s.StartAt = val
+}
+
+// SetEndAt sets the value of EndAt.
+func (s *VideoResponse) SetEndAt(val OptDateTime) {
+	s.EndAt = val
 }
 
 // SetTags sets the value of Tags.
@@ -1213,6 +1245,73 @@ func (s *VideoResponse) SetThumbnails(val OptThumbnailsResponse) {
 // SetTitle sets the value of Title.
 func (s *VideoResponse) SetTitle(val OptString) {
 	s.Title = val
+}
+
+// SetPlatform sets the value of Platform.
+func (s *VideoResponse) SetPlatform(val OptVideoResponsePlatform) {
+	s.Platform = val
+}
+
+type VideoResponsePlatform string
+
+const (
+	VideoResponsePlatformYoutube     VideoResponsePlatform = "youtube"
+	VideoResponsePlatformTwitch      VideoResponsePlatform = "twitch"
+	VideoResponsePlatformTwitcasting VideoResponsePlatform = "twitcasting"
+	VideoResponsePlatformNiconico    VideoResponsePlatform = "niconico"
+	VideoResponsePlatformUnknown     VideoResponsePlatform = "unknown"
+)
+
+// AllValues returns all VideoResponsePlatform values.
+func (VideoResponsePlatform) AllValues() []VideoResponsePlatform {
+	return []VideoResponsePlatform{
+		VideoResponsePlatformYoutube,
+		VideoResponsePlatformTwitch,
+		VideoResponsePlatformTwitcasting,
+		VideoResponsePlatformNiconico,
+		VideoResponsePlatformUnknown,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VideoResponsePlatform) MarshalText() ([]byte, error) {
+	switch s {
+	case VideoResponsePlatformYoutube:
+		return []byte(s), nil
+	case VideoResponsePlatformTwitch:
+		return []byte(s), nil
+	case VideoResponsePlatformTwitcasting:
+		return []byte(s), nil
+	case VideoResponsePlatformNiconico:
+		return []byte(s), nil
+	case VideoResponsePlatformUnknown:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VideoResponsePlatform) UnmarshalText(data []byte) error {
+	switch VideoResponsePlatform(data) {
+	case VideoResponsePlatformYoutube:
+		*s = VideoResponsePlatformYoutube
+		return nil
+	case VideoResponsePlatformTwitch:
+		*s = VideoResponsePlatformTwitch
+		return nil
+	case VideoResponsePlatformTwitcasting:
+		*s = VideoResponsePlatformTwitcasting
+		return nil
+	case VideoResponsePlatformNiconico:
+		*s = VideoResponsePlatformNiconico
+		return nil
+	case VideoResponsePlatformUnknown:
+		*s = VideoResponsePlatformUnknown
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // VideosGetBadRequest is response for VideosGet operation.
@@ -1234,33 +1333,6 @@ func (*VideosGetInternalServerError) videosGetRes() {}
 type VideosGetNotFound struct{}
 
 func (*VideosGetNotFound) videosGetRes() {}
-
-type VideosGetOK struct {
-	Data       OptVideosResponse `json:"data"`
-	Pagination OptPagination     `json:"pagination"`
-}
-
-// GetData returns the value of Data.
-func (s *VideosGetOK) GetData() OptVideosResponse {
-	return s.Data
-}
-
-// GetPagination returns the value of Pagination.
-func (s *VideosGetOK) GetPagination() OptPagination {
-	return s.Pagination
-}
-
-// SetData sets the value of Data.
-func (s *VideosGetOK) SetData(val OptVideosResponse) {
-	s.Data = val
-}
-
-// SetPagination sets the value of Pagination.
-func (s *VideosGetOK) SetPagination(val OptPagination) {
-	s.Pagination = val
-}
-
-func (*VideosGetOK) videosGetRes() {}
 
 // VideosGetUnauthorized is response for VideosGet operation.
 type VideosGetUnauthorized struct{}
@@ -1349,7 +1421,8 @@ func (*VideosPutUnauthorized) videosPutRes() {}
 
 // Ref: #/components/schemas/VideosResponse
 type VideosResponse struct {
-	Videos []VideoResponse `json:"videos"`
+	Videos     []VideoResponse `json:"videos"`
+	Pagination OptPagination   `json:"pagination"`
 }
 
 // GetVideos returns the value of Videos.
@@ -1357,10 +1430,21 @@ func (s *VideosResponse) GetVideos() []VideoResponse {
 	return s.Videos
 }
 
+// GetPagination returns the value of Pagination.
+func (s *VideosResponse) GetPagination() OptPagination {
+	return s.Pagination
+}
+
 // SetVideos sets the value of Videos.
 func (s *VideosResponse) SetVideos(val []VideoResponse) {
 	s.Videos = val
 }
 
+// SetPagination sets the value of Pagination.
+func (s *VideosResponse) SetPagination(val OptPagination) {
+	s.Pagination = val
+}
+
+func (*VideosResponse) videosGetRes()  {}
 func (*VideosResponse) videosPostRes() {}
 func (*VideosResponse) videosPutRes()  {}

@@ -2,17 +2,17 @@ package output
 
 import "github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
 
-type ListChannels struct {
-	Channels   model.Channels
+type ListCreators struct {
+	Creators   model.Creators
 	Pagination *model.Pagination
 }
 
-func NewListChannels(
-	channels model.Channels,
+func NewListCreators(
+	creators model.Creators,
 	pagination *model.Pagination,
-) *ListChannels {
-	return &ListChannels{
-		Channels:   channels,
+) *ListCreators {
+	return &ListCreators{
+		Creators:   creators,
 		Pagination: pagination,
 	}
 }

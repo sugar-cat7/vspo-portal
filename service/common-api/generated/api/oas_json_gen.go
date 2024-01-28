@@ -365,105 +365,14 @@ func (s *ChannelStatisticsResponse) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *CreatorsGetOK) Encode(e *jx.Encoder) {
+func (s *CreatorResponse) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *CreatorsGetOK) encodeFields(e *jx.Encoder) {
-	{
-		if s.Creators != nil {
-			e.FieldStart("creators")
-			e.ArrStart()
-			for _, elem := range s.Creators {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.Pagination.Set {
-			e.FieldStart("pagination")
-			s.Pagination.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfCreatorsGetOK = [2]string{
-	0: "creators",
-	1: "pagination",
-}
-
-// Decode decodes CreatorsGetOK from json.
-func (s *CreatorsGetOK) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode CreatorsGetOK to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "creators":
-			if err := func() error {
-				s.Creators = make([]CreatorsGetOKCreatorsItem, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem CreatorsGetOKCreatorsItem
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Creators = append(s.Creators, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"creators\"")
-			}
-		case "pagination":
-			if err := func() error {
-				s.Pagination.Reset()
-				if err := s.Pagination.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pagination\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode CreatorsGetOK")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *CreatorsGetOK) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *CreatorsGetOK) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *CreatorsGetOKCreatorsItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *CreatorsGetOKCreatorsItem) encodeFields(e *jx.Encoder) {
+func (s *CreatorResponse) encodeFields(e *jx.Encoder) {
 	{
 		if s.ID.Set {
 			e.FieldStart("id")
@@ -488,16 +397,16 @@ func (s *CreatorsGetOKCreatorsItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfCreatorsGetOKCreatorsItem = [3]string{
+var jsonFieldsNameOfCreatorResponse = [3]string{
 	0: "id",
 	1: "name",
 	2: "channels",
 }
 
-// Decode decodes CreatorsGetOKCreatorsItem from json.
-func (s *CreatorsGetOKCreatorsItem) Decode(d *jx.Decoder) error {
+// Decode decodes CreatorResponse from json.
+func (s *CreatorResponse) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode CreatorsGetOKCreatorsItem to nil")
+		return errors.New("invalid: unable to decode CreatorResponse to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -544,21 +453,112 @@ func (s *CreatorsGetOKCreatorsItem) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode CreatorsGetOKCreatorsItem")
+		return errors.Wrap(err, "decode CreatorResponse")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *CreatorsGetOKCreatorsItem) MarshalJSON() ([]byte, error) {
+func (s *CreatorResponse) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *CreatorsGetOKCreatorsItem) UnmarshalJSON(data []byte) error {
+func (s *CreatorResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *CreatorsResponse) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *CreatorsResponse) encodeFields(e *jx.Encoder) {
+	{
+		if s.Creators != nil {
+			e.FieldStart("creators")
+			e.ArrStart()
+			for _, elem := range s.Creators {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Pagination.Set {
+			e.FieldStart("pagination")
+			s.Pagination.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfCreatorsResponse = [2]string{
+	0: "creators",
+	1: "pagination",
+}
+
+// Decode decodes CreatorsResponse from json.
+func (s *CreatorsResponse) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode CreatorsResponse to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "creators":
+			if err := func() error {
+				s.Creators = make([]CreatorResponse, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem CreatorResponse
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Creators = append(s.Creators, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"creators\"")
+			}
+		case "pagination":
+			if err := func() error {
+				s.Pagination.Reset()
+				if err := s.Pagination.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pagination\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode CreatorsResponse")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *CreatorsResponse) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *CreatorsResponse) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -969,18 +969,18 @@ func (s *OptThumbnailsResponse) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes VideosResponse as json.
-func (o OptVideosResponse) Encode(e *jx.Encoder) {
+// Encode encodes VideoResponsePlatform as json.
+func (o OptVideoResponsePlatform) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	o.Value.Encode(e)
+	e.Str(string(o.Value))
 }
 
-// Decode decodes VideosResponse from json.
-func (o *OptVideosResponse) Decode(d *jx.Decoder) error {
+// Decode decodes VideoResponsePlatform from json.
+func (o *OptVideoResponsePlatform) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptVideosResponse to nil")
+		return errors.New("invalid: unable to decode OptVideoResponsePlatform to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -990,14 +990,14 @@ func (o *OptVideosResponse) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptVideosResponse) MarshalJSON() ([]byte, error) {
+func (s OptVideoResponsePlatform) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptVideosResponse) UnmarshalJSON(data []byte) error {
+func (s *OptVideoResponsePlatform) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1633,15 +1633,15 @@ func (s *VideoResponse) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *VideoResponse) encodeFields(e *jx.Encoder) {
 	{
-		if s.CreatorId.Set {
-			e.FieldStart("creatorId")
-			s.CreatorId.Encode(e)
+		if s.ChannelId.Set {
+			e.FieldStart("channelId")
+			s.ChannelId.Encode(e)
 		}
 	}
 	{
-		if s.CreatorTitle.Set {
-			e.FieldStart("creatorTitle")
-			s.CreatorTitle.Encode(e)
+		if s.ChannelTitle.Set {
+			e.FieldStart("channelTitle")
+			s.ChannelTitle.Encode(e)
 		}
 	}
 	{
@@ -1659,7 +1659,19 @@ func (s *VideoResponse) encodeFields(e *jx.Encoder) {
 	{
 		if s.PublishedAt.Set {
 			e.FieldStart("publishedAt")
-			s.PublishedAt.Encode(e)
+			s.PublishedAt.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.StartAt.Set {
+			e.FieldStart("startAt")
+			s.StartAt.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
+		if s.EndAt.Set {
+			e.FieldStart("endAt")
+			s.EndAt.Encode(e, json.EncodeDateTime)
 		}
 	}
 	{
@@ -1684,17 +1696,26 @@ func (s *VideoResponse) encodeFields(e *jx.Encoder) {
 			s.Title.Encode(e)
 		}
 	}
+	{
+		if s.Platform.Set {
+			e.FieldStart("platform")
+			s.Platform.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfVideoResponse = [8]string{
-	0: "creatorId",
-	1: "creatorTitle",
-	2: "description",
-	3: "id",
-	4: "publishedAt",
-	5: "tags",
-	6: "thumbnails",
-	7: "title",
+var jsonFieldsNameOfVideoResponse = [11]string{
+	0:  "channelId",
+	1:  "channelTitle",
+	2:  "description",
+	3:  "id",
+	4:  "publishedAt",
+	5:  "startAt",
+	6:  "endAt",
+	7:  "tags",
+	8:  "thumbnails",
+	9:  "title",
+	10: "platform",
 }
 
 // Decode decodes VideoResponse from json.
@@ -1705,25 +1726,25 @@ func (s *VideoResponse) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "creatorId":
+		case "channelId":
 			if err := func() error {
-				s.CreatorId.Reset()
-				if err := s.CreatorId.Decode(d); err != nil {
+				s.ChannelId.Reset()
+				if err := s.ChannelId.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"creatorId\"")
+				return errors.Wrap(err, "decode field \"channelId\"")
 			}
-		case "creatorTitle":
+		case "channelTitle":
 			if err := func() error {
-				s.CreatorTitle.Reset()
-				if err := s.CreatorTitle.Decode(d); err != nil {
+				s.ChannelTitle.Reset()
+				if err := s.ChannelTitle.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"creatorTitle\"")
+				return errors.Wrap(err, "decode field \"channelTitle\"")
 			}
 		case "description":
 			if err := func() error {
@@ -1748,12 +1769,32 @@ func (s *VideoResponse) Decode(d *jx.Decoder) error {
 		case "publishedAt":
 			if err := func() error {
 				s.PublishedAt.Reset()
-				if err := s.PublishedAt.Decode(d); err != nil {
+				if err := s.PublishedAt.Decode(d, json.DecodeDateTime); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"publishedAt\"")
+			}
+		case "startAt":
+			if err := func() error {
+				s.StartAt.Reset()
+				if err := s.StartAt.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"startAt\"")
+			}
+		case "endAt":
+			if err := func() error {
+				s.EndAt.Reset()
+				if err := s.EndAt.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"endAt\"")
 			}
 		case "tags":
 			if err := func() error {
@@ -1794,6 +1835,16 @@ func (s *VideoResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"title\"")
 			}
+		case "platform":
+			if err := func() error {
+				s.Platform.Reset()
+				if err := s.Platform.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"platform\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -1818,82 +1869,48 @@ func (s *VideoResponse) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode implements json.Marshaler.
-func (s *VideosGetOK) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
+// Encode encodes VideoResponsePlatform as json.
+func (s VideoResponsePlatform) Encode(e *jx.Encoder) {
+	e.Str(string(s))
 }
 
-// encodeFields encodes fields.
-func (s *VideosGetOK) encodeFields(e *jx.Encoder) {
-	{
-		if s.Data.Set {
-			e.FieldStart("data")
-			s.Data.Encode(e)
-		}
-	}
-	{
-		if s.Pagination.Set {
-			e.FieldStart("pagination")
-			s.Pagination.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfVideosGetOK = [2]string{
-	0: "data",
-	1: "pagination",
-}
-
-// Decode decodes VideosGetOK from json.
-func (s *VideosGetOK) Decode(d *jx.Decoder) error {
+// Decode decodes VideoResponsePlatform from json.
+func (s *VideoResponsePlatform) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosGetOK to nil")
+		return errors.New("invalid: unable to decode VideoResponsePlatform to nil")
 	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "data":
-			if err := func() error {
-				s.Data.Reset()
-				if err := s.Data.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"data\"")
-			}
-		case "pagination":
-			if err := func() error {
-				s.Pagination.Reset()
-				if err := s.Pagination.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"pagination\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode VideosGetOK")
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch VideoResponsePlatform(v) {
+	case VideoResponsePlatformYoutube:
+		*s = VideoResponsePlatformYoutube
+	case VideoResponsePlatformTwitch:
+		*s = VideoResponsePlatformTwitch
+	case VideoResponsePlatformTwitcasting:
+		*s = VideoResponsePlatformTwitcasting
+	case VideoResponsePlatformNiconico:
+		*s = VideoResponsePlatformNiconico
+	case VideoResponsePlatformUnknown:
+		*s = VideoResponsePlatformUnknown
+	default:
+		*s = VideoResponsePlatform(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *VideosGetOK) MarshalJSON() ([]byte, error) {
+func (s VideoResponsePlatform) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosGetOK) UnmarshalJSON(data []byte) error {
+func (s *VideoResponsePlatform) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2069,10 +2086,17 @@ func (s *VideosResponse) encodeFields(e *jx.Encoder) {
 			e.ArrEnd()
 		}
 	}
+	{
+		if s.Pagination.Set {
+			e.FieldStart("pagination")
+			s.Pagination.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfVideosResponse = [1]string{
+var jsonFieldsNameOfVideosResponse = [2]string{
 	0: "videos",
+	1: "pagination",
 }
 
 // Decode decodes VideosResponse from json.
@@ -2099,6 +2123,16 @@ func (s *VideosResponse) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"videos\"")
+			}
+		case "pagination":
+			if err := func() error {
+				s.Pagination.Reset()
+				if err := s.Pagination.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"pagination\"")
 			}
 		default:
 			return d.Skip()

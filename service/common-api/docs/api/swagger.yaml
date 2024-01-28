@@ -39,24 +39,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  creators:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                          example: "creator1"
-                        name:
-                          type: string
-                          example: "Creator Name 1"
-                        channels:
-                          type: array
-                          items:
-                            $ref: '#/components/schemas/ChannelResponse'
-                  pagination:
-                    $ref: '#/components/schemas/Pagination'
+                $ref: '#/components/schemas/CreatorsResponse'
         "400":
           description: Bad Request
         "401":
@@ -112,11 +95,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/VideosResponse'
-                  pagination:
-                    $ref: '#/components/schemas/Pagination'
+                $ref: '#/components/schemas/VideosResponse'
         "400":
           description: Bad Request
         "401":
@@ -211,13 +190,30 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/VideoResponse'
+        pagination:
+            $ref: '#/components/schemas/Pagination'
+    CreatorResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: UCiMG6VdScBabPhJ1ZtaVmbw
+        name:
+          type: string
+          example: 花芽なずな
+        channels:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelResponse'
     CreatorsResponse:
       type: object
       properties:
         creators:
           type: array
           items:
-            $ref: '#/components/schemas/ChannelResponse'
+            $ref: '#/components/schemas/CreatorResponse'
+        pagination:
+            $ref: '#/components/schemas/Pagination'
     ChannelResponse:
       type: object
       properties:
@@ -283,10 +279,10 @@ components:
     VideoResponse:
       type: object
       properties:
-        creatorId:
+        channelId:
           type: string
           example: UCiMG6VdScBabPhJ1ZtaVmbw
-        creatorTitle:
+        channelTitle:
           type: string
           example: 花芽なずな / Nazuna Kaga
         description:
@@ -298,6 +294,15 @@ components:
         publishedAt:
           type: string
           example: 2020-12-31T12:34:56+09:00
+          format: date-time
+        startAt:
+          type: string
+          example: 2020-12-31T12:34:56+09:00
+          format: date-time
+        endAt:
+          type: string
+          example: 2020-12-31T12:34:56+09:00
+          format: date-time
         tags:
           type: array
           items:
@@ -307,6 +312,10 @@ components:
         title:
           type: string
           example: 【ぶいすぽっ！】Blessing ~12人で歌ってみた~
+        platform:
+          type: string
+          example: youtube
+          enum: [youtube, twitch, twitcasting, niconico, unknown]
     ViewsResponse:
       type: object
       properties:

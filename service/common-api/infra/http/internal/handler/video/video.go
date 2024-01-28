@@ -6,20 +6,20 @@ import (
 	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/api"
 )
 
-// ChannelsChannelIDVideosGet implements the GET /channels/{channel_id}/videos endpoint.
-func (h *VH) ChannelsChannelIDVideosGet(ctx context.Context, params api.ChannelsChannelIDVideosGetParams) (api.ChannelsChannelIDVideosGetRes, error) {
-	// FIXME: implement
-	return &api.ChannelsChannelIDVideosGetOK{}, nil
-}
-
-// ChannelsChannelIDVideosPut implements the PUT /channels/{channel_id}/videos endpoint.
-func (h *VH) ChannelsChannelIDVideosPut(ctx context.Context, req *api.ChannelsChannelIDVideosPutReq, params api.ChannelsChannelIDVideosPutParams) (api.ChannelsChannelIDVideosPutRes, error) {
+// VideosGet implements the GET /channels/{channel_id}/videos endpoint.
+func (h *VH) VideosGet(ctx context.Context, params api.VideosGetParams) (api.VideosGetRes, error) {
 	// FIXME: implement
 	return &api.VideosResponse{}, nil
 }
 
-// ChannelsChannelIDVideosPost implements the POST /channels/{channel_id}/videos endpoint.
-func (h *VH) ChannelsChannelIDVideosPost(ctx context.Context, req *api.ChannelsChannelIDVideosPostReq, params api.ChannelsChannelIDVideosPostParams) (api.ChannelsChannelIDVideosPostRes, error) {
+// VideosPut implements the PUT /channels/{channel_id}/videos endpoint.
+func (h *VH) VideosPut(ctx context.Context, req *api.VideosPutReq) (api.VideosPutRes, error) {
+	// FIXME: implement
+	return &api.VideosResponse{}, nil
+}
+
+// VideosPost implements the POST /channels/{channel_id}/videos endpoint.
+func (h *VH) VideosPost(ctx context.Context, req *api.VideosPostReq) (api.VideosPostRes, error) {
 	// FIXME: implement
 	return &api.VideosResponse{}, nil
 }

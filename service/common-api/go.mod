@@ -5,6 +5,7 @@ go 1.20
 require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
+	github.com/jackc/pgx/v5 v5.5.2
 	github.com/ogen-go/ogen v0.81.2
 	github.com/volatiletech/null/v8 v8.1.2
 	go.opentelemetry.io/otel v1.22.0
@@ -23,6 +24,8 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/gofrs/uuid v3.2.0+incompatible // indirect
 	github.com/google/uuid v1.5.0 // indirect
+	github.com/jackc/pgpassfile v1.0.0 // indirect
+	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/rogpeppe/go-internal v1.11.0 // indirect
@@ -32,6 +35,7 @@ require (
 	github.com/volatiletech/strmangle v0.0.1 // indirect
 	go.uber.org/goleak v1.3.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
+	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/exp v0.0.0-20230725093048-515e97ebf090 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect
