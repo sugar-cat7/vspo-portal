@@ -7,25 +7,25 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/repository"
 )
 
-type channel struct{}
+type creator struct{}
 
-func NewChannel() repository.Channel {
-	return &channel{}
+func NewCreator() repository.Creator {
+	return &creator{}
 }
 
-func (r *channel) List(
+func (r *creator) List(
 	ctx context.Context,
-	query repository.ListChannelsQuery,
-) (model.Channels, error) {
+	query repository.ListCreatorsQuery,
+) (model.Creators, error) {
 	// FIXME: implement
 	if query.Page.Valid && query.Limit.Valid {
 	}
-	return model.Channels{}, nil
+	return model.Creators{}, nil
 }
 
-func (r *channel) Count(
+func (r *creator) Count(
 	ctx context.Context,
-	query repository.ListChannelsQuery,
+	query repository.ListCreatorsQuery,
 ) (uint64, error) {
 	// FIXME: implement
 	return 0, nil

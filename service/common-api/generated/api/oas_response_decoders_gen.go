@@ -30,7 +30,7 @@ func decodeCreatorsGetResponse(resp *http.Response) (res CreatorsGetRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CreatorsGetOK
+			var response CreatorsResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -46,6 +46,15 @@ func decodeCreatorsGetResponse(resp *http.Response) (res CreatorsGetRes, _ error
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -86,7 +95,7 @@ func decodeVideosGetResponse(resp *http.Response) (res VideosGetRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response VideosGetOK
+			var response VideosResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -102,6 +111,15 @@ func decodeVideosGetResponse(resp *http.Response) (res VideosGetRes, _ error) {
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:
@@ -159,6 +177,15 @@ func decodeVideosPostResponse(resp *http.Response) (res VideosPostRes, _ error) 
 				}
 				return res, err
 			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
+			}
 			return &response, nil
 		default:
 			return res, validate.InvalidContentType(ct)
@@ -214,6 +241,15 @@ func decodeVideosPutResponse(resp *http.Response) (res VideosPutRes, _ error) {
 					Err:         err,
 				}
 				return res, err
+			}
+			// Validate response.
+			if err := func() error {
+				if err := response.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return res, errors.Wrap(err, "validate")
 			}
 			return &response, nil
 		default:

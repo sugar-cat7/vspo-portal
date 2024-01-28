@@ -8,22 +8,23 @@ import (
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_repository
-type Channel interface {
+type Creator interface {
 	List(
 		ctx context.Context,
-		query ListChannelsQuery,
-	) (model.Channels, error)
+		query ListCreatorsQuery,
+	) (model.Creators, error)
 	Count(
 		ctx context.Context,
-		query ListChannelsQuery,
+		query ListCreatorsQuery,
 	) (uint64, error)
 }
 
-type GetChannelQuery struct {
+type GetCreatorQuery struct {
 	ID null.String
 	BaseGetOptions
 }
 
-type ListChannelsQuery struct {
+type ListCreatorsQuery struct {
+	CreatorID null.String
 	BaseListOptions
 }

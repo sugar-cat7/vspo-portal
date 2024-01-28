@@ -6,14 +6,14 @@ import (
 )
 
 type Dependency struct {
-	ChannelInteractor usecase.ChannelInteractor
+	CreatorInteractor usecase.CreatorInteractor
 }
 
 func Inject() *Dependency {
-	channelInteractor := usecase.NewChannelInteractor(
-		repository.NewChannel(),
+	creatorInteractor := usecase.NewCreatorInteractor(
+		repository.NewCreator(),
 	)
 	return &Dependency{
-		ChannelInteractor: channelInteractor,
+		CreatorInteractor: creatorInteractor,
 	}
 }

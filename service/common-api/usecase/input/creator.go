@@ -1,35 +1,35 @@
 package input
 
-type GetChannel struct {
+type GetCreator struct {
 	ID string
 }
 
-func NewGetChannel(
+func NewGetCreator(
 	id string,
-) *GetChannel {
-	return &GetChannel{
+) *GetCreator {
+	return &GetCreator{
 		ID: id,
 	}
 }
 
-type ListChannels struct {
+type ListCreators struct {
 	ids   []string
 	Page  uint64
 	Limit uint64
 }
 
-func NewListChannels(
+func NewListCreators(
 	ids []string,
 	page uint64,
 	limit uint64,
-) *ListChannels {
+) *ListCreators {
 	if page == 0 {
 		page = 1
 	}
 	if limit == 0 {
 		limit = 30
 	}
-	return &ListChannels{
+	return &ListCreators{
 		ids:   ids,
 		Page:  page,
 		Limit: limit,

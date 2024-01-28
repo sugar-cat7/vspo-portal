@@ -7,9 +7,9 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/output"
 )
 
-type ChannelInteractor interface {
+type CreatorInteractor interface {
 	List(
 		ctx context.Context,
-		param *input.ListChannels,
-	) (*output.ListChannels, error)
+		param *input.ListCreators,
+	) (*output.ListCreators, error)
 }

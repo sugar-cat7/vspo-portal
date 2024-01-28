@@ -9,6 +9,7 @@ type Channel struct {
 	ID         string
 	Snippet    ChannelSnippet
 	Statistics ChannelStatistics
+	Videos     Videos
 }
 
 // ChannelSnippet represents a channel snippet.
