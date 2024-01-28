@@ -1,3 +1,5 @@
+import {formatWithTimeZone} from "@/lib/utils";
+
 export const platforms = [
   { id: "youtube", name: "YouTube" },
   { id: "twitch", name: "Twitch" },
@@ -20,10 +22,16 @@ export const sideBarContents = [
 ];
 
 export const bottomNavigationContents = [
-  { id: "live", name: "配信中" },
-  { id: "clip", name: "切り抜き" },
-  { id: "twitch-clip", name: "クリップ" },
-  { id: "event", name: "イベント" },
+  { id: "list", name: "配信一覧", link: "/schedule/all" },
+  { id: "clip", name: "切り抜き", link: "/clips" },
+  { id: "twitch-clip", name: "クリップ", link: "/twitch-clips" },
+  {
+    id: "event",
+    name: "イベント",
+    get link() {
+      return `/events/${formatWithTimeZone(new Date(), "ja", "yyyy-MM")}`;
+    },
+  },
 ];
 
 export const timeframes = [
