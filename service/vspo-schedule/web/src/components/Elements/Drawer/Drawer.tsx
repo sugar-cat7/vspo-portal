@@ -1,4 +1,3 @@
-import { sideBarContents } from "@/data/master";
 import {
   List,
   ListItem,
@@ -12,11 +11,10 @@ import {
 } from "@mui/material";
 import React from "react";
 import Link from "next/link";
-
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { styled } from "@mui/system";
-import { QA_LINK, SUPPORT_LINK, DISCORD_LINK } from "@/lib/Const";
+import { drawerContents, getNavigationRouteInfo } from "@/data/navigation";
 import { DrawerIcon } from "../Icon";
 
 const StyledListItemIcon = styled(ListItemIcon)(() => ({
@@ -39,33 +37,13 @@ export const CustomDrawer: React.FC = () => {
         <Typography variant="subtitle2" sx={{ padding: "8px 16px" }}>
           <ChipStyle label="Main Section" size="small" />
         </Typography>
-        {sideBarContents.map(({ id, name }) => {
-          const link =
-            id === "list"
-              ? "/schedule/all"
-              : id === "clip"
-              ? "/clips"
-              : id === "qa"
-              ? QA_LINK
-              : id === "support"
-              ? SUPPORT_LINK
-              : id === "notification"
-              ? "/notifications"
-              : id === "freechat"
-              ? "/freechat"
-              : id === "twitch-clip"
-              ? "/twitch-clips"
-              : id === "about"
-              ? "/about"
-              : id === "discord"
-              ? DISCORD_LINK
-              : "/schedule/" + id;
-          const isExternalLink = id === "qa" || id == "support";
+        {drawerContents.map(({ id, name}) => {
+          const { link, isExternalLink } = getNavigationRouteInfo(id);
 
           if (id === "freechat") {
             return (
               <React.Fragment key={id}>
-                <Link href={link || ""}>
+                <Link href={link}>
                   <ListItem>
                     <StyledListItemIcon>
                       <DrawerIcon id={id} />
@@ -84,7 +62,7 @@ export const CustomDrawer: React.FC = () => {
           if (id === "clip" || id === "twitch-clip") {
             return (
               <React.Fragment key={id}>
-                <Link href={link || ""}>
+                <Link href={link}>
                   <ListItem>
                     <StyledListItemIcon>
                       <DrawerIcon id={id} />
@@ -136,7 +114,7 @@ export const CustomDrawer: React.FC = () => {
               </ListItem>
             </a>
           ) : (
-            <Link href={link || ""} key={id}>
+            <Link href={link} key={id}>
               <ListItem>
                 <StyledListItemIcon>
                   <DrawerIcon id={id} />

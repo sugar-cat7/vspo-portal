@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { Box } from "@mui/system";
 import { DrawerIcon } from "../Elements";
-import { bottomNavigationContents } from "@/data/master";
 import Link from "next/link";
 import { useRouter } from 'next/router';
+import { bottomNavigationContents, getNavigationRouteInfo } from "@/data/navigation";
 
 const getActiveNavOption = (activePath: string) => {
   const pathParts = activePath.split("/");
@@ -12,7 +12,10 @@ const getActiveNavOption = (activePath: string) => {
     return undefined;
   }
   const basePath = pathParts.slice(0, 2).join("/");
-  return bottomNavigationContents.find(({ link }) => link.startsWith(basePath));
+  return bottomNavigationContents.find(({ id }) => {
+    const link = getNavigationRouteInfo(id).link;
+    return link.startsWith(basePath);
+  });
 };
 
 export const CustomBottomNavigation: React.FC = () => {
@@ -30,10 +33,10 @@ export const CustomBottomNavigation: React.FC = () => {
         value={value}
         showLabels
       >
-        {bottomNavigationContents.map(({ id, name, link }) => (
+        {bottomNavigationContents.map(({ id, name }) => (
           <BottomNavigationAction
             component={Link}
-            href={link}
+            href={getNavigationRouteInfo(id).link}
             key={id}
             label={name}
             value={id}

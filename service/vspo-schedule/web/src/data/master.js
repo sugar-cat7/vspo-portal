@@ -1,37 +1,8 @@
-import {formatWithTimeZone} from "@/lib/utils";
-
 export const platforms = [
   { id: "youtube", name: "YouTube" },
   { id: "twitch", name: "Twitch" },
   { id: "twitcasting", name: "ツイキャス" },
   { id: "nicovideo", name: "ニコニコ動画" },
-];
-
-export const sideBarContents = [
-  { id: "live", name: "配信中" },
-  { id: "upcoming", name: "配信予定" },
-  { id: "archive", name: "アーカイブ" },
-  { id: "freechat", name: "フリーチャット" },
-  { id: "clip", name: "切り抜き一覧" },
-  { id: "twitch-clip", name: "クリップ一覧" },
-  { id: "about", name: "すぽじゅーるについて" },
-  { id: "notification", name: "お知らせ" },
-  { id: "qa", name: "お問い合わせ" },
-  { id: "discord", name: "Discord Bot" },
-  // { id: "support", name: "メッセージやご支援" },
-];
-
-export const bottomNavigationContents = [
-  { id: "list", name: "配信一覧", link: "/schedule/all" },
-  { id: "clip", name: "切り抜き", link: "/clips" },
-  { id: "twitch-clip", name: "クリップ", link: "/twitch-clips" },
-  {
-    id: "event",
-    name: "イベント",
-    get link() {
-      return `/events/${formatWithTimeZone(new Date(), "ja", "yyyy-MM")}`;
-    },
-  },
 ];
 
 export const timeframes = [
