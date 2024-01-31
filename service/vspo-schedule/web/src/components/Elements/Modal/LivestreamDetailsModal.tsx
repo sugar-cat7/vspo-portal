@@ -325,28 +325,30 @@ interface TabPanelProps {
   children: React.ReactNode;
 }
 
-const ScrollableTabPanel = styled("div")({
-  flex: "1",
+const TabPanelScrollContainer = styled("div")(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
+  height: "100%",
   overflowX: "hidden",
   overflowY: "auto",
+  padding: theme.spacing(1),
   scrollbarWidth: "none",
   "&::-webkit-scrollbar": {
     display: "none",
   },
-});
+}));
 
 const TabPanel: React.FC<TabPanelProps> = ({ value, index, children }) => {
   return (
-    <ScrollableTabPanel
+    <div
       role="tabpanel"
       hidden={value !== index}
       id={`livestream tabpanel-${index}`}
       aria-labelledby={`livestream-tab-${index}`}
+      style={{ flex: "1", overflow: "hidden" }}
     >
-      {value === index && <Box p={1} sx={{ flex: 1 }}>{children}</Box>}
-    </ScrollableTabPanel>
+      {value === index && <TabPanelScrollContainer>{children}</TabPanelScrollContainer>}
+    </div>
   );
 };
 
