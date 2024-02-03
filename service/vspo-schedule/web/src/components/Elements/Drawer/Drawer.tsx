@@ -14,8 +14,21 @@ import Link from "next/link";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { styled } from "@mui/system";
-import { drawerContents, getNavigationRouteInfo } from "@/data/navigation";
+import { getNavigationRouteInfo, NavigationRouteId } from "@/data/navigation";
 import { DrawerIcon } from "../Icon";
+
+const drawerContents = [
+  { id: "live", name: "配信中" },
+  { id: "upcoming", name: "配信予定" },
+  { id: "archive", name: "アーカイブ" },
+  { id: "freechat", name: "フリーチャット" },
+  { id: "clip", name: "切り抜き一覧" },
+  { id: "twitch-clip", name: "クリップ一覧" },
+  { id: "about", name: "すぽじゅーるについて" },
+  { id: "notification", name: "お知らせ" },
+  { id: "qa", name: "お問い合わせ" },
+  { id: "discord", name: "Discord Bot" },
+] as const satisfies { id: NavigationRouteId, name: string }[];
 
 const StyledListItemIcon = styled(ListItemIcon)(() => ({
   minWidth: "32px",

@@ -4,7 +4,14 @@ import { Box } from "@mui/system";
 import { DrawerIcon } from "../Elements";
 import Link from "next/link";
 import { useRouter } from 'next/router';
-import { bottomNavigationContents, getNavigationRouteInfo } from "@/data/navigation";
+import { getNavigationRouteInfo, NavigationRouteId } from "@/data/navigation";
+
+const bottomNavigationContents = [
+  { id: "list", name: "配信一覧" },
+  { id: "clip", name: "切り抜き" },
+  { id: "twitch-clip", name: "クリップ" },
+  { id: "event", name: "イベント" },
+] as const satisfies { id: NavigationRouteId, name: string }[];
 
 const getActiveNavOption = (activePath: string) => {
   const pathParts = activePath.split("/");
