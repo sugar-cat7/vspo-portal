@@ -7,7 +7,8 @@ import {
   CardActionArea,
   Avatar,
 } from "@mui/material";
-import { Box, styled } from "@mui/system";
+import { styled } from "@mui/material/styles";
+import { Box } from "@mui/system";
 import { Livestream } from "@/types/streaming";
 import {
   getLivestreamUrl,
@@ -77,7 +78,10 @@ const StyledCard = styled(Card)<StyledCardProps>(({ theme, livestatus }) => ({
       : livestatus === "upcoming"
       ? "3px solid rgb(45, 75, 112)"
       : "none",
-  backgroundColor: theme.palette.mode === "dark" ? "#353535" : "white",
+  backgroundColor: "white",
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: "#353535",
+  },
   [theme.breakpoints.up("sm")]: {
     flexDirection: "row",
     transform: "unset",

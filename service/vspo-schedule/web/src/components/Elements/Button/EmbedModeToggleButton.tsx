@@ -2,8 +2,8 @@ import { EmbedModeContext } from "@/context/EmbedMode"; // ファイルパスは
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { useContext } from "react";
-import { styled } from "@mui/system";
 import { Switch } from "@mui/material";
+import { styled } from "@mui/material/styles";
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,

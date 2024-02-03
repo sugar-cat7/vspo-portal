@@ -11,6 +11,7 @@ import {
   Button,
   Toolbar,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import Timeline from "@mui/lab/Timeline";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
@@ -25,7 +26,6 @@ import { ContentLayout } from "@/components/Layout";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { useMediaQuery } from "@mui/material";
 import { members } from "@/data/members";
-import { styled } from "@mui/system";
 import { formatWithTimeZone, groupEventsByYearMonth } from "@/lib/utils";
 import React, { useEffect } from "react";
 import { fetchVspoEvents } from "@/lib/api";
@@ -121,7 +121,11 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
 };
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  color: theme.palette.mode === "dark" ? "white" : "gray",
+  color: "gray",
+
+  [theme.getColorSchemeSelector("dark")]: {
+    color: "white",
+  },
 }));
 
 const IndexPage: NextPageWithLayout<Props> = ({

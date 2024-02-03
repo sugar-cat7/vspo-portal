@@ -1,7 +1,7 @@
 import { faDiscord, faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
-import { styled } from "@mui/system";
+import { styled } from "@mui/material/styles";
 import ReorderIcon from "@mui/icons-material/Reorder";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
@@ -16,7 +16,11 @@ import EventIcon from "@mui/icons-material/Event";
 import InfoIcon from "@mui/icons-material/Info";
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)(({ theme }) => ({
-  color: theme.palette.mode === "dark" ? "white" : "black",
+  color: "black",
+
+  [theme.getColorSchemeSelector("dark")]: {
+    color: "white",
+  },
 }));
 
 type Props = { platform: string };

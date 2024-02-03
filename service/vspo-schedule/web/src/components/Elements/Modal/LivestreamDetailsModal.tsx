@@ -16,7 +16,7 @@ import {
   Tabs,
   BottomNavigation,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled } from "@mui/material/styles";
 import { Clip, Livestream, Platform } from "@/types/streaming";
 import {
   formatWithTimeZone,
@@ -43,10 +43,14 @@ type LivestreamDetailsModalProps = {
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   position: "sticky",
   top: 0,
-  backgroundColor: theme.palette.mode === "dark" ? "#212121" : "#7266cf",
-  borderBottom: `1px solid ${theme.palette.divider}`,
+  backgroundColor: "#7266cf",
+  borderBottom: `1px solid ${theme.vars.palette.divider}`,
   padding: theme.spacing(1),
   color: "white",
+
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: "#212121",
+  },
 }));
 
 const LiveLabel = styled("div")<{ isUpcoming?: boolean }>(
@@ -80,7 +84,7 @@ const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
   position: "sticky",
   bottom: 0,
   backgroundColor: "rgba(0, 0, 0, 0.75)",
-  borderTop: `1px solid ${theme.palette.divider}`,
+  borderTop: `1px solid ${theme.vars.palette.divider}`,
   padding: theme.spacing(2),
 }));
 

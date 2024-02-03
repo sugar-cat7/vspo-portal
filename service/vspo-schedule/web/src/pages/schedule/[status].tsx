@@ -1,5 +1,6 @@
 import React from "react";
 import { Container, Box, Tab, Tabs } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { Livestream } from "@/types/streaming";
 import {
@@ -10,7 +11,6 @@ import {
   isValidDate,
   removeDuplicateTitles,
 } from "@/lib/utils";
-import { styled } from "@mui/system";
 import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { NextPageWithLayout } from "../_app";
@@ -39,7 +39,7 @@ const TabBox = styled(Box)(({ theme }) => ({
   borderColor: "divider",
   top: "64px",
   zIndex: "1000",
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: theme.vars.palette.background.default,
   display: "flex",
   justifyContent: "center",
   position: "sticky",

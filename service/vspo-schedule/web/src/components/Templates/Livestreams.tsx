@@ -9,11 +9,11 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { Livestream } from "@/types/streaming";
 import { formatWithTimeZone, groupLivestreamsByTimeRange } from "@/lib/utils";
 import { TabPanel } from "@mui/lab";
 import { LivestreamCard } from "../Elements";
-import { styled } from "@mui/system";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
 import { members } from "@/data/members";
@@ -26,22 +26,28 @@ type Props = {
 
 const StyledAccordion = styled(Accordion)(({ theme }) => ({
   width: "100%",
-  backgroundColor:
-    theme.palette.mode === "dark" ? "#353535" : "rgb(45, 75, 112)",
+  backgroundColor: "rgb(45, 75, 112)",
   color: "white",
   fontWeight: "bold",
   borderRadius: "4px",
+
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: "#353535",
+  },
 }));
 
 const DateTypography = styled(Typography)(({ theme }) => ({
   width: "100%",
   textAlign: "center",
-  backgroundColor:
-    theme.palette.mode === "dark" ? "#353535" : "rgb(45, 75, 112)",
+  backgroundColor: "rgb(45, 75, 112)",
   color: "white",
   fontWeight: "bold",
   padding: "0.75rem",
   borderRadius: "4px",
+
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: "#353535",
+  },
 }));
 
 const TimeRangeLabel = styled(Typography)(({ theme }) => ({
@@ -50,12 +56,16 @@ const TimeRangeLabel = styled(Typography)(({ theme }) => ({
   fontSize: "1.5rem",
   fontWeight: 600,
   textAlign: "center",
-  background: theme.palette.mode === "dark" ? "#353535" : "rgb(45, 75, 112)",
+  backgroundColor: "rgb(45, 75, 112)",
   borderRadius: "1.35rem",
   marginBottom: theme.spacing(2),
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: "#353535",
+  },
   [theme.breakpoints.down("md")]: {
     width: "10rem",
     fontSize: "1.2rem",

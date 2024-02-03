@@ -1,6 +1,5 @@
-import { ThemeContext } from "@/context/Theme";
-import { useContext } from "react";
 import { Tweet, TweetNotFound } from "react-tweet";
+import { useColorScheme } from "@mui/material/styles";
 
 type TweetEmbedProps = {
   tweetLink: string;
@@ -8,7 +7,7 @@ type TweetEmbedProps = {
 
 export const TweetEmbed: React.FC<TweetEmbedProps> = ({ tweetLink }) => {
   const tweetId = tweetLink.split("/").pop();
-  const [mode] = useContext(ThemeContext);
+  const { mode } = useColorScheme();
   return (
     <div className={mode}>
       {tweetId ? <Tweet id={tweetId} /> : <TweetNotFound />}

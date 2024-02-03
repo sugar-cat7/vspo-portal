@@ -11,13 +11,12 @@ import {
   Pagination,
   Avatar,
   Chip,
-  Palette,
   PaletteColor,
   Button,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { Clip, Platform } from "@/types/streaming";
 import { getLivestreamUrl, isTrending } from "@/lib/utils";
-import { styled } from "@mui/system";
 import { members } from "@/data/members";
 import { PlayArrow } from "@mui/icons-material";
 import { EmbedModeContext } from "@/context/EmbedMode";
@@ -203,8 +202,8 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
                       height: "24px",
                       backgroundColor: (theme) =>
                         (
-                          theme.palette[
-                            clipLabel.color as keyof Palette
+                          theme.vars.palette[
+                            clipLabel.color as keyof typeof theme.vars.palette
                           ] as PaletteColor
                         ).main,
                       color: "white",

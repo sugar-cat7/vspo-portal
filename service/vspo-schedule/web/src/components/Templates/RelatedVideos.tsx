@@ -13,7 +13,7 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled } from "@mui/material/styles";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import useSWRInfinite from "swr/infinite";

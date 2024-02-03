@@ -1,4 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
+import { getInitColorSchemeScript } from "@mui/material/styles";
 
 class MyDocument extends Document {
   render() {
@@ -30,6 +31,7 @@ class MyDocument extends Document {
           <meta name="theme-color" content="#fff" />
         </Head>
         <body>
+          {getInitColorSchemeScript()}
           <Main />
           <NextScript />
         </body>
