@@ -1,4 +1,6 @@
-export const members = [
+import { Member } from "@/types/member";
+
+export const members: Member[] = [
   {
     id: 1,
     name: "藍沢エマ",
@@ -8,6 +10,7 @@ export const members = [
     twitcastingUserId: "1435560167794302978",
     iconUrl:
       "https://yt3.ggpht.com/oIps6UVvqtpJykcdjYYyRvhdcyVoR1wAdH8CnTp4msMaKYdn8XMLj4FHsLoqfWaJzbLJKSPjCg=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 2,
@@ -18,6 +21,7 @@ export const members = [
     twitcastingUserId: "1278069456359444480",
     iconUrl:
       "https://yt3.ggpht.com/7M4bq-eX19nDu1Mzf6RWdHSpyCNP1USrfJ2oTfWgCTiIv31G3-7Sbdf4QzTRemQiEYRTEE0L9g=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 3,
@@ -28,6 +32,7 @@ export const members = [
     twitcastingUserId: "1108236843466711043",
     iconUrl:
       "https://yt3.ggpht.com/ytc/APkrFKa8-P-02Nq3PiioxmAYuaVlI2N88vATP8pXCPQHwQ=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 4,
@@ -38,6 +43,7 @@ export const members = [
     twitcastingUserId: "1041915108069261313",
     iconUrl:
       "https://yt3.ggpht.com/z2_Tom0OvgKnTvRM9HbUWHqGyfb3x5H8EuQ5f10N_sIoODGODF0FJPaQVPX4FHtwFtbZrYaiiA=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 5,
@@ -48,6 +54,7 @@ export const members = [
     twitcastingUserId: "1041912206583984130",
     iconUrl:
       "https://yt3.ggpht.com/HsgFKOFi-dN8VTnvRLV276FwW5PMR7Ynjxf_Rg1eKt9djmlU9zJXiaMBr7Bg7n0HCX2qsx9D=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 6,
@@ -57,6 +64,7 @@ export const members = [
     twitcastingScreenId: "xprprQchanx",
     iconUrl:
       "https://yt3.ggpht.com/83sEziNDVt1HoBeo4JXIBXjA3DMGCxxyCLmCig9nml-h7f5bPMvczmtgh8TQUqzaOEoc-0lFgg=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 7,
@@ -67,6 +75,7 @@ export const members = [
     twitcastingUserId: "1276905650446979072",
     iconUrl:
       "https://yt3.ggpht.com/U2M8O-qwS0vrjAr7nYk9y58xAV-I80eRn1jn1MX6pmsGcMdtUhMmgRekSAun2ca2Db7ntFuwwQ=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 8,
@@ -77,6 +86,7 @@ export const members = [
     twitcastingUserId: "1221690508273078277",
     iconUrl:
       "https://yt3.ggpht.com/_BNEc4IHu2lbfF0QWQzRBJHaKmCyeBMUcJjX_SsDqPr6Tc9EX20ujJBQ1rmbLjqi7xRepR3oCw=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 9,
@@ -86,6 +96,7 @@ export const members = [
     twitcastingUserId: "1105705824733687808",
     iconUrl:
       "https://yt3.ggpht.com/ytc/APkrFKaJ1d6lTp32GNjCmMZpwkKdE2F9AQKTT9dipEfD=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 10,
@@ -96,6 +107,7 @@ export const members = [
     twitcastingUserId: "1258264128780554241",
     iconUrl:
       "https://yt3.ggpht.com/t557GNcLS_5tgJCkbA7qaEs7XrogCmScjWRauTQRtknc7VXuGMF18YjeLVHFEarbkRN5pWOF=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 11,
@@ -106,16 +118,18 @@ export const members = [
     twitcastingUserId: "1435565684881178633",
     iconUrl:
       "https://yt3.ggpht.com/nHOf1h_guQXgrCw-E3rDcEKV2r8wvOUys7_3lrvKsDWu-Fbf5VT_mBwCNglvWpaNGonWWjmcdQ=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 12,
-    name: "白波 らむね",
+    name: "白波らむね",
     channelId: "UC61OwuYOVuKkpKnid-43Twg",
     twitchChannelId: "858359149",
     twitcastingScreenId: "ramune_shirana3",
     twitcastingUserId: "1558536246456389632",
     iconUrl:
       "https://yt3.ggpht.com/89CDsuDU9WD9o-_LQg1hqEvntFzihLLPnIx5mR4A0oBs0jc6pGV_aMdWz8CO3T-WbURePtdGbA=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 13,
@@ -126,25 +140,28 @@ export const members = [
     twitcastingUserId: "1276939850885656576",
     iconUrl:
       "https://yt3.ggpht.com/76a_ty_OwF-nJWNuuxxeJokcgqlmkKCHwXSto9cKKkyjPO2agiu5Tc7t4f6dz5uaab7X8U5mVQ=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 14,
-    name: "兎咲 ミミ",
+    name: "兎咲ミミ",
     channelId: "UCnvVG9RbOW3J6Ifqo-zKLiw",
     twitcastingScreenId: "mimi_tosaki",
     twitcastingUserId: "1276920584299966465",
     iconUrl:
       "https://yt3.ggpht.com/q3SKZBWy8lyeSBcvjlo6E2lc9IeX6ZeIWp2wDMROGGfsjrkJCjGt7Nk2T1dAFhpHAl2wLl_A=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 15,
-    name: "猫汰 つな",
+    name: "猫汰つな",
     channelId: "UCIjdfjcSaEgdjwbgjxC3ZWg",
     twitchChannelId: "858359105",
     twitcastingScreenId: "tsuna_nekota",
     twitcastingUserId: "1535916492155678721",
     iconUrl:
       "https://yt3.ggpht.com/5cB1RxA8O44yMKNGvEMqvS3E1FaTloSC1GoTfY48kjAcxllPwyySVO9ioRoSfLSKFATLJycV=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 16,
@@ -155,6 +172,7 @@ export const members = [
     twitcastingUserId: "1274610375212711936",
     iconUrl:
       "https://yt3.ggpht.com/ytc/APkrFKbM7XhffWgOdXsKctu6ERj5phdQ6Wg5rIY5UK0e=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 17,
@@ -165,6 +183,7 @@ export const members = [
     twitcastingUserId: "1381969294624313344",
     iconUrl:
       "https://yt3.ggpht.com/TaSlDiG5kna6N97pSfFntREvdnSy5AOorOIvT7VxvD9CkG17nd1vWligkJVnhgqrIFHxa2-wZw=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 18,
@@ -173,9 +192,10 @@ export const members = [
     iconUrl:
       "https://yt3.ggpht.com/oIDXQDZsMSTeGShVPE_-CAifw4duLe5z-8_6zhT3x3cenZq0KScM6UH0Y6Gva9k-p648YDrNMA=s240-c-k-c0x00ffffff-no-rj",
     twitchChannelId: "584184005",
-    twitchChanneUserName: "濃いめのあかりん",
+    twitchChannelUserName: "濃いめのあかりん",
     twitchIconUrl:
       "https://static-cdn.jtvnw.net/jtv_user_pictures/3c8667c4-7373-4280-9d7f-fee14ad908b2-profile_image-70x70.png",
+    keywords: [],
   },
   {
     id: 19,
@@ -184,35 +204,20 @@ export const members = [
     twitchChannelId: "779969264",
     iconUrl:
       "https://yt3.ggpht.com/dgFxRY6ACT5Qi3lM1j8YZPe_ZGH_pCRy2N_p5znoAE9mYTYYqUN64RGQvMnMqF4MDr-PKEQJyU8=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
   {
     id: 20,
-    name: "夜乃くろむ / Yano Kuromu",
+    name: "夜乃くろむ",
     channelId: "UCX4WL24YEOUYd7qDsFSLDOw",
     iconUrl:
       "https://yt3.ggpht.com/s5yBpdTfsald7IesR0XOLBAE49k5P9e5aLqE6AsmPf2pb8GSQ9-srQz-eSiAUWrkfCTTcDZWZA=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [],
   },
-];
-export const memberNames = [
-  "藍沢エマ",
-  "空澄セナ",
-  "一ノ瀬うるは",
-  "花芽すみれ",
-  "花芽なずな",
-  "神成きゅぴ",
-  "如月れん",
-  "胡桃のあ",
-  "小雀とと",
-  "小森めと",
-  "紫宮るな",
-  "白波 らむね",
-  "橘ひなの",
-  "兎咲 ミミ",
-  "猫汰 つな",
-  "英リサ",
-  "八雲べに",
-  "ぶいすぽ",
-  "夢野あかり",
-  "あかりん",
-  "夜乃くろむ",
-];
+]
+  .map((member) => ({
+    ...member,
+    keywords: [...member.keywords, member.name],
+  }));
+
+export const memberNames = members.map(({ name }) => name);

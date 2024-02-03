@@ -4,7 +4,7 @@ import { Clip } from "@/types/streaming";
 import { filterByTimeframe, formatWithTimeZone } from "@/lib/utils";
 import { Box } from "@mui/system";
 import { NextPageWithLayout } from "./_app";
-import { Loading, SerarchDialog } from "@/components/Elements";
+import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
@@ -46,7 +46,7 @@ const ClipPage: NextPageWithLayout<ClipsProps> = ({
       ) : (
         <ClipTabs clips={filteredClips} />
       )}
-      <SerarchDialog
+      <SearchDialog
         clips={clips}
         setFilteredClips={setFilteredClips}
         searchTarget="clip"
