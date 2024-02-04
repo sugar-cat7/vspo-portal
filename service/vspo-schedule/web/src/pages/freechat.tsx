@@ -1,8 +1,6 @@
 import { LivestreamCard } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
-import { freeChatVideoIds } from "@/data/master";
-import { mockFreeChats } from "@/data/freechats";
-import { ENVIRONMENT, TEMP_TIMESTAMP } from "@/lib/Const";
+import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { formatWithTimeZone } from "@/lib/utils";
 import { Box } from "@mui/system";
 import { GetStaticProps } from "next";
@@ -20,24 +18,22 @@ type FreeChatsProps = {
 
 const FreeChatPage: NextPageWithLayout<FreeChatsProps> = ({ freeChats }) => {
   return (
-    <>
-      <Box
-        sx={{
-          padding: "24px",
-          marginTop: "76px",
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <Grid container spacing={3} sx={{ maxWidth: "1152px" }}>
-          {freeChats.map((freeChat) => (
-            <Grid item xs={6} sm={6} md={3} lg={3} key={freeChat.id}>
-              <LivestreamCard livestream={freeChat} />
-            </Grid>
-          ))}
-        </Grid>
-      </Box>
-    </>
+    <Box
+      sx={{
+        padding: "24px",
+        marginTop: "76px",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <Grid container spacing={3} sx={{ maxWidth: "1152px" }}>
+        {freeChats.map((freeChat) => (
+          <Grid item xs={6} sm={6} md={3} lg={3} key={freeChat.id}>
+            <LivestreamCard livestream={freeChat} />
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 };
 
@@ -72,6 +68,7 @@ FreeChatPage.getLayout = (page, pageProps) => {
       path="/freechat"
     >
       {page}
+      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

@@ -66,7 +66,7 @@ export const DrawerIcon: React.FC<DrawerIconProps> = ({ id }) => {
     case "archive":
       return <AllInboxIcon />;
     case "list":
-      return <ReorderIcon />;
+      return <LiveTvIcon />;
     case "clip":
       return <ContentCutIcon />;
     case "qa":

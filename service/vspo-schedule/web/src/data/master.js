@@ -5,27 +5,6 @@ export const platforms = [
   { id: "nicovideo", name: "ニコニコ動画" },
 ];
 
-export const sideBarContents = [
-  { id: "live", name: "配信中" },
-  { id: "upcoming", name: "配信予定" },
-  { id: "archive", name: "アーカイブ" },
-  { id: "freechat", name: "フリーチャット" },
-  { id: "clip", name: "切り抜き一覧" },
-  { id: "twitch-clip", name: "クリップ一覧" },
-  { id: "about", name: "すぽじゅーるについて" },
-  { id: "notification", name: "お知らせ" },
-  { id: "qa", name: "お問い合わせ" },
-  { id: "discord", name: "Discord Bot" },
-  // { id: "support", name: "メッセージやご支援" },
-];
-
-export const bottomNavigationContents = [
-  { id: "live", name: "配信中" },
-  { id: "clip", name: "切り抜き" },
-  { id: "twitch-clip", name: "クリップ" },
-  { id: "event", name: "イベント" },
-];
-
 export const timeframes = [
   { label: "1日", value: "1day" },
   { label: "1週間", value: "1week" },
