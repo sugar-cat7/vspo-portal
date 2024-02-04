@@ -4,7 +4,7 @@ import { format, utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
 import { Locale, differenceInMinutes } from "date-fns";
 import { TEMP_TIMESTAMP } from "./Const";
-import { freeChatVideoIds, membersKeyWords } from "@/data/master";
+import { freeChatVideoIds } from "@/data/master";
 import { VspoEvent } from "@/types/events";
 
 /**
@@ -203,7 +203,7 @@ export const filterClips = (
 
   const filteredClips = clips.filter((clip) => {
     const isMemberMatch = searchMemberIds.some((memberId) => {
-      const memberKeywords = membersKeyWords.find(
+      const memberKeywords = members.find(
         (member) => member.id === memberId
       )?.keywords;
 

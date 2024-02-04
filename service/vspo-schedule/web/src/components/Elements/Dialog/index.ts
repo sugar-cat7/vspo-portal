@@ -1,1 +1,1 @@
-export * from "./SerarchDialog";
+export * from "./SearchDialog";

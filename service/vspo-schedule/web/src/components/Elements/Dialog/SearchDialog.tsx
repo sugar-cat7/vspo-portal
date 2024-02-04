@@ -57,7 +57,8 @@ const StyledAlert = styled(Alert)(({ theme }) => ({
 const StyledTextField = styled(TextField)(() => ({
   minWidth: "150px",
 }));
-export const SerarchDialog: React.FC<Props> = ({
+
+export const SearchDialog: React.FC<Props> = ({
   livestreamsByDate,
   setFilteredLivestreamsByDate,
   clips,
