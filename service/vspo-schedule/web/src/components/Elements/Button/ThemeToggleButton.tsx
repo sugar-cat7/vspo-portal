@@ -1,9 +1,8 @@
-import { ThemeContext, ThemeType } from "@/context/Theme";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import { styled } from "@mui/system";
 import Switch from "@mui/material/Switch";
-import { useContext } from "react";
+import { styled, useColorScheme } from "@mui/material/styles";
+
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,
   height: 34,
@@ -22,14 +21,23 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
       },
       "& + .MuiSwitch-track": {
         opacity: 1,
-        backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
+        backgroundColor: "#aab4be",
+
+        [theme.getColorSchemeSelector("dark")]: {
+          backgroundColor: "#8796a5",
+        },
       },
     },
   },
   "& .MuiSwitch-thumb": {
-    backgroundColor: theme.palette.mode === "dark" ? "#003892" : "#001e3c",
+    backgroundColor: "#001e3c",
     width: 32,
     height: 32,
+
+    [theme.getColorSchemeSelector("dark")]: {
+      backgroundColor: "#003892",
+    },
+
     "&:before": {
       content: "''",
       position: "absolute",
@@ -46,12 +54,17 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   },
   "& .MuiSwitch-track": {
     opacity: 1,
-    backgroundColor: theme.palette.mode === "dark" ? "#8796A5" : "#aab4be",
+    backgroundColor: "#aab4be",
     borderRadius: 20 / 2,
+
+    [theme.getColorSchemeSelector("dark")]: {
+      backgroundColor: "#8796a5",
+    },
   },
 }));
+
 export const ThemeToggleButton: React.FC = () => {
-  const [mode, setMode] = useContext(ThemeContext);
+  const { mode, setMode } = useColorScheme();
 
   const handleModeChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -59,7 +72,7 @@ export const ThemeToggleButton: React.FC = () => {
   ) => {
     setMode(checked ? "dark" : "light");
   };
-  const label = "背景のテーマ: " + (mode === "dark" ? "dark" : "light");
+  const label = `背景のテーマ: ${mode ?? "light"}`;
   return (
     <FormGroup>
       <FormControlLabel

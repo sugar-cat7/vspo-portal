@@ -10,9 +10,10 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Box, styled } from "@mui/system";
+import { Box } from "@mui/system";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
@@ -21,8 +22,12 @@ import { CustomDrawer, ThemeToggleButton } from "../Elements";
 import SettingsIcon from "@mui/icons-material/Settings";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#212121" : "#7266cf",
+  backgroundColor: "#7266cf",
   zIndex: 1300,
+
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: "#212121",
+  },
 }));
 const StyledTypography = styled(Typography)({
   fontFamily:
@@ -39,10 +44,10 @@ const StyledSubtitle = styled(Typography)({
   paddingLeft: "0px",
 });
 
-const StyledAlert = styled(Alert)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#e5f6fd" : "primary",
-  color: theme.palette.mode === "dark" ? "#014361" : "primary",
-}));
+const StyledAlert = styled(Alert)({
+  backgroundColor: "#e5f6fd",
+  color: "#014361",
+});
 
 const SocialIconLink: React.FC<{ url: string, icon: React.ReactNode }> = ({ url, icon }) => {
   const clickTargetSize = "24px";

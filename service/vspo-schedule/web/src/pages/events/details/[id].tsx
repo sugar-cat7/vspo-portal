@@ -1,4 +1,5 @@
 import { Typography, Button, Box, Link, Avatar } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { events } from "@/data/events";
@@ -10,7 +11,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ContentLayout } from "@/components/Layout";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { members } from "@/data/members";
-import { styled } from "@mui/system";
 import { fetchVspoEvents } from "@/lib/api";
 import { TEMP_TIMESTAMP } from "@/lib/Const";
 type Props = {

@@ -14,7 +14,8 @@ import {
   Fab,
   MenuItem,
 } from "@mui/material";
-import { Box, styled } from "@mui/system";
+import { styled } from "@mui/material/styles";
+import { Box } from "@mui/system";
 import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { filterLivestreams, applyFilters } from "@/lib/utils";
@@ -36,7 +37,11 @@ const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
   bottom: "4rem",
   right: "2rem",
-  backgroundColor: theme.palette.mode === "dark" ? "#353535" : "#7266cf",
+  backgroundColor: "#7266cf",
+
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: "#353535",
+  },
 }));
 
 const StyledSearchIcon = styled(SearchIcon)(({ theme }) => ({
@@ -44,7 +49,9 @@ const StyledSearchIcon = styled(SearchIcon)(({ theme }) => ({
 }));
 
 const StyledAlert = styled(Alert)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "transparent" : "primary",
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: "transparent",
+  },
 }));
 
 const StyledTextField = styled(TextField)(() => ({

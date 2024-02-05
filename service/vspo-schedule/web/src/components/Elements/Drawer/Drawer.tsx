@@ -9,11 +9,11 @@ import {
   Divider,
   Box,
 } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import React from "react";
 import Link from "next/link";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { styled } from "@mui/system";
 import { getNavigationRouteInfo, NavigationRouteId } from "@/data/navigation";
 import { DrawerIcon } from "../Icon";
 
@@ -36,10 +36,14 @@ const StyledListItemIcon = styled(ListItemIcon)(() => ({
 
 const ChipStyle = styled(Chip)(({ theme }) => ({
   backgroundColor: "transparent",
-  color: theme.palette.mode === "dark" ? "white" : "rgb(45, 75, 112)",
-  border: `1px solid ${
-    theme.palette.mode === "dark" ? "white" : "rgb(45, 75, 112)"
-  }`,
+  border: "1px solid",
+  borderColor: "rgb(45, 75, 112)",
+  color: "rgb(45, 75, 112)",
+
+  [theme.getColorSchemeSelector("dark")]: {
+    borderColor: "white",
+    color: "white",
+  },
 }));
 
 export const CustomDrawer: React.FC = () => {

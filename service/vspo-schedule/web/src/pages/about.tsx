@@ -7,7 +7,7 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { styled } from "@mui/system";
+import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ContentLayout } from "@/components/Layout";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
@@ -77,7 +77,7 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
 }));
 
 const StyledLink = styled("a")(({ theme }) => ({
-  color: theme.palette.primary.main,
+  color: theme.vars.palette.primary.main,
   textDecoration: "none",
   "&:hover": {
     textDecoration: "underline",
