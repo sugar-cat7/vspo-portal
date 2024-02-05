@@ -397,7 +397,8 @@ const InfoTabs: React.FC<{
               <Tab label="ライブチャット" {...a11yProps(2)} />
             )}
           {videoInfo?.platform === Platform.Twitch &&
-            "actualEndTime" in videoInfo && (
+            "actualEndTime" in videoInfo &&
+            isStatusLive(videoInfo) === "live" && (
               <Tab label="チャット" {...a11yProps(2)} />
             )}
         </Tabs>
@@ -524,7 +525,8 @@ const InfoTabs: React.FC<{
           </TabPanel>
         )}
       {videoInfo?.platform === Platform.Twitch &&
-        "actualEndTime" in videoInfo && (
+        "actualEndTime" in videoInfo &&
+        isStatusLive(videoInfo) === "live" && (
           <TabPanel value={value} index={2}>
             <ChatEmbed livestream={videoInfo} platform={videoInfo.platform} />
           </TabPanel>
