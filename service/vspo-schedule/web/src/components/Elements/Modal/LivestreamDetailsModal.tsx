@@ -13,7 +13,7 @@ import {
   Tabs,
   BottomNavigation,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, useColorScheme } from "@mui/material/styles";
 import { Clip, Livestream, Platform } from "@/types/streaming";
 import {
   formatWithTimeZone,
@@ -150,7 +150,11 @@ const VideoPlayerOrLinkComponent: React.FC<{
 const VideoPlayerOrLink = React.memo(VideoPlayerOrLinkComponent);
 
 const YoutubeChatEmbed: React.FC<{ videoId: string }> = ({ videoId }) => {
-  const chatEmbedUrl = `https://www.youtube.com/live_chat?v=${videoId}&embed_domain=${window.location.hostname}`;
+  const { colorScheme } = useColorScheme();
+  let chatEmbedUrl = `https://www.youtube.com/live_chat?v=${videoId}&embed_domain=${window.location.hostname}`;
+  if (colorScheme === "dark") {
+    chatEmbedUrl += "&dark_theme=1";
+  }
 
   return (
     <ResponsiveChatIframeWrapper>
@@ -164,12 +168,12 @@ const YoutubeChatEmbed: React.FC<{ videoId: string }> = ({ videoId }) => {
   );
 };
 
-interface TwitchChatEmbedProps {
-  channelName: string;
-}
-
-const TwitchChatEmbed: React.FC<TwitchChatEmbedProps> = ({ channelName }) => {
-  const chatEmbedUrl = `https://www.twitch.tv/embed/${channelName}/chat?parent=${window.location.hostname}`;
+const TwitchChatEmbed: React.FC<{ channelName: string }> = ({ channelName }) => {
+  const { colorScheme } = useColorScheme();
+  let chatEmbedUrl = `https://www.twitch.tv/embed/${channelName}/chat?parent=${window.location.hostname}`;
+  if (colorScheme === "dark") {
+    chatEmbedUrl += "&darkpopout";
+  }
 
   return (
     <ResponsiveChatIframeWrapper>
