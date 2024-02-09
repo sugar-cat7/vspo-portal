@@ -7,7 +7,6 @@ import {
   Avatar,
   Box,
   TextField,
-  AppBar,
   Button,
   Toolbar,
 } from "@mui/material";
@@ -53,6 +52,59 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
     height: 28,
   },
 }));
+
+const AdjacentYearMonthButton: React.FC<{
+  disabled: boolean;
+  yearMonth?: string;
+  children: React.ReactNode;
+}> = ({ disabled, yearMonth, children }) => (
+  <Button
+    color="inherit"
+    {...(disabled
+        ? { disabled: true }
+        : { component: Link, href: `/events/${yearMonth}` }
+    )}
+  >
+    {children}
+  </Button>
+);
+
+const YearMonthSelector: React.FC<{
+  beforeYearMonth?: string;
+  currentYearMonth?: string;
+  nextYearMonth?: string;
+}> = ({ beforeYearMonth, currentYearMonth, nextYearMonth }) => (
+  <Box
+    sx={(theme) => ({
+      ...theme.mixins.toolbar,
+      display: "flex",
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      color: theme.palette.text.primary,
+    })}
+  >
+    <AdjacentYearMonthButton
+      disabled={!beforeYearMonth}
+      yearMonth={beforeYearMonth}
+    >
+      前の月へ
+    </AdjacentYearMonthButton>
+    <Typography
+      variant="h6"
+      component="div"
+      style={{ width: "160px", textAlign: "center" }}
+    >
+      {currentYearMonth && currentYearMonth.replace("-", "年") + "月"}
+    </Typography>
+    <AdjacentYearMonthButton
+      disabled={!nextYearMonth}
+      yearMonth={nextYearMonth}
+    >
+      次の月へ
+    </AdjacentYearMonthButton>
+  </Box>
+);
 
 export const getStaticPaths: GetStaticPaths = async () => {
   try {
@@ -120,14 +172,6 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
   }
 };
 
-const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  color: "gray",
-
-  [theme.getColorSchemeSelector("dark")]: {
-    color: "white",
-  },
-}));
-
 const IndexPage: NextPageWithLayout<Props> = ({
   events,
   beforeYearMonth,
@@ -180,49 +224,15 @@ const IndexPage: NextPageWithLayout<Props> = ({
 
   return (
     <>
-      <StyledAppBar
-        position="static"
-        sx={{
-          marginTop: matches ? "55px" : "60px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          backgroundColor: "transparent",
-          elevation: 0,
-          boxShadow: "none",
-        }}
-      >
-        <Toolbar>
-          {beforeYearMonth ? (
-            <Button
-              color="inherit"
-              component={Link}
-              href={`/events/${beforeYearMonth}`}
-            >
-              前の月へ
-            </Button>
-          ) : (
-            <Button sx={{ opacity: 0.5 }}>前の月へ</Button>
-          )}
-          <Typography variant="h6" component="div" sx={{ margin: "0 20px" }}>
-            {currentYearMonth && currentYearMonth.replace("-", "年") + "月"}
-          </Typography>
-          {nextYearMonth ? (
-            <Button
-              color="inherit"
-              component={Link}
-              href={`/events/${nextYearMonth}`}
-            >
-              次の月へ
-            </Button>
-          ) : (
-            <Button sx={{ opacity: 0.5 }}>次の月へ</Button>
-          )}
-        </Toolbar>
-      </StyledAppBar>
+      <Toolbar />
 
-      <Container maxWidth="lg" sx={{ paddingTop: "20px" }}>
+      <YearMonthSelector
+        beforeYearMonth={beforeYearMonth}
+        currentYearMonth={currentYearMonth}
+        nextYearMonth={nextYearMonth}
+      />
+
+      <Container maxWidth="lg" sx={{ pt: 1 }}>
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
