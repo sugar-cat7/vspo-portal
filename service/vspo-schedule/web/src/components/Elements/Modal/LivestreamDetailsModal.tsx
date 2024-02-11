@@ -151,12 +151,12 @@ const VideoPlayerOrLink = React.memo(VideoPlayerOrLinkComponent);
 
 const getTwitchChatEmbedUrl = (livestream: Livestream, isDarkMode: boolean) => {
   const chatEmbedUrl = `https://www.twitch.tv/embed/${livestream.twitchName!}/chat?parent=${window.location.hostname}`;
-  return isDarkMode ? chatEmbedUrl + "&darkpopout" : chatEmbedUrl;
+  return isDarkMode ? `${chatEmbedUrl}&darkpopout` : chatEmbedUrl;
 };
 
 const getYouTubeChatEmbedUrl = (livestream: Livestream, isDarkMode: boolean) => {
   const chatEmbedUrl = `https://www.youtube.com/live_chat?v=${livestream.id}&embed_domain=${window.location.hostname}`;
-  return isDarkMode ? chatEmbedUrl + "&dark_theme=1" : chatEmbedUrl;
+  return isDarkMode ? `${chatEmbedUrl}&dark_theme=1` : chatEmbedUrl;
 };
 
 const ChatEmbed: React.FC<{
