@@ -20,7 +20,7 @@ import {
   getLivestreamUrl,
   isStatusLive,
 } from "@/lib/utils";
-import { PlatformIcon } from "..";
+import { Loading, PlatformIcon } from "..";
 import CloseIcon from "@mui/icons-material/Close";
 import { members } from "@/data/members";
 import ShareIcon from "@mui/icons-material/Share";
@@ -149,41 +149,41 @@ const VideoPlayerOrLinkComponent: React.FC<{
 
 const VideoPlayerOrLink = React.memo(VideoPlayerOrLinkComponent);
 
-const YoutubeChatEmbed: React.FC<{ videoId: string }> = ({ videoId }) => {
-  const { colorScheme } = useColorScheme();
-  let chatEmbedUrl = `https://www.youtube.com/live_chat?v=${videoId}&embed_domain=${window.location.hostname}`;
-  if (colorScheme === "dark") {
-    chatEmbedUrl += "&dark_theme=1";
-  }
-
-  return (
-    <ResponsiveChatIframeWrapper>
-      <ResponsiveChatIframe
-        key={chatEmbedUrl}
-        src={chatEmbedUrl}
-        title="Youtube chat embed"
-        loading="lazy"
-      />
-    </ResponsiveChatIframeWrapper>
-  );
+const getTwitchChatEmbedUrl = (livestream: Livestream, isDarkMode: boolean) => {
+  const chatEmbedUrl = `https://www.twitch.tv/embed/${livestream.twitchName!}/chat?parent=${window.location.hostname}`;
+  return isDarkMode ? chatEmbedUrl + "&darkpopout" : chatEmbedUrl;
 };
 
-const TwitchChatEmbed: React.FC<{ channelName: string }> = ({ channelName }) => {
+const getYouTubeChatEmbedUrl = (livestream: Livestream, isDarkMode: boolean) => {
+  const chatEmbedUrl = `https://www.youtube.com/live_chat?v=${livestream.id}&embed_domain=${window.location.hostname}`;
+  return isDarkMode ? chatEmbedUrl + "&dark_theme=1" : chatEmbedUrl;
+};
+
+const ChatEmbed: React.FC<{
+  livestream: Livestream;
+  platform: Platform.Twitch | Platform.YouTube;
+}> = ({ livestream, platform }) => {
   const { colorScheme } = useColorScheme();
-  let chatEmbedUrl = `https://www.twitch.tv/embed/${channelName}/chat?parent=${window.location.hostname}`;
-  if (colorScheme === "dark") {
-    chatEmbedUrl += "&darkpopout";
-  }
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  const isDarkMode = colorScheme === "dark";
+  const chatEmbedUrl = platform === Platform.Twitch
+    ? getTwitchChatEmbedUrl(livestream, isDarkMode)
+    : getYouTubeChatEmbedUrl(livestream, isDarkMode);
 
   return (
-    <ResponsiveChatIframeWrapper>
-      <ResponsiveChatIframe
-        key={chatEmbedUrl}
-        src={chatEmbedUrl}
-        title="Twitch chat embed"
-        loading="lazy"
-      />
-    </ResponsiveChatIframeWrapper>
+    <>
+      {isLoading && <Loading />}
+      <ResponsiveChatIframeWrapper
+        style={{ display: isLoading ? "none" : "block" }}
+      >
+        <ResponsiveChatIframe
+          src={chatEmbedUrl}
+          title={`${platform} chat embed`}
+          onLoad={() => setIsLoading(false)}
+        />
+      </ResponsiveChatIframeWrapper>
+    </>
   );
 };
 
@@ -523,13 +523,13 @@ const InfoTabs: React.FC<{
         "actualEndTime" in videoInfo &&
         isStatusLive(videoInfo) === "live" && (
           <TabPanel value={value} index={2}>
-            <YoutubeChatEmbed videoId={videoInfo?.id} />
+            <ChatEmbed livestream={videoInfo} platform={videoInfo.platform} />
           </TabPanel>
         )}
       {videoInfo?.platform === Platform.Twitch &&
         "actualEndTime" in videoInfo && (
           <TabPanel value={value} index={2}>
-            <TwitchChatEmbed channelName={videoInfo.twitchName!} />
+            <ChatEmbed livestream={videoInfo} platform={videoInfo.platform} />
           </TabPanel>
         )}
     </Box>
