@@ -16,6 +16,10 @@ import (
 type SecurityHandler interface {
 	// HandleApiKeyAuth handles ApiKeyAuth security.
 	HandleApiKeyAuth(ctx context.Context, operationName string, t ApiKeyAuth) (context.Context, error)
+	// HandleTwitchApiKey handles TwitchApiKey security.
+	HandleTwitchApiKey(ctx context.Context, operationName string, t TwitchApiKey) (context.Context, error)
+	// HandleYoutubeApiKey handles YoutubeApiKey security.
+	HandleYoutubeApiKey(ctx context.Context, operationName string, t YoutubeApiKey) (context.Context, error)
 }
 
 func findAuthorization(h http.Header, prefix string) (string, bool) {
@@ -49,11 +53,47 @@ func (s *Server) securityApiKeyAuth(ctx context.Context, operationName string, r
 	}
 	return rctx, true, err
 }
+func (s *Server) securityTwitchApiKey(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
+	var t TwitchApiKey
+	const parameterName = "X-Twitch-API-Key"
+	value := req.Header.Get(parameterName)
+	if value == "" {
+		return ctx, false, nil
+	}
+	t.APIKey = value
+	rctx, err := s.sec.HandleTwitchApiKey(ctx, operationName, t)
+	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
+		return nil, false, nil
+	} else if err != nil {
+		return nil, false, err
+	}
+	return rctx, true, err
+}
+func (s *Server) securityYoutubeApiKey(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
+	var t YoutubeApiKey
+	const parameterName = "X-Youtube-API-Key"
+	value := req.Header.Get(parameterName)
+	if value == "" {
+		return ctx, false, nil
+	}
+	t.APIKey = value
+	rctx, err := s.sec.HandleYoutubeApiKey(ctx, operationName, t)
+	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
+		return nil, false, nil
+	} else if err != nil {
+		return nil, false, err
+	}
+	return rctx, true, err
+}
 
 // SecuritySource is provider of security values (tokens, passwords, etc.).
 type SecuritySource interface {
 	// ApiKeyAuth provides ApiKeyAuth security value.
 	ApiKeyAuth(ctx context.Context, operationName string) (ApiKeyAuth, error)
+	// TwitchApiKey provides TwitchApiKey security value.
+	TwitchApiKey(ctx context.Context, operationName string) (TwitchApiKey, error)
+	// YoutubeApiKey provides YoutubeApiKey security value.
+	YoutubeApiKey(ctx context.Context, operationName string) (YoutubeApiKey, error)
 }
 
 func (s *Client) securityApiKeyAuth(ctx context.Context, operationName string, req *http.Request) error {
@@ -62,5 +102,21 @@ func (s *Client) securityApiKeyAuth(ctx context.Context, operationName string, r
 		return errors.Wrap(err, "security source \"ApiKeyAuth\"")
 	}
 	req.Header.Set("x-api-key", t.APIKey)
+	return nil
+}
+func (s *Client) securityTwitchApiKey(ctx context.Context, operationName string, req *http.Request) error {
+	t, err := s.sec.TwitchApiKey(ctx, operationName)
+	if err != nil {
+		return errors.Wrap(err, "security source \"TwitchApiKey\"")
+	}
+	req.Header.Set("X-Twitch-API-Key", t.APIKey)
+	return nil
+}
+func (s *Client) securityYoutubeApiKey(ctx context.Context, operationName string, req *http.Request) error {
+	t, err := s.sec.YoutubeApiKey(ctx, operationName)
+	if err != nil {
+		return errors.Wrap(err, "security source \"YoutubeApiKey\"")
+	}
+	req.Header.Set("X-Youtube-API-Key", t.APIKey)
 	return nil
 }

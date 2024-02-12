@@ -2,6 +2,10 @@
 
 package api
 
+import (
+	"github.com/go-faster/errors"
+)
+
 type ApiKeyAuth struct {
 	APIKey string
 }
@@ -15,138 +19,6 @@ func (s *ApiKeyAuth) GetAPIKey() string {
 func (s *ApiKeyAuth) SetAPIKey(val string) {
 	s.APIKey = val
 }
-
-// ChannelsChannelIDVideosPostBadRequest is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostBadRequest struct{}
-
-func (*ChannelsChannelIDVideosPostBadRequest) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPostForbidden is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostForbidden struct{}
-
-func (*ChannelsChannelIDVideosPostForbidden) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPostInternalServerError is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostInternalServerError struct{}
-
-func (*ChannelsChannelIDVideosPostInternalServerError) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPostNotFound is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostNotFound struct{}
-
-func (*ChannelsChannelIDVideosPostNotFound) channelsChannelIDVideosPostRes() {}
-
-type ChannelsChannelIDVideosPostOKApplicationJSON string
-
-func (*ChannelsChannelIDVideosPostOKApplicationJSON) channelsChannelIDVideosPostRes() {}
-
-type ChannelsChannelIDVideosPostReq struct {
-	// Array of YouTube channel IDs.
-	Ids       []string  `json:"ids"`
-	StartDate OptString `json:"start_date"`
-	EndDate   OptString `json:"end_date"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsChannelIDVideosPostReq) GetIds() []string {
-	return s.Ids
-}
-
-// GetStartDate returns the value of StartDate.
-func (s *ChannelsChannelIDVideosPostReq) GetStartDate() OptString {
-	return s.StartDate
-}
-
-// GetEndDate returns the value of EndDate.
-func (s *ChannelsChannelIDVideosPostReq) GetEndDate() OptString {
-	return s.EndDate
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsChannelIDVideosPostReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// SetStartDate sets the value of StartDate.
-func (s *ChannelsChannelIDVideosPostReq) SetStartDate(val OptString) {
-	s.StartDate = val
-}
-
-// SetEndDate sets the value of EndDate.
-func (s *ChannelsChannelIDVideosPostReq) SetEndDate(val OptString) {
-	s.EndDate = val
-}
-
-// ChannelsChannelIDVideosPostUnauthorized is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostUnauthorized struct{}
-
-func (*ChannelsChannelIDVideosPostUnauthorized) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPutBadRequest is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutBadRequest struct{}
-
-func (*ChannelsChannelIDVideosPutBadRequest) channelsChannelIDVideosPutRes() {}
-
-// ChannelsChannelIDVideosPutForbidden is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutForbidden struct{}
-
-func (*ChannelsChannelIDVideosPutForbidden) channelsChannelIDVideosPutRes() {}
-
-// ChannelsChannelIDVideosPutInternalServerError is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutInternalServerError struct{}
-
-func (*ChannelsChannelIDVideosPutInternalServerError) channelsChannelIDVideosPutRes() {}
-
-// ChannelsChannelIDVideosPutNotFound is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutNotFound struct{}
-
-func (*ChannelsChannelIDVideosPutNotFound) channelsChannelIDVideosPutRes() {}
-
-type ChannelsChannelIDVideosPutOKApplicationJSON string
-
-func (*ChannelsChannelIDVideosPutOKApplicationJSON) channelsChannelIDVideosPutRes() {}
-
-type ChannelsChannelIDVideosPutReq struct {
-	// Array of YouTube channel IDs.
-	Ids       []string  `json:"ids"`
-	StartDate OptString `json:"start_date"`
-	EndDate   OptString `json:"end_date"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsChannelIDVideosPutReq) GetIds() []string {
-	return s.Ids
-}
-
-// GetStartDate returns the value of StartDate.
-func (s *ChannelsChannelIDVideosPutReq) GetStartDate() OptString {
-	return s.StartDate
-}
-
-// GetEndDate returns the value of EndDate.
-func (s *ChannelsChannelIDVideosPutReq) GetEndDate() OptString {
-	return s.EndDate
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsChannelIDVideosPutReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// SetStartDate sets the value of StartDate.
-func (s *ChannelsChannelIDVideosPutReq) SetStartDate(val OptString) {
-	s.StartDate = val
-}
-
-// SetEndDate sets the value of EndDate.
-func (s *ChannelsChannelIDVideosPutReq) SetEndDate(val OptString) {
-	s.EndDate = val
-}
-
-// ChannelsChannelIDVideosPutUnauthorized is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutUnauthorized struct{}
-
-func (*ChannelsChannelIDVideosPutUnauthorized) channelsChannelIDVideosPutRes() {}
 
 // ChannelsPostBadRequest is response for ChannelsPost operation.
 type ChannelsPostBadRequest struct{}
@@ -173,40 +45,149 @@ type ChannelsPostOKApplicationJSON string
 func (*ChannelsPostOKApplicationJSON) channelsPostRes() {}
 
 type ChannelsPostReq struct {
-	// Array of YouTube channel IDs.
-	Ids       []string  `json:"ids"`
-	StartDate OptString `json:"start_date"`
-	EndDate   OptString `json:"end_date"`
+	// Video's platform type.
+	PlatformType OptChannelsPostReqPlatformType `json:"platform_type"`
+	// Period for performing updates.
+	Period OptChannelsPostReqPeriod `json:"period"`
 }
 
-// GetIds returns the value of Ids.
-func (s *ChannelsPostReq) GetIds() []string {
-	return s.Ids
+// GetPlatformType returns the value of PlatformType.
+func (s *ChannelsPostReq) GetPlatformType() OptChannelsPostReqPlatformType {
+	return s.PlatformType
 }
 
-// GetStartDate returns the value of StartDate.
-func (s *ChannelsPostReq) GetStartDate() OptString {
-	return s.StartDate
+// GetPeriod returns the value of Period.
+func (s *ChannelsPostReq) GetPeriod() OptChannelsPostReqPeriod {
+	return s.Period
 }
 
-// GetEndDate returns the value of EndDate.
-func (s *ChannelsPostReq) GetEndDate() OptString {
-	return s.EndDate
+// SetPlatformType sets the value of PlatformType.
+func (s *ChannelsPostReq) SetPlatformType(val OptChannelsPostReqPlatformType) {
+	s.PlatformType = val
 }
 
-// SetIds sets the value of Ids.
-func (s *ChannelsPostReq) SetIds(val []string) {
-	s.Ids = val
+// SetPeriod sets the value of Period.
+func (s *ChannelsPostReq) SetPeriod(val OptChannelsPostReqPeriod) {
+	s.Period = val
 }
 
-// SetStartDate sets the value of StartDate.
-func (s *ChannelsPostReq) SetStartDate(val OptString) {
-	s.StartDate = val
+// Period for performing updates.
+type ChannelsPostReqPeriod string
+
+const (
+	ChannelsPostReqPeriodAll   ChannelsPostReqPeriod = "all"
+	ChannelsPostReqPeriodDay   ChannelsPostReqPeriod = "day"
+	ChannelsPostReqPeriodMonth ChannelsPostReqPeriod = "month"
+	ChannelsPostReqPeriodWeek  ChannelsPostReqPeriod = "week"
+)
+
+// AllValues returns all ChannelsPostReqPeriod values.
+func (ChannelsPostReqPeriod) AllValues() []ChannelsPostReqPeriod {
+	return []ChannelsPostReqPeriod{
+		ChannelsPostReqPeriodAll,
+		ChannelsPostReqPeriodDay,
+		ChannelsPostReqPeriodMonth,
+		ChannelsPostReqPeriodWeek,
+	}
 }
 
-// SetEndDate sets the value of EndDate.
-func (s *ChannelsPostReq) SetEndDate(val OptString) {
-	s.EndDate = val
+// MarshalText implements encoding.TextMarshaler.
+func (s ChannelsPostReqPeriod) MarshalText() ([]byte, error) {
+	switch s {
+	case ChannelsPostReqPeriodAll:
+		return []byte(s), nil
+	case ChannelsPostReqPeriodDay:
+		return []byte(s), nil
+	case ChannelsPostReqPeriodMonth:
+		return []byte(s), nil
+	case ChannelsPostReqPeriodWeek:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ChannelsPostReqPeriod) UnmarshalText(data []byte) error {
+	switch ChannelsPostReqPeriod(data) {
+	case ChannelsPostReqPeriodAll:
+		*s = ChannelsPostReqPeriodAll
+		return nil
+	case ChannelsPostReqPeriodDay:
+		*s = ChannelsPostReqPeriodDay
+		return nil
+	case ChannelsPostReqPeriodMonth:
+		*s = ChannelsPostReqPeriodMonth
+		return nil
+	case ChannelsPostReqPeriodWeek:
+		*s = ChannelsPostReqPeriodWeek
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Video's platform type.
+type ChannelsPostReqPlatformType string
+
+const (
+	ChannelsPostReqPlatformTypeAll         ChannelsPostReqPlatformType = "all"
+	ChannelsPostReqPlatformTypeYoutube     ChannelsPostReqPlatformType = "youtube"
+	ChannelsPostReqPlatformTypeTwitch      ChannelsPostReqPlatformType = "twitch"
+	ChannelsPostReqPlatformTypeTwitcasting ChannelsPostReqPlatformType = "twitcasting"
+	ChannelsPostReqPlatformTypeNiconico    ChannelsPostReqPlatformType = "niconico"
+)
+
+// AllValues returns all ChannelsPostReqPlatformType values.
+func (ChannelsPostReqPlatformType) AllValues() []ChannelsPostReqPlatformType {
+	return []ChannelsPostReqPlatformType{
+		ChannelsPostReqPlatformTypeAll,
+		ChannelsPostReqPlatformTypeYoutube,
+		ChannelsPostReqPlatformTypeTwitch,
+		ChannelsPostReqPlatformTypeTwitcasting,
+		ChannelsPostReqPlatformTypeNiconico,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ChannelsPostReqPlatformType) MarshalText() ([]byte, error) {
+	switch s {
+	case ChannelsPostReqPlatformTypeAll:
+		return []byte(s), nil
+	case ChannelsPostReqPlatformTypeYoutube:
+		return []byte(s), nil
+	case ChannelsPostReqPlatformTypeTwitch:
+		return []byte(s), nil
+	case ChannelsPostReqPlatformTypeTwitcasting:
+		return []byte(s), nil
+	case ChannelsPostReqPlatformTypeNiconico:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ChannelsPostReqPlatformType) UnmarshalText(data []byte) error {
+	switch ChannelsPostReqPlatformType(data) {
+	case ChannelsPostReqPlatformTypeAll:
+		*s = ChannelsPostReqPlatformTypeAll
+		return nil
+	case ChannelsPostReqPlatformTypeYoutube:
+		*s = ChannelsPostReqPlatformTypeYoutube
+		return nil
+	case ChannelsPostReqPlatformTypeTwitch:
+		*s = ChannelsPostReqPlatformTypeTwitch
+		return nil
+	case ChannelsPostReqPlatformTypeTwitcasting:
+		*s = ChannelsPostReqPlatformTypeTwitcasting
+		return nil
+	case ChannelsPostReqPlatformTypeNiconico:
+		*s = ChannelsPostReqPlatformTypeNiconico
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // ChannelsPostUnauthorized is response for ChannelsPost operation.
@@ -214,104 +195,38 @@ type ChannelsPostUnauthorized struct{}
 
 func (*ChannelsPostUnauthorized) channelsPostRes() {}
 
-// ChannelsPutBadRequest is response for ChannelsPut operation.
-type ChannelsPutBadRequest struct{}
-
-func (*ChannelsPutBadRequest) channelsPutRes() {}
-
-// ChannelsPutForbidden is response for ChannelsPut operation.
-type ChannelsPutForbidden struct{}
-
-func (*ChannelsPutForbidden) channelsPutRes() {}
-
-// ChannelsPutInternalServerError is response for ChannelsPut operation.
-type ChannelsPutInternalServerError struct{}
-
-func (*ChannelsPutInternalServerError) channelsPutRes() {}
-
-// ChannelsPutNotFound is response for ChannelsPut operation.
-type ChannelsPutNotFound struct{}
-
-func (*ChannelsPutNotFound) channelsPutRes() {}
-
-type ChannelsPutOKApplicationJSON string
-
-func (*ChannelsPutOKApplicationJSON) channelsPutRes() {}
-
-type ChannelsPutReq struct {
-	// Array of YouTube channel IDs.
-	Ids       []string  `json:"ids"`
-	StartDate OptString `json:"start_date"`
-	EndDate   OptString `json:"end_date"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsPutReq) GetIds() []string {
-	return s.Ids
-}
-
-// GetStartDate returns the value of StartDate.
-func (s *ChannelsPutReq) GetStartDate() OptString {
-	return s.StartDate
-}
-
-// GetEndDate returns the value of EndDate.
-func (s *ChannelsPutReq) GetEndDate() OptString {
-	return s.EndDate
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsPutReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// SetStartDate sets the value of StartDate.
-func (s *ChannelsPutReq) SetStartDate(val OptString) {
-	s.StartDate = val
-}
-
-// SetEndDate sets the value of EndDate.
-func (s *ChannelsPutReq) SetEndDate(val OptString) {
-	s.EndDate = val
-}
-
-// ChannelsPutUnauthorized is response for ChannelsPut operation.
-type ChannelsPutUnauthorized struct{}
-
-func (*ChannelsPutUnauthorized) channelsPutRes() {}
-
-// NewOptString returns new OptString with value set to v.
-func NewOptString(v string) OptString {
-	return OptString{
+// NewOptChannelsPostReqPeriod returns new OptChannelsPostReqPeriod with value set to v.
+func NewOptChannelsPostReqPeriod(v ChannelsPostReqPeriod) OptChannelsPostReqPeriod {
+	return OptChannelsPostReqPeriod{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptString is optional string.
-type OptString struct {
-	Value string
+// OptChannelsPostReqPeriod is optional ChannelsPostReqPeriod.
+type OptChannelsPostReqPeriod struct {
+	Value ChannelsPostReqPeriod
 	Set   bool
 }
 
-// IsSet returns true if OptString was set.
-func (o OptString) IsSet() bool { return o.Set }
+// IsSet returns true if OptChannelsPostReqPeriod was set.
+func (o OptChannelsPostReqPeriod) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptString) Reset() {
-	var v string
+func (o *OptChannelsPostReqPeriod) Reset() {
+	var v ChannelsPostReqPeriod
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptString) SetTo(v string) {
+func (o *OptChannelsPostReqPeriod) SetTo(v ChannelsPostReqPeriod) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptString) Get() (v string, ok bool) {
+func (o OptChannelsPostReqPeriod) Get() (v ChannelsPostReqPeriod, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -319,9 +234,462 @@ func (o OptString) Get() (v string, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptString) Or(d string) string {
+func (o OptChannelsPostReqPeriod) Or(d ChannelsPostReqPeriod) ChannelsPostReqPeriod {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
+}
+
+// NewOptChannelsPostReqPlatformType returns new OptChannelsPostReqPlatformType with value set to v.
+func NewOptChannelsPostReqPlatformType(v ChannelsPostReqPlatformType) OptChannelsPostReqPlatformType {
+	return OptChannelsPostReqPlatformType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptChannelsPostReqPlatformType is optional ChannelsPostReqPlatformType.
+type OptChannelsPostReqPlatformType struct {
+	Value ChannelsPostReqPlatformType
+	Set   bool
+}
+
+// IsSet returns true if OptChannelsPostReqPlatformType was set.
+func (o OptChannelsPostReqPlatformType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptChannelsPostReqPlatformType) Reset() {
+	var v ChannelsPostReqPlatformType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptChannelsPostReqPlatformType) SetTo(v ChannelsPostReqPlatformType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptChannelsPostReqPlatformType) Get() (v ChannelsPostReqPlatformType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptChannelsPostReqPlatformType) Or(d ChannelsPostReqPlatformType) ChannelsPostReqPlatformType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptVideosPostReqPeriod returns new OptVideosPostReqPeriod with value set to v.
+func NewOptVideosPostReqPeriod(v VideosPostReqPeriod) OptVideosPostReqPeriod {
+	return OptVideosPostReqPeriod{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptVideosPostReqPeriod is optional VideosPostReqPeriod.
+type OptVideosPostReqPeriod struct {
+	Value VideosPostReqPeriod
+	Set   bool
+}
+
+// IsSet returns true if OptVideosPostReqPeriod was set.
+func (o OptVideosPostReqPeriod) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptVideosPostReqPeriod) Reset() {
+	var v VideosPostReqPeriod
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptVideosPostReqPeriod) SetTo(v VideosPostReqPeriod) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptVideosPostReqPeriod) Get() (v VideosPostReqPeriod, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptVideosPostReqPeriod) Or(d VideosPostReqPeriod) VideosPostReqPeriod {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptVideosPostReqPlatformType returns new OptVideosPostReqPlatformType with value set to v.
+func NewOptVideosPostReqPlatformType(v VideosPostReqPlatformType) OptVideosPostReqPlatformType {
+	return OptVideosPostReqPlatformType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptVideosPostReqPlatformType is optional VideosPostReqPlatformType.
+type OptVideosPostReqPlatformType struct {
+	Value VideosPostReqPlatformType
+	Set   bool
+}
+
+// IsSet returns true if OptVideosPostReqPlatformType was set.
+func (o OptVideosPostReqPlatformType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptVideosPostReqPlatformType) Reset() {
+	var v VideosPostReqPlatformType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptVideosPostReqPlatformType) SetTo(v VideosPostReqPlatformType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptVideosPostReqPlatformType) Get() (v VideosPostReqPlatformType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptVideosPostReqPlatformType) Or(d VideosPostReqPlatformType) VideosPostReqPlatformType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptVideosPostReqVideoType returns new OptVideosPostReqVideoType with value set to v.
+func NewOptVideosPostReqVideoType(v VideosPostReqVideoType) OptVideosPostReqVideoType {
+	return OptVideosPostReqVideoType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptVideosPostReqVideoType is optional VideosPostReqVideoType.
+type OptVideosPostReqVideoType struct {
+	Value VideosPostReqVideoType
+	Set   bool
+}
+
+// IsSet returns true if OptVideosPostReqVideoType was set.
+func (o OptVideosPostReqVideoType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptVideosPostReqVideoType) Reset() {
+	var v VideosPostReqVideoType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptVideosPostReqVideoType) SetTo(v VideosPostReqVideoType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptVideosPostReqVideoType) Get() (v VideosPostReqVideoType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptVideosPostReqVideoType) Or(d VideosPostReqVideoType) VideosPostReqVideoType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+type TwitchApiKey struct {
+	APIKey string
+}
+
+// GetAPIKey returns the value of APIKey.
+func (s *TwitchApiKey) GetAPIKey() string {
+	return s.APIKey
+}
+
+// SetAPIKey sets the value of APIKey.
+func (s *TwitchApiKey) SetAPIKey(val string) {
+	s.APIKey = val
+}
+
+// VideosPostBadRequest is response for VideosPost operation.
+type VideosPostBadRequest struct{}
+
+func (*VideosPostBadRequest) videosPostRes() {}
+
+// VideosPostForbidden is response for VideosPost operation.
+type VideosPostForbidden struct{}
+
+func (*VideosPostForbidden) videosPostRes() {}
+
+// VideosPostInternalServerError is response for VideosPost operation.
+type VideosPostInternalServerError struct{}
+
+func (*VideosPostInternalServerError) videosPostRes() {}
+
+// VideosPostNotFound is response for VideosPost operation.
+type VideosPostNotFound struct{}
+
+func (*VideosPostNotFound) videosPostRes() {}
+
+type VideosPostOKApplicationJSON string
+
+func (*VideosPostOKApplicationJSON) videosPostRes() {}
+
+type VideosPostReq struct {
+	// Video's platform type.
+	PlatformType OptVideosPostReqPlatformType `json:"platform_type"`
+	// Period for performing updates.
+	Period    OptVideosPostReqPeriod    `json:"period"`
+	VideoType OptVideosPostReqVideoType `json:"video_type"`
+}
+
+// GetPlatformType returns the value of PlatformType.
+func (s *VideosPostReq) GetPlatformType() OptVideosPostReqPlatformType {
+	return s.PlatformType
+}
+
+// GetPeriod returns the value of Period.
+func (s *VideosPostReq) GetPeriod() OptVideosPostReqPeriod {
+	return s.Period
+}
+
+// GetVideoType returns the value of VideoType.
+func (s *VideosPostReq) GetVideoType() OptVideosPostReqVideoType {
+	return s.VideoType
+}
+
+// SetPlatformType sets the value of PlatformType.
+func (s *VideosPostReq) SetPlatformType(val OptVideosPostReqPlatformType) {
+	s.PlatformType = val
+}
+
+// SetPeriod sets the value of Period.
+func (s *VideosPostReq) SetPeriod(val OptVideosPostReqPeriod) {
+	s.Period = val
+}
+
+// SetVideoType sets the value of VideoType.
+func (s *VideosPostReq) SetVideoType(val OptVideosPostReqVideoType) {
+	s.VideoType = val
+}
+
+// Period for performing updates.
+type VideosPostReqPeriod string
+
+const (
+	VideosPostReqPeriodAll   VideosPostReqPeriod = "all"
+	VideosPostReqPeriodDay   VideosPostReqPeriod = "day"
+	VideosPostReqPeriodMonth VideosPostReqPeriod = "month"
+	VideosPostReqPeriodWeek  VideosPostReqPeriod = "week"
+)
+
+// AllValues returns all VideosPostReqPeriod values.
+func (VideosPostReqPeriod) AllValues() []VideosPostReqPeriod {
+	return []VideosPostReqPeriod{
+		VideosPostReqPeriodAll,
+		VideosPostReqPeriodDay,
+		VideosPostReqPeriodMonth,
+		VideosPostReqPeriodWeek,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VideosPostReqPeriod) MarshalText() ([]byte, error) {
+	switch s {
+	case VideosPostReqPeriodAll:
+		return []byte(s), nil
+	case VideosPostReqPeriodDay:
+		return []byte(s), nil
+	case VideosPostReqPeriodMonth:
+		return []byte(s), nil
+	case VideosPostReqPeriodWeek:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VideosPostReqPeriod) UnmarshalText(data []byte) error {
+	switch VideosPostReqPeriod(data) {
+	case VideosPostReqPeriodAll:
+		*s = VideosPostReqPeriodAll
+		return nil
+	case VideosPostReqPeriodDay:
+		*s = VideosPostReqPeriodDay
+		return nil
+	case VideosPostReqPeriodMonth:
+		*s = VideosPostReqPeriodMonth
+		return nil
+	case VideosPostReqPeriodWeek:
+		*s = VideosPostReqPeriodWeek
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Video's platform type.
+type VideosPostReqPlatformType string
+
+const (
+	VideosPostReqPlatformTypeAll         VideosPostReqPlatformType = "all"
+	VideosPostReqPlatformTypeYoutube     VideosPostReqPlatformType = "youtube"
+	VideosPostReqPlatformTypeTwitch      VideosPostReqPlatformType = "twitch"
+	VideosPostReqPlatformTypeTwitcasting VideosPostReqPlatformType = "twitcasting"
+	VideosPostReqPlatformTypeNiconico    VideosPostReqPlatformType = "niconico"
+)
+
+// AllValues returns all VideosPostReqPlatformType values.
+func (VideosPostReqPlatformType) AllValues() []VideosPostReqPlatformType {
+	return []VideosPostReqPlatformType{
+		VideosPostReqPlatformTypeAll,
+		VideosPostReqPlatformTypeYoutube,
+		VideosPostReqPlatformTypeTwitch,
+		VideosPostReqPlatformTypeTwitcasting,
+		VideosPostReqPlatformTypeNiconico,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VideosPostReqPlatformType) MarshalText() ([]byte, error) {
+	switch s {
+	case VideosPostReqPlatformTypeAll:
+		return []byte(s), nil
+	case VideosPostReqPlatformTypeYoutube:
+		return []byte(s), nil
+	case VideosPostReqPlatformTypeTwitch:
+		return []byte(s), nil
+	case VideosPostReqPlatformTypeTwitcasting:
+		return []byte(s), nil
+	case VideosPostReqPlatformTypeNiconico:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VideosPostReqPlatformType) UnmarshalText(data []byte) error {
+	switch VideosPostReqPlatformType(data) {
+	case VideosPostReqPlatformTypeAll:
+		*s = VideosPostReqPlatformTypeAll
+		return nil
+	case VideosPostReqPlatformTypeYoutube:
+		*s = VideosPostReqPlatformTypeYoutube
+		return nil
+	case VideosPostReqPlatformTypeTwitch:
+		*s = VideosPostReqPlatformTypeTwitch
+		return nil
+	case VideosPostReqPlatformTypeTwitcasting:
+		*s = VideosPostReqPlatformTypeTwitcasting
+		return nil
+	case VideosPostReqPlatformTypeNiconico:
+		*s = VideosPostReqPlatformTypeNiconico
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type VideosPostReqVideoType string
+
+const (
+	VideosPostReqVideoTypeAll           VideosPostReqVideoType = "all"
+	VideosPostReqVideoTypeVspoBroadcast VideosPostReqVideoType = "vspo_broadcast"
+	VideosPostReqVideoTypeClip          VideosPostReqVideoType = "clip"
+	VideosPostReqVideoTypeFreechat      VideosPostReqVideoType = "freechat"
+)
+
+// AllValues returns all VideosPostReqVideoType values.
+func (VideosPostReqVideoType) AllValues() []VideosPostReqVideoType {
+	return []VideosPostReqVideoType{
+		VideosPostReqVideoTypeAll,
+		VideosPostReqVideoTypeVspoBroadcast,
+		VideosPostReqVideoTypeClip,
+		VideosPostReqVideoTypeFreechat,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VideosPostReqVideoType) MarshalText() ([]byte, error) {
+	switch s {
+	case VideosPostReqVideoTypeAll:
+		return []byte(s), nil
+	case VideosPostReqVideoTypeVspoBroadcast:
+		return []byte(s), nil
+	case VideosPostReqVideoTypeClip:
+		return []byte(s), nil
+	case VideosPostReqVideoTypeFreechat:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VideosPostReqVideoType) UnmarshalText(data []byte) error {
+	switch VideosPostReqVideoType(data) {
+	case VideosPostReqVideoTypeAll:
+		*s = VideosPostReqVideoTypeAll
+		return nil
+	case VideosPostReqVideoTypeVspoBroadcast:
+		*s = VideosPostReqVideoTypeVspoBroadcast
+		return nil
+	case VideosPostReqVideoTypeClip:
+		*s = VideosPostReqVideoTypeClip
+		return nil
+	case VideosPostReqVideoTypeFreechat:
+		*s = VideosPostReqVideoTypeFreechat
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// VideosPostUnauthorized is response for VideosPost operation.
+type VideosPostUnauthorized struct{}
+
+func (*VideosPostUnauthorized) videosPostRes() {}
+
+type YoutubeApiKey struct {
+	APIKey string
+}
+
+// GetAPIKey returns the value of APIKey.
+func (s *YoutubeApiKey) GetAPIKey() string {
+	return s.APIKey
+}
+
+// SetAPIKey sets the value of APIKey.
+func (s *YoutubeApiKey) SetAPIKey(val string) {
+	s.APIKey = val
 }

@@ -8,30 +8,18 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
-	// ChannelsChannelIDVideosPost implements POST /channels/{channel_id}/videos operation.
-	//
-	// Update videos related to a specific channel based on provided cronType.
-	//
-	// POST /channels/{channel_id}/videos
-	ChannelsChannelIDVideosPost(ctx context.Context, req *ChannelsChannelIDVideosPostReq, params ChannelsChannelIDVideosPostParams) (ChannelsChannelIDVideosPostRes, error)
-	// ChannelsChannelIDVideosPut implements PUT /channels/{channel_id}/videos operation.
-	//
-	// Update videos related to a specific channel based on provided cronType.
-	//
-	// PUT /channels/{channel_id}/videos
-	ChannelsChannelIDVideosPut(ctx context.Context, req *ChannelsChannelIDVideosPutReq, params ChannelsChannelIDVideosPutParams) (ChannelsChannelIDVideosPutRes, error)
 	// ChannelsPost implements POST /channels operation.
 	//
 	// Creates channels by fetching from Youtube using provided Channel IDs.
 	//
 	// POST /channels
 	ChannelsPost(ctx context.Context, req *ChannelsPostReq) (ChannelsPostRes, error)
-	// ChannelsPut implements PUT /channels operation.
+	// VideosPost implements POST /videos operation.
 	//
-	// Updates channels by fetching from Youtube using provided Channel IDs.
+	// Update videos related to a specific channel based on provided cronType.
 	//
-	// PUT /channels
-	ChannelsPut(ctx context.Context, req *ChannelsPutReq) (ChannelsPutRes, error)
+	// POST /videos
+	VideosPost(ctx context.Context, req *VideosPostReq) (VideosPostRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

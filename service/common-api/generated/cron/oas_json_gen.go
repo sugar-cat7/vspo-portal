@@ -7,306 +7,6 @@ import (
 	"github.com/go-faster/jx"
 )
 
-// Encode encodes ChannelsChannelIDVideosPostOKApplicationJSON as json.
-func (s ChannelsChannelIDVideosPostOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := string(s)
-
-	e.Str(unwrapped)
-}
-
-// Decode decodes ChannelsChannelIDVideosPostOKApplicationJSON from json.
-func (s *ChannelsChannelIDVideosPostOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsChannelIDVideosPostOKApplicationJSON to nil")
-	}
-	var unwrapped string
-	if err := func() error {
-		v, err := d.Str()
-		unwrapped = string(v)
-		if err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = ChannelsChannelIDVideosPostOKApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s ChannelsChannelIDVideosPostOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsChannelIDVideosPostOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *ChannelsChannelIDVideosPostReq) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *ChannelsChannelIDVideosPostReq) encodeFields(e *jx.Encoder) {
-	{
-		if s.Ids != nil {
-			e.FieldStart("ids")
-			e.ArrStart()
-			for _, elem := range s.Ids {
-				e.Str(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.StartDate.Set {
-			e.FieldStart("start_date")
-			s.StartDate.Encode(e)
-		}
-	}
-	{
-		if s.EndDate.Set {
-			e.FieldStart("end_date")
-			s.EndDate.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfChannelsChannelIDVideosPostReq = [3]string{
-	0: "ids",
-	1: "start_date",
-	2: "end_date",
-}
-
-// Decode decodes ChannelsChannelIDVideosPostReq from json.
-func (s *ChannelsChannelIDVideosPostReq) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsChannelIDVideosPostReq to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "ids":
-			if err := func() error {
-				s.Ids = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Ids = append(s.Ids, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ids\"")
-			}
-		case "start_date":
-			if err := func() error {
-				s.StartDate.Reset()
-				if err := s.StartDate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"start_date\"")
-			}
-		case "end_date":
-			if err := func() error {
-				s.EndDate.Reset()
-				if err := s.EndDate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"end_date\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode ChannelsChannelIDVideosPostReq")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsChannelIDVideosPostReq) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsChannelIDVideosPostReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes ChannelsChannelIDVideosPutOKApplicationJSON as json.
-func (s ChannelsChannelIDVideosPutOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := string(s)
-
-	e.Str(unwrapped)
-}
-
-// Decode decodes ChannelsChannelIDVideosPutOKApplicationJSON from json.
-func (s *ChannelsChannelIDVideosPutOKApplicationJSON) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsChannelIDVideosPutOKApplicationJSON to nil")
-	}
-	var unwrapped string
-	if err := func() error {
-		v, err := d.Str()
-		unwrapped = string(v)
-		if err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = ChannelsChannelIDVideosPutOKApplicationJSON(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s ChannelsChannelIDVideosPutOKApplicationJSON) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsChannelIDVideosPutOKApplicationJSON) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *ChannelsChannelIDVideosPutReq) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *ChannelsChannelIDVideosPutReq) encodeFields(e *jx.Encoder) {
-	{
-		if s.Ids != nil {
-			e.FieldStart("ids")
-			e.ArrStart()
-			for _, elem := range s.Ids {
-				e.Str(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		if s.StartDate.Set {
-			e.FieldStart("start_date")
-			s.StartDate.Encode(e)
-		}
-	}
-	{
-		if s.EndDate.Set {
-			e.FieldStart("end_date")
-			s.EndDate.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfChannelsChannelIDVideosPutReq = [3]string{
-	0: "ids",
-	1: "start_date",
-	2: "end_date",
-}
-
-// Decode decodes ChannelsChannelIDVideosPutReq from json.
-func (s *ChannelsChannelIDVideosPutReq) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsChannelIDVideosPutReq to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "ids":
-			if err := func() error {
-				s.Ids = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Ids = append(s.Ids, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ids\"")
-			}
-		case "start_date":
-			if err := func() error {
-				s.StartDate.Reset()
-				if err := s.StartDate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"start_date\"")
-			}
-		case "end_date":
-			if err := func() error {
-				s.EndDate.Reset()
-				if err := s.EndDate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"end_date\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode ChannelsChannelIDVideosPutReq")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsChannelIDVideosPutReq) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsChannelIDVideosPutReq) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes ChannelsPostOKApplicationJSON as json.
 func (s ChannelsPostOKApplicationJSON) Encode(e *jx.Encoder) {
 	unwrapped := string(s)
@@ -357,33 +57,22 @@ func (s *ChannelsPostReq) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *ChannelsPostReq) encodeFields(e *jx.Encoder) {
 	{
-		if s.Ids != nil {
-			e.FieldStart("ids")
-			e.ArrStart()
-			for _, elem := range s.Ids {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+		if s.PlatformType.Set {
+			e.FieldStart("platform_type")
+			s.PlatformType.Encode(e)
 		}
 	}
 	{
-		if s.StartDate.Set {
-			e.FieldStart("start_date")
-			s.StartDate.Encode(e)
-		}
-	}
-	{
-		if s.EndDate.Set {
-			e.FieldStart("end_date")
-			s.EndDate.Encode(e)
+		if s.Period.Set {
+			e.FieldStart("period")
+			s.Period.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfChannelsPostReq = [3]string{
-	0: "ids",
-	1: "start_date",
-	2: "end_date",
+var jsonFieldsNameOfChannelsPostReq = [2]string{
+	0: "platform_type",
+	1: "period",
 }
 
 // Decode decodes ChannelsPostReq from json.
@@ -394,44 +83,25 @@ func (s *ChannelsPostReq) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "ids":
+		case "platform_type":
 			if err := func() error {
-				s.Ids = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Ids = append(s.Ids, elem)
-					return nil
-				}); err != nil {
+				s.PlatformType.Reset()
+				if err := s.PlatformType.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ids\"")
+				return errors.Wrap(err, "decode field \"platform_type\"")
 			}
-		case "start_date":
+		case "period":
 			if err := func() error {
-				s.StartDate.Reset()
-				if err := s.StartDate.Decode(d); err != nil {
+				s.Period.Reset()
+				if err := s.Period.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"start_date\"")
-			}
-		case "end_date":
-			if err := func() error {
-				s.EndDate.Reset()
-				if err := s.EndDate.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"end_date\"")
+				return errors.Wrap(err, "decode field \"period\"")
 			}
 		default:
 			return d.Skip()
@@ -457,17 +127,272 @@ func (s *ChannelsPostReq) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPutOKApplicationJSON as json.
-func (s ChannelsPutOKApplicationJSON) Encode(e *jx.Encoder) {
+// Encode encodes ChannelsPostReqPeriod as json.
+func (s ChannelsPostReqPeriod) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes ChannelsPostReqPeriod from json.
+func (s *ChannelsPostReqPeriod) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsPostReqPeriod to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch ChannelsPostReqPeriod(v) {
+	case ChannelsPostReqPeriodAll:
+		*s = ChannelsPostReqPeriodAll
+	case ChannelsPostReqPeriodDay:
+		*s = ChannelsPostReqPeriodDay
+	case ChannelsPostReqPeriodMonth:
+		*s = ChannelsPostReqPeriodMonth
+	case ChannelsPostReqPeriodWeek:
+		*s = ChannelsPostReqPeriodWeek
+	default:
+		*s = ChannelsPostReqPeriod(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ChannelsPostReqPeriod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsPostReqPeriod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsPostReqPlatformType as json.
+func (s ChannelsPostReqPlatformType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes ChannelsPostReqPlatformType from json.
+func (s *ChannelsPostReqPlatformType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsPostReqPlatformType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch ChannelsPostReqPlatformType(v) {
+	case ChannelsPostReqPlatformTypeAll:
+		*s = ChannelsPostReqPlatformTypeAll
+	case ChannelsPostReqPlatformTypeYoutube:
+		*s = ChannelsPostReqPlatformTypeYoutube
+	case ChannelsPostReqPlatformTypeTwitch:
+		*s = ChannelsPostReqPlatformTypeTwitch
+	case ChannelsPostReqPlatformTypeTwitcasting:
+		*s = ChannelsPostReqPlatformTypeTwitcasting
+	case ChannelsPostReqPlatformTypeNiconico:
+		*s = ChannelsPostReqPlatformTypeNiconico
+	default:
+		*s = ChannelsPostReqPlatformType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ChannelsPostReqPlatformType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsPostReqPlatformType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsPostReqPeriod as json.
+func (o OptChannelsPostReqPeriod) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes ChannelsPostReqPeriod from json.
+func (o *OptChannelsPostReqPeriod) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptChannelsPostReqPeriod to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptChannelsPostReqPeriod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptChannelsPostReqPeriod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsPostReqPlatformType as json.
+func (o OptChannelsPostReqPlatformType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes ChannelsPostReqPlatformType from json.
+func (o *OptChannelsPostReqPlatformType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptChannelsPostReqPlatformType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptChannelsPostReqPlatformType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptChannelsPostReqPlatformType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes VideosPostReqPeriod as json.
+func (o OptVideosPostReqPeriod) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes VideosPostReqPeriod from json.
+func (o *OptVideosPostReqPeriod) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptVideosPostReqPeriod to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptVideosPostReqPeriod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptVideosPostReqPeriod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes VideosPostReqPlatformType as json.
+func (o OptVideosPostReqPlatformType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes VideosPostReqPlatformType from json.
+func (o *OptVideosPostReqPlatformType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptVideosPostReqPlatformType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptVideosPostReqPlatformType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptVideosPostReqPlatformType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes VideosPostReqVideoType as json.
+func (o OptVideosPostReqVideoType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes VideosPostReqVideoType from json.
+func (o *OptVideosPostReqVideoType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptVideosPostReqVideoType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptVideosPostReqVideoType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptVideosPostReqVideoType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes VideosPostOKApplicationJSON as json.
+func (s VideosPostOKApplicationJSON) Encode(e *jx.Encoder) {
 	unwrapped := string(s)
 
 	e.Str(unwrapped)
 }
 
-// Decode decodes ChannelsPutOKApplicationJSON from json.
-func (s *ChannelsPutOKApplicationJSON) Decode(d *jx.Decoder) error {
+// Decode decodes VideosPostOKApplicationJSON from json.
+func (s *VideosPostOKApplicationJSON) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPutOKApplicationJSON to nil")
+		return errors.New("invalid: unable to decode VideosPostOKApplicationJSON to nil")
 	}
 	var unwrapped string
 	if err := func() error {
@@ -480,164 +405,250 @@ func (s *ChannelsPutOKApplicationJSON) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ChannelsPutOKApplicationJSON(unwrapped)
+	*s = VideosPostOKApplicationJSON(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ChannelsPutOKApplicationJSON) MarshalJSON() ([]byte, error) {
+func (s VideosPostOKApplicationJSON) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPutOKApplicationJSON) UnmarshalJSON(data []byte) error {
+func (s *VideosPostOKApplicationJSON) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *ChannelsPutReq) Encode(e *jx.Encoder) {
+func (s *VideosPostReq) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ChannelsPutReq) encodeFields(e *jx.Encoder) {
+func (s *VideosPostReq) encodeFields(e *jx.Encoder) {
 	{
-		if s.Ids != nil {
-			e.FieldStart("ids")
-			e.ArrStart()
-			for _, elem := range s.Ids {
-				e.Str(elem)
-			}
-			e.ArrEnd()
+		if s.PlatformType.Set {
+			e.FieldStart("platform_type")
+			s.PlatformType.Encode(e)
 		}
 	}
 	{
-		if s.StartDate.Set {
-			e.FieldStart("start_date")
-			s.StartDate.Encode(e)
+		if s.Period.Set {
+			e.FieldStart("period")
+			s.Period.Encode(e)
 		}
 	}
 	{
-		if s.EndDate.Set {
-			e.FieldStart("end_date")
-			s.EndDate.Encode(e)
+		if s.VideoType.Set {
+			e.FieldStart("video_type")
+			s.VideoType.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfChannelsPutReq = [3]string{
-	0: "ids",
-	1: "start_date",
-	2: "end_date",
+var jsonFieldsNameOfVideosPostReq = [3]string{
+	0: "platform_type",
+	1: "period",
+	2: "video_type",
 }
 
-// Decode decodes ChannelsPutReq from json.
-func (s *ChannelsPutReq) Decode(d *jx.Decoder) error {
+// Decode decodes VideosPostReq from json.
+func (s *VideosPostReq) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPutReq to nil")
+		return errors.New("invalid: unable to decode VideosPostReq to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "ids":
+		case "platform_type":
 			if err := func() error {
-				s.Ids = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Ids = append(s.Ids, elem)
-					return nil
-				}); err != nil {
+				s.PlatformType.Reset()
+				if err := s.PlatformType.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"ids\"")
+				return errors.Wrap(err, "decode field \"platform_type\"")
 			}
-		case "start_date":
+		case "period":
 			if err := func() error {
-				s.StartDate.Reset()
-				if err := s.StartDate.Decode(d); err != nil {
+				s.Period.Reset()
+				if err := s.Period.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"start_date\"")
+				return errors.Wrap(err, "decode field \"period\"")
 			}
-		case "end_date":
+		case "video_type":
 			if err := func() error {
-				s.EndDate.Reset()
-				if err := s.EndDate.Decode(d); err != nil {
+				s.VideoType.Reset()
+				if err := s.VideoType.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"end_date\"")
+				return errors.Wrap(err, "decode field \"video_type\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ChannelsPutReq")
+		return errors.Wrap(err, "decode VideosPostReq")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsPutReq) MarshalJSON() ([]byte, error) {
+func (s *VideosPostReq) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPutReq) UnmarshalJSON(data []byte) error {
+func (s *VideosPostReq) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes string as json.
-func (o OptString) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
+// Encode encodes VideosPostReqPeriod as json.
+func (s VideosPostReqPeriod) Encode(e *jx.Encoder) {
+	e.Str(string(s))
 }
 
-// Decode decodes string from json.
-func (o *OptString) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptString to nil")
+// Decode decodes VideosPostReqPeriod from json.
+func (s *VideosPostReqPeriod) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode VideosPostReqPeriod to nil")
 	}
-	o.Set = true
-	v, err := d.Str()
+	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
-	o.Value = string(v)
+	// Try to use constant string.
+	switch VideosPostReqPeriod(v) {
+	case VideosPostReqPeriodAll:
+		*s = VideosPostReqPeriodAll
+	case VideosPostReqPeriodDay:
+		*s = VideosPostReqPeriodDay
+	case VideosPostReqPeriodMonth:
+		*s = VideosPostReqPeriodMonth
+	case VideosPostReqPeriodWeek:
+		*s = VideosPostReqPeriodWeek
+	default:
+		*s = VideosPostReqPeriod(v)
+	}
+
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptString) MarshalJSON() ([]byte, error) {
+func (s VideosPostReqPeriod) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptString) UnmarshalJSON(data []byte) error {
+func (s *VideosPostReqPeriod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes VideosPostReqPlatformType as json.
+func (s VideosPostReqPlatformType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes VideosPostReqPlatformType from json.
+func (s *VideosPostReqPlatformType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode VideosPostReqPlatformType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch VideosPostReqPlatformType(v) {
+	case VideosPostReqPlatformTypeAll:
+		*s = VideosPostReqPlatformTypeAll
+	case VideosPostReqPlatformTypeYoutube:
+		*s = VideosPostReqPlatformTypeYoutube
+	case VideosPostReqPlatformTypeTwitch:
+		*s = VideosPostReqPlatformTypeTwitch
+	case VideosPostReqPlatformTypeTwitcasting:
+		*s = VideosPostReqPlatformTypeTwitcasting
+	case VideosPostReqPlatformTypeNiconico:
+		*s = VideosPostReqPlatformTypeNiconico
+	default:
+		*s = VideosPostReqPlatformType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s VideosPostReqPlatformType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *VideosPostReqPlatformType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes VideosPostReqVideoType as json.
+func (s VideosPostReqVideoType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes VideosPostReqVideoType from json.
+func (s *VideosPostReqVideoType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode VideosPostReqVideoType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch VideosPostReqVideoType(v) {
+	case VideosPostReqVideoTypeAll:
+		*s = VideosPostReqVideoTypeAll
+	case VideosPostReqVideoTypeVspoBroadcast:
+		*s = VideosPostReqVideoTypeVspoBroadcast
+	case VideosPostReqVideoTypeClip:
+		*s = VideosPostReqVideoTypeClip
+	case VideosPostReqVideoTypeFreechat:
+		*s = VideosPostReqVideoTypeFreechat
+	default:
+		*s = VideosPostReqVideoType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s VideosPostReqVideoType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *VideosPostReqVideoType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
