@@ -12,14 +12,23 @@ type ThemeProviderProps = {
 };
 
 const theme = extendTheme({
+  mixins: {
+    scrollbar: {
+      scrollbarWidth: "none",
+      "&::-webkit-scrollbar": {
+        display: "none",
+      },
+    },
+  },
   components: {
     MuiCssBaseline: {
+      styleOverrides: ({ mixins }) => ({
+        body: mixins.scrollbar,
+      }),
+    },
+    MuiDrawer: {
       styleOverrides: {
-        body: {
-          "&::-webkit-scrollbar": {
-            display: "none",
-          },
-        },
+        paper: ({ theme }) => theme.mixins.scrollbar,
       },
     },
   },

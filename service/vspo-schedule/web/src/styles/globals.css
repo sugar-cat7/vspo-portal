@@ -11,10 +11,6 @@ body {
   height: 100%;
 }
 
-body {
-  /* overflow-y: scroll !important; */
-}
-
 a {
   color: inherit;
   text-decoration: none;

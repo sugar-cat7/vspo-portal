@@ -340,10 +340,7 @@ const TabPanelScrollContainer = styled("div")(({ theme }) => ({
   overflowX: "hidden",
   overflowY: "auto",
   padding: theme.spacing(1),
-  scrollbarWidth: "none",
-  "&::-webkit-scrollbar": {
-    display: "none",
-  },
+  ...theme.mixins.scrollbar,
 }));
 
 const TabPanel: React.FC<TabPanelProps> = ({ value, index, children }) => {
