@@ -14,118 +14,6 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeChannelsChannelIDVideosPostResponse(resp *http.Response) (res ChannelsChannelIDVideosPostRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response ChannelsChannelIDVideosPostOKApplicationJSON
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 400:
-		// Code 400.
-		return &ChannelsChannelIDVideosPostBadRequest{}, nil
-	case 401:
-		// Code 401.
-		return &ChannelsChannelIDVideosPostUnauthorized{}, nil
-	case 403:
-		// Code 403.
-		return &ChannelsChannelIDVideosPostForbidden{}, nil
-	case 404:
-		// Code 404.
-		return &ChannelsChannelIDVideosPostNotFound{}, nil
-	case 500:
-		// Code 500.
-		return &ChannelsChannelIDVideosPostInternalServerError{}, nil
-	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
-}
-
-func decodeChannelsChannelIDVideosPutResponse(resp *http.Response) (res ChannelsChannelIDVideosPutRes, _ error) {
-	switch resp.StatusCode {
-	case 200:
-		// Code 200.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response ChannelsChannelIDVideosPutOKApplicationJSON
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 400:
-		// Code 400.
-		return &ChannelsChannelIDVideosPutBadRequest{}, nil
-	case 401:
-		// Code 401.
-		return &ChannelsChannelIDVideosPutUnauthorized{}, nil
-	case 403:
-		// Code 403.
-		return &ChannelsChannelIDVideosPutForbidden{}, nil
-	case 404:
-		// Code 404.
-		return &ChannelsChannelIDVideosPutNotFound{}, nil
-	case 500:
-		// Code 500.
-		return &ChannelsChannelIDVideosPutInternalServerError{}, nil
-	}
-	return res, validate.UnexpectedStatusCode(resp.StatusCode)
-}
-
 func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
@@ -182,7 +70,7 @@ func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ err
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeChannelsPutResponse(resp *http.Response) (res ChannelsPutRes, _ error) {
+func decodeVideosPostResponse(resp *http.Response) (res VideosPostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -198,7 +86,7 @@ func decodeChannelsPutResponse(resp *http.Response) (res ChannelsPutRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsPutOKApplicationJSON
+			var response VideosPostOKApplicationJSON
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -221,19 +109,19 @@ func decodeChannelsPutResponse(resp *http.Response) (res ChannelsPutRes, _ error
 		}
 	case 400:
 		// Code 400.
-		return &ChannelsPutBadRequest{}, nil
+		return &VideosPostBadRequest{}, nil
 	case 401:
 		// Code 401.
-		return &ChannelsPutUnauthorized{}, nil
+		return &VideosPostUnauthorized{}, nil
 	case 403:
 		// Code 403.
-		return &ChannelsPutForbidden{}, nil
+		return &VideosPostForbidden{}, nil
 	case 404:
 		// Code 404.
-		return &ChannelsPutNotFound{}, nil
+		return &VideosPostNotFound{}, nil
 	case 500:
 		// Code 500.
-		return &ChannelsPutInternalServerError{}, nil
+		return &VideosPostInternalServerError{}, nil
 	}
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }

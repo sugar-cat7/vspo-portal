@@ -19,334 +19,6 @@ import (
 	"github.com/ogen-go/ogen/ogenerrors"
 )
 
-// handleChannelsChannelIDVideosPostRequest handles POST /channels/{channel_id}/videos operation.
-//
-// Update videos related to a specific channel based on provided cronType.
-//
-// POST /channels/{channel_id}/videos
-func (s *Server) handleChannelsChannelIDVideosPostRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/channels/{channel_id}/videos"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "ChannelsChannelIDVideosPost",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "ChannelsChannelIDVideosPost",
-			ID:   "",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "ChannelsChannelIDVideosPost", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
-					Err:              err,
-				}
-				recordError("Security:ApiKeyAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeChannelsChannelIDVideosPostParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	request, close, err := s.decodeChannelsChannelIDVideosPostRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
-
-	var response ChannelsChannelIDVideosPostRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "ChannelsChannelIDVideosPost",
-			OperationSummary: "Create videos for a specific channel",
-			OperationID:      "",
-			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "channel_id",
-					In:   "path",
-				}: params.ChannelID,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = *ChannelsChannelIDVideosPostReq
-			Params   = ChannelsChannelIDVideosPostParams
-			Response = ChannelsChannelIDVideosPostRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackChannelsChannelIDVideosPostParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ChannelsChannelIDVideosPost(ctx, request, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.ChannelsChannelIDVideosPost(ctx, request, params)
-	}
-	if err != nil {
-		recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeChannelsChannelIDVideosPostResponse(response, w, span); err != nil {
-		recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handleChannelsChannelIDVideosPutRequest handles PUT /channels/{channel_id}/videos operation.
-//
-// Update videos related to a specific channel based on provided cronType.
-//
-// PUT /channels/{channel_id}/videos
-func (s *Server) handleChannelsChannelIDVideosPutRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/channels/{channel_id}/videos"),
-	}
-
-	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "ChannelsChannelIDVideosPut",
-		trace.WithAttributes(otelAttrs...),
-		serverSpanKind,
-	)
-	defer span.End()
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		elapsedDuration := time.Since(startTime)
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		s.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	s.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	var (
-		recordError = func(stage string, err error) {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			s.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: "ChannelsChannelIDVideosPut",
-			ID:   "",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "ChannelsChannelIDVideosPut", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
-					Err:              err,
-				}
-				recordError("Security:ApiKeyAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeChannelsChannelIDVideosPutParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	request, close, err := s.decodeChannelsChannelIDVideosPutRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
-
-	var response ChannelsChannelIDVideosPutRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    "ChannelsChannelIDVideosPut",
-			OperationSummary: "Update videos for a specific channel",
-			OperationID:      "",
-			Body:             request,
-			Params: middleware.Parameters{
-				{
-					Name: "channel_id",
-					In:   "path",
-				}: params.ChannelID,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = *ChannelsChannelIDVideosPutReq
-			Params   = ChannelsChannelIDVideosPutParams
-			Response = ChannelsChannelIDVideosPutRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackChannelsChannelIDVideosPutParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ChannelsChannelIDVideosPut(ctx, request, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.ChannelsChannelIDVideosPut(ctx, request, params)
-	}
-	if err != nil {
-		recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeChannelsChannelIDVideosPutResponse(response, w, span); err != nil {
-		recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
 // handleChannelsPostRequest handles POST /channels operation.
 //
 // Creates channels by fetching from Youtube using provided Channel IDs.
@@ -408,11 +80,47 @@ func (s *Server) handleChannelsPostRequest(args [0]string, argsEscaped bool, w h
 				ctx = sctx
 			}
 		}
+		{
+			sctx, ok, err := s.securityYoutubeApiKey(ctx, "ChannelsPost", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "YoutubeApiKey",
+					Err:              err,
+				}
+				recordError("Security:YoutubeApiKey", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 1
+				ctx = sctx
+			}
+		}
+		{
+			sctx, ok, err := s.securityTwitchApiKey(ctx, "ChannelsPost", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "TwitchApiKey",
+					Err:              err,
+				}
+				recordError("Security:TwitchApiKey", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 2
+				ctx = sctx
+			}
+		}
 
 		if ok := func() bool {
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
+				{0b00000010},
+				{0b00000100},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {
@@ -453,7 +161,7 @@ func (s *Server) handleChannelsPostRequest(args [0]string, argsEscaped bool, w h
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    "ChannelsPost",
-			OperationSummary: "Create Channels from Youtube",
+			OperationSummary: "Upsert Channel(Youtube/Twitch/Twitcasting)",
 			OperationID:      "",
 			Body:             request,
 			Params:           middleware.Parameters{},
@@ -496,19 +204,19 @@ func (s *Server) handleChannelsPostRequest(args [0]string, argsEscaped bool, w h
 	}
 }
 
-// handleChannelsPutRequest handles PUT /channels operation.
+// handleVideosPostRequest handles POST /videos operation.
 //
-// Updates channels by fetching from Youtube using provided Channel IDs.
+// Update videos related to a specific channel based on provided cronType.
 //
-// PUT /channels
-func (s *Server) handleChannelsPutRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// POST /videos
+func (s *Server) handleVideosPostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/channels"),
+		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/videos"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "ChannelsPut",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "VideosPost",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -533,7 +241,7 @@ func (s *Server) handleChannelsPutRequest(args [0]string, argsEscaped bool, w ht
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "ChannelsPut",
+			Name: "VideosPost",
 			ID:   "",
 		}
 	)
@@ -541,7 +249,7 @@ func (s *Server) handleChannelsPutRequest(args [0]string, argsEscaped bool, w ht
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "ChannelsPut", r)
+			sctx, ok, err := s.securityApiKeyAuth(ctx, "VideosPost", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -557,11 +265,47 @@ func (s *Server) handleChannelsPutRequest(args [0]string, argsEscaped bool, w ht
 				ctx = sctx
 			}
 		}
+		{
+			sctx, ok, err := s.securityYoutubeApiKey(ctx, "VideosPost", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "YoutubeApiKey",
+					Err:              err,
+				}
+				recordError("Security:YoutubeApiKey", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 1
+				ctx = sctx
+			}
+		}
+		{
+			sctx, ok, err := s.securityTwitchApiKey(ctx, "VideosPost", r)
+			if err != nil {
+				err = &ogenerrors.SecurityError{
+					OperationContext: opErrContext,
+					Security:         "TwitchApiKey",
+					Err:              err,
+				}
+				recordError("Security:TwitchApiKey", err)
+				s.cfg.ErrorHandler(ctx, w, r, err)
+				return
+			}
+			if ok {
+				satisfied[0] |= 1 << 2
+				ctx = sctx
+			}
+		}
 
 		if ok := func() bool {
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
+				{0b00000010},
+				{0b00000100},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {
@@ -581,7 +325,7 @@ func (s *Server) handleChannelsPutRequest(args [0]string, argsEscaped bool, w ht
 			return
 		}
 	}
-	request, close, err := s.decodeChannelsPutRequest(r)
+	request, close, err := s.decodeVideosPostRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -597,12 +341,12 @@ func (s *Server) handleChannelsPutRequest(args [0]string, argsEscaped bool, w ht
 		}
 	}()
 
-	var response ChannelsPutRes
+	var response VideosPostRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "ChannelsPut",
-			OperationSummary: "Update Channels from Youtube",
+			OperationName:    "VideosPost",
+			OperationSummary: "Upsert videos",
 			OperationID:      "",
 			Body:             request,
 			Params:           middleware.Parameters{},
@@ -610,9 +354,9 @@ func (s *Server) handleChannelsPutRequest(args [0]string, argsEscaped bool, w ht
 		}
 
 		type (
-			Request  = *ChannelsPutReq
+			Request  = *VideosPostReq
 			Params   = struct{}
-			Response = ChannelsPutRes
+			Response = VideosPostRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -623,12 +367,12 @@ func (s *Server) handleChannelsPutRequest(args [0]string, argsEscaped bool, w ht
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ChannelsPut(ctx, request)
+				response, err = s.h.VideosPost(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ChannelsPut(ctx, request)
+		response, err = s.h.VideosPost(ctx, request)
 	}
 	if err != nil {
 		recordError("Internal", err)
@@ -636,7 +380,7 @@ func (s *Server) handleChannelsPutRequest(args [0]string, argsEscaped bool, w ht
 		return
 	}
 
-	if err := encodeChannelsPutResponse(response, w, span); err != nil {
+	if err := encodeVideosPostResponse(response, w, span); err != nil {
 		recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
