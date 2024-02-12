@@ -18,7 +18,7 @@ import { Clip, Livestream, Platform } from "@/types/streaming";
 import {
   formatWithTimeZone,
   getLivestreamUrl,
-  isStatusLive,
+  getLiveStatus,
 } from "@/lib/utils";
 import { Loading, PlatformIcon } from "..";
 import CloseIcon from "@mui/icons-material/Close";
@@ -391,7 +391,7 @@ const InfoTabs: React.FC<{
   );
   const showChatTab = isLivestream(videoInfo) &&
     isOnPlatformWithChat(videoInfo) &&
-    isStatusLive(videoInfo) === "live";
+    getLiveStatus(videoInfo) === "live";
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -425,10 +425,10 @@ const InfoTabs: React.FC<{
             </TypographySmallOnMobile>
             {isLivestream(videoInfo) && (
               <>
-                {isStatusLive(videoInfo) === "live" && (
+                {getLiveStatus(videoInfo) === "live" && (
                   <LiveLabel>Live</LiveLabel>
                 )}
-                {isStatusLive(videoInfo) === "upcoming" && (
+                {getLiveStatus(videoInfo) === "upcoming" && (
                   <LiveLabel isUpcoming>配信予定</LiveLabel>
                 )}
               </>

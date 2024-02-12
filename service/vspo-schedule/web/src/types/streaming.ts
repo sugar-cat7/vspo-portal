@@ -42,6 +42,12 @@ export type SearchListResponse = {
   items: SearchResult[];
 };
 
+export enum LiveStatus {
+  Archive = "archive",
+  Live = "live",
+  Upcoming = "upcoming",
+}
+
 export enum Platform {
   YouTube = "youtube",
   Twitch = "twitch",

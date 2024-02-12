@@ -1,8 +1,8 @@
 import { members } from "@/data/members";
-import { Clip, Livestream, MemberKeyword, Platform } from "@/types/streaming";
+import { Clip, LiveStatus, Livestream, MemberKeyword, Platform } from "@/types/streaming";
 import { format, utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
-import { Locale, differenceInMinutes } from "date-fns";
+import { differenceInMinutes, Locale } from "date-fns";
 import { TEMP_TIMESTAMP } from "./Const";
 import { freeChatVideoIds } from "@/data/master";
 import { VspoEvent } from "@/types/events";
@@ -444,11 +444,12 @@ export const isUpcomingLivestreams = (
 };
 
 /**
- * Determines if a livestream is live, upcoming or archived based on its scheduled start time and actual end time.
- * @param {Livestream} livestream - The livestream to check the status of.
- * @returns {string} - The status of the livestream: "live", "upcoming", or "archive".
+ * Determines if a livestream is live, upcoming, archived, or is a freechat.
+ * @param {Livestream} livestream - The livestream to check the live status of.
+ * @returns {LiveStatus | "freechat"} - The live status of the livestream
+ *   ("live", "upcoming", or "archive") or "freechat".
  */
-export const isStatusLive = (livestream: Livestream): string => {
+export const getLiveStatus = (livestream: Livestream): LiveStatus | "freechat" => {
   if (freeChatVideoIds.includes(livestream.id)) {
     return "freechat";
   }
@@ -468,15 +469,15 @@ export const isStatusLive = (livestream: Livestream): string => {
   const isWithinTwelveHours: boolean =
     timeDifference <= twelveHoursInMilliseconds;
   if (new Date(livestream.scheduledStartTime) > new Date()) {
-    return "upcoming";
+    return LiveStatus.Upcoming;
   } else if (
     livestream?.actualEndTime &&
     livestream.actualEndTime.includes("1998-01-01") &&
     isWithinTwelveHours
   ) {
-    return "live";
+    return LiveStatus.Live;
   } else {
-    return "archive";
+    return LiveStatus.Archive;
   }
 };
 
@@ -521,7 +522,7 @@ export const liveStatusFilterLivestreams = (
     if (livestreamsByDate.hasOwnProperty(dateKey)) {
       const livestreams = livestreamsByDate[dateKey];
       const filteredLivestreams = livestreams.filter(
-        (livestream) => isStatusLive(livestream) === liveStatus
+        (livestream) => getLiveStatus(livestream) === liveStatus
       );
 
       if (filteredLivestreams.length > 0) {
