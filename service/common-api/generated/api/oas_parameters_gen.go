@@ -13,22 +13,37 @@ import (
 
 // CreatorsGetParams is parameters of GET /creators operation.
 type CreatorsGetParams struct {
-	// Comma-separated list of creator IDs.
-	Ids OptString
-	// Page.
+	// A list of IDs that identify the creators you want to get. To get more than one creator, include
+	// this parameter for each creator you want to get. The creator_id and creator_id parameters are
+	// mutually exclusive.
+	CreatorIds OptString
+	// A filter used to filter the list of creators by the creator's type.(The default is "all".).
+	CreatorType OptCreatorsGetCreatorType
+	// Pagination object. Specify this parameter only if you don't specify the creator_ids query
+	// parameter.
 	Page OptInt
-	// Page limit.
+	// The maximum number of items to return per page(The default is 20.) Specify this parameter only if
+	// you don't specify the creator_ids query parameter.
 	Limit OptInt
 }
 
 func unpackCreatorsGetParams(packed middleware.Parameters) (params CreatorsGetParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "ids",
+			Name: "creator_ids",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Ids = v.(OptString)
+			params.CreatorIds = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "creator_type",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CreatorType = v.(OptCreatorsGetCreatorType)
 		}
 	}
 	{
@@ -54,17 +69,17 @@ func unpackCreatorsGetParams(packed middleware.Parameters) (params CreatorsGetPa
 
 func decodeCreatorsGetParams(args [0]string, argsEscaped bool, r *http.Request) (params CreatorsGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
-	// Decode query: ids.
+	// Decode query: creator_ids.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "ids",
+			Name:    "creator_ids",
 			Style:   uri.QueryStyleForm,
-			Explode: false,
+			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotIdsVal string
+				var paramsDotCreatorIdsVal string
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -76,12 +91,12 @@ func decodeCreatorsGetParams(args [0]string, argsEscaped bool, r *http.Request) 
 						return err
 					}
 
-					paramsDotIdsVal = c
+					paramsDotCreatorIdsVal = c
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.Ids.SetTo(paramsDotIdsVal)
+				params.CreatorIds.SetTo(paramsDotCreatorIdsVal)
 				return nil
 			}); err != nil {
 				return err
@@ -90,7 +105,63 @@ func decodeCreatorsGetParams(args [0]string, argsEscaped bool, r *http.Request) 
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "ids",
+			Name: "creator_ids",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: creator_type.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "creator_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotCreatorTypeVal CreatorsGetCreatorType
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotCreatorTypeVal = CreatorsGetCreatorType(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.CreatorType.SetTo(paramsDotCreatorTypeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.CreatorType.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "creator_type",
 			In:   "query",
 			Err:  err,
 		}
@@ -182,21 +253,44 @@ func decodeCreatorsGetParams(args [0]string, argsEscaped bool, r *http.Request) 
 
 // VideosGetParams is parameters of GET /videos operation.
 type VideosGetParams struct {
-	// Unique identifier of the creator.
+	// A list of IDs that identify the videos you want to get. To get more than one video, include this
+	// parameter for each video you want to get. The video_id and creator_id parameters are mutually
+	// exclusive.
+	VideoIds OptString
+	// The ID of the creator whose list of videos you want to get. The video_id and creator_id parameters
+	// are mutually exclusive.
 	CreatorID OptString
-	// Comma-separated list of videos IDs.
-	Ids OptString
-	// Start Date.
-	StartDate OptString
-	// End Date.
-	EndDate OptString
-	// Page.
+	// The ISO 639-1 two-letter code for Japanese (i.e., ja).
+	Language OptString
+	// A filter used to filter the list of videos by the video's type.(The default is "vspo_broadcast".).
+	VideoType OptVideosGetVideoType
+	// A filter used to filter the list of videos by the video's vspo_broadcast type.(The default is
+	// "all".).
+	BroadcastType OptVideosGetBroadcastType
+	// A filter used to filter the list of videos by when they were published.(The default is "all".).
+	Period OptVideosGetPeriod
+	// The order to sort the returned videos.(The default is "time".).
+	Sort OptVideosGetSort
+	// A filter used to filter the list of videos by the video's platform type.(The default is "all".).
+	PlatformType OptVideosGetPlatformType
+	// Pagination object. Specify this parameter only if you don't specify the creator_id or video_ids
+	// query parameter.
 	Page OptInt
-	// Page limit.
+	// The maximum number of items to return per page(The default is 20.) Specify this parameter only if
+	// you don't specify the creator_id or video_ids query parameter.
 	Limit OptInt
 }
 
 func unpackVideosGetParams(packed middleware.Parameters) (params VideosGetParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "video_ids",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.VideoIds = v.(OptString)
+		}
+	}
 	{
 		key := middleware.ParameterKey{
 			Name: "creator_id",
@@ -208,29 +302,56 @@ func unpackVideosGetParams(packed middleware.Parameters) (params VideosGetParams
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "ids",
+			Name: "language",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Ids = v.(OptString)
+			params.Language = v.(OptString)
 		}
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "start_date",
+			Name: "video_type",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.StartDate = v.(OptString)
+			params.VideoType = v.(OptVideosGetVideoType)
 		}
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "end_date",
+			Name: "broadcast_type",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.EndDate = v.(OptString)
+			params.BroadcastType = v.(OptVideosGetBroadcastType)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "period",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Period = v.(OptVideosGetPeriod)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "sort",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Sort = v.(OptVideosGetSort)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "platform_type",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PlatformType = v.(OptVideosGetPlatformType)
 		}
 	}
 	{
@@ -256,6 +377,47 @@ func unpackVideosGetParams(packed middleware.Parameters) (params VideosGetParams
 
 func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (params VideosGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: video_ids.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "video_ids",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotVideoIdsVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotVideoIdsVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.VideoIds.SetTo(paramsDotVideoIdsVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "video_ids",
+			In:   "query",
+			Err:  err,
+		}
+	}
 	// Decode query: creator_id.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
@@ -297,17 +459,17 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 			Err:  err,
 		}
 	}
-	// Decode query: ids.
+	// Decode query: language.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "ids",
+			Name:    "language",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotIdsVal string
+				var paramsDotLanguageVal string
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -319,12 +481,12 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 						return err
 					}
 
-					paramsDotIdsVal = c
+					paramsDotLanguageVal = c
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.Ids.SetTo(paramsDotIdsVal)
+				params.Language.SetTo(paramsDotLanguageVal)
 				return nil
 			}); err != nil {
 				return err
@@ -333,22 +495,22 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "ids",
+			Name: "language",
 			In:   "query",
 			Err:  err,
 		}
 	}
-	// Decode query: start_date.
+	// Decode query: video_type.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "start_date",
+			Name:    "video_type",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotStartDateVal string
+				var paramsDotVideoTypeVal VideosGetVideoType
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -360,36 +522,51 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 						return err
 					}
 
-					paramsDotStartDateVal = c
+					paramsDotVideoTypeVal = VideosGetVideoType(c)
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.StartDate.SetTo(paramsDotStartDateVal)
+				params.VideoType.SetTo(paramsDotVideoTypeVal)
 				return nil
 			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.VideoType.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
 				return err
 			}
 		}
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "start_date",
+			Name: "video_type",
 			In:   "query",
 			Err:  err,
 		}
 	}
-	// Decode query: end_date.
+	// Decode query: broadcast_type.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "end_date",
+			Name:    "broadcast_type",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotEndDateVal string
+				var paramsDotBroadcastTypeVal VideosGetBroadcastType
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -401,21 +578,204 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 						return err
 					}
 
-					paramsDotEndDateVal = c
+					paramsDotBroadcastTypeVal = VideosGetBroadcastType(c)
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.EndDate.SetTo(paramsDotEndDateVal)
+				params.BroadcastType.SetTo(paramsDotBroadcastTypeVal)
 				return nil
 			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.BroadcastType.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
 				return err
 			}
 		}
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "end_date",
+			Name: "broadcast_type",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: period.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPeriodVal VideosGetPeriod
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPeriodVal = VideosGetPeriod(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Period.SetTo(paramsDotPeriodVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Period.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "period",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: sort.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSortVal VideosGetSort
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSortVal = VideosGetSort(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Sort.SetTo(paramsDotSortVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Sort.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "sort",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: platform_type.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "platform_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPlatformTypeVal VideosGetPlatformType
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPlatformTypeVal = VideosGetPlatformType(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PlatformType.SetTo(paramsDotPlatformTypeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.PlatformType.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "platform_type",
 			In:   "query",
 			Err:  err,
 		}

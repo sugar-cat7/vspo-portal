@@ -2,6 +2,7 @@ package model
 
 import "math"
 
+// Pagination struct holds the information about the pagination of data.
 type Pagination struct {
 	CurrentPage uint64
 	PrevPage    uint64
@@ -11,6 +12,8 @@ type Pagination struct {
 	HasNext     bool
 }
 
+// NewPagination is a function to create a new Pagination instance.
+// It takes the current page number, limit per page, and total count of items as parameters.
 func NewPagination(
 	page uint64,
 	limit uint64,

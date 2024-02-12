@@ -125,9 +125,13 @@ func (s *Server) handleCreatorsGetRequest(args [0]string, argsEscaped bool, w ht
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "ids",
+					Name: "creator_ids",
 					In:   "query",
-				}: params.Ids,
+				}: params.CreatorIds,
+				{
+					Name: "creator_type",
+					In:   "query",
+				}: params.CreatorType,
 				{
 					Name: "page",
 					In:   "query",
@@ -282,21 +286,37 @@ func (s *Server) handleVideosGetRequest(args [0]string, argsEscaped bool, w http
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
+					Name: "video_ids",
+					In:   "query",
+				}: params.VideoIds,
+				{
 					Name: "creator_id",
 					In:   "query",
 				}: params.CreatorID,
 				{
-					Name: "ids",
+					Name: "language",
 					In:   "query",
-				}: params.Ids,
+				}: params.Language,
 				{
-					Name: "start_date",
+					Name: "video_type",
 					In:   "query",
-				}: params.StartDate,
+				}: params.VideoType,
 				{
-					Name: "end_date",
+					Name: "broadcast_type",
 					In:   "query",
-				}: params.EndDate,
+				}: params.BroadcastType,
+				{
+					Name: "period",
+					In:   "query",
+				}: params.Period,
+				{
+					Name: "sort",
+					In:   "query",
+				}: params.Sort,
+				{
+					Name: "platform_type",
+					In:   "query",
+				}: params.PlatformType,
 				{
 					Name: "page",
 					In:   "query",

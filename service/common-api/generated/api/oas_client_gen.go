@@ -151,16 +151,33 @@ func (c *Client) sendCreatorsGet(ctx context.Context, params CreatorsGetParams) 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
 	{
-		// Encode "ids" parameter.
+		// Encode "creator_ids" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "ids",
+			Name:    "creator_ids",
 			Style:   uri.QueryStyleForm,
-			Explode: false,
+			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Ids.Get(); ok {
+			if val, ok := params.CreatorIds.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "creator_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "creator_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.CreatorType.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
 			}
 			return nil
 		}); err != nil {
@@ -310,6 +327,23 @@ func (c *Client) sendVideosGet(ctx context.Context, params VideosGetParams) (res
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
 	{
+		// Encode "video_ids" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "video_ids",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.VideoIds.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
 		// Encode "creator_id" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "creator_id",
@@ -327,15 +361,15 @@ func (c *Client) sendVideosGet(ctx context.Context, params VideosGetParams) (res
 		}
 	}
 	{
-		// Encode "ids" parameter.
+		// Encode "language" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "ids",
+			Name:    "language",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Ids.Get(); ok {
+			if val, ok := params.Language.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
 			}
 			return nil
@@ -344,16 +378,16 @@ func (c *Client) sendVideosGet(ctx context.Context, params VideosGetParams) (res
 		}
 	}
 	{
-		// Encode "start_date" parameter.
+		// Encode "video_type" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "start_date",
+			Name:    "video_type",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.StartDate.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+			if val, ok := params.VideoType.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
 			}
 			return nil
 		}); err != nil {
@@ -361,16 +395,67 @@ func (c *Client) sendVideosGet(ctx context.Context, params VideosGetParams) (res
 		}
 	}
 	{
-		// Encode "end_date" parameter.
+		// Encode "broadcast_type" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "end_date",
+			Name:    "broadcast_type",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.EndDate.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+			if val, ok := params.BroadcastType.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "period" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Period.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "sort" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Sort.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "platform_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "platform_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PlatformType.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
 			}
 			return nil
 		}); err != nil {

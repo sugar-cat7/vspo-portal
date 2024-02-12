@@ -11,10 +11,11 @@ import (
 
 // CreatorsGet implements the GET /creators endpoint.
 func (h *CH) CreatorsGet(ctx context.Context, params api.CreatorsGetParams) (api.CreatorsGetRes, error) {
-	ids := strings.Split(params.Ids.Value, ",")
+	ids := strings.Split(params.CreatorIds.Value, ",")
 
 	c, err := h.creatorInteractor.List(ctx, input.NewListCreators(
 		ids,
+		string(params.CreatorType.Value),
 		uint64(params.Page.Value),
 		uint64(params.Limit.Value),
 	))

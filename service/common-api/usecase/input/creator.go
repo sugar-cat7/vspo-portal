@@ -20,6 +20,7 @@ type ListCreators struct {
 
 func NewListCreators(
 	ids []string,
+	creatorType string,
 	page uint64,
 	limit uint64,
 ) *ListCreators {
@@ -27,7 +28,7 @@ func NewListCreators(
 		page = 1
 	}
 	if limit == 0 {
-		limit = 30
+		limit = 20
 	}
 	return &ListCreators{
 		ids:   ids,
