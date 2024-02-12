@@ -25,6 +25,6 @@ type GetCreatorQuery struct {
 }
 
 type ListCreatorsQuery struct {
-	CreatorID null.String
+	CreatorIDs []*null.String
 	BaseListOptions
 }

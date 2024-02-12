@@ -17,34 +17,14 @@ func CreatorsResponse(c model.Creators) []api.CreatorResponse {
 // CreatorResponse converts model.Creator to api.CreatorResponse
 func CreatorResponse(c *model.Creator) api.CreatorResponse {
 	return api.CreatorResponse{
-		ID: api.OptString{
+		CreatorID: api.OptString{
 			Value: c.ID,
 		},
-		Name: api.OptString{
+		CreatorName: api.OptString{
 			Value: c.Name,
 		},
-		Channels: ChannelsResponse(c.Channels),
-	}
-}
-
-// ThumbnailsResponse converts model.Thumbnails to api.OptThumbnailsResponse
-func ThumbnailsResponse(t model.Thumbnails) api.OptThumbnailsResponse {
-	return api.OptThumbnailsResponse{
-		Value: api.ThumbnailsResponse{
-			Default: thumbnailResponse(t.Default),
-			Medium:  thumbnailResponse(t.Medium),
-			High:    thumbnailResponse(t.High),
-		},
-	}
-}
-
-// thumbnailResponse converts model.Thumbnail to api.OptThumbnailResponse
-func thumbnailResponse(t model.Thumbnail) api.OptThumbnailResponse {
-	return api.OptThumbnailResponse{
-		Value: api.ThumbnailResponse{
-			URL:    api.OptString{Value: t.URL},
-			Width:  api.OptInt{Value: t.Width},
-			Height: api.OptInt{Value: t.Height},
+		ChannelInfo: api.OptChannelResponse{
+			Value: ChannelResponse(&c.Channel),
 		},
 	}
 }
@@ -61,48 +41,21 @@ func ChannelsResponse(c model.Channels) []api.ChannelResponse {
 // ChannelResponse converts model.Channel to api.ChannelResponse
 func ChannelResponse(c *model.Channel) api.ChannelResponse {
 	return api.ChannelResponse{
-		ID: api.OptString{
-			Value: c.ID,
-		},
-		Snippet: api.OptChannelSnippetResponse{
-			Value: api.ChannelSnippetResponse{
-				Youtube:     platformSnippetResponse(c.Snippet.Youtube),
-				Twitch:      platformSnippetResponse(c.Snippet.Twitch),
-				TwitCasting: platformSnippetResponse(c.Snippet.TwitCasting),
-				Niconico:    platformSnippetResponse(c.Snippet.Niconico),
-			},
-		},
-		Statistics: api.OptChannelStatisticsResponse{
-			Value: api.ChannelStatisticsResponse{
-				Youtube:     platformStatisticsResponse(c.Statistics.Youtube),
-				Twitch:      platformStatisticsResponse(c.Statistics.Twitch),
-				TwitCasting: platformStatisticsResponse(c.Statistics.TwitCasting),
-				Niconico:    platformStatisticsResponse(c.Statistics.Niconico),
-			}},
+		Youtube:     platformSnippetResponse(c.Youtube),
+		Twitch:      platformSnippetResponse(c.Twitch),
+		TwitCasting: platformSnippetResponse(c.TwitCasting),
+		Niconico:    platformSnippetResponse(c.Niconico),
 	}
 }
 
 // platformSnippetResponse converts model.PlatformSnippet to api.OptPlatformSnippet
-func platformSnippetResponse(ps model.Snippet) api.OptPlatformSnippet {
-	return api.OptPlatformSnippet{
-		Value: api.PlatformSnippet{
-			Title:       api.OptString{Value: ps.Title},
-			Description: api.OptString{Value: ps.Description},
-			CustomURL:   api.OptString{Value: ps.CustomURL},
-			PublishedAt: api.OptDateTime{Value: ps.PublishedAt},
-			Thumbnails:  ThumbnailsResponse(ps.Thumbnails),
-		},
-	}
-}
-
-// platformStatisticsResponse converts model.PlatformStatistics to api.OptPlatformStatistics
-func platformStatisticsResponse(ps model.Statistics) api.OptPlatformStatistics {
-	return api.OptPlatformStatistics{
-		Value: api.PlatformStatistics{
-			ViewCount:             api.OptString{Value: ps.ViewCount},
-			SubscriberCount:       api.OptString{Value: ps.SubscriberCount},
-			HiddenSubscriberCount: api.OptBool{Value: ps.HiddenSubscriberCount},
-			VideoCount:            api.OptString{Value: ps.VideoCount},
+func platformSnippetResponse(ps model.ChannelSnippet) api.OptChannelPlatformSnippet {
+	return api.OptChannelPlatformSnippet{
+		Value: api.ChannelPlatformSnippet{
+			ChannelID:    api.OptString{Value: ps.ChannelID},
+			Name:         api.OptString{Value: ps.Name},
+			Description:  api.OptString{Value: ps.Description},
+			ThumbnailURL: api.OptString{Value: ps.ThumbnailURL.String()},
 		},
 	}
 }
@@ -110,12 +63,6 @@ func platformStatisticsResponse(ps model.Statistics) api.OptPlatformStatistics {
 // VideoResponse converts model.Video to api.VideoResponse
 func VideoResponse(v *model.Video) api.VideoResponse {
 	return api.VideoResponse{
-		ID: api.OptString{
-			Value: v.ID,
-		},
-		ChannelId: api.OptString{
-			Value: v.ChannelID,
-		},
 		Title: api.OptString{
 			Value: v.Title,
 		},
@@ -131,8 +78,7 @@ func VideoResponse(v *model.Video) api.VideoResponse {
 		EndAt: api.OptDateTime{
 			Value: v.EndAt,
 		},
-		Tags:       v.Tags,
-		Thumbnails: ThumbnailsResponse(v.Thumbnails),
+		Tags: v.Tags,
 		Platform: api.OptVideoResponsePlatform{
 			Value: api.VideoResponsePlatform(v.Platform.String()),
 		},

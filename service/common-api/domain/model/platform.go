@@ -11,6 +11,7 @@ const (
 	PlatformUnknown     Platform = "unknown"
 )
 
+// NewPlatform creates a new Platform type based on the provided string.
 func NewPlatform(
 	platform string,
 ) Platform {
