@@ -1,4 +1,3 @@
-// components/ClipTabs.tsx
 import React from "react";
 import {
   Accordion,
@@ -12,7 +11,6 @@ import {
 import { styled } from "@mui/material/styles";
 import { Livestream } from "@/types/streaming";
 import { formatWithTimeZone, groupLivestreamsByTimeRange } from "@/lib/utils";
-import { TabPanel } from "@mui/lab";
 import { LivestreamCard } from "../Elements";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
@@ -106,7 +104,7 @@ export const LivestreamCards: React.FC<Props> = ({
   }
   return (
     <>
-      {Object.entries(livestreamsByDate).map(([date, livestreams], index) => {
+      {Object.entries(livestreamsByDate).map(([date, livestreams]) => {
         const livestreamsByTimeRange = groupLivestreamsByTimeRange(livestreams);
         let events: VspoEvent[] = [];
         if (date in eventsByDate) {
@@ -185,7 +183,7 @@ export const LivestreamCards: React.FC<Props> = ({
                       >
                         {members.map(
                           (member, index) =>
-                            event?.contentSummary.includes(
+                            event.contentSummary.includes(
                               (member.name || "").replace(" ", ""),
                             ) && (
                               <StyledAvatar

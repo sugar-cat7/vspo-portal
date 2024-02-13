@@ -1,9 +1,8 @@
-// pages/notifications/[id].tsx
 import { GetStaticProps, GetStaticPaths } from "next";
 import { Notice } from "@/types/notice";
 import { ContentLayout } from "@/components/Layout";
 import { NextPageWithLayout } from "../_app";
-import { Container, Typography, Chip, Box } from "@mui/material";
+import { Container, Typography, Chip } from "@mui/material";
 import { Breadcrumb, TweetEmbed } from "@/components/Elements";
 import { notifications } from "@/data/notifications";
 import { getColor } from "@/lib/utils";
@@ -61,7 +60,7 @@ NoticePage.getLayout = (page, pageProps) => {
   );
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps = ({ params }) => {
   const id = params?.id;
   const notice = notifications.find((notice) => notice.id === Number(id));
 
@@ -72,7 +71,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   };
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = () => {
   const paths = notifications.map((notice) => ({
     params: { id: notice.id.toString() },
   }));

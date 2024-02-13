@@ -102,7 +102,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   );
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = () => {
   const statusPaths = ["all", "live", "upcoming", "archive"].map((status) => ({
     params: { status },
   }));
@@ -262,6 +262,7 @@ HomePage.getLayout = (page, pageProps) => {
       break;
     default:
       title = "配信スケジュール";
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       headTitle = `配信スケジュール/${pageProps.liveStatus}`;
       break;
   }

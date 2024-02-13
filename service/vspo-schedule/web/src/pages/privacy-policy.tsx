@@ -101,7 +101,7 @@ const PrivacyPolicy: NextPageWithLayout = () => {
   );
 };
 
-PrivacyPolicy.getLayout = (page, pageProps) => {
+PrivacyPolicy.getLayout = (page) => {
   return (
     <ContentLayout
       title="プライバシーポリシー"

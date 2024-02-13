@@ -1,3 +1,55 @@
 {
-  "extends": "next/core-web-vitals"
+  "root": true,
+  "plugins": ["@typescript-eslint"],
+  "parser": "@typescript-eslint/parser",
+  "extends": [
+    "eslint:recommended",
+    "next/core-web-vitals"
+  ],
+  "rules": {
+    // Allow but flag full-width whitespace
+    "no-irregular-whitespace": "warn"
+  },
+  "overrides": [
+    {
+      "files": ["./src/**/*.ts", "./src/**/*.tsx"],
+      "parserOptions": {
+        "project": "./tsconfig.json"
+      },
+      "extends": ["plugin:@typescript-eslint/recommended-type-checked"],
+      "rules": {
+        /* Overrides for @typescript-eslint/recommended-type-checked */
+        // Allow use of {} as type (especially for component props)
+        "@typescript-eslint/ban-types": [
+          "error",
+          {
+            "extendDefaults": true,
+            "types": {
+              "{}": false
+            }
+          }
+        ],
+        // Allow promises to be unhandled, for brevity
+        // e.g. NextRouter.push(path)
+        "@typescript-eslint/no-floating-promises": "off",
+        // Allow promises to be returned where void return expected
+        // e.g. onClick={async () => {...}}
+        "@typescript-eslint/no-misused-promises": [
+          "error",
+          {
+            "checksVoidReturn": false
+          }
+        ],
+        // Allow string enum value to be compared with string literal
+        // e.g. getLiveStatus(livestream) === "live"
+        "@typescript-eslint/no-unsafe-enum-comparison": "off",
+
+        /* Additional rules */
+        // Disallow trivially inferrable types, for reduced cognitive load
+        "@typescript-eslint/no-inferrable-types": "error",
+        // Flag potentially unnecessary conditions
+        "@typescript-eslint/no-unnecessary-condition": "warn"
+      }
+    }
+  ]
 }

@@ -5,7 +5,7 @@ import { useContext } from "react";
 import { Switch } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-const MaterialUISwitch = styled(Switch)(({ theme }) => ({
+const MaterialUISwitch = styled(Switch)({
   width: 62,
   height: 34,
   padding: 7,
@@ -33,7 +33,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     borderRadius: 20 / 2,
     backgroundColor: "#5c6bc0", // モダンな色彩
   },
-}));
+});
 
 export const EmbedModeToggleButton: React.FC = () => {
   const [isEmbedMode, setIsEmbedMode] = useContext(EmbedModeContext);

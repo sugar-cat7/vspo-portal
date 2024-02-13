@@ -44,9 +44,9 @@ const StyledFab = styled(Fab)(({ theme }) => ({
   },
 }));
 
-const StyledSearchIcon = styled(SearchIcon)(({ theme }) => ({
+const StyledSearchIcon = styled(SearchIcon)({
   color: "white",
-}));
+});
 
 const StyledAlert = styled(Alert)(({ theme }) => ({
   [theme.getColorSchemeSelector("dark")]: {

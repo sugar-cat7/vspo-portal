@@ -15,10 +15,7 @@ type ClipsProps = {
   lastUpdateDate: string;
 };
 
-const ClipPage: NextPageWithLayout<ClipsProps> = ({
-  clips,
-  lastUpdateDate,
-}) => {
+const ClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
   const [filteredClips, setFilteredClips] = React.useState<Clip[]>(clips);
   const [isProcessing, setIsProcessing] = React.useState<boolean>(true);
   useEffect(() => {

@@ -137,12 +137,12 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
     const events = eventsByMonth[yearMonth];
     const yearMonths = Object.keys(eventsByMonth);
     const currentIndex = yearMonths.indexOf(yearMonth);
-    const nextYearMonth = yearMonths?.at(currentIndex + 1) || "";
+    const nextYearMonth = yearMonths.at(currentIndex + 1) || "";
     const beforeYearMonth =
-      yearMonths?.at(currentIndex - 1) !== yearMonth &&
-      yearMonths?.at(currentIndex - 1) !==
-        yearMonths?.at(yearMonths?.length - 1)
-        ? yearMonths?.at(currentIndex - 1)
+      yearMonths.at(currentIndex - 1) !== yearMonth &&
+      yearMonths.at(currentIndex - 1) !==
+        yearMonths.at(yearMonths.length - 1)
+        ? yearMonths.at(currentIndex - 1)
         : "";
 
     const sortedData = events.sort(
@@ -195,7 +195,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
 
   let eventsByDate: EventsByDate = {};
 
-  if (filteredEvents && filteredEvents?.length > 0) {
+  if (filteredEvents && filteredEvents.length > 0) {
     eventsByDate = filteredEvents.reduce(
       (acc: EventsByDate, event: VspoEvent) => {
         const date = event.startedAt.split("T")[0];
@@ -216,7 +216,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
   }, []);
 
   useEffect(() => {
-    if (!events || events?.length === 0) {
+    if (!events || events.length === 0) {
       router.replace(`/events/${latestYearMonth}`);
     }
   }, [events, router, latestYearMonth]);
@@ -277,7 +277,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                         <TimelineDot
                           color={isFutureEvent ? "success" : "grey"}
                         />
-                        {Object.entries(eventsByDate)?.length - 1 !== index && (
+                        {Object.entries(eventsByDate).length - 1 !== index && (
                           <TimelineConnector />
                         )}
                       </TimelineSeparator>

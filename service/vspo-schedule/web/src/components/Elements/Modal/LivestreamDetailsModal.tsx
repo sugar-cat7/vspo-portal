@@ -116,7 +116,7 @@ const VideoPlayerOrLinkComponent: React.FC<{
     if (livestream.platform === Platform.YouTube) {
       embedUrl = url.replace("watch?v=", "embed/");
     } else if (livestream.platform === Platform.Twitch) {
-      const tid = !livestream?.twitchPastVideoId
+      const tid = !livestream.twitchPastVideoId
         ? `channel=${livestream.twitchName}`
         : `video=${livestream.twitchPastVideoId}`;
       embedUrl = `https://player.twitch.tv/?${tid}&parent=${document.location.hostname}&autoplay=false`;
@@ -200,7 +200,7 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
 }) => {
   const router = useRouter();
   const url =
-    livestream?.isTemp && livestream?.tempUrl
+    livestream?.isTemp && livestream.tempUrl
       ? livestream.tempUrl
       : livestream
         ? getLivestreamUrl({
@@ -208,9 +208,9 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
             platform: livestream.platform,
             externalLink: livestream.link,
             memberName: livestream.channelTitle,
-            twitchUsername: livestream?.twitchName,
-            actualEndTime: livestream?.actualEndTime,
-            twitchPastVideoId: livestream?.twitchPastVideoId,
+            twitchUsername: livestream.twitchName,
+            actualEndTime: livestream.actualEndTime,
+            twitchPastVideoId: livestream.twitchPastVideoId,
           })
         : getLivestreamUrl({
             videoId: clip?.id || "",
@@ -225,7 +225,7 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
   }
 
   const iconUrl = livestream
-    ? livestream?.iconUrl
+    ? livestream.iconUrl
     : clip?.platform === Platform.Twitch
       ? members.filter((m) => m.twitchChannelId === clip.channelId).at(0)
           ?.iconUrl
@@ -387,7 +387,7 @@ const InfoTabs: React.FC<{
     setValue(newValue);
   };
   const formattedStartTime = formatWithTimeZone(
-    videoInfo?.scheduledStartTime || videoInfo?.createdAt || "",
+    videoInfo.scheduledStartTime || videoInfo.createdAt || "",
     "ja",
     "MM/dd HH:mm~",
   );
@@ -474,8 +474,8 @@ const InfoTabs: React.FC<{
                   if (navigator.share) {
                     try {
                       await navigator.share({
-                        title: videoInfo.title!, // ここにビデオのタイトルを設定します
-                        text: videoInfo.title!, // ここに共有するテキストを設定します
+                        title: videoInfo.title, // ここにビデオのタイトルを設定します
+                        text: videoInfo.title, // ここに共有するテキストを設定します
                         url: url, // ここにビデオのURLを設定します
                       });
                     } catch (error) {

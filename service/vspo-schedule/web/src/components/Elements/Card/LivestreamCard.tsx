@@ -1,9 +1,8 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useMemo } from "react";
 import {
   Card,
   CardContent,
   Typography,
-  CardMedia,
   CardActionArea,
   Avatar,
 } from "@mui/material";
@@ -11,7 +10,6 @@ import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import { Livestream } from "@/types/streaming";
 import {
-  getLivestreamUrl,
   getLiveStatus,
   formatWithTimeZone,
 } from "@/lib/utils";
@@ -145,27 +143,12 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
   const [isEmbedMode] = useContext(EmbedModeContext);
   const { isOpen, openModal, closeModal } = useModal();
   const {
-    id,
     title,
     channelTitle,
-    thumbnailUrl,
     scheduledStartTime,
     iconUrl,
     platform,
-    link,
-    twitchName,
-    actualEndTime,
-    twitchPastVideoId,
   } = livestream;
-  const url = getLivestreamUrl({
-    videoId: id,
-    platform: platform,
-    externalLink: link,
-    memberName: channelTitle,
-    twitchUsername: twitchName,
-    actualEndTime: actualEndTime,
-    twitchPastVideoId: twitchPastVideoId,
-  });
   const livestreamStatus = useMemo(
     () => getLiveStatus(livestream),
     [livestream],

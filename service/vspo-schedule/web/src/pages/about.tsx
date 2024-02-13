@@ -76,14 +76,6 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
   margin: theme.spacing(2, 0),
 }));
 
-const StyledLink = styled("a")(({ theme }) => ({
-  color: theme.vars.palette.primary.main,
-  textDecoration: "none",
-  "&:hover": {
-    textDecoration: "underline",
-  },
-}));
-
 const AboutPage: NextPageWithLayout = () => {
   return (
     <Box sx={{ paddingTop: "80px", margin: "20px" }}>

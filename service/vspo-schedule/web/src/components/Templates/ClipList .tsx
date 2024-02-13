@@ -5,18 +5,16 @@ import {
   Card,
   CardActionArea,
   CardContent,
-  CardMedia,
   Typography,
   Box,
   Pagination,
   Avatar,
   Chip,
   PaletteColor,
-  Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Clip, Platform } from "@/types/streaming";
-import { getLivestreamUrl, isTrending } from "@/lib/utils";
+import { isTrending } from "@/lib/utils";
 import { members } from "@/data/members";
 import { PlayArrow } from "@mui/icons-material";
 import { EmbedModeContext } from "@/context/EmbedMode";
@@ -38,20 +36,6 @@ const StyledCardMedia = styled(Box)({
   objectFit: "contain",
 });
 
-const ResponsiveIframeWrapper = styled("div")({
-  position: "relative",
-  overflow: "hidden",
-  paddingTop: "56.25%", // for 16:9 aspect ratio
-});
-
-const ResponsiveIframe = styled("iframe")({
-  position: "absolute",
-  top: "0",
-  left: "0",
-  width: "100%",
-  height: "100%",
-  border: "0",
-});
 const StyledAvatar = styled(Avatar)(({ theme }) => ({
   width: 48,
   height: 48,
@@ -60,25 +44,6 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
     height: 32,
   },
 }));
-const getViewCountChipStyle = (viewCount: number) => {
-  if (viewCount >= 10000) {
-    return {
-      backgroundColor: "rgba(0, 0, 255, 0.7)",
-      color: "white",
-      fontWeight: "bold",
-    };
-  } else if (viewCount >= 5000) {
-    return {
-      backgroundColor: "rgba(0, 128, 0, 0.7)",
-      color: "white",
-    };
-  } else {
-    return {
-      backgroundColor: "rgba(0, 0, 0, 0.6)",
-      color: "white",
-    };
-  }
-};
 
 const formatViewCount = (viewCount: number) => {
   return Math.floor(viewCount / 100_000) * 10;
@@ -96,51 +61,6 @@ const getClipLabel = (clip: Clip) => {
   // }
   return null;
 };
-
-const VideoPlayerOrLinkComponent: React.FC<{
-  url: string;
-  clip: Clip;
-  isEmbedMode: boolean;
-}> = ({ url, clip, isEmbedMode }) => {
-  // Check if the video is from YouTube or Twitch and adjust the embed URL accordingly
-  let embedUrl;
-  if (clip.platform === Platform.YouTube) {
-    embedUrl = url.replace("watch?v=", "embed/");
-  } else if (clip.platform === Platform.Twitch) {
-    embedUrl = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${document.location.hostname}&autoplay=false`;
-  }
-
-  if (isEmbedMode) {
-    return (
-      <ResponsiveIframeWrapper>
-        <ResponsiveIframe
-          key={embedUrl}
-          src={embedUrl}
-          title={`${clip.platform} video player`}
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          loading="lazy"
-        />
-      </ResponsiveIframeWrapper>
-    );
-  } else {
-    return (
-      <CardMedia
-        component="img"
-        image={clip.thumbnailUrl}
-        alt={clip.title}
-        sx={{
-          height: 0,
-          paddingTop: "56.25%", // 16:9 アスペクト比
-          backgroundSize: "cover",
-          backgroundImage: `url(${clip.thumbnailUrl})`,
-        }}
-      />
-    );
-  }
-};
-
-const VideoPlayerOrLink = React.memo(VideoPlayerOrLinkComponent);
 
 export const ClipList: React.FC<Props> = ({ clips }) => {
   const [page, setPage] = useState(1);
@@ -166,18 +86,12 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
     <Container maxWidth="lg" sx={{ paddingTop: "50px" }}>
       <Grid container spacing={3}>
         {paginatedClips.map((clip) => {
-          const url = getLivestreamUrl({
-            videoId: clip.id,
-            platform: clip.platform,
-            isClip: true,
-            externalLink: clip?.link,
-          });
           const iconUrl =
             clip.platform === Platform.Twitch
               ? members
                   .filter((m) => m.twitchChannelId === clip.channelId)
                   .at(0)?.iconUrl
-              : clip?.iconUrl;
+              : clip.iconUrl;
 
           const clipLabel = getClipLabel(clip);
           return (
@@ -285,7 +199,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
                             )}
                           </StyledAvatar>
                         </Box>
-                        {clip?.viewCount && Number(clip.viewCount) > 100000 && (
+                        {clip.viewCount && Number(clip.viewCount) > 100000 && (
                           <Chip
                             icon={
                               <PlayArrow

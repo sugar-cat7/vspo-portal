@@ -1,13 +1,12 @@
-import { VercelRequest } from "@vercel/node";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export const validateGetRequest = (
   req: NextApiRequest,
   res: NextApiResponse,
-  next: Function,
+  next: Function, // eslint-disable-line @typescript-eslint/ban-types
 ) => {
-  const referer = req.headers?.referer;
-  const host = req.headers?.host;
+  const referer = req.headers.referer;
+  const host = req.headers.host;
 
   // Ensure both referer and host exist, and that the referer includes the host
   if (!referer || !host || !referer.includes(host)) {

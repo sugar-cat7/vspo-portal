@@ -23,6 +23,7 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     <>
       <EmbedModeProvider>
         <ThemeModeProvider>
+          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-argument */}
           {getLayout(<Component {...pageProps} />, pageProps)}
         </ThemeModeProvider>
       </EmbedModeProvider>

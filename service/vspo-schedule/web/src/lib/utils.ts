@@ -3,47 +3,14 @@ import {
   Clip,
   LiveStatus,
   Livestream,
-  MemberKeyword,
   Platform,
 } from "@/types/streaming";
-import { format, utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
+import { format, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
-import { differenceInMinutes, Locale } from "date-fns";
+import { Locale } from "date-fns";
 import { TEMP_TIMESTAMP } from "./Const";
 import { freeChatVideoIds } from "@/data/master";
 import { VspoEvent } from "@/types/events";
-
-/**
- * Check if a date is within this week.
- * @param date - The date to check.
- * @returns - A boolean indicating if the date is within this week.
- */
-export const isInThisWeek = (date: Date): boolean => {
-  const now = new Date();
-  const startOfWeek = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() - now.getDay(),
-  );
-  const endOfWeek = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + (6 - now.getDay()),
-  );
-
-  return date >= startOfWeek && date <= endOfWeek;
-};
-
-/**
- * Get a Date object representing one week ago.
- * @returns - A Date object representing one week ago.
- */
-export const getOneWeekAgo = (): Date => {
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0); // Set the time to 00:00:00
-  const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
-  return oneWeekAgo;
-};
 
 /**
  * Group an array of items by a specified key.
@@ -92,7 +59,6 @@ export const getLivestreamUrl = ({
   externalLink,
   memberName,
   twitchUsername,
-  actualEndTime,
   twitchPastVideoId,
   isClip,
 }: GetLivestreamUrl): string => {
@@ -116,6 +82,7 @@ export const getLivestreamUrl = ({
       return `https://live.nicovideo.jp/watch/${videoId}`;
     default:
       throw new Error(
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         `Unsupported platform: ${platform}. Supported platforms are: ${Object.values(
           Platform,
         ).join(", ")}`,
@@ -218,7 +185,6 @@ export const filterClips = (
       }
 
       let keywordMatchCount = 0;
-      let hasBracketMatch = false;
 
       memberKeywords.forEach((keyword) => {
         // Check for keyword match in title
@@ -229,7 +195,6 @@ export const filterClips = (
           const bracketPattern = new RegExp(`【${keyword}】`);
           if (bracketPattern.test(clip.title)) {
             keywordMatchCount += bracketWeight;
-            hasBracketMatch = true;
           }
         }
       });
@@ -254,32 +219,6 @@ export const filterClips = (
   });
 
   return filteredClips;
-};
-
-/**
- * Filters livestreams based on their scheduled start times.
- *
- * @param livestreams - An array of Livestream objects.
- * @returns An array of filtered Livestream objects.
- */
-const dateFilter = (livestreams: Livestream[]): Livestream[] => {
-  return livestreams.filter((stream, index, self) => {
-    const currentTime = new Date(stream.scheduledStartTime);
-    return !self.some((otherStream, otherIndex) => {
-      if (stream.channelId === otherStream.channelId && index !== otherIndex) {
-        const otherTime = new Date(otherStream.scheduledStartTime);
-        const timeDifference = Math.abs(
-          currentTime.getTime() - otherTime.getTime(),
-        );
-        return (
-          timeDifference < 3 * 60 * 1000 &&
-          otherIndex > index &&
-          stream.platform === otherStream.platform
-        );
-      }
-      return false;
-    });
-  });
 };
 
 /**
@@ -354,12 +293,6 @@ export const removeDuplicatTwitchId = (
 };
 
 /**
- * Convert a Firestore timestamp to an ISO string date.
- * @param timestamp - A Firestore timestamp to convert.
- * @returns - An ISO string date representing the given timestamp.
- */
-
-/**
  * Get a range of one week ago and one week later, without considering the time.
  * @returns - An object with `oneWeekAgo` and `oneWeekLater` properties representing the dates.
  */
@@ -405,51 +338,6 @@ export const formatWithTimeZone = (
 };
 
 /**
- * Check if a scheduled start time is within one hour from the current time, in the specified timezone.
- * @param scheduledStartTime - The scheduled start time to check.
- * @param localeCode - The locale code to use for checking the time.
- * @returns - A boolean indicating if the scheduled start time is within one hour from the current time.
- */
-export const isWithinOneHour = (
-  scheduledStartTime: string,
-  localeCode: string,
-): boolean => {
-  const timeZone = localeTimeZoneMap[localeCode];
-  const localStartTime = utcToZonedTime(scheduledStartTime, timeZone);
-  const nowUtc = zonedTimeToUtc(new Date(), timeZone); // 現在時刻をUTCに変換
-  const nowLocal = utcToZonedTime(nowUtc, timeZone); // 現在時刻を指定されたタイムゾーンに変換
-
-  // scheduledStartTimeが現在時刻よりも未来の場合、差分が1時間以内であればtrueを返す
-  if (localStartTime > nowLocal) {
-    const diffInMinutes = differenceInMinutes(localStartTime, nowLocal);
-    return diffInMinutes <= 90;
-  }
-
-  // scheduledStartTimeが現在時刻よりも過去の場合、常にfalseを返す
-  return false;
-};
-
-/**
- * Check if a scheduled start time is in the future, in the specified timezone.
- * @param scheduledStartTime - The scheduled start time to check.
- * @param localeCode - The locale code to use for checking the time.
- * @returns - A boolean indicating if the scheduled start time is in the future.
- */
-export const isUpcomingLivestreams = (
-  scheduledStartTime: string,
-  localeCode: string,
-): boolean => {
-  // const timeZone = localeTimeZoneMap[localeCode];
-  // const nowUtc = zonedTimeToUtc(new Date(), timeZone);
-  if (new Date(scheduledStartTime) > new Date()) {
-    return true;
-  }
-
-  // scheduledStartTimeが現在時刻よりも過去の場合、常にfalseを返す
-  return false;
-};
-
-/**
  * Determines if a livestream is live, upcoming, archived, or is a freechat.
  * @param {Livestream} livestream - The livestream to check the live status of.
  * @returns {LiveStatus | "freechat"} - The live status of the livestream
@@ -479,7 +367,7 @@ export const getLiveStatus = (
   if (new Date(livestream.scheduledStartTime) > new Date()) {
     return LiveStatus.Upcoming;
   } else if (
-    livestream?.actualEndTime &&
+    livestream.actualEndTime &&
     livestream.actualEndTime.includes("1998-01-01") &&
     isWithinTwelveHours
   ) {
@@ -512,62 +400,6 @@ export const groupLivestreamsByTimeRange = (livestreams: Livestream[]) => {
       }),
     };
   });
-};
-
-/**
- * Filters livestreams by their live status and returns the filtered results grouped by date.
- * @param {Record<string, Livestream[]>} livestreamsByDate - The record of livestreams grouped by date.
- * @param {string} liveStatus - The live status to filter by ("live", "upcoming", or "archive").
- * @returns {Record<string, Livestream[]>} - A record of filtered livestreams grouped by date.
- */
-export const liveStatusFilterLivestreams = (
-  livestreamsByDate: Record<string, Livestream[]>,
-  liveStatus: string,
-): Record<string, Livestream[]> => {
-  const allLivestreamsByDate: Record<string, Livestream[]> = {};
-
-  for (const dateKey in livestreamsByDate) {
-    if (livestreamsByDate.hasOwnProperty(dateKey)) {
-      const livestreams = livestreamsByDate[dateKey];
-      const filteredLivestreams = livestreams.filter(
-        (livestream) => getLiveStatus(livestream) === liveStatus,
-      );
-
-      if (filteredLivestreams.length > 0) {
-        allLivestreamsByDate[dateKey] = filteredLivestreams;
-      }
-    }
-  }
-
-  return allLivestreamsByDate;
-};
-
-/**
- * Filters an array of clips by an array of member keywords and returns the filtered clips.
- * @param {Clip[]} clips - The array of clips to filter.
- * @param {MemberKeyword[]} membersKeywords - The array of member keywords to filter by.
- * @returns {Clip[]} - An array of filtered clips.
- */
-export const filterClipsByKeywords = (
-  clips: Clip[],
-  membersKeywords: MemberKeyword[],
-): Clip[] => {
-  if (!clips || clips.length === 0) {
-    return [];
-  }
-  // 全メンバーキーワードを1つの配列にまとめる
-  const allKeywords = membersKeywords.flatMap((member) => member.keywords);
-
-  // クリップのタイトルにキーワードが含まれているかどうかを判定する関数
-  const containsKeywords = (title: string): boolean => {
-    return allKeywords.some((keyword) => title.includes(keyword));
-  };
-
-  // キーワードが含まれているクリップだけをフィルタリングして返す
-  return clips.filter(
-    (clip) =>
-      containsKeywords(clip.title) && clip.platform === Platform.YouTube,
-  );
 };
 
 /**
@@ -680,17 +512,6 @@ export const applyFilters = (
   return filteredClips;
 };
 
-/**
- * Get a Date object representing six months ago, without considering the time.
- * @returns - A Date object representing six months ago, without time.
- */
-export const getOneMonthAgo = (): Date => {
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0); // Set the time to 00:00:00
-  currentDate.setMonth(currentDate.getMonth() - 1);
-  return currentDate;
-};
-
 const TRENDING_THRESHOLDS = [
   { days: 1, viewCount: 500 },
   { days: 2, viewCount: 750 },
@@ -721,16 +542,6 @@ export const isTrending = (clip: Clip) => {
         : TWITCH_TRENDING_THRESHOLDS * days * 1.25;
     return isOlderThan(days) && viewCount >= trendThreshold;
   });
-};
-
-export const isPopular = (clip: Clip) => {
-  return Number(clip.viewCount) >= 5000;
-};
-
-export const isNew = (clip: Clip) => {
-  const oneDayAgo = new Date();
-  oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-  return clip.createdAt && new Date(clip.createdAt) > oneDayAgo;
 };
 
 export const getColor = (tag: string) => {

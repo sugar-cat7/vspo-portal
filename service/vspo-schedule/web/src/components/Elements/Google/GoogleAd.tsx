@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 declare global {
   interface Window {
-    adsbygoogle: any;
+    adsbygoogle: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   }
 }
 export const GoogleAd: React.FC = () => {
@@ -11,6 +11,7 @@ export const GoogleAd: React.FC = () => {
 
   useEffect(() => {
     try {
+      // eslint-disable-next-line
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
         {},
       );
