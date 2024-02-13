@@ -186,14 +186,14 @@ export const LivestreamCards: React.FC<Props> = ({
                         {members.map(
                           (member, index) =>
                             event?.contentSummary.includes(
-                              (member.name || "").replace(" ", "")
+                              (member.name || "").replace(" ", ""),
                             ) && (
                               <StyledAvatar
                                 key={index}
                                 alt={member.name}
                                 src={member.iconUrl}
                               />
-                            )
+                            ),
                         )}
                       </Box>
                     </Box>
@@ -237,7 +237,7 @@ export const LivestreamCards: React.FC<Props> = ({
                     </Grid>
                     {/* )} */}
                   </Box>
-                )
+                ),
             )}
           </Box>
           // </TabPanel>

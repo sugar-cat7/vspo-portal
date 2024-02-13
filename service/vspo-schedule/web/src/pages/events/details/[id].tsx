@@ -90,20 +90,20 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
           {formatWithTimeZone(
             new Date(event?.startedAt?.split("T")[0] || TEMP_TIMESTAMP),
             "ja",
-            "MM/dd (E)"
+            "MM/dd (E)",
           )}
         </Typography>
         {members.map(
           (member, index) =>
             event?.contentSummary.includes(
-              (member.name || "").replace(" ", "")
+              (member.name || "").replace(" ", ""),
             ) && (
               <StyledAvatar
                 key={index}
                 alt={member.name}
                 src={member.iconUrl}
               />
-            )
+            ),
         )}
       </Box>
       <Typography variant="body1" sx={{ marginBottom: "20px" }}>

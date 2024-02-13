@@ -26,7 +26,7 @@ import Image from "next/image";
 
 const LivestreamDetailsModal = dynamic(
   () => import("../Elements/Modal").then((mod) => mod.LivestreamDetailsModal),
-  { ssr: false }
+  { ssr: false },
 );
 
 type Props = {
@@ -159,7 +159,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
 
   const paginatedClips = clips.slice(
     (page - 1) * clipsPerPage,
-    page * clipsPerPage
+    page * clipsPerPage,
   );
 
   return (
@@ -294,7 +294,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
                               />
                             }
                             label={`${formatViewCount(
-                              Number(clip.viewCount)
+                              Number(clip.viewCount),
                             )}万以上`}
                             sx={{
                               height: "24px",

@@ -40,7 +40,7 @@ const parseMarkdown = (text: string): JSX.Element[] => {
             width={500}
             height={300}
           />
-        </Box>
+        </Box>,
       );
       start = match.index !== undefined ? match.index + match[0].length : 0;
     }
@@ -55,7 +55,7 @@ const parseMarkdown = (text: string): JSX.Element[] => {
           <Button variant="contained" color="primary">
             {match[1]}
           </Button>
-        </Link>
+        </Link>,
       );
       start = match.index !== undefined ? match.index + match[0].length : 0;
     }

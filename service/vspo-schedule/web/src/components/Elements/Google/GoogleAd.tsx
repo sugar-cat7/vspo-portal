@@ -12,7 +12,7 @@ export const GoogleAd: React.FC = () => {
   useEffect(() => {
     try {
       ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
-        {}
+        {},
       );
     } catch (error) {
       console.error(error);

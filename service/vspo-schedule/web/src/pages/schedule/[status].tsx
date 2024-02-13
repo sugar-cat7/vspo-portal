@@ -130,7 +130,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
   const fetchEvents = await fetchVspoEvents();
 
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
-    (l) => !freeChatIds.includes(l.id)
+    (l) => !freeChatIds.includes(l.id),
   );
 
   const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
@@ -143,7 +143,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
     const scheduledStartTimeString = formatWithTimeZone(
       new Date(livestream.scheduledStartTime),
       "ja",
-      "yyyy-MM-dd"
+      "yyyy-MM-dd",
     );
 
     const isAll = params?.status === "all";
@@ -174,12 +174,12 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
       const yesterdayDateString = formatWithTimeZone(
         yesterdayDate,
         "ja",
-        "yyyy-MM-dd"
+        "yyyy-MM-dd",
       );
       const scheduledStartTimeString = formatWithTimeZone(
         new Date(livestream.scheduledStartTime),
         "ja",
-        "yyyy-MM-dd"
+        "yyyy-MM-dd",
       );
       return scheduledStartTimeString === yesterdayDateString;
     });
@@ -196,7 +196,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
       return formatWithTimeZone(
         livestream.scheduledStartTime,
         "ja",
-        "yyyy-MM-dd"
+        "yyyy-MM-dd",
       );
     } catch (err) {
       console.error("Invalid date:", livestream.scheduledStartTime);
@@ -214,7 +214,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
   });
 
   const allDates = uniqueLivestreams.map((livestream) =>
-    formatWithTimeZone(livestream.scheduledStartTime, "ja", "yyyy-MM-dd")
+    formatWithTimeZone(livestream.scheduledStartTime, "ja", "yyyy-MM-dd"),
   );
   const today = formatWithTimeZone(new Date(), "ja", "yyyy-MM-dd");
   const tabDates = [...new Set(allDates)].sort().filter((dateStr) => {

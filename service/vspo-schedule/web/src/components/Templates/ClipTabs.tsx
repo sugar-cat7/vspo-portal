@@ -11,7 +11,7 @@ type Props = {
 
 export const ClipTabs: React.FC<Props> = ({ clips }) => {
   const [value, setValue] = useState(
-    clips.at(0)?.platform === Platform.YouTube ? 0 : 1
+    clips.at(0)?.platform === Platform.YouTube ? 0 : 1,
   );
   const [sortedClips, setSortedClips] = useState(clips);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {

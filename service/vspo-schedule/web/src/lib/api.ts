@@ -23,7 +23,7 @@ export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
           headers: {
             "x-api-key": process.env.API_KEY,
           },
-        }
+        },
       );
       const events = response.data.map((event) => {
         // startedAtを 'T' で分割し、日付部分だけを取得
@@ -61,7 +61,7 @@ export const fetchVspoLivestreams = async ({
           params: {
             limit: limit,
           },
-        }
+        },
       );
       return convertThumbnailQualityInObjects(response.data);
     } else {
@@ -82,7 +82,7 @@ export const fetchVspoClips = async (): Promise<Clip[]> => {
           headers: {
             "x-api-key": process.env.API_KEY,
           },
-        }
+        },
       );
       return convertThumbnailQualityInObjects(response.data.pastClips);
     } else {
@@ -103,7 +103,7 @@ export const fetchFreeChat = async (): Promise<Livestream[]> => {
           headers: {
             "x-api-key": process.env.API_KEY,
           },
-        }
+        },
       );
       return convertThumbnailQualityInObjects(response.data);
     } else {
@@ -143,11 +143,11 @@ export type RelatedProps = {
 
 export const fetchVspoRelatedVideo = async (
   page = 1,
-  limit = 10
+  limit = 10,
 ): Promise<RelatedProps> => {
   const pastLivestreams = await fetchVspoLivestreams({ limit: 50 });
   const liveStreams = pastLivestreams.filter(
-    (livestream) => getLiveStatus(livestream) === "live"
+    (livestream) => getLiveStatus(livestream) === "live",
   );
 
   const pastClips = await fetchVspoClips();

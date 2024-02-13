@@ -40,7 +40,7 @@ export const EmbedModeToggleButton: React.FC = () => {
 
   const handleModeChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    checked: boolean
+    checked: boolean,
   ) => {
     setIsEmbedMode(checked);
   };

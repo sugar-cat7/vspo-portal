@@ -28,7 +28,7 @@ const drawerContents = [
   { id: "notification", name: "お知らせ" },
   { id: "qa", name: "お問い合わせ" },
   { id: "discord", name: "Discord Bot" },
-] as const satisfies { id: NavigationRouteId, name: string }[];
+] as const satisfies { id: NavigationRouteId; name: string }[];
 
 const StyledListItemIcon = styled(ListItemIcon)(() => ({
   minWidth: "32px",
@@ -54,7 +54,7 @@ export const CustomDrawer: React.FC = () => {
         <Typography variant="subtitle2" sx={{ padding: "8px 16px" }}>
           <ChipStyle label="Main Section" size="small" />
         </Typography>
-        {drawerContents.map(({ id, name}) => {
+        {drawerContents.map(({ id, name }) => {
           const { link, isExternalLink } = getNavigationRouteInfo(id);
 
           if (id === "freechat") {

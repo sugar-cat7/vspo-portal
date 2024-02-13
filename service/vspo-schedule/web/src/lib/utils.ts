@@ -1,5 +1,11 @@
 import { members } from "@/data/members";
-import { Clip, LiveStatus, Livestream, MemberKeyword, Platform } from "@/types/streaming";
+import {
+  Clip,
+  LiveStatus,
+  Livestream,
+  MemberKeyword,
+  Platform,
+} from "@/types/streaming";
 import { format, utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
 import { differenceInMinutes, Locale } from "date-fns";
@@ -17,12 +23,12 @@ export const isInThisWeek = (date: Date): boolean => {
   const startOfWeek = new Date(
     now.getFullYear(),
     now.getMonth(),
-    now.getDate() - now.getDay()
+    now.getDate() - now.getDay(),
   );
   const endOfWeek = new Date(
     now.getFullYear(),
     now.getMonth(),
-    now.getDate() + (6 - now.getDay())
+    now.getDate() + (6 - now.getDay()),
   );
 
   return date >= startOfWeek && date <= endOfWeek;
@@ -48,7 +54,7 @@ export const getOneWeekAgo = (): Date => {
  */
 export const groupBy = <T>(
   items: T[],
-  keyGetter: (item: T) => string
+  keyGetter: (item: T) => string,
 ): Record<string, T[]> => {
   const groupedItems: Record<string, T[]> = {};
 
@@ -97,8 +103,8 @@ export const getLivestreamUrl = ({
       return isClip && externalLink
         ? externalLink
         : !twitchPastVideoId
-        ? `https://www.twitch.tv/${twitchUsername}`
-        : `https://www.twitch.tv/videos/${twitchPastVideoId}`;
+          ? `https://www.twitch.tv/${twitchUsername}`
+          : `https://www.twitch.tv/videos/${twitchPastVideoId}`;
     case Platform.TwitCasting:
       return externalLink?.includes("movie")
         ? externalLink
@@ -111,8 +117,8 @@ export const getLivestreamUrl = ({
     default:
       throw new Error(
         `Unsupported platform: ${platform}. Supported platforms are: ${Object.values(
-          Platform
-        ).join(", ")}`
+          Platform,
+        ).join(", ")}`,
       );
   }
 };
@@ -134,7 +140,7 @@ export const filterLivestreams = (
   searchEndDate: string | null,
   searchMemberIds: number[],
   searchPlatforms: string[],
-  searchKeyword: string
+  searchKeyword: string,
 ): Record<string, Livestream[]> => {
   const filteredLivestreamsByDate: Record<string, Livestream[]> = {};
   const keywordFilter = (item: Livestream) =>
@@ -158,7 +164,7 @@ export const filterLivestreams = (
         searchMemberIds.some((memberId) =>
           members
             .filter((m) => m.iconUrl === livestream.iconUrl)
-            .some((member) => member.id === memberId)
+            .some((member) => member.id === memberId),
         );
 
       const isPlatformMatch =
@@ -190,7 +196,7 @@ export const filterLivestreams = (
  */
 export const filterClips = (
   clips: Clip[],
-  searchMemberIds: number[]
+  searchMemberIds: number[],
 ): Clip[] => {
   if (!clips) {
     return [];
@@ -204,7 +210,7 @@ export const filterClips = (
   const filteredClips = clips.filter((clip) => {
     const isMemberMatch = searchMemberIds.some((memberId) => {
       const memberKeywords = members.find(
-        (member) => member.id === memberId
+        (member) => member.id === memberId,
       )?.keywords;
 
       if (!memberKeywords) {
@@ -263,7 +269,7 @@ const dateFilter = (livestreams: Livestream[]): Livestream[] => {
       if (stream.channelId === otherStream.channelId && index !== otherIndex) {
         const otherTime = new Date(otherStream.scheduledStartTime);
         const timeDifference = Math.abs(
-          currentTime.getTime() - otherTime.getTime()
+          currentTime.getTime() - otherTime.getTime(),
         );
         return (
           timeDifference < 3 * 60 * 1000 &&
@@ -292,7 +298,7 @@ const titleFilter = (livestreams: Livestream[]): Livestream[] => {
       if (stream.channelId === otherStream.channelId && index !== otherIndex) {
         const otherTime = new Date(otherStream.scheduledStartTime);
         const timeDifference = Math.abs(
-          currentTime.getTime() - otherTime.getTime()
+          currentTime.getTime() - otherTime.getTime(),
         );
 
         return (
@@ -315,7 +321,7 @@ const titleFilter = (livestreams: Livestream[]): Livestream[] => {
  * @returns An array of unique Livestream objects.
  */
 export const removeDuplicateTitles = (
-  livestreams: Livestream[]
+  livestreams: Livestream[],
 ): Livestream[] => {
   const filteredLivestreams = removeDuplicatTwitchId(titleFilter(livestreams));
   const seenTitles = new Set();
@@ -333,7 +339,7 @@ export const removeDuplicateTitles = (
  * @returns An array of unique Livestream objects.
  */
 export const removeDuplicatTwitchId = (
-  livestreams: Livestream[]
+  livestreams: Livestream[],
 ): Livestream[] => {
   const seenTwitchIds = new Set();
   return livestreams.filter((livestream) => {
@@ -391,7 +397,7 @@ const localeTimeZoneMap: Record<string, string> = {
 export const formatWithTimeZone = (
   date: Date | number | string,
   localeCode: string,
-  dateFormat: string
+  dateFormat: string,
 ): string => {
   const timeZone = localeTimeZoneMap[localeCode];
   const zonedDate = utcToZonedTime(date, timeZone);
@@ -406,7 +412,7 @@ export const formatWithTimeZone = (
  */
 export const isWithinOneHour = (
   scheduledStartTime: string,
-  localeCode: string
+  localeCode: string,
 ): boolean => {
   const timeZone = localeTimeZoneMap[localeCode];
   const localStartTime = utcToZonedTime(scheduledStartTime, timeZone);
@@ -431,7 +437,7 @@ export const isWithinOneHour = (
  */
 export const isUpcomingLivestreams = (
   scheduledStartTime: string,
-  localeCode: string
+  localeCode: string,
 ): boolean => {
   // const timeZone = localeTimeZoneMap[localeCode];
   // const nowUtc = zonedTimeToUtc(new Date(), timeZone);
@@ -449,7 +455,9 @@ export const isUpcomingLivestreams = (
  * @returns {LiveStatus | "freechat"} - The live status of the livestream
  *   ("live", "upcoming", or "archive") or "freechat".
  */
-export const getLiveStatus = (livestream: Livestream): LiveStatus | "freechat" => {
+export const getLiveStatus = (
+  livestream: Livestream,
+): LiveStatus | "freechat" => {
   if (freeChatVideoIds.includes(livestream.id)) {
     return "freechat";
   }
@@ -459,7 +467,7 @@ export const getLiveStatus = (livestream: Livestream): LiveStatus | "freechat" =
 
   // 時間差をミリ秒で計算
   const timeDifference: number = Math.abs(
-    scheduledStartTime.getTime() - currentTime.getTime()
+    scheduledStartTime.getTime() - currentTime.getTime(),
   );
 
   // 12時間をミリ秒で表す
@@ -514,7 +522,7 @@ export const groupLivestreamsByTimeRange = (livestreams: Livestream[]) => {
  */
 export const liveStatusFilterLivestreams = (
   livestreamsByDate: Record<string, Livestream[]>,
-  liveStatus: string
+  liveStatus: string,
 ): Record<string, Livestream[]> => {
   const allLivestreamsByDate: Record<string, Livestream[]> = {};
 
@@ -522,7 +530,7 @@ export const liveStatusFilterLivestreams = (
     if (livestreamsByDate.hasOwnProperty(dateKey)) {
       const livestreams = livestreamsByDate[dateKey];
       const filteredLivestreams = livestreams.filter(
-        (livestream) => getLiveStatus(livestream) === liveStatus
+        (livestream) => getLiveStatus(livestream) === liveStatus,
       );
 
       if (filteredLivestreams.length > 0) {
@@ -542,7 +550,7 @@ export const liveStatusFilterLivestreams = (
  */
 export const filterClipsByKeywords = (
   clips: Clip[],
-  membersKeywords: MemberKeyword[]
+  membersKeywords: MemberKeyword[],
 ): Clip[] => {
   if (!clips || clips.length === 0) {
     return [];
@@ -557,7 +565,8 @@ export const filterClipsByKeywords = (
 
   // キーワードが含まれているクリップだけをフィルタリングして返す
   return clips.filter(
-    (clip) => containsKeywords(clip.title) && clip.platform === Platform.YouTube
+    (clip) =>
+      containsKeywords(clip.title) && clip.platform === Platform.YouTube,
   );
 };
 
@@ -599,7 +608,7 @@ export const shuffleClips = (clips: Clip[]): Clip[] => {
 
 export const filterByTimeframe = (
   clips: Clip[],
-  timeframe: string | null
+  timeframe: string | null,
 ): Clip[] => {
   if (!timeframe) return clips;
 
@@ -607,7 +616,7 @@ export const filterByTimeframe = (
   return clips.filter((clip) => {
     const clipCreatedAt = new Date(clip.createdAt || TEMP_TIMESTAMP);
     const daysDifference = Math.floor(
-      (now.getTime() - clipCreatedAt.getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - clipCreatedAt.getTime()) / (1000 * 60 * 60 * 24),
     );
 
     switch (timeframe) {
@@ -639,8 +648,8 @@ const filterByMemberIds = (clips: Clip[], memberIds: number[]): Clip[] => {
     return clips.filter((clip) =>
       memberIds.includes(
         members.filter((m) => m.twitchChannelId === clip.channelId).at(0)?.id ??
-          0
-      )
+          0,
+      ),
     );
   }
 };
@@ -652,7 +661,7 @@ export const filterByKeyword = (clips: Clip[], keyword: string): Clip[] => {
   return clips.filter(
     (clip) =>
       clip.title.toLowerCase().includes(lowercasedKeyword) ||
-      clip.description.toLowerCase().includes(lowercasedKeyword)
+      clip.description.toLowerCase().includes(lowercasedKeyword),
   );
 };
 
@@ -660,7 +669,7 @@ export const applyFilters = (
   clips: Clip[],
   searchClipTimeframe: string | null,
   searchMemberIds: number[],
-  searchKeyword: string
+  searchKeyword: string,
 ): Clip[] => {
   let filteredClips = [...clips];
 
@@ -765,16 +774,19 @@ export const groupEventsByYearMonth = (events: VspoEvent[]) => {
 
   return Object.entries(eventsByMonth)
     .sort(([keyA], [keyB]) => (keyA > keyB ? 1 : -1))
-    .reduce((sortedObj, [key, value]) => {
-      sortedObj[key] = value;
-      return sortedObj;
-    }, {} as { [key: string]: VspoEvent[] });
+    .reduce(
+      (sortedObj, [key, value]) => {
+        sortedObj[key] = value;
+        return sortedObj;
+      },
+      {} as { [key: string]: VspoEvent[] },
+    );
 };
 
 type HasThumbnailUrl = { thumbnailUrl: string };
 
 export const convertThumbnailQualityInObjects = <T extends HasThumbnailUrl>(
-  objects: T[]
+  objects: T[],
 ): T[] => {
   return objects.map((object) => ({
     ...object,

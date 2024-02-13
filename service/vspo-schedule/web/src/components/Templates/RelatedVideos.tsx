@@ -77,7 +77,7 @@ type Videos = {
 const getRelatedVideos = (
   relatedVideos?: RelatedProps,
   channnelId?: string,
-  videoId?: string
+  videoId?: string,
 ): Videos => {
   if (!relatedVideos) return { liveStreams: [], clips: [] };
 
@@ -91,7 +91,7 @@ const getRelatedVideos = (
         return true;
       }
       return false;
-    }
+    },
   );
 
   const relatedClips: Clip[] = relatedVideos.clips.filter((c) => {
@@ -127,7 +127,7 @@ const getRelatedVideos = (
 
 const LivestreamDetailsModal = dynamic(
   () => import("../Elements/Modal").then((mod) => mod.LivestreamDetailsModal),
-  { ssr: false }
+  { ssr: false },
 );
 
 export const RelatedVideos: React.FC<{
@@ -141,7 +141,7 @@ export const RelatedVideos: React.FC<{
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       shouldRetryOnError: false,
-    }
+    },
   );
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedLivestream, setSelectedLivestream] =
@@ -202,10 +202,10 @@ export const RelatedVideos: React.FC<{
                       new Date(
                         livestream?.scheduledStartTime ||
                           livestream?.createdAt ||
-                          TEMP_TIMESTAMP
+                          TEMP_TIMESTAMP,
                       ),
                       "ja",
-                      "MM/dd (E)"
+                      "MM/dd (E)",
                     )}
                   </Typography>
                 </StyledCardContent>
@@ -242,10 +242,10 @@ export const RelatedVideos: React.FC<{
                       new Date(
                         livestream?.scheduledStartTime ||
                           livestream?.createdAt ||
-                          TEMP_TIMESTAMP
+                          TEMP_TIMESTAMP,
                       ),
                       "ja",
-                      "MM/dd (E)"
+                      "MM/dd (E)",
                     )}
                   </Typography>
                 </StyledCardContent>

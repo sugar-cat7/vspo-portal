@@ -4,7 +4,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 export const validateGetRequest = (
   req: NextApiRequest,
   res: NextApiResponse,
-  next: Function
+  next: Function,
 ) => {
   const referer = req.headers?.referer;
   const host = req.headers?.host;
