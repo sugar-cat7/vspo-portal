@@ -18,7 +18,7 @@ import { Clip, Livestream, Platform } from "@/types/streaming";
 import {
   formatWithTimeZone,
   getLivestreamUrl,
-  isStatusLive,
+  getLiveStatus,
 } from "@/lib/utils";
 import { Loading, PlatformIcon } from "..";
 import CloseIcon from "@mui/icons-material/Close";
@@ -160,14 +160,13 @@ const getYouTubeChatEmbedUrl = (livestream: Livestream, isDarkMode: boolean) => 
 };
 
 const ChatEmbed: React.FC<{
-  livestream: Livestream;
-  platform: Platform.Twitch | Platform.YouTube;
-}> = ({ livestream, platform }) => {
+  livestream: Livestream & { platform: Platform.Twitch | Platform.YouTube };
+}> = ({ livestream }) => {
   const { colorScheme } = useColorScheme();
   const [isLoading, setIsLoading] = React.useState(true);
 
   const isDarkMode = colorScheme === "dark";
-  const chatEmbedUrl = platform === Platform.Twitch
+  const chatEmbedUrl = livestream.platform === Platform.Twitch
     ? getTwitchChatEmbedUrl(livestream, isDarkMode)
     : getYouTubeChatEmbedUrl(livestream, isDarkMode);
 
@@ -179,7 +178,7 @@ const ChatEmbed: React.FC<{
       >
         <ResponsiveChatIframe
           src={chatEmbedUrl}
-          title={`${platform} chat embed`}
+          title={`${livestream.platform} chat embed`}
           onLoad={() => setIsLoading(false)}
         />
       </ResponsiveChatIframeWrapper>
@@ -364,6 +363,17 @@ const a11yProps = (index: number) => {
   };
 };
 
+const isLivestream = (video: Livestream | Clip): video is Livestream => {
+  return "actualEndTime" in video;
+};
+
+const isOnPlatformWithChat = <T extends { platform: Platform }>(
+  video: T,
+): video is T & { platform: Platform.Twitch | Platform.YouTube } => {
+  return video.platform === Platform.Twitch ||
+    video.platform === Platform.YouTube;
+};
+
 const InfoTabs: React.FC<{
   videoInfo: Livestream | Clip;
   iconUrl?: string;
@@ -379,6 +389,10 @@ const InfoTabs: React.FC<{
     "ja",
     "MM/dd HH:mm~"
   );
+  const showChatTab = isLivestream(videoInfo) &&
+    isOnPlatformWithChat(videoInfo) &&
+    getLiveStatus(videoInfo) === "live";
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
@@ -391,15 +405,9 @@ const InfoTabs: React.FC<{
         >
           <Tab label="概要" {...a11yProps(0)} />
           <Tab label="関連動画" {...a11yProps(1)} />
-          {videoInfo?.platform === Platform.YouTube &&
-            "actualEndTime" in videoInfo &&
-            isStatusLive(videoInfo) === "live" && (
-              <Tab label="ライブチャット" {...a11yProps(2)} />
-            )}
-          {videoInfo?.platform === Platform.Twitch &&
-            "actualEndTime" in videoInfo && (
-              <Tab label="チャット" {...a11yProps(2)} />
-            )}
+          {showChatTab && (
+            <Tab label="ライブチャット" {...a11yProps(2)} />
+          )}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -415,12 +423,12 @@ const InfoTabs: React.FC<{
             <TypographySmallOnMobile sx={{ marginRight: "10px" }}>
               {formattedStartTime}
             </TypographySmallOnMobile>
-            {"actualEndTime" in videoInfo && (
+            {isLivestream(videoInfo) && (
               <>
-                {isStatusLive(videoInfo) === "live" && (
+                {getLiveStatus(videoInfo) === "live" && (
                   <LiveLabel>Live</LiveLabel>
                 )}
-                {isStatusLive(videoInfo) === "upcoming" && (
+                {getLiveStatus(videoInfo) === "upcoming" && (
                   <LiveLabel isUpcoming>配信予定</LiveLabel>
                 )}
               </>
@@ -516,19 +524,11 @@ const InfoTabs: React.FC<{
           videoId={videoInfo.id}
         />
       </TabPanel>
-      {videoInfo?.platform === Platform.YouTube &&
-        "actualEndTime" in videoInfo &&
-        isStatusLive(videoInfo) === "live" && (
-          <TabPanel value={value} index={2}>
-            <ChatEmbed livestream={videoInfo} platform={videoInfo.platform} />
-          </TabPanel>
-        )}
-      {videoInfo?.platform === Platform.Twitch &&
-        "actualEndTime" in videoInfo && (
-          <TabPanel value={value} index={2}>
-            <ChatEmbed livestream={videoInfo} platform={videoInfo.platform} />
-          </TabPanel>
-        )}
+      {showChatTab && (
+        <TabPanel value={value} index={2}>
+          <ChatEmbed livestream={videoInfo} />
+        </TabPanel>
+      )}
     </Box>
   );
 };

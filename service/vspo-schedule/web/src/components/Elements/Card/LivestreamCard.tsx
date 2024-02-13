@@ -12,7 +12,7 @@ import { Box } from "@mui/system";
 import { Livestream } from "@/types/streaming";
 import {
   getLivestreamUrl,
-  isStatusLive,
+  getLiveStatus,
   formatWithTimeZone,
 } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
@@ -167,7 +167,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
     twitchPastVideoId: twitchPastVideoId,
   });
   const livestreamStatus = useMemo(
-    () => isStatusLive(livestream),
+    () => getLiveStatus(livestream),
     [livestream]
   );
   return (

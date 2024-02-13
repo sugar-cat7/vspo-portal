@@ -7,7 +7,7 @@ import {
   formatWithTimeZone,
   getOneWeekRange,
   groupBy,
-  isStatusLive,
+  getLiveStatus,
   isValidDate,
   removeDuplicateTitles,
 } from "@/lib/utils";
@@ -162,7 +162,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
         scheduledStartTime >= oneWeekAgo &&
         scheduledStartTime <= oneWeekLater &&
         !freeChatVideoIds.includes(livestream.id) &&
-        params?.status === isStatusLive(livestream)
+        params?.status === getLiveStatus(livestream)
       );
     }
   });

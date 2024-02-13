@@ -6,7 +6,7 @@ import { mockClips, mockTwitchClips } from "@/data/clips";
 import { mockLiveStreams } from "@/data/livestreams";
 import {
   convertThumbnailQualityInObjects,
-  isStatusLive,
+  getLiveStatus,
   shuffleClips,
 } from "./utils";
 import { API_ROOT, BASE_URL, ENVIRONMENT } from "./Const";
@@ -147,7 +147,7 @@ export const fetchVspoRelatedVideo = async (
 ): Promise<RelatedProps> => {
   const pastLivestreams = await fetchVspoLivestreams({ limit: 50 });
   const liveStreams = pastLivestreams.filter(
-    (livestream) => isStatusLive(livestream) === "live"
+    (livestream) => getLiveStatus(livestream) === "live"
   );
 
   const pastClips = await fetchVspoClips();
