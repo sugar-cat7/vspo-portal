@@ -220,6 +220,7 @@ export const Header: React.FC<Props> = ({ title }) => {
               display: "flex",
               justifyContent: "flex-start",
               alignItems: "center",
+              padding: 0,
             }}
           >
             <ThemeToggleButton />
