@@ -81,7 +81,7 @@ const YearMonthSelector: React.FC<{
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      color: theme.palette.text.primary,
+      color: theme.vars.palette.text.primary,
     })}
   >
     <AdjacentYearMonthButton
