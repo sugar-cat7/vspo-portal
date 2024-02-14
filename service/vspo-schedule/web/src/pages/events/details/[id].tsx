@@ -116,17 +116,17 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
         })}
       </Typography>
       {event.tweetLinks.map((link, index) => (
-          <Box
-            key={index}
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: "20px",
-            }}
-          >
-            <TweetEmbed tweetLink={link} />
-          </Box>
-        ))}
+        <Box
+          key={index}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <TweetEmbed tweetLink={link} />
+        </Box>
+      ))}
       {event.webPageLinks.length > 0 && (
         <Box sx={{ marginBottom: "20px" }}>
           <Typography variant="h6" sx={{ marginBottom: "10px" }}>
@@ -157,7 +157,8 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
  */
 EventPage.getLayout = (page, pageProps) => {
   const eventTitle = pageProps.event?.title ?? "Event Not Found";
-  const eventContentSummary = pageProps.event?.contentSummary ?? "This event could not be found.";
+  const eventContentSummary =
+    pageProps.event?.contentSummary ?? "This event could not be found.";
 
   return (
     <ContentLayout

@@ -9,10 +9,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import { Livestream } from "@/types/streaming";
-import {
-  getLiveStatus,
-  formatWithTimeZone,
-} from "@/lib/utils";
+import { getLiveStatus, formatWithTimeZone } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
 import { EmbedModeContext } from "@/context/EmbedMode";
 import { useModal } from "@/hooks";
@@ -142,13 +139,8 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
 }) => {
   const [isEmbedMode] = useContext(EmbedModeContext);
   const { isOpen, openModal, closeModal } = useModal();
-  const {
-    title,
-    channelTitle,
-    scheduledStartTime,
-    iconUrl,
-    platform,
-  } = livestream;
+  const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
+    livestream;
   const livestreamStatus = useMemo(
     () => getLiveStatus(livestream),
     [livestream],

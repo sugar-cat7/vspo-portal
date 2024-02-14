@@ -1,10 +1,5 @@
 import { members } from "@/data/members";
-import {
-  Clip,
-  LiveStatus,
-  Livestream,
-  Platform,
-} from "@/types/streaming";
+import { Clip, LiveStatus, Livestream, Platform } from "@/types/streaming";
 import { format, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
 import { Locale } from "date-fns";

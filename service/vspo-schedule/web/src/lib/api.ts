@@ -163,7 +163,8 @@ const api = axios.create({
   baseURL: "/api", // your base API url, for example '/api'
 });
 
-export const fetcher = <T>(url: string) => api.get<T>(url).then((res) => res.data);
+export const fetcher = <T>(url: string) =>
+  api.get<T>(url).then((res) => res.data);
 
 export const client = createClient<paths>({
   baseUrl: BASE_URL,

@@ -140,8 +140,7 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
     const nextYearMonth = yearMonths.at(currentIndex + 1) || "";
     const beforeYearMonth =
       yearMonths.at(currentIndex - 1) !== yearMonth &&
-      yearMonths.at(currentIndex - 1) !==
-        yearMonths.at(yearMonths.length - 1)
+      yearMonths.at(currentIndex - 1) !== yearMonths.at(yearMonths.length - 1)
         ? yearMonths.at(currentIndex - 1)
         : "";
 
