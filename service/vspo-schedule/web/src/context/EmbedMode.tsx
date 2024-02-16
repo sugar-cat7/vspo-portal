@@ -1,6 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 
-export type EmbedModeType = boolean;
+type EmbedModeType = boolean;
 
 export const EmbedModeContext = createContext<
   [EmbedModeType, (embedMode: EmbedModeType) => void]

@@ -1,47 +1,3 @@
-export type Thumbnail = {
-  url: string;
-  width: number;
-  height: number;
-};
-
-export type Thumbnails = {
-  default: Thumbnail;
-  medium: Thumbnail;
-  high: Thumbnail;
-};
-
-export type Snippet = {
-  publishedAt: string;
-  channelId: string;
-  title: string;
-  description: string;
-  thumbnails: Thumbnails;
-  channelTitle: string;
-  liveBroadcastContent: string;
-  publishTime: string;
-};
-
-export type SearchResult = {
-  kind: string;
-  etag: string;
-  id: {
-    kind: string;
-    videoId: string;
-  };
-  snippet: Snippet;
-};
-
-export type SearchListResponse = {
-  kind: string;
-  etag: string;
-  regionCode: string;
-  pageInfo: {
-    totalResults: number;
-    resultsPerPage: number;
-  };
-  items: SearchResult[];
-};
-
 export enum LiveStatus {
   Archive = "archive",
   Live = "live",
@@ -77,24 +33,6 @@ export type Livestream = {
   tempUrl?: string;
 };
 
-export type YoutubeItem = {
-  id: string;
-  liveStreamingDetails: {
-    actualStartTime: string;
-    actualEndTime?: string;
-    scheduledStartTime: string;
-  };
-};
-
-export type LivestreamResponse = {
-  livestreams: Livestream[];
-};
-
-export type FormatOptions = {
-  dateFormat: string;
-  locale?: string;
-};
-
 export type Clip = {
   id: string;
   title: string;
@@ -112,24 +50,4 @@ export type Clip = {
   scheduledStartTime?: string;
   isTemp?: boolean;
   tempUrl?: string;
-};
-export type MemberKeyword = {
-  id: number;
-  name: string;
-  keywords: string[];
-};
-
-export type ArticleData = {
-  link: string;
-  publishedAt: string;
-  updated?: boolean;
-};
-
-export type ArticleSummary = {
-  startedAt: string;
-  title: string;
-  contentSummary: string;
-  webPageLinks: string[];
-  tweetLinks: string[];
-  newsId: string;
 };
