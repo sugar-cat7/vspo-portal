@@ -44,7 +44,7 @@
     "@biomejs/biome": "1.5.3",
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
-    "@vercel/node": "^3.0.15",
+    "@vercel/node": "^3.0.19",
     "lefthook": "^1.6.1"
   }
 }
