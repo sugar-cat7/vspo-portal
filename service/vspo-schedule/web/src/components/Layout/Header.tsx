@@ -227,16 +227,6 @@ export const Header: React.FC<Props> = ({ title }) => {
           >
             <ThemeToggleButton />
           </MenuItem>
-          {/* <MenuItem
-            // onClick={handleSettingsClose}
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center",
-            }}
-          >
-            <EmbedModeToggleButton />
-          </MenuItem> */}
         </Menu>
       </SwipeableDrawer>
 

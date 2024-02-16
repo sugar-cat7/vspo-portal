@@ -5,7 +5,6 @@ import { Analytics } from "@vercel/analytics/react";
 import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
 import { ThemeModeProvider } from "@/context/Theme";
-import { EmbedModeProvider } from "@/context/EmbedMode";
 import { GoogleAnalytics } from "@/components/Elements";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
@@ -21,12 +20,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
 
   return (
     <>
-      <EmbedModeProvider>
-        <ThemeModeProvider>
-          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-argument */}
-          {getLayout(<Component {...pageProps} />, pageProps)}
-        </ThemeModeProvider>
-      </EmbedModeProvider>
+      <ThemeModeProvider>
+        {/* eslint-disable-next-line @typescript-eslint/no-unsafe-argument */}
+        {getLayout(<Component {...pageProps} />, pageProps)}
+      </ThemeModeProvider>
       <Analytics />
       <GoogleAnalytics />
     </>

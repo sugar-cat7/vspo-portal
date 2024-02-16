@@ -34,7 +34,6 @@ type LivestreamDetailsModalProps = {
   clip?: Clip;
   open: boolean;
   onClose: () => void;
-  isDefaultEmbedMode?: boolean;
 };
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
