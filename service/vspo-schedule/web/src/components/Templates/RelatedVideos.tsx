@@ -1,10 +1,9 @@
 import { memberNames } from "@/data/members";
 import { TEMP_TIMESTAMP } from "@/lib/Const";
-import { RelatedProps, fetchVspoRelatedVideo, fetcher } from "@/lib/api";
+import { RelatedProps, fetcher } from "@/lib/api";
 import { formatWithTimeZone } from "@/lib/utils";
 import { Clip, Livestream } from "@/types/streaming";
 import {
-  Grid,
   Card,
   CardActionArea,
   CardMedia,
@@ -14,14 +13,13 @@ import {
   Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import useSWRInfinite from "swr/infinite";
 import { Loading } from "../Elements";
 import dynamic from "next/dynamic";
 import { useModal } from "@/hooks";
 
-const StyledCard = styled(Card)(({ theme }) => ({
+const StyledCard = styled(Card)({
   marginTop: "8px",
   marginBottom: "8px",
   "& .MuiTypography-root": {
@@ -34,7 +32,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   display: "flex",
   height: "90px",
   width: "100%",
-}));
+});
 
 const StyledCardMedia = styled(CardMedia)({
   width: "120px", // fixed width
@@ -77,7 +75,7 @@ type Videos = {
 const getRelatedVideos = (
   relatedVideos?: RelatedProps,
   channnelId?: string,
-  videoId?: string
+  videoId?: string,
 ): Videos => {
   if (!relatedVideos) return { liveStreams: [], clips: [] };
 
@@ -91,7 +89,7 @@ const getRelatedVideos = (
         return true;
       }
       return false;
-    }
+    },
   );
 
   const relatedClips: Clip[] = relatedVideos.clips.filter((c) => {
@@ -127,21 +125,22 @@ const getRelatedVideos = (
 
 const LivestreamDetailsModal = dynamic(
   () => import("../Elements/Modal").then((mod) => mod.LivestreamDetailsModal),
-  { ssr: false }
+  { ssr: false },
 );
 
 export const RelatedVideos: React.FC<{
   channnelId: string;
   videoId: string;
 }> = ({ channnelId, videoId }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { data, error, size, setSize, isValidating } = useSWRInfinite(
     (index: number) => `/relatedVideo?page=${index + 1}&limit=5`,
-    fetcher,
+    fetcher<Videos>,
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: false,
       shouldRetryOnError: false,
-    }
+    },
   );
   const { isOpen, openModal, closeModal } = useModal();
   const [selectedLivestream, setSelectedLivestream] =
@@ -200,12 +199,12 @@ export const RelatedVideos: React.FC<{
                   <Typography variant="body2" color="text.secondary">
                     {formatWithTimeZone(
                       new Date(
-                        livestream?.scheduledStartTime ||
-                          livestream?.createdAt ||
-                          TEMP_TIMESTAMP
+                        livestream.scheduledStartTime ||
+                          livestream.createdAt ||
+                          TEMP_TIMESTAMP,
                       ),
                       "ja",
-                      "MM/dd (E)"
+                      "MM/dd (E)",
                     )}
                   </Typography>
                 </StyledCardContent>
@@ -240,12 +239,12 @@ export const RelatedVideos: React.FC<{
                   <Typography variant="body2" color="text.secondary">
                     {formatWithTimeZone(
                       new Date(
-                        livestream?.scheduledStartTime ||
-                          livestream?.createdAt ||
-                          TEMP_TIMESTAMP
+                        livestream.scheduledStartTime ||
+                          livestream.createdAt ||
+                          TEMP_TIMESTAMP,
                       ),
                       "ja",
-                      "MM/dd (E)"
+                      "MM/dd (E)",
                     )}
                   </Typography>
                 </StyledCardContent>

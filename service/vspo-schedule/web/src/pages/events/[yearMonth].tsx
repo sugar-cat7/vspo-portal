@@ -61,9 +61,8 @@ const AdjacentYearMonthButton: React.FC<{
   <Button
     color="inherit"
     {...(disabled
-        ? { disabled: true }
-        : { component: Link, href: `/events/${yearMonth}` }
-    )}
+      ? { disabled: true }
+      : { component: Link, href: `/events/${yearMonth}` })}
   >
     {children}
   </Button>
@@ -138,17 +137,16 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
     const events = eventsByMonth[yearMonth];
     const yearMonths = Object.keys(eventsByMonth);
     const currentIndex = yearMonths.indexOf(yearMonth);
-    const nextYearMonth = yearMonths?.at(currentIndex + 1) || "";
+    const nextYearMonth = yearMonths.at(currentIndex + 1) || "";
     const beforeYearMonth =
-      yearMonths?.at(currentIndex - 1) !== yearMonth &&
-      yearMonths?.at(currentIndex - 1) !==
-        yearMonths?.at(yearMonths?.length - 1)
-        ? yearMonths?.at(currentIndex - 1)
+      yearMonths.at(currentIndex - 1) !== yearMonth &&
+      yearMonths.at(currentIndex - 1) !== yearMonths.at(yearMonths.length - 1)
+        ? yearMonths.at(currentIndex - 1)
         : "";
 
     const sortedData = events.sort(
       (a, b) =>
-        new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime()
+        new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime(),
     );
 
     const latestYearMonth = Object.keys(eventsByMonth).sort().pop();
@@ -158,7 +156,7 @@ export const getStaticProps: GetStaticProps<Props> = async (context) => {
         lastUpdateDate: formatWithTimeZone(
           new Date(),
           "ja",
-          "yyyy/MM/dd HH:mm"
+          "yyyy/MM/dd HH:mm",
         ),
         beforeYearMonth: beforeYearMonth,
         nextYearMonth: nextYearMonth,
@@ -189,14 +187,14 @@ const IndexPage: NextPageWithLayout<Props> = ({
     if (!searchText) return events;
     return events
       ? events.filter((event) =>
-          event.title.toLowerCase().includes(searchText.toLowerCase())
+          event.title.toLowerCase().includes(searchText.toLowerCase()),
         )
       : [];
   }, [events, searchText]);
 
   let eventsByDate: EventsByDate = {};
 
-  if (filteredEvents && filteredEvents?.length > 0) {
+  if (filteredEvents && filteredEvents.length > 0) {
     eventsByDate = filteredEvents.reduce(
       (acc: EventsByDate, event: VspoEvent) => {
         const date = event.startedAt.split("T")[0];
@@ -206,7 +204,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
         acc[date].push(event);
         return acc;
       },
-      {} as EventsByDate
+      {} as EventsByDate,
     );
   }
 
@@ -217,7 +215,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
   }, []);
 
   useEffect(() => {
-    if (!events || events?.length === 0) {
+    if (!events || events.length === 0) {
       router.replace(`/events/${latestYearMonth}`);
     }
   }, [events, router, latestYearMonth]);
@@ -270,7 +268,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                           {formatWithTimeZone(
                             new Date(date),
                             "ja",
-                            "MM/dd (E)"
+                            "MM/dd (E)",
                           )}
                         </Typography>
                       </TimelineOppositeContent>
@@ -278,7 +276,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                         <TimelineDot
                           color={isFutureEvent ? "success" : "grey"}
                         />
-                        {Object.entries(eventsByDate)?.length - 1 !== index && (
+                        {Object.entries(eventsByDate).length - 1 !== index && (
                           <TimelineConnector />
                         )}
                       </TimelineSeparator>
@@ -290,7 +288,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                           const today = formatWithTimeZone(
                             new Date(),
                             "ja",
-                            "yyyy-MM-dd"
+                            "yyyy-MM-dd",
                           );
 
                           const isEventToday = eventDate === today;
@@ -329,14 +327,14 @@ const IndexPage: NextPageWithLayout<Props> = ({
                                       {members.map(
                                         (member, index) =>
                                           event.contentSummary.includes(
-                                            member.name.replace(" ", "")
+                                            member.name.replace(" ", ""),
                                           ) && (
                                             <StyledAvatar
                                               key={index}
                                               alt={member.name}
                                               src={member.iconUrl}
                                             />
-                                          )
+                                          ),
                                       )}
                                     </Box>
                                   </CardContent>
@@ -375,14 +373,14 @@ const IndexPage: NextPageWithLayout<Props> = ({
                                         {members.map(
                                           (member, index) =>
                                             event.contentSummary.includes(
-                                              member.name.replace(" ", "")
+                                              member.name.replace(" ", ""),
                                             ) && (
                                               <StyledAvatar
                                                 key={index}
                                                 alt={member.name}
                                                 src={member.iconUrl}
                                               />
-                                            )
+                                            ),
                                         )}
                                       </Box>
                                     </CardContent>
@@ -395,7 +393,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                       </TimelineContent>
                     </TimelineItem>
                   );
-                }
+                },
               )}
             </Timeline>
           </Grid>

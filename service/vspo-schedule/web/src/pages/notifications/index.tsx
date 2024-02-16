@@ -107,7 +107,7 @@ const Notifications: NextPageWithLayout = () => {
   );
 };
 
-Notifications.getLayout = (page, pageProps) => {
+Notifications.getLayout = (page) => {
   return (
     <ContentLayout
       title="すぽじゅーるからのお知らせ"

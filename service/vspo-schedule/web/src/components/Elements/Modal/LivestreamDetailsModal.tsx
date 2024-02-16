@@ -48,20 +48,20 @@ const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   },
 }));
 
-const LiveLabel = styled("div")<{ isUpcoming?: boolean }>(
-  ({ isUpcoming }) => ({
-    width: "78px",
-    color: "rgb(255, 255, 255)",
-    fontSize: "15px",
-    fontWeight: "700",
-    fontFamily: "Roboto, sans-serif",
-    textAlign: "center",
-    lineHeight: "24px",
-    background: isUpcoming ? "rgb(45, 75, 112)" : "rgb(255, 0, 0)",
-    borderRadius: "12px",
-    marginRight: "2.0rem",
-  })
-);
+const LiveLabel = styled("div")<{
+  isUpcoming?: boolean;
+}>(({ isUpcoming }) => ({
+  width: "78px",
+  color: "rgb(255, 255, 255)",
+  fontSize: "15px",
+  fontWeight: "700",
+  fontFamily: "Roboto, sans-serif",
+  textAlign: "center",
+  lineHeight: "24px",
+  background: isUpcoming ? "rgb(45, 75, 112)" : "rgb(255, 0, 0)",
+  borderRadius: "12px",
+  marginRight: "2.0rem",
+}));
 
 const StyledDialogContent = styled(DialogContent)({
   overflow: "hidden",
@@ -116,7 +116,7 @@ const VideoPlayerOrLinkComponent: React.FC<{
     if (livestream.platform === Platform.YouTube) {
       embedUrl = url.replace("watch?v=", "embed/");
     } else if (livestream.platform === Platform.Twitch) {
-      const tid = !livestream?.twitchPastVideoId
+      const tid = !livestream.twitchPastVideoId
         ? `channel=${livestream.twitchName}`
         : `video=${livestream.twitchPastVideoId}`;
       embedUrl = `https://player.twitch.tv/?${tid}&parent=${document.location.hostname}&autoplay=false`;
@@ -150,11 +150,16 @@ const VideoPlayerOrLinkComponent: React.FC<{
 const VideoPlayerOrLink = React.memo(VideoPlayerOrLinkComponent);
 
 const getTwitchChatEmbedUrl = (livestream: Livestream, isDarkMode: boolean) => {
-  const chatEmbedUrl = `https://www.twitch.tv/embed/${livestream.twitchName!}/chat?parent=${window.location.hostname}`;
+  const chatEmbedUrl = `https://www.twitch.tv/embed/${livestream.twitchName!}/chat?parent=${
+    window.location.hostname
+  }`;
   return isDarkMode ? `${chatEmbedUrl}&darkpopout` : chatEmbedUrl;
 };
 
-const getYouTubeChatEmbedUrl = (livestream: Livestream, isDarkMode: boolean) => {
+const getYouTubeChatEmbedUrl = (
+  livestream: Livestream,
+  isDarkMode: boolean,
+) => {
   const chatEmbedUrl = `https://www.youtube.com/live_chat?v=${livestream.id}&embed_domain=${window.location.hostname}`;
   return isDarkMode ? `${chatEmbedUrl}&dark_theme=1` : chatEmbedUrl;
 };
@@ -166,9 +171,10 @@ const ChatEmbed: React.FC<{
   const [isLoading, setIsLoading] = React.useState(true);
 
   const isDarkMode = colorScheme === "dark";
-  const chatEmbedUrl = livestream.platform === Platform.Twitch
-    ? getTwitchChatEmbedUrl(livestream, isDarkMode)
-    : getYouTubeChatEmbedUrl(livestream, isDarkMode);
+  const chatEmbedUrl =
+    livestream.platform === Platform.Twitch
+      ? getTwitchChatEmbedUrl(livestream, isDarkMode)
+      : getYouTubeChatEmbedUrl(livestream, isDarkMode);
 
   return (
     <>
@@ -194,24 +200,24 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
 }) => {
   const router = useRouter();
   const url =
-    livestream?.isTemp && livestream?.tempUrl
+    livestream?.isTemp && livestream.tempUrl
       ? livestream.tempUrl
       : livestream
-      ? getLivestreamUrl({
-          videoId: livestream.id,
-          platform: livestream.platform,
-          externalLink: livestream.link,
-          memberName: livestream.channelTitle,
-          twitchUsername: livestream?.twitchName,
-          actualEndTime: livestream?.actualEndTime,
-          twitchPastVideoId: livestream?.twitchPastVideoId,
-        })
-      : getLivestreamUrl({
-          videoId: clip?.id || "",
-          platform: clip?.platform || Platform.YouTube,
-          isClip: true,
-          externalLink: clip?.link,
-        });
+        ? getLivestreamUrl({
+            videoId: livestream.id,
+            platform: livestream.platform,
+            externalLink: livestream.link,
+            memberName: livestream.channelTitle,
+            twitchUsername: livestream.twitchName,
+            actualEndTime: livestream.actualEndTime,
+            twitchPastVideoId: livestream.twitchPastVideoId,
+          })
+        : getLivestreamUrl({
+            videoId: clip?.id || "",
+            platform: clip?.platform || Platform.YouTube,
+            isClip: true,
+            externalLink: clip?.link,
+          });
 
   const videoInfo = livestream || clip;
   if (!videoInfo) {
@@ -219,17 +225,14 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
   }
 
   const iconUrl = livestream
-    ? livestream?.iconUrl
+    ? livestream.iconUrl
     : clip?.platform === Platform.Twitch
-    ? members.filter((m) => m.twitchChannelId === clip.channelId).at(0)?.iconUrl
-    : clip?.iconUrl;
+      ? members.filter((m) => m.twitchChannelId === clip.channelId).at(0)
+          ?.iconUrl
+      : clip?.iconUrl;
 
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullScreen
-    >
+    <Dialog open={open} onClose={onClose} fullScreen>
       <StyledDialogTitle>
         <Box display="flex" alignItems="center">
           {/* <NextLink href="/"> */}
@@ -268,11 +271,7 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
           },
         }}
       >
-        <VideoPlayerOrLink
-          url={url}
-          livestream={livestream}
-          clip={clip}
-        />
+        <VideoPlayerOrLink url={url} livestream={livestream} clip={clip} />
         <InfoTabs videoInfo={videoInfo} iconUrl={iconUrl} url={url} />
       </StyledDialogContent>
       <Box
@@ -351,7 +350,9 @@ const TabPanel: React.FC<TabPanelProps> = ({ value, index, children }) => {
       aria-labelledby={`livestream-tab-${index}`}
       style={{ flex: "1", overflow: "hidden" }}
     >
-      {value === index && <TabPanelScrollContainer>{children}</TabPanelScrollContainer>}
+      {value === index && (
+        <TabPanelScrollContainer>{children}</TabPanelScrollContainer>
+      )}
     </div>
   );
 };
@@ -370,8 +371,9 @@ const isLivestream = (video: Livestream | Clip): video is Livestream => {
 const isOnPlatformWithChat = <T extends { platform: Platform }>(
   video: T,
 ): video is T & { platform: Platform.Twitch | Platform.YouTube } => {
-  return video.platform === Platform.Twitch ||
-    video.platform === Platform.YouTube;
+  return (
+    video.platform === Platform.Twitch || video.platform === Platform.YouTube
+  );
 };
 
 const InfoTabs: React.FC<{
@@ -385,11 +387,12 @@ const InfoTabs: React.FC<{
     setValue(newValue);
   };
   const formattedStartTime = formatWithTimeZone(
-    videoInfo?.scheduledStartTime || videoInfo?.createdAt || "",
+    videoInfo.scheduledStartTime || videoInfo.createdAt || "",
     "ja",
-    "MM/dd HH:mm~"
+    "MM/dd HH:mm~",
   );
-  const showChatTab = isLivestream(videoInfo) &&
+  const showChatTab =
+    isLivestream(videoInfo) &&
     isOnPlatformWithChat(videoInfo) &&
     getLiveStatus(videoInfo) === "live";
 
@@ -405,9 +408,7 @@ const InfoTabs: React.FC<{
         >
           <Tab label="概要" {...a11yProps(0)} />
           <Tab label="関連動画" {...a11yProps(1)} />
-          {showChatTab && (
-            <Tab label="ライブチャット" {...a11yProps(2)} />
-          )}
+          {showChatTab && <Tab label="ライブチャット" {...a11yProps(2)} />}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -473,8 +474,8 @@ const InfoTabs: React.FC<{
                   if (navigator.share) {
                     try {
                       await navigator.share({
-                        title: videoInfo.title!, // ここにビデオのタイトルを設定します
-                        text: videoInfo.title!, // ここに共有するテキストを設定します
+                        title: videoInfo.title, // ここにビデオのタイトルを設定します
+                        text: videoInfo.title, // ここに共有するテキストを設定します
                         url: url, // ここにビデオのURLを設定します
                       });
                     } catch (error) {
@@ -482,7 +483,7 @@ const InfoTabs: React.FC<{
                     }
                   } else {
                     console.log(
-                      "Your system does not support the Web Share API"
+                      "Your system does not support the Web Share API",
                     );
                   }
                 }}

@@ -49,7 +49,10 @@ const StyledAlert = styled(Alert)({
   color: "#014361",
 });
 
-const SocialIconLink: React.FC<{ url: string, icon: React.ReactNode }> = ({ url, icon }) => {
+const SocialIconLink: React.FC<{
+  url: string;
+  icon: React.ReactNode;
+}> = ({ url, icon }) => {
   const clickTargetSize = "24px";
   return (
     <a
@@ -68,7 +71,7 @@ const SocialIconLink: React.FC<{ url: string, icon: React.ReactNode }> = ({ url,
       {icon}
     </a>
   );
-}
+};
 
 type Props = {
   title: string;
@@ -76,7 +79,7 @@ type Props = {
 export const Header: React.FC<Props> = ({ title }) => {
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState<null | HTMLElement>(
-    null
+    null,
   );
 
   const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {

@@ -2,7 +2,6 @@ import { Typography, Button, Box, Link, Avatar } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
-import { events } from "@/data/events";
 import { NextPageWithLayout } from "../../_app";
 import { VspoEvent } from "@/types/events";
 import { TweetEmbed } from "@/components/Elements";
@@ -76,7 +75,7 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
         Back
       </Button>
       <Typography variant="h4" sx={{ marginBottom: "10px" }}>
-        {event?.title}
+        {event.title}
       </Typography>
       <Box
         sx={{
@@ -88,26 +87,26 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
       >
         <Typography color="textSecondary">
           {formatWithTimeZone(
-            new Date(event?.startedAt?.split("T")[0] || TEMP_TIMESTAMP),
+            new Date(event.startedAt.split("T")[0] || TEMP_TIMESTAMP),
             "ja",
-            "MM/dd (E)"
+            "MM/dd (E)",
           )}
         </Typography>
         {members.map(
           (member, index) =>
-            event?.contentSummary.includes(
-              (member.name || "").replace(" ", "")
+            event.contentSummary.includes(
+              (member.name || "").replace(" ", ""),
             ) && (
               <StyledAvatar
                 key={index}
                 alt={member.name}
                 src={member.iconUrl}
               />
-            )
+            ),
         )}
       </Box>
       <Typography variant="body1" sx={{ marginBottom: "20px" }}>
-        {event?.contentSummary.split("\n").map((line, index) => {
+        {event.contentSummary.split("\n").map((line, index) => {
           return (
             <Typography key={index} variant="body1">
               {line}
@@ -116,21 +115,19 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
           );
         })}
       </Typography>
-      {event.tweetLinks &&
-        event.tweetLinks.length > 0 &&
-        event.tweetLinks.map((link, index) => (
-          <Box
-            key={index}
-            sx={{
-              display: "flex",
-              justifyContent: "center",
-              marginBottom: "20px",
-            }}
-          >
-            <TweetEmbed tweetLink={link} />
-          </Box>
-        ))}
-      {event.webPageLinks && event.webPageLinks.length > 0 && (
+      {event.tweetLinks.map((link, index) => (
+        <Box
+          key={index}
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <TweetEmbed tweetLink={link} />
+        </Box>
+      ))}
+      {event.webPageLinks.length > 0 && (
         <Box sx={{ marginBottom: "20px" }}>
           <Typography variant="h6" sx={{ marginBottom: "10px" }}>
             Web Links:
@@ -155,13 +152,13 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
   );
 };
 
+/* eslint-disable @typescript-eslint/no-unnecessary-condition --
+ * pageProps is empty in fallback render
+ */
 EventPage.getLayout = (page, pageProps) => {
-  const eventTitle = pageProps?.event?.title
-    ? pageProps.event.title
-    : "Event Not Found";
-  const eventContentSummary = pageProps?.event?.contentSummary
-    ? pageProps.event.contentSummary
-    : "This event could not be found.";
+  const eventTitle = pageProps.event?.title ?? "Event Not Found";
+  const eventContentSummary =
+    pageProps.event?.contentSummary ?? "This event could not be found.";
 
   return (
     <ContentLayout
@@ -174,5 +171,6 @@ EventPage.getLayout = (page, pageProps) => {
     </ContentLayout>
   );
 };
+/* eslint-enable @typescript-eslint/no-unnecessary-condition */
 
 export default EventPage;

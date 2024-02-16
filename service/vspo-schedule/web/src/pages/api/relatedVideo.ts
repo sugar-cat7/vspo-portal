@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { validateGetRequest } from "@/lib/validator";
 import { fetchVspoRelatedVideo } from "@/lib/api";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+export default (req: NextApiRequest, res: NextApiResponse) => {
   validateGetRequest(req, res, async () => {
     // クエリパラメータからページ数とリミット数を取得。指定がなければデフォルトの値として1と10を設定
     const page = parseInt(req.query.page as string, 10) || 1;

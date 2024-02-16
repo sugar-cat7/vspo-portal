@@ -44,9 +44,9 @@ const StyledFab = styled(Fab)(({ theme }) => ({
   },
 }));
 
-const StyledSearchIcon = styled(SearchIcon)(({ theme }) => ({
+const StyledSearchIcon = styled(SearchIcon)({
   color: "white",
-}));
+});
 
 const StyledAlert = styled(Alert)(({ theme }) => ({
   [theme.getColorSchemeSelector("dark")]: {
@@ -68,7 +68,7 @@ export const SearchDialog: React.FC<Props> = ({
 }) => {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [searchStartDate, setSearchStartDate] = React.useState<string | null>(
-    null
+    null,
   );
   const [searchEndDate, setSearchEndDate] = React.useState<string | null>(null);
   const [searchMemberIds, setSearchMemberIds] = React.useState<number[]>([]);
@@ -104,7 +104,7 @@ export const SearchDialog: React.FC<Props> = ({
             searchEndDate,
             searchMemberIds,
             searchPlatforms,
-            searchKeyword
+            searchKeyword,
           );
           setFilteredLivestreamsByDate(filteredLivestreams);
         }
@@ -116,7 +116,7 @@ export const SearchDialog: React.FC<Props> = ({
             clips,
             searchClipTimeframe,
             searchMemberIds,
-            searchKeyword
+            searchKeyword,
           );
           setFilteredClips(filteredClips);
         }
@@ -189,7 +189,7 @@ export const SearchDialog: React.FC<Props> = ({
                 options={platforms}
                 getOptionLabel={(option) => option.name}
                 value={platforms.filter((platform) =>
-                  searchPlatforms.includes(platform.id)
+                  searchPlatforms.includes(platform.id),
                 )}
                 onChange={(event, newValue) =>
                   setSearchPlatforms(newValue.map((item) => item.id))
@@ -214,7 +214,7 @@ export const SearchDialog: React.FC<Props> = ({
               options={members}
               getOptionLabel={(option) => option.name}
               value={members.filter((member) =>
-                searchMemberIds.includes(member.id)
+                searchMemberIds.includes(member.id),
               )}
               onChange={(event, newValue) =>
                 handleSelectMember(newValue.map((item) => item.id))

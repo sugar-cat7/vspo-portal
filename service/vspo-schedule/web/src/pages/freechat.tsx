@@ -42,7 +42,7 @@ export const getStaticProps: GetStaticProps<FreeChatsProps> = async () => {
 
   // Create a mapping of channelId to id for members
   const memberIdMap = new Map(
-    members.map((member) => [member.channelId, member.id])
+    members.map((member) => [member.channelId, member.id]),
   );
 
   // Sort the freeChats array based on the memberIdMap

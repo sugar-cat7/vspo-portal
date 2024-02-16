@@ -214,10 +214,9 @@ export const members: Member[] = [
       "https://yt3.ggpht.com/s5yBpdTfsald7IesR0XOLBAE49k5P9e5aLqE6AsmPf2pb8GSQ9-srQz-eSiAUWrkfCTTcDZWZA=s240-c-k-c0x00ffffff-no-rj",
     keywords: [],
   },
-]
-  .map((member) => ({
-    ...member,
-    keywords: [...member.keywords, member.name],
-  }));
+].map((member) => ({
+  ...member,
+  keywords: [...member.keywords, member.name],
+}));
 
 export const memberNames = members.map(({ name }) => name);

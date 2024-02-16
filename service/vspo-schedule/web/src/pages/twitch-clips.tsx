@@ -65,9 +65,9 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
 
   if (ENVIRONMENT === "production") {
     const memberClipsPromises = members.map((member) =>
-      member?.twitchChannelId
+      member.twitchChannelId
         ? fetchTwitchClips(member.twitchChannelId)
-        : Promise.resolve([])
+        : Promise.resolve([]),
     );
 
     const settledResults = await Promise.allSettled(memberClipsPromises);

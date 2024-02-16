@@ -1,20 +1,15 @@
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useMemo } from "react";
 import {
   Card,
   CardContent,
   Typography,
-  CardMedia,
   CardActionArea,
   Avatar,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import { Livestream } from "@/types/streaming";
-import {
-  getLivestreamUrl,
-  getLiveStatus,
-  formatWithTimeZone,
-} from "@/lib/utils";
+import { getLiveStatus, formatWithTimeZone } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
 import { EmbedModeContext } from "@/context/EmbedMode";
 import { useModal } from "@/hooks";
@@ -55,7 +50,7 @@ const LiveLabel = styled("div")<{ isUpcoming?: boolean }>(
       top: "-8px",
       right: "2px",
     },
-  })
+  }),
 );
 
 const ResponsiveTypography = styled(Typography)(({ theme }) => ({
@@ -76,8 +71,8 @@ const StyledCard = styled(Card)<StyledCardProps>(({ theme, livestatus }) => ({
     livestatus === "live"
       ? "3px solid red"
       : livestatus === "upcoming"
-      ? "3px solid rgb(45, 75, 112)"
-      : "none",
+        ? "3px solid rgb(45, 75, 112)"
+        : "none",
   backgroundColor: "white",
   [theme.getColorSchemeSelector("dark")]: {
     backgroundColor: "#353535",
@@ -127,12 +122,12 @@ const FontSizeOnTypography = styled(Typography)(
   }),
   ({ title }) => ({
     marginLeft: title?.startsWith("【") ? "-10px" : 0,
-  })
+  }),
 );
 
 const LivestreamDetailsModal = dynamic(
   () => import("../Modal").then((mod) => mod.LivestreamDetailsModal),
-  { ssr: false }
+  { ssr: false },
 );
 
 type LivestreamCardProps = {
@@ -144,31 +139,11 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
 }) => {
   const [isEmbedMode] = useContext(EmbedModeContext);
   const { isOpen, openModal, closeModal } = useModal();
-  const {
-    id,
-    title,
-    channelTitle,
-    thumbnailUrl,
-    scheduledStartTime,
-    iconUrl,
-    platform,
-    link,
-    twitchName,
-    actualEndTime,
-    twitchPastVideoId,
-  } = livestream;
-  const url = getLivestreamUrl({
-    videoId: id,
-    platform: platform,
-    externalLink: link,
-    memberName: channelTitle,
-    twitchUsername: twitchName,
-    actualEndTime: actualEndTime,
-    twitchPastVideoId: twitchPastVideoId,
-  });
+  const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
+    livestream;
   const livestreamStatus = useMemo(
     () => getLiveStatus(livestream),
-    [livestream]
+    [livestream],
   );
   return (
     <CardBox>

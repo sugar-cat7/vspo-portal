@@ -1,43 +1,11 @@
 import { members } from "@/data/members";
-import { Clip, LiveStatus, Livestream, MemberKeyword, Platform } from "@/types/streaming";
-import { format, utcToZonedTime, zonedTimeToUtc } from "date-fns-tz";
+import { Clip, LiveStatus, Livestream, Platform } from "@/types/streaming";
+import { format, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
-import { differenceInMinutes, Locale } from "date-fns";
+import { Locale } from "date-fns";
 import { TEMP_TIMESTAMP } from "./Const";
 import { freeChatVideoIds } from "@/data/master";
 import { VspoEvent } from "@/types/events";
-
-/**
- * Check if a date is within this week.
- * @param date - The date to check.
- * @returns - A boolean indicating if the date is within this week.
- */
-export const isInThisWeek = (date: Date): boolean => {
-  const now = new Date();
-  const startOfWeek = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() - now.getDay()
-  );
-  const endOfWeek = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() + (6 - now.getDay())
-  );
-
-  return date >= startOfWeek && date <= endOfWeek;
-};
-
-/**
- * Get a Date object representing one week ago.
- * @returns - A Date object representing one week ago.
- */
-export const getOneWeekAgo = (): Date => {
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0); // Set the time to 00:00:00
-  const oneWeekAgo = new Date(currentDate.getTime() - 7 * 24 * 60 * 60 * 1000);
-  return oneWeekAgo;
-};
 
 /**
  * Group an array of items by a specified key.
@@ -48,7 +16,7 @@ export const getOneWeekAgo = (): Date => {
  */
 export const groupBy = <T>(
   items: T[],
-  keyGetter: (item: T) => string
+  keyGetter: (item: T) => string,
 ): Record<string, T[]> => {
   const groupedItems: Record<string, T[]> = {};
 
@@ -86,7 +54,6 @@ export const getLivestreamUrl = ({
   externalLink,
   memberName,
   twitchUsername,
-  actualEndTime,
   twitchPastVideoId,
   isClip,
 }: GetLivestreamUrl): string => {
@@ -97,8 +64,8 @@ export const getLivestreamUrl = ({
       return isClip && externalLink
         ? externalLink
         : !twitchPastVideoId
-        ? `https://www.twitch.tv/${twitchUsername}`
-        : `https://www.twitch.tv/videos/${twitchPastVideoId}`;
+          ? `https://www.twitch.tv/${twitchUsername}`
+          : `https://www.twitch.tv/videos/${twitchPastVideoId}`;
     case Platform.TwitCasting:
       return externalLink?.includes("movie")
         ? externalLink
@@ -110,9 +77,10 @@ export const getLivestreamUrl = ({
       return `https://live.nicovideo.jp/watch/${videoId}`;
     default:
       throw new Error(
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         `Unsupported platform: ${platform}. Supported platforms are: ${Object.values(
-          Platform
-        ).join(", ")}`
+          Platform,
+        ).join(", ")}`,
       );
   }
 };
@@ -134,7 +102,7 @@ export const filterLivestreams = (
   searchEndDate: string | null,
   searchMemberIds: number[],
   searchPlatforms: string[],
-  searchKeyword: string
+  searchKeyword: string,
 ): Record<string, Livestream[]> => {
   const filteredLivestreamsByDate: Record<string, Livestream[]> = {};
   const keywordFilter = (item: Livestream) =>
@@ -158,7 +126,7 @@ export const filterLivestreams = (
         searchMemberIds.some((memberId) =>
           members
             .filter((m) => m.iconUrl === livestream.iconUrl)
-            .some((member) => member.id === memberId)
+            .some((member) => member.id === memberId),
         );
 
       const isPlatformMatch =
@@ -190,7 +158,7 @@ export const filterLivestreams = (
  */
 export const filterClips = (
   clips: Clip[],
-  searchMemberIds: number[]
+  searchMemberIds: number[],
 ): Clip[] => {
   if (!clips) {
     return [];
@@ -204,7 +172,7 @@ export const filterClips = (
   const filteredClips = clips.filter((clip) => {
     const isMemberMatch = searchMemberIds.some((memberId) => {
       const memberKeywords = members.find(
-        (member) => member.id === memberId
+        (member) => member.id === memberId,
       )?.keywords;
 
       if (!memberKeywords) {
@@ -212,7 +180,6 @@ export const filterClips = (
       }
 
       let keywordMatchCount = 0;
-      let hasBracketMatch = false;
 
       memberKeywords.forEach((keyword) => {
         // Check for keyword match in title
@@ -223,7 +190,6 @@ export const filterClips = (
           const bracketPattern = new RegExp(`【${keyword}】`);
           if (bracketPattern.test(clip.title)) {
             keywordMatchCount += bracketWeight;
-            hasBracketMatch = true;
           }
         }
       });
@@ -251,32 +217,6 @@ export const filterClips = (
 };
 
 /**
- * Filters livestreams based on their scheduled start times.
- *
- * @param livestreams - An array of Livestream objects.
- * @returns An array of filtered Livestream objects.
- */
-const dateFilter = (livestreams: Livestream[]): Livestream[] => {
-  return livestreams.filter((stream, index, self) => {
-    const currentTime = new Date(stream.scheduledStartTime);
-    return !self.some((otherStream, otherIndex) => {
-      if (stream.channelId === otherStream.channelId && index !== otherIndex) {
-        const otherTime = new Date(otherStream.scheduledStartTime);
-        const timeDifference = Math.abs(
-          currentTime.getTime() - otherTime.getTime()
-        );
-        return (
-          timeDifference < 3 * 60 * 1000 &&
-          otherIndex > index &&
-          stream.platform === otherStream.platform
-        );
-      }
-      return false;
-    });
-  });
-};
-
-/**
  * Filters livestreams based on their titles.
  * Gives lower priority to streams marked as isTemp if there's another stream with the same title.
  *
@@ -292,7 +232,7 @@ const titleFilter = (livestreams: Livestream[]): Livestream[] => {
       if (stream.channelId === otherStream.channelId && index !== otherIndex) {
         const otherTime = new Date(otherStream.scheduledStartTime);
         const timeDifference = Math.abs(
-          currentTime.getTime() - otherTime.getTime()
+          currentTime.getTime() - otherTime.getTime(),
         );
 
         return (
@@ -315,7 +255,7 @@ const titleFilter = (livestreams: Livestream[]): Livestream[] => {
  * @returns An array of unique Livestream objects.
  */
 export const removeDuplicateTitles = (
-  livestreams: Livestream[]
+  livestreams: Livestream[],
 ): Livestream[] => {
   const filteredLivestreams = removeDuplicatTwitchId(titleFilter(livestreams));
   const seenTitles = new Set();
@@ -333,7 +273,7 @@ export const removeDuplicateTitles = (
  * @returns An array of unique Livestream objects.
  */
 export const removeDuplicatTwitchId = (
-  livestreams: Livestream[]
+  livestreams: Livestream[],
 ): Livestream[] => {
   const seenTwitchIds = new Set();
   return livestreams.filter((livestream) => {
@@ -346,12 +286,6 @@ export const removeDuplicatTwitchId = (
     }
   });
 };
-
-/**
- * Convert a Firestore timestamp to an ISO string date.
- * @param timestamp - A Firestore timestamp to convert.
- * @returns - An ISO string date representing the given timestamp.
- */
 
 /**
  * Get a range of one week ago and one week later, without considering the time.
@@ -391,56 +325,11 @@ const localeTimeZoneMap: Record<string, string> = {
 export const formatWithTimeZone = (
   date: Date | number | string,
   localeCode: string,
-  dateFormat: string
+  dateFormat: string,
 ): string => {
   const timeZone = localeTimeZoneMap[localeCode];
   const zonedDate = utcToZonedTime(date, timeZone);
   return format(zonedDate, dateFormat, { locale: locales[localeCode] });
-};
-
-/**
- * Check if a scheduled start time is within one hour from the current time, in the specified timezone.
- * @param scheduledStartTime - The scheduled start time to check.
- * @param localeCode - The locale code to use for checking the time.
- * @returns - A boolean indicating if the scheduled start time is within one hour from the current time.
- */
-export const isWithinOneHour = (
-  scheduledStartTime: string,
-  localeCode: string
-): boolean => {
-  const timeZone = localeTimeZoneMap[localeCode];
-  const localStartTime = utcToZonedTime(scheduledStartTime, timeZone);
-  const nowUtc = zonedTimeToUtc(new Date(), timeZone); // 現在時刻をUTCに変換
-  const nowLocal = utcToZonedTime(nowUtc, timeZone); // 現在時刻を指定されたタイムゾーンに変換
-
-  // scheduledStartTimeが現在時刻よりも未来の場合、差分が1時間以内であればtrueを返す
-  if (localStartTime > nowLocal) {
-    const diffInMinutes = differenceInMinutes(localStartTime, nowLocal);
-    return diffInMinutes <= 90;
-  }
-
-  // scheduledStartTimeが現在時刻よりも過去の場合、常にfalseを返す
-  return false;
-};
-
-/**
- * Check if a scheduled start time is in the future, in the specified timezone.
- * @param scheduledStartTime - The scheduled start time to check.
- * @param localeCode - The locale code to use for checking the time.
- * @returns - A boolean indicating if the scheduled start time is in the future.
- */
-export const isUpcomingLivestreams = (
-  scheduledStartTime: string,
-  localeCode: string
-): boolean => {
-  // const timeZone = localeTimeZoneMap[localeCode];
-  // const nowUtc = zonedTimeToUtc(new Date(), timeZone);
-  if (new Date(scheduledStartTime) > new Date()) {
-    return true;
-  }
-
-  // scheduledStartTimeが現在時刻よりも過去の場合、常にfalseを返す
-  return false;
 };
 
 /**
@@ -449,7 +338,9 @@ export const isUpcomingLivestreams = (
  * @returns {LiveStatus | "freechat"} - The live status of the livestream
  *   ("live", "upcoming", or "archive") or "freechat".
  */
-export const getLiveStatus = (livestream: Livestream): LiveStatus | "freechat" => {
+export const getLiveStatus = (
+  livestream: Livestream,
+): LiveStatus | "freechat" => {
   if (freeChatVideoIds.includes(livestream.id)) {
     return "freechat";
   }
@@ -459,7 +350,7 @@ export const getLiveStatus = (livestream: Livestream): LiveStatus | "freechat" =
 
   // 時間差をミリ秒で計算
   const timeDifference: number = Math.abs(
-    scheduledStartTime.getTime() - currentTime.getTime()
+    scheduledStartTime.getTime() - currentTime.getTime(),
   );
 
   // 12時間をミリ秒で表す
@@ -471,7 +362,7 @@ export const getLiveStatus = (livestream: Livestream): LiveStatus | "freechat" =
   if (new Date(livestream.scheduledStartTime) > new Date()) {
     return LiveStatus.Upcoming;
   } else if (
-    livestream?.actualEndTime &&
+    livestream.actualEndTime &&
     livestream.actualEndTime.includes("1998-01-01") &&
     isWithinTwelveHours
   ) {
@@ -504,61 +395,6 @@ export const groupLivestreamsByTimeRange = (livestreams: Livestream[]) => {
       }),
     };
   });
-};
-
-/**
- * Filters livestreams by their live status and returns the filtered results grouped by date.
- * @param {Record<string, Livestream[]>} livestreamsByDate - The record of livestreams grouped by date.
- * @param {string} liveStatus - The live status to filter by ("live", "upcoming", or "archive").
- * @returns {Record<string, Livestream[]>} - A record of filtered livestreams grouped by date.
- */
-export const liveStatusFilterLivestreams = (
-  livestreamsByDate: Record<string, Livestream[]>,
-  liveStatus: string
-): Record<string, Livestream[]> => {
-  const allLivestreamsByDate: Record<string, Livestream[]> = {};
-
-  for (const dateKey in livestreamsByDate) {
-    if (livestreamsByDate.hasOwnProperty(dateKey)) {
-      const livestreams = livestreamsByDate[dateKey];
-      const filteredLivestreams = livestreams.filter(
-        (livestream) => getLiveStatus(livestream) === liveStatus
-      );
-
-      if (filteredLivestreams.length > 0) {
-        allLivestreamsByDate[dateKey] = filteredLivestreams;
-      }
-    }
-  }
-
-  return allLivestreamsByDate;
-};
-
-/**
- * Filters an array of clips by an array of member keywords and returns the filtered clips.
- * @param {Clip[]} clips - The array of clips to filter.
- * @param {MemberKeyword[]} membersKeywords - The array of member keywords to filter by.
- * @returns {Clip[]} - An array of filtered clips.
- */
-export const filterClipsByKeywords = (
-  clips: Clip[],
-  membersKeywords: MemberKeyword[]
-): Clip[] => {
-  if (!clips || clips.length === 0) {
-    return [];
-  }
-  // 全メンバーキーワードを1つの配列にまとめる
-  const allKeywords = membersKeywords.flatMap((member) => member.keywords);
-
-  // クリップのタイトルにキーワードが含まれているかどうかを判定する関数
-  const containsKeywords = (title: string): boolean => {
-    return allKeywords.some((keyword) => title.includes(keyword));
-  };
-
-  // キーワードが含まれているクリップだけをフィルタリングして返す
-  return clips.filter(
-    (clip) => containsKeywords(clip.title) && clip.platform === Platform.YouTube
-  );
 };
 
 /**
@@ -599,7 +435,7 @@ export const shuffleClips = (clips: Clip[]): Clip[] => {
 
 export const filterByTimeframe = (
   clips: Clip[],
-  timeframe: string | null
+  timeframe: string | null,
 ): Clip[] => {
   if (!timeframe) return clips;
 
@@ -607,7 +443,7 @@ export const filterByTimeframe = (
   return clips.filter((clip) => {
     const clipCreatedAt = new Date(clip.createdAt || TEMP_TIMESTAMP);
     const daysDifference = Math.floor(
-      (now.getTime() - clipCreatedAt.getTime()) / (1000 * 60 * 60 * 24)
+      (now.getTime() - clipCreatedAt.getTime()) / (1000 * 60 * 60 * 24),
     );
 
     switch (timeframe) {
@@ -639,8 +475,8 @@ const filterByMemberIds = (clips: Clip[], memberIds: number[]): Clip[] => {
     return clips.filter((clip) =>
       memberIds.includes(
         members.filter((m) => m.twitchChannelId === clip.channelId).at(0)?.id ??
-          0
-      )
+          0,
+      ),
     );
   }
 };
@@ -652,7 +488,7 @@ export const filterByKeyword = (clips: Clip[], keyword: string): Clip[] => {
   return clips.filter(
     (clip) =>
       clip.title.toLowerCase().includes(lowercasedKeyword) ||
-      clip.description.toLowerCase().includes(lowercasedKeyword)
+      clip.description.toLowerCase().includes(lowercasedKeyword),
   );
 };
 
@@ -660,7 +496,7 @@ export const applyFilters = (
   clips: Clip[],
   searchClipTimeframe: string | null,
   searchMemberIds: number[],
-  searchKeyword: string
+  searchKeyword: string,
 ): Clip[] => {
   let filteredClips = [...clips];
 
@@ -669,17 +505,6 @@ export const applyFilters = (
   filteredClips = filterByKeyword(filteredClips, searchKeyword);
 
   return filteredClips;
-};
-
-/**
- * Get a Date object representing six months ago, without considering the time.
- * @returns - A Date object representing six months ago, without time.
- */
-export const getOneMonthAgo = (): Date => {
-  const currentDate = new Date();
-  currentDate.setHours(0, 0, 0, 0); // Set the time to 00:00:00
-  currentDate.setMonth(currentDate.getMonth() - 1);
-  return currentDate;
 };
 
 const TRENDING_THRESHOLDS = [
@@ -712,16 +537,6 @@ export const isTrending = (clip: Clip) => {
         : TWITCH_TRENDING_THRESHOLDS * days * 1.25;
     return isOlderThan(days) && viewCount >= trendThreshold;
   });
-};
-
-export const isPopular = (clip: Clip) => {
-  return Number(clip.viewCount) >= 5000;
-};
-
-export const isNew = (clip: Clip) => {
-  const oneDayAgo = new Date();
-  oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-  return clip.createdAt && new Date(clip.createdAt) > oneDayAgo;
 };
 
 export const getColor = (tag: string) => {
@@ -765,16 +580,19 @@ export const groupEventsByYearMonth = (events: VspoEvent[]) => {
 
   return Object.entries(eventsByMonth)
     .sort(([keyA], [keyB]) => (keyA > keyB ? 1 : -1))
-    .reduce((sortedObj, [key, value]) => {
-      sortedObj[key] = value;
-      return sortedObj;
-    }, {} as { [key: string]: VspoEvent[] });
+    .reduce(
+      (sortedObj, [key, value]) => {
+        sortedObj[key] = value;
+        return sortedObj;
+      },
+      {} as { [key: string]: VspoEvent[] },
+    );
 };
 
 type HasThumbnailUrl = { thumbnailUrl: string };
 
 export const convertThumbnailQualityInObjects = <T extends HasThumbnailUrl>(
-  objects: T[]
+  objects: T[],
 ): T[] => {
   return objects.map((object) => ({
     ...object,

@@ -1,5 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
-import { useRouter } from "next/router";
+import { useState, useCallback } from "react";
 
 export const useModal = () => {
   const [isOpen, setIsOpen] = useState(false);

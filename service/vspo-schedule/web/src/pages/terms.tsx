@@ -176,7 +176,7 @@ const Terms: NextPageWithLayout = () => {
   );
 };
 
-Terms.getLayout = (page, pageProps) => {
+Terms.getLayout = (page) => {
   return (
     <ContentLayout
       title="利用規約"

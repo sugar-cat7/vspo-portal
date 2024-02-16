@@ -3,7 +3,7 @@ import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { Box } from "@mui/system";
 import { DrawerIcon } from "../Elements";
 import Link from "next/link";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 import { getNavigationRouteInfo, NavigationRouteId } from "@/data/navigation";
 
 const bottomNavigationContents = [
@@ -11,7 +11,7 @@ const bottomNavigationContents = [
   { id: "clip", name: "切り抜き" },
   { id: "twitch-clip", name: "クリップ" },
   { id: "event", name: "イベント" },
-] as const satisfies { id: NavigationRouteId, name: string }[];
+] as const satisfies { id: NavigationRouteId; name: string }[];
 
 const getActiveNavOption = (activePath: string) => {
   const pathParts = activePath.split("/");
@@ -36,10 +36,7 @@ export const CustomBottomNavigation: React.FC = () => {
 
   return (
     <Box sx={{ width: "100%", position: "fixed", bottom: 0, zIndex: 1000 }}>
-      <BottomNavigation
-        value={value}
-        showLabels
-      >
+      <BottomNavigation value={value} showLabels>
         {bottomNavigationContents.map(({ id, name }) => (
           <BottomNavigationAction
             component={Link}
