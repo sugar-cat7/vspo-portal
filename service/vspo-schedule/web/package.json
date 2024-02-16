@@ -7,6 +7,7 @@
     "build": "next build && next-sitemap",
     "start": "next start",
     "format": "biome format ./src",
+    "knip": "knip",
     "lint": "next lint",
     "postinstall": "lefthook install"
   },
@@ -45,6 +46,7 @@
     "@typescript-eslint/eslint-plugin": "^7.0.1",
     "@typescript-eslint/parser": "^7.0.1",
     "@vercel/node": "^3.0.15",
+    "knip": "^5.0.1",
     "lefthook": "^1.6.1"
   }
 }
