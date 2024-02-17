@@ -3,8 +3,8 @@ package http
 import (
 	oas "github.com/sugar-cat7/vspo-portal/service/common-api/generated/api"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/dependency"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/internal/handler/creator"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/internal/handler/video"
+	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/server/internal/handler/creator"
+	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/server/internal/handler/video"
 )
 
 // Compile-time check for Handler.
