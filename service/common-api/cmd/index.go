@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/api"
-	handler "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http"
+	handler "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/server"
 )
 
 // debug
