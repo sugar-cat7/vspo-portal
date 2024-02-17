@@ -2,6 +2,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/samber/lo"
 )
 
 // Video represents each platform video
@@ -13,10 +15,11 @@ type Video struct {
 	StartAt      time.Time
 	EndAt        time.Time
 	Platform     Platform
-	Status       string
+	Status       Status
 	Tags         []string
 	ViewCount    uint64
 	ThumbnailURL ThumbnailURL
+	IsDeleted    bool
 	CreatorInfo  CreatorInfo
 }
 
@@ -28,4 +31,61 @@ type CreatorInfo struct {
 	ID           string
 	Name         string
 	ThumbnailURL ThumbnailURL
+}
+
+// VideoType represents the type of video.
+type VideoType string
+
+const (
+	VideoTypeAll           VideoType = "all"
+	VideoTypeVspoBroadcast VideoType = "vspo_broadcast"
+	VideoTypeClip          VideoType = "clip"
+	VideoTypeFreechat      VideoType = "freechat"
+)
+
+func (t VideoType) String() string {
+	return string(t)
+}
+
+// Status represents the status of a video.
+type Status string
+
+const (
+	StatusLive     Status = "live"
+	StatusUpcoming Status = "upcoming"
+	StatusEnded    Status = "ended"
+)
+
+func (s Status) String() string {
+	return string(s)
+}
+
+// Filter videos that need to be updated
+func (vs Videos) FilterUpdateTarget(comparisonVideos Videos) Videos {
+	return lo.Filter(vs, func(newVideo *Video, _ int) bool {
+		// Check if the deleted video is included in the existing videos
+		return !lo.SomeBy(comparisonVideos, func(video *Video) bool {
+			if video.ID == newVideo.ID {
+				if video.Status == newVideo.Status {
+					return false
+				}
+				if video.IsDeleted {
+					return false
+				}
+			}
+			return true
+		})
+	})
+}
+
+// FilterCreator filters videos by creator ID
+func (vs Videos) FilterCreator(cs Creators) Videos {
+	if len(cs) == 0 {
+		return vs
+	}
+	return lo.Filter(vs, func(video *Video, _ int) bool {
+		return lo.Contains(lo.Map(cs, func(c *Creator, _ int) string {
+			return c.ID
+		}), video.CreatorInfo.ID)
+	})
 }

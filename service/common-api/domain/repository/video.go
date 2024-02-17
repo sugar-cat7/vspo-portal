@@ -8,24 +8,27 @@ import (
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_repository
-type Creator interface {
+type Video interface {
 	List(
 		ctx context.Context,
-		query ListCreatorsQuery,
-	) (model.Creators, error)
+		query ListVideosQuery,
+	) (model.Videos, error)
 	Count(
 		ctx context.Context,
-		query ListCreatorsQuery,
+		query ListVideosQuery,
 	) (uint64, error)
+	UpsertAll(
+		ctx context.Context,
+		m model.Videos,
+	) (model.Videos, error)
 }
 
-type GetCreatorQuery struct {
+type GetVideoQuery struct {
 	ID null.String
 	BaseGetOptions
 }
 
-type ListCreatorsQuery struct {
-	CreatorIDs       []*null.String
-	IsOnlyVspoMember bool
+type ListVideosQuery struct {
+	VideoIDs []*null.String
 	BaseListOptions
 }
