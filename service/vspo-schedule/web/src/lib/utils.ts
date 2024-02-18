@@ -156,10 +156,7 @@ export const filterLivestreams = (
  * @param searchMemberIds - An array of member IDs to filter clips by.
  * @returns An array of filtered Clip objects.
  */
-export const filterClips = (
-  clips: Clip[],
-  searchMemberIds: number[],
-): Clip[] => {
+const filterClips = (clips: Clip[], searchMemberIds: number[]): Clip[] => {
   if (!clips) {
     return [];
   }
@@ -257,7 +254,7 @@ const titleFilter = (livestreams: Livestream[]): Livestream[] => {
 export const removeDuplicateTitles = (
   livestreams: Livestream[],
 ): Livestream[] => {
-  const filteredLivestreams = removeDuplicatTwitchId(titleFilter(livestreams));
+  const filteredLivestreams = removeDuplicateTwitchId(titleFilter(livestreams));
   const seenTitles = new Set();
   return filteredLivestreams.filter((livestream) => {
     const isDuplicate = seenTitles.has(livestream.id);
@@ -272,9 +269,7 @@ export const removeDuplicateTitles = (
  * @param livestreams - An array of Livestream objects.
  * @returns An array of unique Livestream objects.
  */
-export const removeDuplicatTwitchId = (
-  livestreams: Livestream[],
-): Livestream[] => {
+const removeDuplicateTwitchId = (livestreams: Livestream[]): Livestream[] => {
   const seenTwitchIds = new Set();
   return livestreams.filter((livestream) => {
     if (!livestream.twitchPastVideoId) {
@@ -481,7 +476,7 @@ const filterByMemberIds = (clips: Clip[], memberIds: number[]): Clip[] => {
   }
 };
 
-export const filterByKeyword = (clips: Clip[], keyword: string): Clip[] => {
+const filterByKeyword = (clips: Clip[], keyword: string): Clip[] => {
   if (!keyword.trim()) return clips;
 
   const lowercasedKeyword = keyword.toLowerCase();

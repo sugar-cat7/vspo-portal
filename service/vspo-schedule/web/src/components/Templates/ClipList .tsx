@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import {
   Container,
   Grid,
@@ -17,7 +17,6 @@ import { Clip, Platform } from "@/types/streaming";
 import { isTrending } from "@/lib/utils";
 import { members } from "@/data/members";
 import { PlayArrow } from "@mui/icons-material";
-import { EmbedModeContext } from "@/context/EmbedMode";
 import { useModal } from "@/hooks";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -64,7 +63,6 @@ const getClipLabel = (clip: Clip) => {
 
 export const ClipList: React.FC<Props> = ({ clips }) => {
   const [page, setPage] = useState(1);
-  const [isEmbedMode] = useContext(EmbedModeContext);
   const { isOpen, openModal: baseOpenModal, closeModal } = useModal();
   const [clickedClip, setClickedClip] = useState<Clip | null>(null);
   const clipsPerPage = 24;
@@ -255,7 +253,6 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
             setClickedClip(null);
             closeModal();
           }}
-          isDefaultEmbedMode={isEmbedMode}
         />
       )}
     </Container>

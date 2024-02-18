@@ -10,5 +10,3 @@ export const API_ROOT =
     : process.env.API_ROOT;
 
 export const ENVIRONMENT = process.env.ENVIRONMENT;
-
-export const BASE_URL = process.env.BASE_URL;

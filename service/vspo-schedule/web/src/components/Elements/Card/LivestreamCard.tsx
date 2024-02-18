@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import React, { useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -11,7 +11,6 @@ import { Box } from "@mui/system";
 import { Livestream } from "@/types/streaming";
 import { getLiveStatus, formatWithTimeZone } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
-import { EmbedModeContext } from "@/context/EmbedMode";
 import { useModal } from "@/hooks";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -137,7 +136,6 @@ type LivestreamCardProps = {
 export const LivestreamCard: React.FC<LivestreamCardProps> = ({
   livestream,
 }) => {
-  const [isEmbedMode] = useContext(EmbedModeContext);
   const { isOpen, openModal, closeModal } = useModal();
   const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
     livestream;
@@ -215,7 +213,6 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
           livestream={livestream}
           open={isOpen}
           onClose={closeModal}
-          isDefaultEmbedMode={isEmbedMode}
         />
       </StyledCard>
     </CardBox>
