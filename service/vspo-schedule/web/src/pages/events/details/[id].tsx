@@ -12,10 +12,10 @@ import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { members } from "@/data/members";
 import { fetchVspoEvents } from "@/lib/api";
 import { TEMP_TIMESTAMP } from "@/lib/Const";
+
 type Props = {
   event: VspoEvent;
   lastUpdateDate: string;
-  id: string;
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -45,7 +45,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   return {
     props: {
       event: event,
-      id: params.id,
       lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
     },
   };
@@ -161,11 +160,7 @@ EventPage.getLayout = (page, pageProps) => {
     pageProps.event?.contentSummary ?? "This event could not be found.";
 
   return (
-    <ContentLayout
-      title={eventTitle}
-      description={eventContentSummary}
-      path={`/events/${pageProps.id}`}
-    >
+    <ContentLayout title={eventTitle} description={eventContentSummary}>
       {page}
       <CustomBottomNavigation />
     </ContentLayout>

@@ -96,7 +96,6 @@ AboutPage.getLayout = (page) => {
     <ContentLayout
       title="すぽじゅーるについて"
       description="すぽじゅーるについて概要をまとめています。"
-      path="/about"
     >
       {page}
       <CustomBottomNavigation />

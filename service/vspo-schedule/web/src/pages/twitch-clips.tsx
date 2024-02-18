@@ -96,7 +96,6 @@ TwitchClipPage.getLayout = (page, pageProps) => {
       title="ぶいすぽっ!クリップ一覧"
       description="ぶいすぽっ!メンバーのTwitchクリップをまとめています。"
       lastUpdateDate={pageProps.lastUpdateDate}
-      path="/twitch-clips"
     >
       {page}
       <CustomBottomNavigation />

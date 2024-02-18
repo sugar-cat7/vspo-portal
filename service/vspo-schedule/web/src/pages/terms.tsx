@@ -181,7 +181,6 @@ Terms.getLayout = (page) => {
     <ContentLayout
       title="利用規約"
       description="本サイトを使用する上での利用規約です。"
-      path="/terms"
     >
       {page}
     </ContentLayout>

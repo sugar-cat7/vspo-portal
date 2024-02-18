@@ -112,7 +112,6 @@ Notifications.getLayout = (page) => {
     <ContentLayout
       title="すぽじゅーるからのお知らせ"
       description="バグ改善や新機能追加に関してのお知らせを表示します。"
-      path="/notifications"
     >
       {page}
       <CustomBottomNavigation />
