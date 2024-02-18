@@ -216,7 +216,7 @@ export const Header: React.FC<Props> = ({ title }) => {
         >
           <MenuItem
             // onClick={handleSettingsClose}
-            style={{
+            sx={{
               display: "flex",
               justifyContent: "flex-start",
               alignItems: "center",
