@@ -12,13 +12,18 @@ import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { members } from "@/data/members";
 import { fetchVspoEvents } from "@/lib/api";
 import { TEMP_TIMESTAMP } from "@/lib/Const";
+
+type Params = {
+  id: string;
+};
+
 type Props = {
   event: VspoEvent;
   lastUpdateDate: string;
   id: string;
 };
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths<Params> = async () => {
   // Fetch events from API
   const fetchEvents: VspoEvent[] = await fetchVspoEvents();
   const paths = fetchEvents.map((event) => ({
@@ -29,12 +34,15 @@ export const getStaticPaths: GetStaticPaths = async () => {
   return { paths, fallback: true };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  if (!params || typeof params.id !== "string") {
+export const getStaticProps: GetStaticProps<Props, Params> = async ({
+  params,
+}) => {
+  if (!params) {
     return {
       notFound: true,
     };
   }
+
   const fetchEvents: VspoEvent[] = await fetchVspoEvents();
   const event = fetchEvents.find((event) => event.newsId === params.id);
   if (!event) {
@@ -42,6 +50,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       notFound: true,
     };
   }
+
   return {
     props: {
       event: event,

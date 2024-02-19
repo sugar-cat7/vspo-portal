@@ -25,11 +25,15 @@ import {
 import { VspoEvent } from "@/types/events";
 import Link from "next/link";
 
+type Params = {
+  status: string;
+};
+
 type LivestreamsProps = {
   livestreamsByDate: Record<string, Livestream[]>;
   eventsByDate: Record<string, VspoEvent[]>;
   lastUpdateDate: string;
-  liveStatus?: string | string[];
+  liveStatus: string;
   todayIndex: number;
   tabDates: string[];
 };
@@ -102,7 +106,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   );
 };
 
-export const getStaticPaths: GetStaticPaths = () => {
+export const getStaticPaths: GetStaticPaths<Params> = () => {
   const statusPaths = ["all", "live", "upcoming", "archive"].map((status) => ({
     params: { status },
   }));
@@ -120,9 +124,15 @@ export const getStaticPaths: GetStaticPaths = () => {
   return { paths: [...statusPaths, ...datePaths], fallback: false };
 };
 
-export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
+export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   params,
 }) => {
+  if (!params) {
+    return {
+      notFound: true,
+    };
+  }
+
   const freeChats = await fetchFreeChat();
   const freeChatIds = freeChats.map((f) => f.id);
   const pastLivestreams = await fetchVspoLivestreams({ limit: 300 });
@@ -134,7 +144,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
   );
 
   const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
-  const isDateStatus = isValidDate(params?.status as string);
+  const isDateStatus = isValidDate(params.status);
   const todayDate = new Date();
 
   const todayDateString = formatWithTimeZone(todayDate, "ja", "yyyy-MM-dd");
@@ -146,11 +156,11 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
       "yyyy-MM-dd",
     );
 
-    const isAll = params?.status === "all";
+    const isAll = params.status === "all";
     if (isAll) {
       return scheduledStartTimeString === todayDateString;
     } else if (isDateStatus) {
-      const targetDate = new Date(params?.status as string);
+      const targetDate = new Date(params.status);
       targetDate.setHours(0, 0, 0, 0);
       return (
         scheduledStartTimeString ===
@@ -162,12 +172,12 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
         scheduledStartTime >= oneWeekAgo &&
         scheduledStartTime <= oneWeekLater &&
         !freeChatVideoIds.includes(livestream.id) &&
-        params?.status === getLiveStatus(livestream)
+        params.status === getLiveStatus(livestream)
       );
     }
   });
 
-  if (filteredLivestreams.length === 0 && params?.status === "all") {
+  if (filteredLivestreams.length === 0 && params.status === "all") {
     filteredLivestreams = uniqueLivestreams.filter((livestream) => {
       const yesterdayDate = new Date();
       yesterdayDate.setDate(yesterdayDate.getDate() - 1);
@@ -228,7 +238,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
   });
   let todayIndex = tabDates.indexOf(today);
   if (isDateStatus) {
-    todayIndex = tabDates.indexOf(params?.status as string);
+    todayIndex = tabDates.indexOf(params.status);
   }
 
   return {
@@ -236,7 +246,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps> = async ({
       livestreamsByDate: livestreamsByDate,
       eventsByDate: fetchEventsByDate,
       lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
-      liveStatus: params?.status,
+      liveStatus: params.status,
       todayIndex: todayIndex >= 0 ? todayIndex : tabDates.length - 1,
       tabDates: tabDates,
     },
@@ -262,7 +272,6 @@ HomePage.getLayout = (page, pageProps) => {
       break;
     default:
       title = "配信スケジュール";
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       headTitle = `配信スケジュール/${pageProps.liveStatus}`;
       break;
   }
