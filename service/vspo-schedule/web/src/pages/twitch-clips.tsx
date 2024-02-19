@@ -44,7 +44,7 @@ const TwitchClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
       {isProcessing ? (
         <Loading />
       ) : filteredClips.length === 0 ? (
-        <Box mt={4} sx={{ padding: "50px" }}>
+        <Box mt={2} sx={{ padding: "0 50px 50px" }}>
           対象のクリップはありません。
         </Box>
       ) : (

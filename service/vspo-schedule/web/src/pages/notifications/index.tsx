@@ -24,7 +24,7 @@ const Notifications: NextPageWithLayout = () => {
     <Container
       maxWidth="lg"
       sx={{
-        marginTop: "80px",
+        marginTop: 2,
       }}
     >
       <Breadcrumb />

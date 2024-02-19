@@ -57,7 +57,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
 }) => {
   return (
     <Container>
-      <Box mt={4}>
+      <Box>
         <TabContext value={todayIndex.toString()}>
           {/* Date */}
           <TabBox>

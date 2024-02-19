@@ -21,7 +21,7 @@ const FreeChatPage: NextPageWithLayout<FreeChatsProps> = ({ freeChats }) => {
     <Box
       sx={{
         padding: "24px",
-        marginTop: "76px",
+        marginTop: 1,
         display: "flex",
         justifyContent: "center",
       }}

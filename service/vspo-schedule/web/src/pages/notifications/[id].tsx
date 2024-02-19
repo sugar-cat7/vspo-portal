@@ -14,7 +14,7 @@ type Props = {
 
 const NoticePage: NextPageWithLayout<Props> = ({ notice }) => {
   return (
-    <Container maxWidth="md" sx={{ marginTop: "80px" }}>
+    <Container maxWidth="md" sx={{ marginTop: 2 }}>
       <Breadcrumb />
       <Typography
         variant="h4"

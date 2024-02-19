@@ -1,4 +1,4 @@
-import { Typography, Button, Box, Link, Avatar } from "@mui/material";
+import { Typography, Button, Box, Link, Avatar, Toolbar } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
@@ -66,7 +66,7 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
     return null;
   }
   return (
-    <Box sx={{ paddingTop: "40px", margin: "40px", width: "80%" }}>
+    <Box sx={{ margin: "16px 40px 40px", width: "80%" }}>
       <Button
         startIcon={<ArrowBackIcon />}
         onClick={() => router.back()}

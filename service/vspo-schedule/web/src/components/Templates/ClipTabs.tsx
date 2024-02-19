@@ -34,7 +34,7 @@ export const ClipTabs: React.FC<Props> = ({ clips }) => {
   }, [value, clips]);
 
   return (
-    <Box sx={{ paddingTop: "80px" }}>
+    <Box sx={{ paddingTop: 2 }}>
       <Tabs value={value} onChange={handleChange} centered>
         <Tab label="新着👀" />
         <Tab label="人気✨" />

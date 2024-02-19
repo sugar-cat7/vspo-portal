@@ -8,7 +8,6 @@ import {
   Box,
   TextField,
   Button,
-  Toolbar,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Timeline from "@mui/lab/Timeline";
@@ -222,8 +221,6 @@ const IndexPage: NextPageWithLayout<Props> = ({
 
   return (
     <>
-      <Toolbar />
-
       <YearMonthSelector
         beforeYearMonth={beforeYearMonth}
         currentYearMonth={currentYearMonth}

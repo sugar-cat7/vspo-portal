@@ -78,7 +78,7 @@ const StyledAccordion = styled(Accordion)(({ theme }) => ({
 
 const AboutPage: NextPageWithLayout = () => {
   return (
-    <Box sx={{ paddingTop: "80px", margin: "20px" }}>
+    <Box sx={{ paddingTop: 2, margin: "20px" }}>
       {aboutSections.map((section, index) => (
         <StyledAccordion key={index}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>

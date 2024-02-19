@@ -112,15 +112,11 @@ export const LivestreamCards: React.FC<Props> = ({
         }
 
         return (
-          // <TabPanel
-          //   key={date}
-          //   value={index.toString()}
-          //   sx={{ padding: 0, fontFamily: "Roboto, sans-serif" }}
-          // >
           <Box
             key={date}
             sx={{
-              margin: "5rem 0",
+              marginTop: 6,
+              marginBottom: "5rem",
             }}
           >
             {events.length > 0 && (
@@ -233,12 +229,10 @@ export const LivestreamCards: React.FC<Props> = ({
                         </Grid>
                       ))}
                     </Grid>
-                    {/* )} */}
                   </Box>
                 ),
             )}
           </Box>
-          // </TabPanel>
         );
       })}
     </>
