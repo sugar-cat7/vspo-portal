@@ -9,7 +9,6 @@ import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
 import { members } from "@/data/members";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { fetchTwitchClips } from "@/lib/api";
 import { ENVIRONMENT } from "@/lib/Const";
 
@@ -99,7 +98,6 @@ TwitchClipPage.getLayout = (page, pageProps) => {
       path="/twitch-clips"
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

@@ -4,6 +4,7 @@ import { CustomHead } from "../Head/Head";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { GoogleAd } from "../Elements/Google/GoogleAd";
+import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 
 type ContentLayoutProps = {
   children: React.ReactNode;
@@ -35,6 +36,7 @@ export const ContentLayout = ({
       <main>{children}</main>
       <GoogleAd />
       <Footer lastUpdateDate={lastUpdateDate} description={footerMessage} />
+      <CustomBottomNavigation />
     </>
   );
 };

@@ -16,7 +16,6 @@ import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { NextPageWithLayout } from "../_app";
 import { LivestreamCards } from "@/components/Templates";
 import { freeChatVideoIds } from "@/data/master";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import {
   fetchFreeChat,
   fetchVspoEvents,
@@ -275,7 +274,6 @@ HomePage.getLayout = (page, pageProps) => {
       headTitle={headTitle}
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

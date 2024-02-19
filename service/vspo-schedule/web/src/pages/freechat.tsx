@@ -1,6 +1,5 @@
 import { LivestreamCard } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { formatWithTimeZone } from "@/lib/utils";
 import { Box } from "@mui/system";
 import { GetStaticProps } from "next";
@@ -68,7 +67,6 @@ FreeChatPage.getLayout = (page, pageProps) => {
       path="/freechat"
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

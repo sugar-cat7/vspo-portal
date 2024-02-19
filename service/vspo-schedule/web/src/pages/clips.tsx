@@ -7,7 +7,6 @@ import { NextPageWithLayout } from "./_app";
 import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { fetchVspoClips } from "@/lib/api";
 
 type ClipsProps = {
@@ -74,7 +73,6 @@ ClipPage.getLayout = (page, pageProps) => {
       path="/clips"
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

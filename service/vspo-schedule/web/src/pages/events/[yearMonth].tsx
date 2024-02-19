@@ -21,7 +21,6 @@ import { GetStaticPaths, GetStaticProps } from "next";
 import { NextPageWithLayout } from "../_app";
 import { VspoEvent } from "@/types/events";
 import { ContentLayout } from "@/components/Layout";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { useMediaQuery } from "@mui/material";
 import { members } from "@/data/members";
 import { formatWithTimeZone, groupEventsByYearMonth } from "@/lib/utils";
@@ -408,7 +407,6 @@ IndexPage.getLayout = (page, pageProps) => {
       path={`/events/${pageProps.currentYearMonth}`}
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

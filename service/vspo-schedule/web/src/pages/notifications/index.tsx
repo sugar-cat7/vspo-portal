@@ -17,7 +17,6 @@ import {
 import Link from "next/link";
 import { getColor } from "@/lib/utils";
 import { Breadcrumb } from "@/components/Elements";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 
 const Notifications: NextPageWithLayout = () => {
   return (
@@ -115,7 +114,6 @@ Notifications.getLayout = (page) => {
       path="/notifications"
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

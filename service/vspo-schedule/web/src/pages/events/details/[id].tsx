@@ -1,4 +1,4 @@
-import { Typography, Button, Box, Link, Avatar, Toolbar } from "@mui/material";
+import { Typography, Button, Box, Link, Avatar } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
@@ -8,7 +8,6 @@ import { TweetEmbed } from "@/components/Elements";
 import { formatWithTimeZone } from "@/lib/utils";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ContentLayout } from "@/components/Layout";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { members } from "@/data/members";
 import { fetchVspoEvents } from "@/lib/api";
 import { TEMP_TIMESTAMP } from "@/lib/Const";
@@ -167,7 +166,6 @@ EventPage.getLayout = (page, pageProps) => {
       path={`/events/${pageProps.id}`}
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

@@ -10,7 +10,6 @@ import {
 import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ContentLayout } from "@/components/Layout";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { NextPageWithLayout } from "./_app";
 import { aboutSections } from "@/data/master";
 import Link from "next/link";
@@ -99,7 +98,6 @@ AboutPage.getLayout = (page) => {
       path="/about"
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };
