@@ -4,7 +4,7 @@ import { ContentLayout } from "@/components/Layout";
 import { NextPageWithLayout } from "../_app";
 import { Container, Typography, Chip } from "@mui/material";
 import { Breadcrumb, TweetEmbed } from "@/components/Elements";
-import { notifications } from "@/data/notifications";
+import { notifications } from "@/data/content/notifications";
 import { getColor } from "@/lib/utils";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 

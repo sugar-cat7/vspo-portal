@@ -15,7 +15,7 @@ import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { NextPageWithLayout } from "../_app";
 import { LivestreamCards } from "@/components/Templates";
-import { freeChatVideoIds } from "@/data/master";
+import { freeChatVideoIds } from "@/data/freechat-video-ids";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import {
   fetchFreeChat,

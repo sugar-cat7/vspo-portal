@@ -12,7 +12,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ContentLayout } from "@/components/Layout";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { NextPageWithLayout } from "./_app";
-import { aboutSections } from "@/data/master";
+import { aboutSections } from "@/data/content/about-sections";
 import Link from "next/link";
 import Image from "next/image";
 import { ReactNode } from "react";

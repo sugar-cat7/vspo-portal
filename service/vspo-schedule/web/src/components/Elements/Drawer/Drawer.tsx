@@ -14,7 +14,10 @@ import React from "react";
 import Link from "next/link";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { getNavigationRouteInfo, NavigationRouteId } from "@/data/navigation";
+import {
+  getNavigationRouteInfo,
+  NavigationRouteId,
+} from "@/constants/navigation";
 import { DrawerIcon } from "../Icon";
 
 const drawerContents = [

@@ -1,16 +1,16 @@
 import axios from "axios";
 import { VspoEvent } from "@/types/events";
-import { mockEvents } from "@/data/events";
 import { Clip, Livestream } from "@/types/streaming";
-import { mockClips, mockTwitchClips } from "@/data/clips";
-import { mockLivestreams } from "@/data/livestreams";
+import { mockClips, mockTwitchClips } from "@/data/mocks/clips";
+import { mockEvents } from "@/data/mocks/events";
+import { mockFreeChats } from "@/data/mocks/freechats";
+import { mockLivestreams } from "@/data/mocks/livestreams";
 import {
   convertThumbnailQualityInObjects,
   getLiveStatus,
   shuffleClips,
 } from "./utils";
 import { API_ROOT, ENVIRONMENT } from "./Const";
-import { mockFreeChats } from "@/data/freechats";
 
 export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
   try {
