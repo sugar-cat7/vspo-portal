@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { Livestream } from "@/types/streaming";
@@ -55,49 +55,45 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   tabDates,
 }) => {
   return (
-    <Container>
-      <Box>
-        <TabContext value={todayIndex.toString()}>
-          {/* Date */}
-          <TabBox>
-            <Tabs
-              aria-label="配信日スケジュール"
-              textColor="primary"
-              indicatorColor="primary"
-              scrollButtons="auto"
-              value={todayIndex.toString()}
-              variant="scrollable"
-            >
-              {tabDates.map((date, i) => {
-                const d = new Date(date);
-                const label = formatWithTimeZone(d, "ja", "MM/dd (E)");
-                return (
-                  <Tab
-                    role="tab"
-                    aria-selected={todayIndex === i}
-                    label={label}
-                    value={i.toString()}
-                    key={date}
-                    sx={{
-                      fontFamily: "Roboto, sans-serif",
-                      textAlign: "center",
-                      fontWeight: "700",
-                    }}
-                    LinkComponent={Link}
-                    href={`/schedule/${date}`}
-                  />
-                );
-              })}
-            </Tabs>
-          </TabBox>
-          {/* Stream Content */}
-          <LivestreamCards
-            livestreamsByDate={livestreamsByDate}
-            eventsByDate={eventsByDate}
-          />
-        </TabContext>
-      </Box>
-    </Container>
+    <TabContext value={todayIndex.toString()}>
+      {/* Date */}
+      <TabBox>
+        <Tabs
+          aria-label="配信日スケジュール"
+          textColor="primary"
+          indicatorColor="primary"
+          scrollButtons="auto"
+          value={todayIndex.toString()}
+          variant="scrollable"
+        >
+          {tabDates.map((date, i) => {
+            const d = new Date(date);
+            const label = formatWithTimeZone(d, "ja", "MM/dd (E)");
+            return (
+              <Tab
+                role="tab"
+                aria-selected={todayIndex === i}
+                label={label}
+                value={i.toString()}
+                key={date}
+                sx={{
+                  fontFamily: "Roboto, sans-serif",
+                  textAlign: "center",
+                  fontWeight: "700",
+                }}
+                LinkComponent={Link}
+                href={`/schedule/${date}`}
+              />
+            );
+          })}
+        </Tabs>
+      </TabBox>
+      {/* Stream Content */}
+      <LivestreamCards
+        livestreamsByDate={livestreamsByDate}
+        eventsByDate={eventsByDate}
+      />
+    </TabContext>
   );
 };
 

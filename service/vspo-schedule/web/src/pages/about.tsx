@@ -6,8 +6,8 @@ import {
   Typography,
   Button,
   Box,
+  Stack,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ContentLayout } from "@/components/Layout";
 import { NextPageWithLayout } from "./_app";
@@ -71,22 +71,18 @@ const parseMarkdown = (text: string): JSX.Element[] => {
   });
 };
 
-const StyledAccordion = styled(Accordion)(({ theme }) => ({
-  margin: theme.spacing(2, 0),
-}));
-
 const AboutPage: NextPageWithLayout = () => {
   return (
-    <Box sx={{ paddingTop: 2, margin: "20px" }}>
+    <Stack direction="column" spacing={2}>
       {aboutSections.map((section, index) => (
-        <StyledAccordion key={index}>
+        <Accordion disableGutters key={index}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h5">{section.title}</Typography>
           </AccordionSummary>
           <AccordionDetails>{parseMarkdown(section.content)}</AccordionDetails>
-        </StyledAccordion>
+        </Accordion>
       ))}
-    </Box>
+    </Stack>
   );
 };
 
@@ -96,6 +92,8 @@ AboutPage.getLayout = (page) => {
       title="すぽじゅーるについて"
       description="すぽじゅーるについて概要をまとめています。"
       path="/about"
+      maxPageWidth="md"
+      padTop
     >
       {page}
     </ContentLayout>

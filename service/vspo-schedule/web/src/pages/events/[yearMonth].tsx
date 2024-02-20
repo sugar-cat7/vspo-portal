@@ -2,12 +2,11 @@ import {
   Typography,
   Card,
   CardContent,
-  Container,
-  Grid,
   Avatar,
   Box,
   TextField,
   Button,
+  Toolbar,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Timeline from "@mui/lab/Timeline";
@@ -71,16 +70,7 @@ const YearMonthSelector: React.FC<{
   currentYearMonth?: string;
   nextYearMonth?: string;
 }> = ({ beforeYearMonth, currentYearMonth, nextYearMonth }) => (
-  <Box
-    sx={(theme) => ({
-      ...theme.mixins.toolbar,
-      display: "flex",
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      color: theme.vars.palette.text.primary,
-    })}
-  >
+  <>
     <AdjacentYearMonthButton
       disabled={!beforeYearMonth}
       yearMonth={beforeYearMonth}
@@ -100,7 +90,7 @@ const YearMonthSelector: React.FC<{
     >
       次の月へ
     </AdjacentYearMonthButton>
-  </Box>
+  </>
 );
 
 export const getStaticPaths: GetStaticPaths = async () => {
@@ -220,181 +210,167 @@ const IndexPage: NextPageWithLayout<Props> = ({
 
   return (
     <>
-      <YearMonthSelector
-        beforeYearMonth={beforeYearMonth}
-        currentYearMonth={currentYearMonth}
-        nextYearMonth={nextYearMonth}
-      />
+      <Toolbar
+        disableGutters
+        sx={(theme) => ({
+          justifyContent: "center",
+          color: theme.vars.palette.text.primary,
+        })}
+      >
+        <YearMonthSelector
+          beforeYearMonth={beforeYearMonth}
+          currentYearMonth={currentYearMonth}
+          nextYearMonth={nextYearMonth}
+        />
+      </Toolbar>
 
-      <Container maxWidth="lg" sx={{ pt: 1 }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="検索"
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              sx={{ marginBottom: "20px" }}
-            />
-            <Timeline position="right" sx={{ padding: "0px" }}>
-              {Object.entries(eventsByDate).map(
-                ([date, eventsOnDate], index) => {
-                  const currentDate = new Date();
-                  currentDate.setHours(0, 0, 0, 0);
-                  const isFutureEvent = new Date(date) > currentDate;
+      <Box sx={{ pt: 1 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label="検索"
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          sx={{ marginBottom: "20px" }}
+        />
+        <Timeline position="right" sx={{ padding: "0px" }}>
+          {Object.entries(eventsByDate).map(([date, eventsOnDate], index) => {
+            const currentDate = new Date();
+            currentDate.setHours(0, 0, 0, 0);
+            const isFutureEvent = new Date(date) > currentDate;
 
-                  return (
-                    <TimelineItem key={index}>
-                      <TimelineOppositeContent
-                        sx={{
-                          maxWidth: matches ? "0px" : "140px",
-                          textAlign: matches ? "left" : "right",
-                          padding: matches ? "0px" : "20px",
-                        }}
-                      >
-                        <Typography
-                          color="textSecondary"
-                          variant="h6"
-                          sx={{
-                            marginLeft: matches ? "30px" : "0px",
-                            width: "100px",
-                          }}
-                        >
-                          {formatWithTimeZone(
-                            new Date(date),
-                            "ja",
-                            "MM/dd (E)",
-                          )}
-                        </Typography>
-                      </TimelineOppositeContent>
-                      <TimelineSeparator>
-                        <TimelineDot
-                          color={isFutureEvent ? "success" : "grey"}
-                        />
-                        {Object.entries(eventsByDate).length - 1 !== index && (
-                          <TimelineConnector />
-                        )}
-                      </TimelineSeparator>
-                      <TimelineContent
-                        sx={{ py: matches ? "40px" : "20px", px: 2 }}
-                      >
-                        {eventsOnDate.map((event, eventIndex) => {
-                          const eventDate = event.startedAt.split("T")[0]; // Get the date part of the ISO string
-                          const today = formatWithTimeZone(
-                            new Date(),
-                            "ja",
-                            "yyyy-MM-dd",
-                          );
+            return (
+              <TimelineItem key={index}>
+                <TimelineOppositeContent
+                  sx={{
+                    maxWidth: matches ? "0px" : "140px",
+                    textAlign: matches ? "left" : "right",
+                    padding: matches ? "0px" : "20px",
+                  }}
+                >
+                  <Typography
+                    color="textSecondary"
+                    variant="h6"
+                    sx={{
+                      marginLeft: matches ? "30px" : "0px",
+                      width: "100px",
+                    }}
+                  >
+                    {formatWithTimeZone(new Date(date), "ja", "MM/dd (E)")}
+                  </Typography>
+                </TimelineOppositeContent>
+                <TimelineSeparator>
+                  <TimelineDot color={isFutureEvent ? "success" : "grey"} />
+                  {Object.entries(eventsByDate).length - 1 !== index && (
+                    <TimelineConnector />
+                  )}
+                </TimelineSeparator>
+                <TimelineContent sx={{ py: matches ? "40px" : "20px", px: 2 }}>
+                  {eventsOnDate.map((event, eventIndex) => {
+                    const eventDate = event.startedAt.split("T")[0]; // Get the date part of the ISO string
+                    const today = formatWithTimeZone(
+                      new Date(),
+                      "ja",
+                      "yyyy-MM-dd",
+                    );
 
-                          const isEventToday = eventDate === today;
-                          return (
-                            <React.Fragment key={eventIndex}>
-                              {event.isNotLink ? (
-                                <Card
+                    const isEventToday = eventDate === today;
+                    return (
+                      <React.Fragment key={eventIndex}>
+                        {event.isNotLink ? (
+                          <Card
+                            sx={{
+                              marginBottom: "20px",
+                              border: isEventToday ? "2px solid red" : "none",
+                            }}
+                            ref={isEventToday ? todayEventRef : null}
+                          >
+                            <CardContent>
+                              <Typography
+                                variant="h6"
+                                component="div"
+                                align="left"
+                                sx={{
+                                  fontSize: matches ? "1.00rem" : "1.25rem",
+                                }}
+                              >
+                                {event.title}
+                              </Typography>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  gap: "10px",
+                                  marginTop: "10px",
+                                }}
+                              >
+                                {members.map(
+                                  (member, index) =>
+                                    event.contentSummary.includes(
+                                      member.name.replace(" ", ""),
+                                    ) && (
+                                      <StyledAvatar
+                                        key={index}
+                                        alt={member.name}
+                                        src={member.iconUrl}
+                                      />
+                                    ),
+                                )}
+                              </Box>
+                            </CardContent>
+                          </Card>
+                        ) : (
+                          <Link href={`/events/details/${event.newsId}`}>
+                            <Card
+                              sx={{
+                                marginBottom: "20px",
+                                border: isEventToday ? "2px solid red" : "none",
+                              }}
+                              ref={isEventToday ? todayEventRef : null}
+                            >
+                              <CardContent>
+                                <Typography
+                                  variant="h6"
+                                  component="div"
+                                  align="left"
                                   sx={{
-                                    marginBottom: "20px",
-                                    border: isEventToday
-                                      ? "2px solid red"
-                                      : "none",
+                                    fontSize: matches ? "1.00rem" : "1.25rem",
                                   }}
-                                  ref={isEventToday ? todayEventRef : null}
                                 >
-                                  <CardContent>
-                                    <Typography
-                                      variant="h6"
-                                      component="div"
-                                      align="left"
-                                      sx={{
-                                        fontSize: matches
-                                          ? "1.00rem"
-                                          : "1.25rem",
-                                      }}
-                                    >
-                                      {event.title}
-                                    </Typography>
-                                    <Box
-                                      sx={{
-                                        display: "flex",
-                                        gap: "10px",
-                                        marginTop: "10px",
-                                      }}
-                                    >
-                                      {members.map(
-                                        (member, index) =>
-                                          event.contentSummary.includes(
-                                            member.name.replace(" ", ""),
-                                          ) && (
-                                            <StyledAvatar
-                                              key={index}
-                                              alt={member.name}
-                                              src={member.iconUrl}
-                                            />
-                                          ),
-                                      )}
-                                    </Box>
-                                  </CardContent>
-                                </Card>
-                              ) : (
-                                <Link href={`/events/details/${event.newsId}`}>
-                                  <Card
-                                    sx={{
-                                      marginBottom: "20px",
-                                      border: isEventToday
-                                        ? "2px solid red"
-                                        : "none",
-                                    }}
-                                    ref={isEventToday ? todayEventRef : null}
-                                  >
-                                    <CardContent>
-                                      <Typography
-                                        variant="h6"
-                                        component="div"
-                                        align="left"
-                                        sx={{
-                                          fontSize: matches
-                                            ? "1.00rem"
-                                            : "1.25rem",
-                                        }}
-                                      >
-                                        {event.title}
-                                      </Typography>
-                                      <Box
-                                        sx={{
-                                          display: "flex",
-                                          gap: "10px",
-                                          marginTop: "10px",
-                                        }}
-                                      >
-                                        {members.map(
-                                          (member, index) =>
-                                            event.contentSummary.includes(
-                                              member.name.replace(" ", ""),
-                                            ) && (
-                                              <StyledAvatar
-                                                key={index}
-                                                alt={member.name}
-                                                src={member.iconUrl}
-                                              />
-                                            ),
-                                        )}
-                                      </Box>
-                                    </CardContent>
-                                  </Card>
-                                </Link>
-                              )}
-                            </React.Fragment>
-                          );
-                        })}
-                      </TimelineContent>
-                    </TimelineItem>
-                  );
-                },
-              )}
-            </Timeline>
-          </Grid>
-        </Grid>
-      </Container>
+                                  {event.title}
+                                </Typography>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    gap: "10px",
+                                    marginTop: "10px",
+                                  }}
+                                >
+                                  {members.map(
+                                    (member, index) =>
+                                      event.contentSummary.includes(
+                                        member.name.replace(" ", ""),
+                                      ) && (
+                                        <StyledAvatar
+                                          key={index}
+                                          alt={member.name}
+                                          src={member.iconUrl}
+                                        />
+                                      ),
+                                  )}
+                                </Box>
+                              </CardContent>
+                            </Card>
+                          </Link>
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </TimelineContent>
+              </TimelineItem>
+            );
+          })}
+        </Timeline>
+      </Box>
     </>
   );
 };
@@ -405,6 +381,7 @@ IndexPage.getLayout = (page, pageProps) => {
       description="ぶいすぽっ!が関係するイベントをまとめています。"
       lastUpdateDate={pageProps.lastUpdateDate}
       path={`/events/${pageProps.currentYearMonth}`}
+      maxPageWidth="md"
     >
       {page}
     </ContentLayout>

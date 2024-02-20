@@ -1,4 +1,4 @@
-import { Typography, Button, Box, Link, Avatar } from "@mui/material";
+import { Typography, Button, Box, Link, Avatar, Toolbar } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { useRouter } from "next/router";
@@ -65,89 +65,90 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
     return null;
   }
   return (
-    <Box sx={{ margin: "16px 40px 40px", width: "80%" }}>
-      <Button
-        startIcon={<ArrowBackIcon />}
-        onClick={() => router.back()}
-        sx={{ marginBottom: "10px" }}
-      >
-        Back
-      </Button>
-      <Typography variant="h4" sx={{ marginBottom: "10px" }}>
-        {event.title}
-      </Typography>
-      <Box
-        sx={{
-          display: "flex",
-          gap: "10px",
-          marginTop: "20px",
-          marginBottom: "20px",
-        }}
-      >
-        <Typography color="textSecondary">
-          {formatWithTimeZone(
-            new Date(event.startedAt.split("T")[0] || TEMP_TIMESTAMP),
-            "ja",
-            "MM/dd (E)",
-          )}
+    <>
+      <Toolbar disableGutters>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()}>
+          Back
+        </Button>
+      </Toolbar>
+
+      <Box>
+        <Typography variant="h4" sx={{ marginBottom: "10px" }}>
+          {event.title}
         </Typography>
-        {members.map(
-          (member, index) =>
-            event.contentSummary.includes(
-              (member.name || "").replace(" ", ""),
-            ) && (
-              <StyledAvatar
-                key={index}
-                alt={member.name}
-                src={member.iconUrl}
-              />
-            ),
-        )}
-      </Box>
-      <Typography variant="body1" sx={{ marginBottom: "20px" }}>
-        {event.contentSummary.split("\n").map((line, index) => {
-          return (
-            <Typography key={index} variant="body1">
-              {line}
-              <br />
-            </Typography>
-          );
-        })}
-      </Typography>
-      {event.tweetLinks.map((link, index) => (
         <Box
-          key={index}
           sx={{
             display: "flex",
-            justifyContent: "center",
+            gap: "10px",
+            marginTop: "20px",
             marginBottom: "20px",
           }}
         >
-          <TweetEmbed tweetLink={link} />
-        </Box>
-      ))}
-      {event.webPageLinks.length > 0 && (
-        <Box sx={{ marginBottom: "20px" }}>
-          <Typography variant="h6" sx={{ marginBottom: "10px" }}>
-            Web Links:
+          <Typography color="textSecondary">
+            {formatWithTimeZone(
+              new Date(event.startedAt.split("T")[0] || TEMP_TIMESTAMP),
+              "ja",
+              "MM/dd (E)",
+            )}
           </Typography>
-          {/* テキストを...にする */}
-          {event.webPageLinks.map((link, index) => (
-            <Link
-              key={index}
-              href={link}
-              sx={{
-                display: "block",
-                marginBottom: "10px",
-                wordBreak: "break-all",
-              }}
-            >
-              {link}
-            </Link>
-          ))}
+          {members.map(
+            (member, index) =>
+              event.contentSummary.includes(
+                (member.name || "").replace(" ", ""),
+              ) && (
+                <StyledAvatar
+                  key={index}
+                  alt={member.name}
+                  src={member.iconUrl}
+                />
+              ),
+          )}
         </Box>
-      )}
-    </Box>
+        <Box sx={{ marginBottom: "20px" }}>
+          {event.contentSummary.split("\n").map((line, index) => {
+            return (
+              <Typography key={index} variant="body1">
+                {line}
+                <br />
+              </Typography>
+            );
+          })}
+        </Box>
+        {event.tweetLinks.map((link, index) => (
+          <Box
+            key={index}
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              marginBottom: "20px",
+            }}
+          >
+            <TweetEmbed tweetLink={link} />
+          </Box>
+        ))}
+        {event.webPageLinks.length > 0 && (
+          <Box sx={{ marginBottom: "20px" }}>
+            <Typography variant="h6" sx={{ marginBottom: "10px" }}>
+              Web Links:
+            </Typography>
+            {/* テキストを...にする */}
+            {event.webPageLinks.map((link, index) => (
+              <Link
+                key={index}
+                href={link}
+                sx={{
+                  display: "block",
+                  marginBottom: "10px",
+                  wordBreak: "break-all",
+                }}
+              >
+                {link}
+              </Link>
+            ))}
+          </Box>
+        )}
+      </Box>
+    </>
   );
 };
 
@@ -164,6 +165,7 @@ EventPage.getLayout = (page, pageProps) => {
       title={eventTitle}
       description={eventContentSummary}
       path={`/events/${pageProps.id}`}
+      maxPageWidth="md"
     >
       {page}
     </ContentLayout>

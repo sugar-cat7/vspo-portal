@@ -1,7 +1,6 @@
 import { LivestreamCard } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { formatWithTimeZone } from "@/lib/utils";
-import { Box } from "@mui/system";
 import { GetStaticProps } from "next";
 import React from "react";
 import { NextPageWithLayout } from "./_app";
@@ -17,22 +16,13 @@ type FreeChatsProps = {
 
 const FreeChatPage: NextPageWithLayout<FreeChatsProps> = ({ freeChats }) => {
   return (
-    <Box
-      sx={{
-        padding: "24px",
-        marginTop: 1,
-        display: "flex",
-        justifyContent: "center",
-      }}
-    >
-      <Grid container spacing={3} sx={{ maxWidth: "1152px" }}>
-        {freeChats.map((freeChat) => (
-          <Grid item xs={6} sm={6} md={3} lg={3} key={freeChat.id}>
-            <LivestreamCard livestream={freeChat} />
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+    <Grid container spacing={3}>
+      {freeChats.map((freeChat) => (
+        <Grid item xs={6} md={3} key={freeChat.id}>
+          <LivestreamCard livestream={freeChat} />
+        </Grid>
+      ))}
+    </Grid>
   );
 };
 
@@ -65,6 +55,8 @@ FreeChatPage.getLayout = (page, pageProps) => {
       description="ぶいすぽっ!メンバーのフリーチャットを確認できます。"
       lastUpdateDate={pageProps.lastUpdateDate}
       path="/freechat"
+      maxPageWidth="lg"
+      padTop
     >
       {page}
     </ContentLayout>
