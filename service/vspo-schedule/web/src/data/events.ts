@@ -1,6 +1,6 @@
 import { VspoEvent } from "@/types/events";
 
-export const events: VspoEvent[] = [
+export const mockEvents: VspoEvent[] = [
   {
     startedAt: "2023-05-12T00:00:00Z",
     title: "「ぶいすぽっ！」3Dお披露目第1弾配信",

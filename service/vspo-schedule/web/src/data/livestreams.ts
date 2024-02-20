@@ -34,7 +34,7 @@ const getRandomTimeSlot = (date: Date) => {
   return newDate.toISOString();
 };
 
-export const mockLiveStreams: Livestream[] = [
+export const mockLivestreams: Livestream[] = [
   {
     id: "4erE1DlBuvc",
     title: "【APEX】打倒【ぶいすぽ/一ノ瀬うるは】",

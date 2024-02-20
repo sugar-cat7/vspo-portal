@@ -1,9 +1,9 @@
 import axios from "axios";
 import { VspoEvent } from "@/types/events";
-import { events } from "@/data/events";
+import { mockEvents } from "@/data/events";
 import { Clip, Livestream } from "@/types/streaming";
 import { mockClips, mockTwitchClips } from "@/data/clips";
-import { mockLiveStreams } from "@/data/livestreams";
+import { mockLivestreams } from "@/data/livestreams";
 import {
   convertThumbnailQualityInObjects,
   getLiveStatus,
@@ -35,7 +35,7 @@ export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
 
       return events;
     } else {
-      return events;
+      return mockEvents;
     }
   } catch (error) {
     console.error("Failed to fetch eventss:", error);
@@ -63,7 +63,7 @@ export const fetchVspoLivestreams = async ({
       );
       return convertThumbnailQualityInObjects(response.data);
     } else {
-      return convertThumbnailQualityInObjects(mockLiveStreams);
+      return convertThumbnailQualityInObjects(mockLivestreams);
     }
   } catch (error) {
     console.error("Failed to fetch livestream:", error);
