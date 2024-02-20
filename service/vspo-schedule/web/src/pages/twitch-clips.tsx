@@ -78,7 +78,7 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
       }
     });
   } else {
-    pastClips = mockTwitchClips as Clip[];
+    pastClips = mockTwitchClips;
   }
 
   return {

@@ -106,7 +106,6 @@ export const aboutSections = [
     「動画やサムネイル情報」が必要な方は、必ずサービス提供元 (YouTube,Twitch,Twitterなど)の「API」を使用して取得していただくようお願い致します。
     詳細はサービス提供元の利用規約をご一読してください。`,
   },
-
   {
     title: "便利機能について",
     content: `① ダークモード切替
