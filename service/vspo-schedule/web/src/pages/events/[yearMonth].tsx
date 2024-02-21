@@ -40,7 +40,7 @@ type Props = {
   lastUpdateDate: string;
   nextYearMonth?: string;
   beforeYearMonth?: string;
-  currentYearMonth: string;
+  currentYearMonth?: string;
   latestYearMonth?: string;
 };
 
@@ -74,7 +74,7 @@ const AdjacentYearMonthButton: React.FC<{
 
 const YearMonthSelector: React.FC<{
   beforeYearMonth?: string;
-  currentYearMonth: string;
+  currentYearMonth?: string;
   nextYearMonth?: string;
 }> = ({ beforeYearMonth, currentYearMonth, nextYearMonth }) => (
   <Box
@@ -98,7 +98,7 @@ const YearMonthSelector: React.FC<{
       component="div"
       style={{ width: "160px", textAlign: "center" }}
     >
-      {currentYearMonth.replace("-", "年") + "月"}
+      {currentYearMonth && currentYearMonth.replace("-", "年") + "月"}
     </Typography>
     <AdjacentYearMonthButton
       disabled={!nextYearMonth}
