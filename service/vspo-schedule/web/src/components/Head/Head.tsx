@@ -1,16 +1,16 @@
 import Head from "next/head";
-import { useRouter } from "next/router";
 
 type CustomHeadProps = {
   title?: string;
   description?: string;
+  path?: string;
 };
 
 export const CustomHead = ({
   title = "",
   description = "",
+  path = "",
 }: CustomHeadProps = {}) => {
-  const router = useRouter();
   const pageTitle = title
     ? `すぽじゅーる | ${title}`
     : "すぽじゅーる - ぶいすぽ";
@@ -23,7 +23,7 @@ export const CustomHead = ({
       <meta property="og:description" content={description} />
       <meta
         property="og:url"
-        content={`https://www.vspo-schedule.com${router.asPath}`}
+        content={`https://www.vspo-schedule.com${path}`}
       />
       <meta property="twitter:title" content={pageTitle} />
       <meta property="twitter:description" content={description} />

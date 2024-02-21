@@ -71,6 +71,7 @@ ClipPage.getLayout = (page, pageProps) => {
       title="ぶいすぽっ!切り抜き一覧"
       description="ぶいすぽっ!メンバーの切り抜き動画をまとめています。"
       lastUpdateDate={pageProps.lastUpdateDate}
+      path="/clips"
     >
       {page}
       <CustomBottomNavigation />

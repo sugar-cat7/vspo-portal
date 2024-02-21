@@ -65,6 +65,7 @@ FreeChatPage.getLayout = (page, pageProps) => {
       title="ぶいすぽっ!フリーチャット"
       description="ぶいすぽっ!メンバーのフリーチャットを確認できます。"
       lastUpdateDate={pageProps.lastUpdateDate}
+      path="/freechat"
     >
       {page}
       <CustomBottomNavigation />

@@ -52,6 +52,7 @@ NoticePage.getLayout = (page, pageProps) => {
     <ContentLayout
       title="すぽじゅーるからのお知らせ"
       description={pageProps.notice.content}
+      path={`/notifications/${pageProps.notice.id}`}
     >
       {page}
       <CustomBottomNavigation />

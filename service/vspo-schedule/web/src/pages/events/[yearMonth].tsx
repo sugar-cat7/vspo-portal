@@ -408,6 +408,7 @@ IndexPage.getLayout = (page, pageProps) => {
       title="ぶいすぽっ!イベント一覧"
       description="ぶいすぽっ!が関係するイベントをまとめています。"
       lastUpdateDate={pageProps.lastUpdateDate}
+      path={`/events/${pageProps.currentYearMonth}`}
     >
       {page}
       <CustomBottomNavigation />

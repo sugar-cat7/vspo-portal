@@ -106,6 +106,7 @@ PrivacyPolicy.getLayout = (page) => {
     <ContentLayout
       title="プライバシーポリシー"
       description="本サイトを使用する上でのプライバシーポリシーです。"
+      path="/privacy-policy"
     >
       {page}
     </ContentLayout>
