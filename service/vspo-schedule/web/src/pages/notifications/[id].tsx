@@ -8,6 +8,10 @@ import { notifications } from "@/data/notifications";
 import { getColor } from "@/lib/utils";
 import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 
+type Params = {
+  id: string;
+};
+
 type Props = {
   notice: Notice;
 };
@@ -60,9 +64,20 @@ NoticePage.getLayout = (page, pageProps) => {
   );
 };
 
-export const getStaticProps: GetStaticProps = ({ params }) => {
-  const id = params?.id;
+export const getStaticProps: GetStaticProps<Props, Params> = ({ params }) => {
+  if (!params) {
+    return {
+      notFound: true,
+    };
+  }
+
+  const id = params.id;
   const notice = notifications.find((notice) => notice.id === Number(id));
+  if (!notice) {
+    return {
+      notFound: true,
+    };
+  }
 
   return {
     props: {
@@ -71,7 +86,7 @@ export const getStaticProps: GetStaticProps = ({ params }) => {
   };
 };
 
-export const getStaticPaths: GetStaticPaths = () => {
+export const getStaticPaths: GetStaticPaths<Params> = () => {
   const paths = notifications.map((notice) => ({
     params: { id: notice.id.toString() },
   }));
