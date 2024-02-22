@@ -14,24 +14,27 @@ import {
   BottomNavigation,
 } from "@mui/material";
 import { styled, useColorScheme } from "@mui/material/styles";
-import { Clip, Livestream, Platform } from "@/types/streaming";
+import { Livestream, PlatformWithChat, Video } from "@/types/streaming";
 import {
   formatWithTimeZone,
-  getLivestreamUrl,
+  getChatEmbedUrl,
   getLiveStatus,
+  getVideoEmbedUrl,
+  getVideoIconUrl,
+  getVideoUrl,
+  isLivestream,
+  isOnPlatformWithChat,
 } from "@/lib/utils";
 import { Loading, PlatformIcon } from "..";
 import CloseIcon from "@mui/icons-material/Close";
-import { members } from "@/data/members";
 import ShareIcon from "@mui/icons-material/Share";
 import { RelatedVideos } from "@/components/Templates";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-type LivestreamDetailsModalProps = {
-  livestream?: Livestream;
-  clip?: Clip;
+type VideoModalProps = {
+  video: Video;
   open: boolean;
   onClose: () => void;
 };
@@ -109,41 +112,14 @@ const ResponsiveChatIframe = styled("iframe")({
   border: "0",
 });
 
-const VideoPlayerOrLinkComponent: React.FC<{
-  url: string;
-  livestream?: Livestream;
-  clip?: Clip;
-}> = ({ url, livestream, clip }) => {
-  if (!livestream && !clip) return <></>;
-  let embedUrl;
-  if (livestream) {
-    if (livestream.platform === "youtube") {
-      embedUrl = url.replace("watch?v=", "embed/");
-    } else if (livestream.platform === "twitch") {
-      const tid = !livestream.twitchPastVideoId
-        ? `channel=${livestream.twitchName}`
-        : `video=${livestream.twitchPastVideoId}`;
-      embedUrl = `https://player.twitch.tv/?${tid}&parent=${document.location.hostname}&autoplay=false`;
-    } else if (livestream.platform === "twitcasting") {
-      // Assuming livestream.id is the Twitcasting live id
-      embedUrl = url;
-    } else if (livestream.platform === "nicovideo") {
-      // Assuming livestream.id is the NicoNico live id
-      embedUrl = `https://live.nicovideo.jp/embed/${livestream.id}/`;
-    }
-  } else if (clip) {
-    if (clip.platform === "youtube") {
-      embedUrl = url.replace("watch?v=", "embed/");
-    } else if (clip.platform === "twitch") {
-      embedUrl = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${document.location.hostname}&autoplay=false`;
-    }
-  }
+const VideoPlayerComponent: React.FC<{ video: Video }> = ({ video }) => {
+  const embedUrl = getVideoEmbedUrl(video);
   return (
     <ResponsiveIframeWrapper>
       <ResponsiveIframe
         key={embedUrl}
         src={embedUrl}
-        title={`${livestream?.platform || clip?.platform} video player`}
+        title={`${video.platform} video player`}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture"
         loading="lazy"
       />
@@ -151,36 +127,16 @@ const VideoPlayerOrLinkComponent: React.FC<{
   );
 };
 
-const VideoPlayerOrLink = React.memo(VideoPlayerOrLinkComponent);
-
-const getTwitchChatEmbedUrl = (livestream: Livestream, isDarkMode: boolean) => {
-  const chatEmbedUrl = `https://www.twitch.tv/embed/${livestream.twitchName!}/chat?parent=${
-    window.location.hostname
-  }`;
-  return isDarkMode ? `${chatEmbedUrl}&darkpopout` : chatEmbedUrl;
-};
-
-const getYouTubeChatEmbedUrl = (
-  livestream: Livestream,
-  isDarkMode: boolean,
-) => {
-  const chatEmbedUrl = `https://www.youtube.com/live_chat?v=${livestream.id}&embed_domain=${window.location.hostname}`;
-  return isDarkMode ? `${chatEmbedUrl}&dark_theme=1` : chatEmbedUrl;
-};
+const VideoPlayer = React.memo(VideoPlayerComponent);
 
 const ChatEmbed: React.FC<{
-  livestream: Livestream & {
-    platform: Extract<Livestream["platform"], "twitch" | "youtube">;
-  };
+  livestream: Livestream & { platform: PlatformWithChat };
 }> = ({ livestream }) => {
   const { colorScheme } = useColorScheme();
   const [isLoading, setIsLoading] = React.useState(true);
 
   const isDarkMode = colorScheme === "dark";
-  const chatEmbedUrl =
-    livestream.platform === "twitch"
-      ? getTwitchChatEmbedUrl(livestream, isDarkMode)
-      : getYouTubeChatEmbedUrl(livestream, isDarkMode);
+  const chatEmbedUrl = getChatEmbedUrl(livestream, isDarkMode);
 
   return (
     <>
@@ -198,45 +154,12 @@ const ChatEmbed: React.FC<{
   );
 };
 
-export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
-  livestream,
-  clip,
+export const VideoModal: React.FC<VideoModalProps> = ({
+  video,
   open,
   onClose,
 }) => {
   const router = useRouter();
-  const url =
-    livestream?.isTemp && livestream.tempUrl
-      ? livestream.tempUrl
-      : livestream
-        ? getLivestreamUrl({
-            videoId: livestream.id,
-            platform: livestream.platform,
-            externalLink: livestream.link,
-            memberName: livestream.channelTitle,
-            twitchUsername: livestream.twitchName,
-            actualEndTime: livestream.actualEndTime,
-            twitchPastVideoId: livestream.twitchPastVideoId,
-          })
-        : getLivestreamUrl({
-            videoId: clip?.id || "",
-            platform: clip?.platform || "youtube",
-            isClip: true,
-            externalLink: clip?.link,
-          });
-
-  const videoInfo = livestream || clip;
-  if (!videoInfo) {
-    return null;
-  }
-
-  const iconUrl = livestream
-    ? livestream.iconUrl
-    : clip?.platform === "twitch"
-      ? members.filter((m) => m.twitchChannelId === clip.channelId).at(0)
-          ?.iconUrl
-      : clip?.iconUrl;
-
   return (
     <Dialog open={open} onClose={onClose} fullScreen>
       <StyledDialogTitle>
@@ -269,16 +192,16 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
           display: "grid",
           grid: {
             // 2 rows, 1 col
-            // InfoTabs fills vertical space left below VideoPlayerOrLink
+            // InfoTabs fills vertical space left below VideoPlayer
             xs: "auto minmax(0, 1fr) / 1fr",
             // 1 row, 2 cols
-            // VideoPlayerOrLink spans 2/3 dialog width, InfoTabs spans 1/3
+            // VideoPlayer spans 2/3 dialog width, InfoTabs spans 1/3
             md: "minmax(0, 1fr) / 2fr 1fr",
           },
         }}
       >
-        <VideoPlayerOrLink url={url} livestream={livestream} clip={clip} />
-        <InfoTabs videoInfo={videoInfo} iconUrl={iconUrl} url={url} />
+        <VideoPlayer video={video} />
+        <InfoTabs video={video} />
       </StyledDialogContent>
       <Box
         sx={{
@@ -328,7 +251,7 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
             paddingRight: "8px",
           }}
         >
-          {videoInfo.title}
+          {video.title}
         </Typography>
       </BottomNavigation>
     </Dialog>
@@ -374,35 +297,23 @@ const a11yProps = (index: number) => {
   };
 };
 
-const isLivestream = (video: Livestream | Clip): video is Livestream => {
-  return "actualEndTime" in video;
-};
-
-const isOnPlatformWithChat = <T extends { platform: Platform }>(
-  video: T,
-): video is T & { platform: Extract<Platform, "twitch" | "youtube"> } => {
-  return video.platform === "twitch" || video.platform === "youtube";
-};
-
-const InfoTabs: React.FC<{
-  videoInfo: Livestream | Clip;
-  iconUrl?: string;
-  url?: string;
-}> = ({ videoInfo, iconUrl, url }) => {
+const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
   const formattedStartTime = formatWithTimeZone(
-    videoInfo.scheduledStartTime || videoInfo.createdAt || "",
+    video.scheduledStartTime || video.createdAt || "",
     "ja",
     "MM/dd HH:mm~",
   );
   const showChatTab =
-    isLivestream(videoInfo) &&
-    isOnPlatformWithChat(videoInfo) &&
-    getLiveStatus(videoInfo) === "live";
+    isLivestream(video) &&
+    isOnPlatformWithChat(video) &&
+    getLiveStatus(video) === "live";
+  const url = getVideoUrl(video);
+  const iconUrl = getVideoIconUrl(video);
   const urlRegex = /(https?:\/\/\S+)/;
 
   return (
@@ -423,7 +334,7 @@ const InfoTabs: React.FC<{
       <TabPanel value={value} index={0}>
         <Box>
           <TypographySmallOnMobile variant="h5">
-            {videoInfo.title}
+            {video.title}
           </TypographySmallOnMobile>
           <Box
             display="flex"
@@ -433,12 +344,10 @@ const InfoTabs: React.FC<{
             <TypographySmallOnMobile sx={{ marginRight: "10px" }}>
               {formattedStartTime}
             </TypographySmallOnMobile>
-            {isLivestream(videoInfo) && (
+            {isLivestream(video) && (
               <>
-                {getLiveStatus(videoInfo) === "live" && (
-                  <LiveLabel>Live</LiveLabel>
-                )}
-                {getLiveStatus(videoInfo) === "upcoming" && (
+                {getLiveStatus(video) === "live" && <LiveLabel>Live</LiveLabel>}
+                {getLiveStatus(video) === "upcoming" && (
                   <LiveLabel isUpcoming>配信予定</LiveLabel>
                 )}
               </>
@@ -449,7 +358,7 @@ const InfoTabs: React.FC<{
           <Box display="flex" alignItems="center" mt={2} mb={2}>
             <Avatar src={iconUrl} />
             <TypographySmallOnMobile variant="h6" style={{ marginLeft: 8 }}>
-              {videoInfo.channelTitle}
+              {video.channelTitle}
             </TypographySmallOnMobile>
           </Box>
           <Box
@@ -464,7 +373,7 @@ const InfoTabs: React.FC<{
                 <Button
                   variant="outlined"
                   color="primary"
-                  startIcon={<PlatformIcon platform={videoInfo.platform} />}
+                  startIcon={<PlatformIcon platform={video.platform} />}
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -483,8 +392,8 @@ const InfoTabs: React.FC<{
                   if (navigator.share) {
                     try {
                       await navigator.share({
-                        title: videoInfo.title, // ここにビデオのタイトルを設定します
-                        text: videoInfo.title, // ここに共有するテキストを設定します
+                        title: video.title, // ここにビデオのタイトルを設定します
+                        text: video.title, // ここに共有するテキストを設定します
                         url: url, // ここにビデオのURLを設定します
                       });
                     } catch (error) {
@@ -503,7 +412,7 @@ const InfoTabs: React.FC<{
           </Box>
         </Box>
         <TypographySmallOnMobileDescription variant="body1">
-          {videoInfo.description.split(urlRegex).map((text, index) => {
+          {video.description.split(urlRegex).map((text, index) => {
             if (index % 2 === 0) {
               return <React.Fragment key={index}>{text}</React.Fragment>;
             }
@@ -521,11 +430,11 @@ const InfoTabs: React.FC<{
         </TypographySmallOnMobileDescription>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <RelatedVideos channelId={videoInfo.channelId} videoId={videoInfo.id} />
+        <RelatedVideos channelId={video.channelId} videoId={video.id} />
       </TabPanel>
       {showChatTab && (
         <TabPanel value={value} index={2}>
-          <ChatEmbed livestream={videoInfo} />
+          <ChatEmbed livestream={video} />
         </TabPanel>
       )}
     </Box>

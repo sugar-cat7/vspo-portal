@@ -1,1 +1,1 @@
-export * from "./LivestreamDetailsModal";
+export * from "./VideoModal";

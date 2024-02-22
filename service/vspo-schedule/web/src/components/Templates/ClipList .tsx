@@ -20,8 +20,8 @@ import { useModal } from "@/hooks";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 
-const LivestreamDetailsModal = dynamic(
-  () => import("../Elements/Modal").then((mod) => mod.LivestreamDetailsModal),
+const VideoModal = dynamic(
+  () => import("../Elements/Modal").then((mod) => mod.VideoModal),
   { ssr: false },
 );
 
@@ -238,9 +238,9 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
         />
       </Box>
       {clickedClip && (
-        <LivestreamDetailsModal
+        <VideoModal
           key={clickedClip.id}
-          clip={clickedClip}
+          video={clickedClip}
           open={isOpen}
           onClose={() => {
             setClickedClip(null);

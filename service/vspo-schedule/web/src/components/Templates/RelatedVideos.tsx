@@ -119,8 +119,8 @@ const getRelatedVideos = (
   return relatedVideosArray;
 };
 
-const LivestreamDetailsModal = dynamic(
-  () => import("../Elements/Modal").then((mod) => mod.LivestreamDetailsModal),
+const VideoModal = dynamic(
+  () => import("../Elements/Modal").then((mod) => mod.VideoModal),
   { ssr: false },
 );
 
@@ -247,17 +247,17 @@ export const RelatedVideos: React.FC<{
         もっと見る
       </Button>
       {selectedLivestream && (
-        <LivestreamDetailsModal
+        <VideoModal
           key={selectedLivestream.id}
-          livestream={selectedLivestream}
+          video={selectedLivestream}
           open={isOpen}
           onClose={closeModal}
         />
       )}
       {selectedClip && (
-        <LivestreamDetailsModal
+        <VideoModal
           key={selectedClip.id}
-          clip={selectedClip}
+          video={selectedClip}
           open={isOpen}
           onClose={closeModal}
         />
