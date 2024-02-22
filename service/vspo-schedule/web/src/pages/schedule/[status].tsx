@@ -282,7 +282,6 @@ HomePage.getLayout = (page, pageProps) => {
       lastUpdateDate={pageProps.lastUpdateDate}
       footerMessage="※メン限の配信は掲載しておりません。"
       headTitle={headTitle}
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       path={`/schedule/${pageProps.liveStatus}`}
     >
       {page}
