@@ -60,7 +60,7 @@ NoticePage.getLayout = (page, pageProps) => {
     <ContentLayout
       title="すぽじゅーるからのお知らせ"
       description={pageProps.notice.content}
-      path={`/notification/${pageProps.notice.id}`}
+      path={`/notifications/${pageProps.notice.id}`}
       maxPageWidth="md"
     >
       {page}

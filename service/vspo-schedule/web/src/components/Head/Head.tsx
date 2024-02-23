@@ -23,7 +23,7 @@ export const CustomHead = ({
       <meta property="og:description" content={description} />
       <meta
         property="og:url"
-        content={`https://www.vspo-schedule.com/${path}`}
+        content={`https://www.vspo-schedule.com${path}`}
       />
       <meta property="twitter:title" content={pageTitle} />
       <meta property="twitter:description" content={description} />

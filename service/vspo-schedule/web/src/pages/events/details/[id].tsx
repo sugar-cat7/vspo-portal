@@ -173,7 +173,7 @@ EventPage.getLayout = (page, pageProps) => {
     <ContentLayout
       title={eventTitle}
       description={eventContentSummary}
-      path={`/events/${pageProps.id}`}
+      path={`/events/details/${pageProps.id}`}
       maxPageWidth="md"
     >
       {page}
