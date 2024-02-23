@@ -27,7 +27,7 @@ export const ContentLayout = ({
   return (
     <>
       <CustomHead
-        title={headTitle ? headTitle : `${title}`}
+        title={headTitle || title}
         description={description}
         path={path}
       />
