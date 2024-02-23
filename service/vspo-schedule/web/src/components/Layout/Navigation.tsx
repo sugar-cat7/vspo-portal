@@ -4,7 +4,10 @@ import { Box } from "@mui/system";
 import { DrawerIcon } from "../Elements";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { getNavigationRouteInfo, NavigationRouteId } from "@/data/navigation";
+import {
+  getNavigationRouteInfo,
+  NavigationRouteId,
+} from "@/constants/navigation";
 
 const bottomNavigationContents = [
   { id: "list", name: "配信一覧" },

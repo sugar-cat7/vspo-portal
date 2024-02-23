@@ -1,4 +1,3 @@
-import { platforms, sampleKeywords, timeframes } from "@/data/master";
 import { members } from "@/data/members";
 import {
   Dialog,
@@ -18,8 +17,11 @@ import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
-import { filterLivestreams, applyFilters } from "@/lib/utils";
-import { Livestream, Clip } from "@/types/streaming";
+import { applyFilters, filterLivestreams } from "@/lib/utils";
+import { Clip, Livestream } from "@/types/streaming";
+import { Timeframe } from "@/types/timeframe";
+import { platforms } from "@/constants/platforms";
+import { timeframes } from "@/constants/timeframes";
 import { PlatformIcon } from "../Icon";
 
 type Props = {
@@ -32,6 +34,14 @@ type Props = {
   searchTarget: "livestream" | "clip";
   setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
+const sampleSearchKeywords = [
+  "おれあぽ",
+  "ニチアサ",
+  "Apex",
+  "Valorant",
+  "雑談",
+];
 
 const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
@@ -73,9 +83,8 @@ export const SearchDialog: React.FC<Props> = ({
   const [searchEndDate, setSearchEndDate] = React.useState<string | null>(null);
   const [searchMemberIds, setSearchMemberIds] = React.useState<number[]>([]);
   const [searchPlatforms, setSearchPlatforms] = React.useState<string[]>([]);
-  const [searchClipTimeframe, setSearchClipTimeframe] = React.useState<
-    string | null
-  >(null);
+  const [searchClipTimeframe, setSearchClipTimeframe] =
+    React.useState<Timeframe | null>(null);
   const [searchKeyword, setSearchKeyword] = React.useState<string>("");
   const handleClickOpen = () => {
     setIsDialogOpen(true);
@@ -170,7 +179,9 @@ export const SearchDialog: React.FC<Props> = ({
                 select
                 label="期間"
                 value={searchClipTimeframe || "1week"}
-                onChange={(e) => setSearchClipTimeframe(e.target.value)}
+                onChange={(e) =>
+                  setSearchClipTimeframe(e.target.value as Timeframe)
+                }
                 sx={{ margin: "1rem 0", width: "100px" }}
               >
                 {timeframes.map((timeframe) => (
@@ -234,7 +245,7 @@ export const SearchDialog: React.FC<Props> = ({
             <Autocomplete
               freeSolo
               id="keyword-autocomplete"
-              options={sampleKeywords}
+              options={sampleSearchKeywords}
               inputValue={searchKeyword}
               onInputChange={(event, newInputValue) => {
                 setSearchKeyword(newInputValue);

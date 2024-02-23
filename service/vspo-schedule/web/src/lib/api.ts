@@ -1,16 +1,16 @@
 import axios from "axios";
 import { VspoEvent } from "@/types/events";
-import { events } from "@/data/events";
 import { Clip, Livestream } from "@/types/streaming";
-import { mockClips, mockTwitchClips } from "@/data/clips";
-import { mockLiveStreams } from "@/data/livestreams";
+import { mockClips, mockTwitchClips } from "@/data/mocks/clips";
+import { mockEvents } from "@/data/mocks/events";
+import { mockFreeChats } from "@/data/mocks/freechats";
+import { mockLivestreams } from "@/data/mocks/livestreams";
 import {
   convertThumbnailQualityInObjects,
   getLiveStatus,
   shuffleClips,
 } from "./utils";
 import { API_ROOT, ENVIRONMENT } from "./Const";
-import { mockFreeChats } from "@/data/freechats";
 
 export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
   try {
@@ -35,7 +35,7 @@ export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
 
       return events;
     } else {
-      return events as VspoEvent[];
+      return mockEvents;
     }
   } catch (error) {
     console.error("Failed to fetch eventss:", error);
@@ -63,7 +63,7 @@ export const fetchVspoLivestreams = async ({
       );
       return convertThumbnailQualityInObjects(response.data);
     } else {
-      return convertThumbnailQualityInObjects(mockLiveStreams) as Livestream[];
+      return convertThumbnailQualityInObjects(mockLivestreams);
     }
   } catch (error) {
     console.error("Failed to fetch livestream:", error);
@@ -84,7 +84,7 @@ export const fetchVspoClips = async (): Promise<Clip[]> => {
       );
       return convertThumbnailQualityInObjects(response.data.pastClips);
     } else {
-      return mockClips as Clip[];
+      return mockClips;
     }
   } catch (error) {
     console.error("Failed to fetch eventss:", error);
@@ -105,7 +105,7 @@ export const fetchFreeChat = async (): Promise<Livestream[]> => {
       );
       return convertThumbnailQualityInObjects(response.data);
     } else {
-      return convertThumbnailQualityInObjects(mockFreeChats) as Livestream[];
+      return convertThumbnailQualityInObjects(mockFreeChats);
     }
   } catch (error) {
     console.error("Failed to fetch freechat:", error);
@@ -126,7 +126,7 @@ export const fetchTwitchClips = async (channelId: string): Promise<Clip[]> => {
       });
       return response.data;
     } else {
-      return convertThumbnailQualityInObjects(mockTwitchClips) as Clip[];
+      return convertThumbnailQualityInObjects(mockTwitchClips);
     }
   } catch (error) {
     console.error(`Failed to fetch clips for channel ID ${channelId}:`, error);

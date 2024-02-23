@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { GetStaticProps } from "next";
 import { Clip } from "@/types/streaming";
 import { filterByTimeframe, formatWithTimeZone } from "@/lib/utils";
-import { mockTwitchClips } from "@/data/clips";
+import { mockTwitchClips } from "@/data/mocks/clips";
 import { Box } from "@mui/system";
 import { NextPageWithLayout } from "./_app";
 import { Loading, SearchDialog } from "@/components/Elements";
@@ -77,7 +77,7 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
       }
     });
   } else {
-    pastClips = mockTwitchClips as Clip[];
+    pastClips = mockTwitchClips;
   }
 
   return {

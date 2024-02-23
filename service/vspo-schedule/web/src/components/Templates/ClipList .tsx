@@ -93,14 +93,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
           const clipLabel = getClipLabel(clip);
           return (
             <Grid item xs={12} sm={6} md={4} key={clip.id}>
-              <Box
-                height="100%"
-                display="flex"
-                sx={{
-                  position: "relative",
-                  ...(clipLabel ? { border: "3px solid red" } : {}),
-                }}
-              >
+              <Box sx={{ position: "relative" }}>
                 {clipLabel && (
                   <Chip
                     label={clipLabel.label}
@@ -128,6 +121,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
                     flexDirection: "column",
                     width: "100%",
                     position: "relative",
+                    ...(clipLabel ? { border: "3px solid red" } : {}),
                   }}
                 >
                   <CardActionArea onClick={() => openModal(clip)}>

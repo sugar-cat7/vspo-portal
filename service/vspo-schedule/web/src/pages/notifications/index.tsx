@@ -1,4 +1,4 @@
-import { notifications } from "@/data/notifications";
+import { notifications } from "@/data/content/notifications";
 import { NextPageWithLayout } from "../_app";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { Notice } from "@/types/notice";

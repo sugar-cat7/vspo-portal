@@ -81,10 +81,13 @@ const TypographySmallOnMobileDescription = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const ResponsiveIframeWrapper = styled("div")({
+const ResponsiveIframeWrapper = styled("div")(({ theme }) => ({
   overflow: "hidden",
-  aspectRatio: "16/9",
-});
+
+  [theme.breakpoints.down("md")]: {
+    aspectRatio: "16/9",
+  },
+}));
 
 const ResponsiveChatIframeWrapper = styled("div")({
   overflow: "hidden",

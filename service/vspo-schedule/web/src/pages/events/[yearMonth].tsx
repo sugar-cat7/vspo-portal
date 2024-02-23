@@ -28,12 +28,16 @@ import { fetchVspoEvents } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
+type Params = {
+  yearMonth: string;
+};
+
 type Props = {
   events: VspoEvent[];
   lastUpdateDate: string;
   nextYearMonth?: string;
   beforeYearMonth?: string;
-  currentYearMonth: string;
+  currentYearMonth?: string;
   latestYearMonth?: string;
 };
 
@@ -93,7 +97,7 @@ const YearMonthSelector: React.FC<{
   </>
 );
 
-export const getStaticPaths: GetStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths<Params> = async () => {
   try {
     const fetchEvents: VspoEvent[] = await fetchVspoEvents();
     const eventsByMonth = groupEventsByYearMonth(fetchEvents);
@@ -109,14 +113,22 @@ export const getStaticPaths: GetStaticPaths = async () => {
   }
 };
 
-export const getStaticProps: GetStaticProps<Props> = async (context) => {
+export const getStaticProps: GetStaticProps<Props, Params> = async ({
+  params,
+}) => {
+  if (!params) {
+    return {
+      notFound: true,
+    };
+  }
+
   try {
     const fetchEvents: VspoEvent[] = await fetchVspoEvents();
     const eventsByMonth = groupEventsByYearMonth(fetchEvents);
 
-    const yearMonth = context.params?.yearMonth;
+    const yearMonth = params.yearMonth;
 
-    if (typeof yearMonth !== "string" || !eventsByMonth[yearMonth]) {
+    if (!eventsByMonth[yearMonth]) {
       return {
         notFound: true,
       };
