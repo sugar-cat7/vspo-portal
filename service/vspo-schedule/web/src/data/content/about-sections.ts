@@ -1,43 +1,3 @@
-export const platforms = [
-  { id: "youtube", name: "YouTube" },
-  { id: "twitch", name: "Twitch" },
-  { id: "twitcasting", name: "ツイキャス" },
-  { id: "nicovideo", name: "ニコニコ動画" },
-];
-
-export const timeframes = [
-  { label: "1日", value: "1day" },
-  { label: "1週間", value: "1week" },
-  { label: "1ヶ月", value: "1month" },
-  // { label: "3ヶ月", value: "all" },
-];
-
-export const sampleKeywords = [
-  "おれあぽ",
-  "ニチアサ",
-  "Apex",
-  "Valorant",
-  "雑談",
-];
-
-export const freeChatVideoIds = [
-  "tFFq_vUblrs",
-  "Rfuu2gkj18w",
-  "bx1-cTN0Zas",
-  "HC8rMmTWBGk",
-  "lSvLABLEhO0",
-  "CIRvsQ7XMoM",
-  "RasCgfRnTOc",
-  "l4_7qk5VE50",
-  "7-rmkxy7SSg",
-  "uZduRVQgZgo",
-  "JkuHbeoqu64",
-  "Fs4QLxzm-Fc",
-  "pT6aeI5S1Kk",
-  "sKJ5moF3X8Y",
-  "7-rmkxy7SSg",
-];
-
 export const aboutSections = [
   {
     title: "本サイトの概要",
@@ -106,7 +66,6 @@ export const aboutSections = [
     「動画やサムネイル情報」が必要な方は、必ずサービス提供元 (YouTube,Twitch,Twitterなど)の「API」を使用して取得していただくようお願い致します。
     詳細はサービス提供元の利用規約をご一読してください。`,
   },
-
   {
     title: "便利機能について",
     content: `① ダークモード切替

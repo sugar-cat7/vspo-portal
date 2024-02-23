@@ -1,3 +1,5 @@
+import { Clip, Platform } from "@/types/streaming";
+
 const today = new Date();
 const tomorrow = new Date(today);
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -7,7 +9,8 @@ const yesterday = new Date(today);
 yesterday.setDate(yesterday.getDate() - 1);
 const dayBeforeYesterday = new Date(today);
 dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
-export const mockClips = [
+
+export const mockClips: Clip[] = [
   {
     id: "ioHOvR9y6lA",
     title:
@@ -537,9 +540,9 @@ export const mockClips = [
     commentCount: "6",
     createdAt: "2023-03-20T09:00:00.000Z",
   },
-];
+].map((clip) => ({ ...clip, platform: clip.platform as Platform }));
 
-export const mockTwitchClips = [
+export const mockTwitchClips: Clip[] = [
   {
     id: "IronicCourageousTaroKappaPride-HmDjtJ4ScfKRXrk_",
     title: "あしゅみのボイスを聞くひなーの",
@@ -1607,4 +1610,4 @@ export const mockTwitchClips = [
     createdAt: "2023-04-23T05:51:57.000Z",
     link: "https://clips.twitch.tv/InquisitiveDullWitchOSkomodo--2P_Ka5ysPSXyj3S",
   },
-];
+].map((clip) => ({ ...clip, platform: clip.platform as Platform }));

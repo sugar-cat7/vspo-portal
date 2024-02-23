@@ -1,3 +1,5 @@
+import { Livestream, Platform } from "@/types/streaming";
+
 const today = new Date();
 const tomorrow = new Date(today);
 tomorrow.setDate(tomorrow.getDate() + 1);
@@ -8,7 +10,7 @@ yesterday.setDate(yesterday.getDate() - 1);
 const dayBeforeYesterday = new Date(today);
 dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
 
-const getRandomTimeSlot = (date) => {
+const getRandomTimeSlot = (date: Date) => {
   const timeSlot = Math.floor(Math.random() * 4);
   const newDate = new Date(date);
 
@@ -32,7 +34,7 @@ const getRandomTimeSlot = (date) => {
   return newDate.toISOString();
 };
 
-export const mockLiveStreams = [
+export const mockLivestreams: Livestream[] = [
   {
     id: "4erE1DlBuvc",
     title: "【APEX】打倒【ぶいすぽ/一ノ瀬うるは】",
@@ -294,4 +296,4 @@ export const mockLiveStreams = [
       "https://yt3.googleusercontent.com/ytc/AL5GRJXuaEZn-og4JbkC4QJvCtmhWfPrJlOUBYQMl1RA=s176-c-k-c0x00ffffff-no-rj",
     platform: "youtube",
   },
-];
+].map((stream) => ({ ...stream, platform: stream.platform as Platform }));

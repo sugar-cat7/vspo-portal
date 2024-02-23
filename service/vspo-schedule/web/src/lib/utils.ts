@@ -1,11 +1,12 @@
+import { freeChatVideoIds } from "@/data/freechat-video-ids";
 import { members } from "@/data/members";
+import { VspoEvent } from "@/types/events";
 import { Clip, LiveStatus, Livestream, Platform } from "@/types/streaming";
+import { Timeframe } from "@/types/timeframe";
 import { format, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
 import { Locale } from "date-fns";
 import { TEMP_TIMESTAMP } from "./Const";
-import { freeChatVideoIds } from "@/data/master";
-import { VspoEvent } from "@/types/events";
 
 /**
  * Group an array of items by a specified key.
@@ -430,7 +431,7 @@ export const shuffleClips = (clips: Clip[]): Clip[] => {
 
 export const filterByTimeframe = (
   clips: Clip[],
-  timeframe: string | null,
+  timeframe: Timeframe | null,
 ): Clip[] => {
   if (!timeframe) return clips;
 
@@ -448,7 +449,6 @@ export const filterByTimeframe = (
         return daysDifference < 7;
       case "1month":
         return daysDifference < 30;
-      case "all":
       default:
         return true;
     }
@@ -489,7 +489,7 @@ const filterByKeyword = (clips: Clip[], keyword: string): Clip[] => {
 
 export const applyFilters = (
   clips: Clip[],
-  searchClipTimeframe: string | null,
+  searchClipTimeframe: Timeframe | null,
   searchMemberIds: number[],
   searchKeyword: string,
 ): Clip[] => {
