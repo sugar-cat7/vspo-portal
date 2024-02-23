@@ -103,7 +103,7 @@ PrivacyPolicy.getLayout = (page) => {
       title="プライバシーポリシー"
       description="本サイトを使用する上でのプライバシーポリシーです。"
       path="/privacy-policy"
-      maxPageWidth="md"
+      maxPageWidth="lg"
       padTop
     >
       {page}
