@@ -15,6 +15,7 @@ type ContentLayoutProps = {
   lastUpdateDate?: string;
   description?: string;
   path?: string;
+  canonicalPath?: string;
   footerMessage?: string;
   headTitle?: string;
   maxPageWidth?: Breakpoint;
@@ -41,6 +42,7 @@ export const ContentLayout = ({
   lastUpdateDate,
   description,
   path,
+  canonicalPath,
   footerMessage,
   headTitle,
   maxPageWidth,
@@ -52,6 +54,7 @@ export const ContentLayout = ({
         title={headTitle || title}
         description={description}
         path={path}
+        canonicalPath={canonicalPath}
       />
       <Header title={title} />
       <StyledContainer component="main" maxWidth={maxPageWidth} padTop={padTop}>
