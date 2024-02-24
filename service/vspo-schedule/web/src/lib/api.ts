@@ -11,6 +11,7 @@ import {
   shuffleClips,
 } from "./utils";
 import { API_ROOT, ENVIRONMENT } from "./Const";
+import { members } from "@/data/members";
 
 export const fetchEvents = async (): Promise<VspoEvent[]> => {
   try {
@@ -113,23 +114,46 @@ export const fetchClips = async (): Promise<Clip[]> => {
   }
 };
 
-export const fetchTwitchClips = async (channelId: string): Promise<Clip[]> => {
+export const fetchTwitchClips = async (): Promise<Clip[]> => {
   try {
     if (ENVIRONMENT === "production") {
-      const response = await axios.get<Clip[]>(`${API_ROOT}/api/clips/twitch`, {
-        params: {
-          channelId,
-        },
-        headers: {
-          "x-api-key": process.env.API_KEY,
-        },
+      const memberClipsPromises = members.map((member) => {
+        return member.twitchChannelId
+          ? fetchMemberTwitchClips(member.twitchChannelId)
+          : Promise.resolve([]);
       });
-      return response.data;
+      const settledResults = await Promise.allSettled(memberClipsPromises);
+      return settledResults
+        .filter(
+          (result): result is PromiseFulfilledResult<Clip[]> =>
+            result.status === "fulfilled" && Array.isArray(result.value),
+        )
+        .flatMap((fulfilledResult) => fulfilledResult.value);
     } else {
-      return convertThumbnailQualityInObjects(mockTwitchClips);
+      return mockTwitchClips;
     }
   } catch (error) {
-    console.error(`Failed to fetch clips for channel ID ${channelId}:`, error);
+    console.error("Failed to fetch Twitch clips:", error);
+    throw error;
+  }
+};
+
+const fetchMemberTwitchClips = async (channelId: string): Promise<Clip[]> => {
+  try {
+    const response = await axios.get<Clip[]>(`${API_ROOT}/api/clips/twitch`, {
+      params: {
+        channelId,
+      },
+      headers: {
+        "x-api-key": process.env.API_KEY,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Failed to fetch Twitch clips for channel ID ${channelId}:`,
+      error,
+    );
     throw error;
   }
 };
