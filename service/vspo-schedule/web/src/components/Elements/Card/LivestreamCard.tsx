@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
-import { Livestream } from "@/types/streaming";
+import { LiveStatus, Livestream } from "@/types/streaming";
 import { getLiveStatus, formatWithTimeZone } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
 import { useModal } from "@/hooks";
@@ -16,8 +16,9 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 
 type StyledCardProps = {
-  livestatus: string;
+  liveStatus: LiveStatus | "freechat";
 };
+
 const LiveLabel = styled("div")<{ isUpcoming?: boolean }>(
   ({ theme, isUpcoming }) => ({
     width: "78px",
@@ -62,14 +63,16 @@ const ResponsiveTypography = styled(Typography)(({ theme }) => ({
   },
 }));
 
-const StyledCard = styled(Card)<StyledCardProps>(({ theme, livestatus }) => ({
+const StyledCard = styled(Card, {
+  shouldForwardProp: (prop) => prop !== "liveStatus",
+})<StyledCardProps>(({ theme, liveStatus }) => ({
   display: "flex",
   flexDirection: "column",
   height: "100%",
   border:
-    livestatus === "live"
+    liveStatus === "live"
       ? "3px solid red"
-      : livestatus === "upcoming"
+      : liveStatus === "upcoming"
         ? "3px solid rgb(45, 75, 112)"
         : "none",
   backgroundColor: "white",
@@ -149,7 +152,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
       {livestreamStatus === "upcoming" && (
         <LiveLabel isUpcoming>配信予定</LiveLabel>
       )}
-      <StyledCard livestatus={livestreamStatus}>
+      <StyledCard liveStatus={livestreamStatus}>
         <CardActionArea onClick={openModal}>
           <StyledCardMedia position="relative">
             <Image
@@ -177,7 +180,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
                 alignItems: "center",
               }}
             >
-              {!(livestreamStatus === "freechat") && (
+              {livestreamStatus !== "freechat" && (
                 <ResponsiveTypography
                   variant="subtitle1"
                   color="text.secondary"

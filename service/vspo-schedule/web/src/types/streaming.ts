@@ -1,8 +1,4 @@
-export enum LiveStatus {
-  Archive = "archive",
-  Live = "live",
-  Upcoming = "upcoming",
-}
+export type LiveStatus = "archive" | "live" | "upcoming";
 
 export enum Platform {
   YouTube = "youtube",

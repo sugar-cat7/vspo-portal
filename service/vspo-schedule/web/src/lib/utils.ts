@@ -356,15 +356,15 @@ export const getLiveStatus = (
   const isWithinTwelveHours: boolean =
     timeDifference <= twelveHoursInMilliseconds;
   if (new Date(livestream.scheduledStartTime) > new Date()) {
-    return LiveStatus.Upcoming;
+    return "upcoming";
   } else if (
     livestream.actualEndTime &&
     livestream.actualEndTime.includes("1998-01-01") &&
     isWithinTwelveHours
   ) {
-    return LiveStatus.Live;
+    return "live";
   } else {
-    return LiveStatus.Archive;
+    return "archive";
   }
 };
 
