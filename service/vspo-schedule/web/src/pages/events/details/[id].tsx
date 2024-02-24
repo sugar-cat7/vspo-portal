@@ -9,7 +9,7 @@ import { formatWithTimeZone } from "@/lib/utils";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ContentLayout } from "@/components/Layout";
 import { members } from "@/data/members";
-import { fetchVspoEvents } from "@/lib/api";
+import { fetchEvents } from "@/lib/api";
 import { TEMP_TIMESTAMP } from "@/lib/Const";
 
 type Params = {
@@ -24,8 +24,8 @@ type Props = {
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
   // Fetch events from API
-  const fetchEvents: VspoEvent[] = await fetchVspoEvents();
-  const paths = fetchEvents.map((event) => ({
+  const fetchedEvents = await fetchEvents();
+  const paths = fetchedEvents.map((event) => ({
     params: { id: event.newsId },
   }));
 
@@ -42,8 +42,8 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     };
   }
 
-  const fetchEvents: VspoEvent[] = await fetchVspoEvents();
-  const event = fetchEvents.find((event) => event.newsId === params.id);
+  const fetchedEvents = await fetchEvents();
+  const event = fetchedEvents.find((event) => event.newsId === params.id);
   if (!event) {
     return {
       notFound: true,

@@ -16,11 +16,7 @@ import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { NextPageWithLayout } from "../_app";
 import { LivestreamCards } from "@/components/Templates";
 import { freeChatVideoIds } from "@/data/freechat-video-ids";
-import {
-  fetchFreeChat,
-  fetchVspoEvents,
-  fetchVspoLivestreams,
-} from "@/lib/api";
+import { fetchFreeChat, fetchEvents, fetchVspoLivestreams } from "@/lib/api";
 import { VspoEvent } from "@/types/events";
 import Link from "next/link";
 
@@ -132,7 +128,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   const freeChatIds = freeChats.map((f) => f.id);
   const pastLivestreams = await fetchVspoLivestreams({ limit: 300 });
 
-  const fetchEvents = await fetchVspoEvents();
+  const events = await fetchEvents();
 
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
     (l) => !freeChatIds.includes(l.id),
@@ -209,7 +205,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     }
   });
 
-  const fetchEventsByDate = groupBy(fetchEvents, (event) => {
+  const eventsByDate = groupBy(events, (event) => {
     try {
       return formatWithTimeZone(event.startedAt, "ja", "yyyy-MM-dd");
     } catch (err) {
@@ -239,7 +235,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   return {
     props: {
       livestreamsByDate: livestreamsByDate,
-      eventsByDate: fetchEventsByDate,
+      eventsByDate: eventsByDate,
       lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
       liveStatus: params.status,
       todayIndex: todayIndex >= 0 ? todayIndex : tabDates.length - 1,

@@ -24,7 +24,7 @@ import { useMediaQuery } from "@mui/material";
 import { members } from "@/data/members";
 import { formatWithTimeZone, groupEventsByYearMonth } from "@/lib/utils";
 import React, { useEffect } from "react";
-import { fetchVspoEvents } from "@/lib/api";
+import { fetchEvents } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -98,8 +98,8 @@ const YearMonthSelector: React.FC<{
 );
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
-  const fetchEvents: VspoEvent[] = await fetchVspoEvents();
-  const eventsByMonth = groupEventsByYearMonth(fetchEvents);
+  const fetchedEvents = await fetchEvents();
+  const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
 
   const paths = Object.keys(eventsByMonth).map((yearMonth) => ({
     params: { yearMonth },
@@ -117,8 +117,8 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     };
   }
 
-  const fetchEvents: VspoEvent[] = await fetchVspoEvents();
-  const eventsByMonth = groupEventsByYearMonth(fetchEvents);
+  const fetchedEvents = await fetchEvents();
+  const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
 
   const yearMonth = params.yearMonth;
 

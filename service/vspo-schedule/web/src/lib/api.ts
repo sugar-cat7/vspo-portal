@@ -12,7 +12,7 @@ import {
 } from "./utils";
 import { API_ROOT, ENVIRONMENT } from "./Const";
 
-export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
+export const fetchEvents = async (): Promise<VspoEvent[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<VspoEvent[]>(
@@ -38,7 +38,7 @@ export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
       return mockEvents;
     }
   } catch (error) {
-    console.error("Failed to fetch eventss:", error);
+    console.error("Failed to fetch events:", error);
     throw error;
   }
 };
