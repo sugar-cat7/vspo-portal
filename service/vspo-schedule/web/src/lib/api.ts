@@ -92,7 +92,7 @@ export const fetchFreeChats = async (): Promise<Livestream[]> => {
   }
 };
 
-export const fetchVspoClips = async (): Promise<Clip[]> => {
+export const fetchClips = async (): Promise<Clip[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<{ pastClips: Clip[] }>(
@@ -108,7 +108,7 @@ export const fetchVspoClips = async (): Promise<Clip[]> => {
       return mockClips;
     }
   } catch (error) {
-    console.error("Failed to fetch eventss:", error);
+    console.error("Failed to fetch YouTube clips:", error);
     throw error;
   }
 };
@@ -148,7 +148,7 @@ export const fetchVspoRelatedVideo = async (
     (livestream) => getLiveStatus(livestream) === "live",
   );
 
-  const pastClips = await fetchVspoClips();
+  const pastClips = await fetchClips();
   const shuffledClips = shuffleClips(pastClips);
   return {
     liveStreams: liveStreams.slice((page - 1) * limit, page * limit),

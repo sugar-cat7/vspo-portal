@@ -7,7 +7,7 @@ import { NextPageWithLayout } from "./_app";
 import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
-import { fetchVspoClips } from "@/lib/api";
+import { fetchClips } from "@/lib/api";
 
 type ClipsProps = {
   clips: Clip[];
@@ -53,7 +53,7 @@ const ClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
 };
 
 export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
-  const pastClips = await fetchVspoClips();
+  const pastClips = await fetchClips();
 
   return {
     props: {
