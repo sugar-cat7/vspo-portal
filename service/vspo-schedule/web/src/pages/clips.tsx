@@ -7,7 +7,6 @@ import { NextPageWithLayout } from "./_app";
 import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { fetchVspoClips } from "@/lib/api";
 
 type ClipsProps = {
@@ -37,7 +36,7 @@ const ClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
       {isProcessing ? (
         <Loading />
       ) : filteredClips.length === 0 ? (
-        <Box mt={4} sx={{ padding: "50px" }}>
+        <Box mt={2} sx={{ padding: "0 50px 50px" }}>
           対象の切り抜きはありません。
         </Box>
       ) : (
@@ -74,7 +73,6 @@ ClipPage.getLayout = (page, pageProps) => {
       path="/clips"
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  Container,
   Grid,
   Card,
   CardActionArea,
@@ -81,7 +80,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
   );
 
   return (
-    <Container maxWidth="lg" sx={{ paddingTop: "50px" }}>
+    <>
       <Grid container spacing={3}>
         {paginatedClips.map((clip) => {
           const iconUrl =
@@ -249,6 +248,6 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
           }}
         />
       )}
-    </Container>
+    </>
   );
 };

@@ -1,13 +1,22 @@
-// components/ClipTabs.tsx
 import React, { useEffect, useState } from "react";
-import { Tabs, Tab, Box } from "@mui/material";
+import { Tabs, Tab } from "@mui/material";
 import { Clip, Platform } from "@/types/streaming";
 import { ClipList } from "./ClipList ";
 import { isTrending, shuffleClips, sortClipsByPopularity } from "@/lib/utils";
+import { styled } from "@mui/material/styles";
 
 type Props = {
   clips: Clip[];
 };
+
+const StyledTabs = styled(Tabs)(({ theme }) => ({
+  marginTop: theme.spacing(2),
+  marginBottom: theme.spacing(6),
+
+  [theme.breakpoints.down("sm")]: {
+    marginTop: theme.spacing(3),
+  },
+}));
 
 export const ClipTabs: React.FC<Props> = ({ clips }) => {
   const [value, setValue] = useState(
@@ -34,16 +43,14 @@ export const ClipTabs: React.FC<Props> = ({ clips }) => {
   }, [value, clips]);
 
   return (
-    <Box sx={{ paddingTop: "80px" }}>
-      <Tabs value={value} onChange={handleChange} centered>
+    <>
+      <StyledTabs value={value} onChange={handleChange} centered>
         <Tab label="新着👀" />
         <Tab label="人気✨" />
         <Tab label="おすすめ💡" />
         <Tab label="急上昇🔥" />
-      </Tabs>
-      <Box>
-        <ClipList clips={sortedClips} />
-      </Box>
-    </Box>
+      </StyledTabs>
+      <ClipList clips={sortedClips} />
+    </>
   );
 };

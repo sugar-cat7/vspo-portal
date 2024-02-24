@@ -73,6 +73,8 @@ const SocialIconLink: React.FC<{
   );
 };
 
+const AppBarOffset = styled("div")(({ theme }) => theme.mixins.toolbar);
+
 type Props = {
   title: string;
 };
@@ -167,6 +169,8 @@ export const Header: React.FC<Props> = ({ title }) => {
           </div>
         </Toolbar>
       </StyledAppBar>
+
+      <AppBarOffset />
 
       <SwipeableDrawer
         anchor="left"

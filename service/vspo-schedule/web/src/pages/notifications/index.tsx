@@ -12,22 +12,19 @@ import {
   TableBody,
   Chip,
   Box,
-  Container,
+  Toolbar,
 } from "@mui/material";
 import Link from "next/link";
 import { getColor } from "@/lib/utils";
 import { Breadcrumb } from "@/components/Elements";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 
 const Notifications: NextPageWithLayout = () => {
   return (
-    <Container
-      maxWidth="lg"
-      sx={{
-        marginTop: "80px",
-      }}
-    >
-      <Breadcrumb />
+    <>
+      <Toolbar disableGutters variant="dense" sx={{ alignItems: "end" }}>
+        <Breadcrumb />
+      </Toolbar>
+
       <TableContainer
         component={Paper}
         sx={{
@@ -103,7 +100,7 @@ const Notifications: NextPageWithLayout = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+    </>
   );
 };
 
@@ -113,9 +110,9 @@ Notifications.getLayout = (page) => {
       title="すぽじゅーるからのお知らせ"
       description="バグ改善や新機能追加に関してのお知らせを表示します。"
       path="/notifications"
+      maxPageWidth="md"
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

@@ -9,7 +9,6 @@ import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
 import { members } from "@/data/members";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import { fetchTwitchClips } from "@/lib/api";
 import { ENVIRONMENT } from "@/lib/Const";
 
@@ -44,7 +43,7 @@ const TwitchClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
       {isProcessing ? (
         <Loading />
       ) : filteredClips.length === 0 ? (
-        <Box mt={4} sx={{ padding: "50px" }}>
+        <Box mt={2} sx={{ padding: "0 50px 50px" }}>
           対象のクリップはありません。
         </Box>
       ) : (
@@ -99,7 +98,6 @@ TwitchClipPage.getLayout = (page, pageProps) => {
       path="/twitch-clips"
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

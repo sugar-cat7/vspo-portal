@@ -2,11 +2,10 @@ import { GetStaticProps, GetStaticPaths } from "next";
 import { Notice } from "@/types/notice";
 import { ContentLayout } from "@/components/Layout";
 import { NextPageWithLayout } from "../_app";
-import { Container, Typography, Chip } from "@mui/material";
+import { Typography, Chip, Box, Toolbar } from "@mui/material";
 import { Breadcrumb, TweetEmbed } from "@/components/Elements";
 import { notifications } from "@/data/content/notifications";
 import { getColor } from "@/lib/utils";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 
 type Params = {
   id: string;
@@ -18,36 +17,41 @@ type Props = {
 
 const NoticePage: NextPageWithLayout<Props> = ({ notice }) => {
   return (
-    <Container maxWidth="md" sx={{ marginTop: "80px" }}>
-      <Breadcrumb />
-      <Typography
-        variant="h4"
-        component="h1"
-        gutterBottom
-        sx={{ marginTop: "10px" }}
-      >
-        {notice.title}
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom>
-        更新日: {notice.updated}
-      </Typography>
-      <Typography variant="subtitle1" gutterBottom>
-        Tags:
-        {notice.tags.map((tag) => (
-          <Chip
-            key={tag}
-            label={tag}
-            variant="outlined"
-            color={getColor(tag)}
-            sx={{ m: 0.5 }}
-          />
-        ))}
-      </Typography>
-      <Typography variant="body1" paragraph>
-        {notice.content}
-      </Typography>
-      {notice.tweetLink && <TweetEmbed tweetLink={notice.tweetLink} />}
-    </Container>
+    <>
+      <Toolbar disableGutters variant="dense" sx={{ alignItems: "end" }}>
+        <Breadcrumb />
+      </Toolbar>
+
+      <Box>
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          sx={{ marginTop: "10px" }}
+        >
+          {notice.title}
+        </Typography>
+        <Typography variant="subtitle1" gutterBottom>
+          更新日: {notice.updated}
+        </Typography>
+        <Typography variant="subtitle1" gutterBottom>
+          Tags:
+          {notice.tags.map((tag) => (
+            <Chip
+              key={tag}
+              label={tag}
+              variant="outlined"
+              color={getColor(tag)}
+              sx={{ m: 0.5 }}
+            />
+          ))}
+        </Typography>
+        <Typography variant="body1" paragraph>
+          {notice.content}
+        </Typography>
+        {notice.tweetLink && <TweetEmbed tweetLink={notice.tweetLink} />}
+      </Box>
+    </>
   );
 };
 
@@ -57,9 +61,9 @@ NoticePage.getLayout = (page, pageProps) => {
       title="すぽじゅーるからのお知らせ"
       description={pageProps.notice.content}
       path={`/notifications/${pageProps.notice.id}`}
+      maxPageWidth="md"
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };

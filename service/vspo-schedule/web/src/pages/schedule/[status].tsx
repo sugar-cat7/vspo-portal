@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Box, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { Livestream } from "@/types/streaming";
@@ -16,7 +16,6 @@ import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { NextPageWithLayout } from "../_app";
 import { LivestreamCards } from "@/components/Templates";
 import { freeChatVideoIds } from "@/data/freechat-video-ids";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
 import {
   fetchFreeChat,
   fetchVspoEvents,
@@ -60,49 +59,45 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   tabDates,
 }) => {
   return (
-    <Container>
-      <Box mt={4}>
-        <TabContext value={todayIndex.toString()}>
-          {/* Date */}
-          <TabBox>
-            <Tabs
-              aria-label="配信日スケジュール"
-              textColor="primary"
-              indicatorColor="primary"
-              scrollButtons="auto"
-              value={todayIndex.toString()}
-              variant="scrollable"
-            >
-              {tabDates.map((date, i) => {
-                const d = new Date(date);
-                const label = formatWithTimeZone(d, "ja", "MM/dd (E)");
-                return (
-                  <Tab
-                    role="tab"
-                    aria-selected={todayIndex === i}
-                    label={label}
-                    value={i.toString()}
-                    key={date}
-                    sx={{
-                      fontFamily: "Roboto, sans-serif",
-                      textAlign: "center",
-                      fontWeight: "700",
-                    }}
-                    LinkComponent={Link}
-                    href={`/schedule/${date}`}
-                  />
-                );
-              })}
-            </Tabs>
-          </TabBox>
-          {/* Stream Content */}
-          <LivestreamCards
-            livestreamsByDate={livestreamsByDate}
-            eventsByDate={eventsByDate}
-          />
-        </TabContext>
-      </Box>
-    </Container>
+    <TabContext value={todayIndex.toString()}>
+      {/* Date */}
+      <TabBox>
+        <Tabs
+          aria-label="配信日スケジュール"
+          textColor="primary"
+          indicatorColor="primary"
+          scrollButtons="auto"
+          value={todayIndex.toString()}
+          variant="scrollable"
+        >
+          {tabDates.map((date, i) => {
+            const d = new Date(date);
+            const label = formatWithTimeZone(d, "ja", "MM/dd (E)");
+            return (
+              <Tab
+                role="tab"
+                aria-selected={todayIndex === i}
+                label={label}
+                value={i.toString()}
+                key={date}
+                sx={{
+                  fontFamily: "Roboto, sans-serif",
+                  textAlign: "center",
+                  fontWeight: "700",
+                }}
+                LinkComponent={Link}
+                href={`/schedule/${date}`}
+              />
+            );
+          })}
+        </Tabs>
+      </TabBox>
+      {/* Stream Content */}
+      <LivestreamCards
+        livestreamsByDate={livestreamsByDate}
+        eventsByDate={eventsByDate}
+      />
+    </TabContext>
   );
 };
 
@@ -285,7 +280,6 @@ HomePage.getLayout = (page, pageProps) => {
       path={`/schedule/${pageProps.liveStatus}`}
     >
       {page}
-      <CustomBottomNavigation />
     </ContentLayout>
   );
 };
