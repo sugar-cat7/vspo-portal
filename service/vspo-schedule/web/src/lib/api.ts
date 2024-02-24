@@ -43,7 +43,7 @@ export const fetchEvents = async (): Promise<VspoEvent[]> => {
   }
 };
 
-export const fetchVspoLivestreams = async ({
+export const fetchLivestreams = async ({
   limit = 300,
 }: {
   limit?: number;
@@ -66,7 +66,7 @@ export const fetchVspoLivestreams = async ({
       return convertThumbnailQualityInObjects(mockLivestreams);
     }
   } catch (error) {
-    console.error("Failed to fetch livestream:", error);
+    console.error("Failed to fetch livestreams:", error);
     throw error;
   }
 };
@@ -143,7 +143,7 @@ export const fetchVspoRelatedVideo = async (
   page = 1,
   limit = 10,
 ): Promise<RelatedProps> => {
-  const pastLivestreams = await fetchVspoLivestreams({ limit: 50 });
+  const pastLivestreams = await fetchLivestreams({ limit: 50 });
   const liveStreams = pastLivestreams.filter(
     (livestream) => getLiveStatus(livestream) === "live",
   );
