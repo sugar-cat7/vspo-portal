@@ -71,6 +71,27 @@ export const fetchLivestreams = async ({
   }
 };
 
+export const fetchFreeChats = async (): Promise<Livestream[]> => {
+  try {
+    if (ENVIRONMENT === "production") {
+      const response = await axios.get<Livestream[]>(
+        `${API_ROOT}/api/freechat`,
+        {
+          headers: {
+            "x-api-key": process.env.API_KEY,
+          },
+        },
+      );
+      return convertThumbnailQualityInObjects(response.data);
+    } else {
+      return convertThumbnailQualityInObjects(mockFreeChats);
+    }
+  } catch (error) {
+    console.error("Failed to fetch freechats:", error);
+    throw error;
+  }
+};
+
 export const fetchVspoClips = async (): Promise<Clip[]> => {
   try {
     if (ENVIRONMENT === "production") {
@@ -88,27 +109,6 @@ export const fetchVspoClips = async (): Promise<Clip[]> => {
     }
   } catch (error) {
     console.error("Failed to fetch eventss:", error);
-    throw error;
-  }
-};
-
-export const fetchFreeChat = async (): Promise<Livestream[]> => {
-  try {
-    if (ENVIRONMENT === "production") {
-      const response = await axios.get<Livestream[]>(
-        `${API_ROOT}/api/freechat`,
-        {
-          headers: {
-            "x-api-key": process.env.API_KEY,
-          },
-        },
-      );
-      return convertThumbnailQualityInObjects(response.data);
-    } else {
-      return convertThumbnailQualityInObjects(mockFreeChats);
-    }
-  } catch (error) {
-    console.error("Failed to fetch freechat:", error);
     throw error;
   }
 };
