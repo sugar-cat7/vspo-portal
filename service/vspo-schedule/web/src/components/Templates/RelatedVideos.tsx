@@ -132,8 +132,10 @@ export const RelatedVideos: React.FC<{
   channnelId: string;
   videoId: string;
 }> = ({ channnelId, videoId }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { data, error, size, setSize, isValidating } = useSWRInfinite(
+  const { data, error, size, setSize, isValidating } = useSWRInfinite<
+    Videos,
+    Error
+  >(
     (index: number) => `/relatedVideo?page=${index + 1}&limit=5`,
     fetcher<Videos>,
     {

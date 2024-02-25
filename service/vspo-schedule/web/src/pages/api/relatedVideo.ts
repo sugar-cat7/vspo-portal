@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { validateGetRequest } from "@/lib/validator";
-import { fetchVspoRelatedVideo } from "@/lib/api";
+import { fetchRelatedVideos } from "@/lib/api";
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
   validateGetRequest(req, res, async () => {
@@ -8,7 +8,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 10;
 
-    const relatedVideos = await fetchVspoRelatedVideo(page, limit);
+    const relatedVideos = await fetchRelatedVideos(page, limit);
 
     // Cache-Controlヘッダーを設定
     res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
