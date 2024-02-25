@@ -3,7 +3,8 @@
 
 CREATE TABLE creator (
     id text PRIMARY KEY,
-    name text NOT NULL
+    name text NOT NULL,
+    member_type text NOT NULL
 );
 
 CREATE TABLE channel (
