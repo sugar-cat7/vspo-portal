@@ -24,7 +24,7 @@ import { useMediaQuery } from "@mui/material";
 import { members } from "@/data/members";
 import { formatWithTimeZone, groupEventsByYearMonth } from "@/lib/utils";
 import React, { useEffect } from "react";
-import { fetchVspoEvents } from "@/lib/api";
+import { fetchEvents } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -98,19 +98,14 @@ const YearMonthSelector: React.FC<{
 );
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
-  try {
-    const fetchEvents: VspoEvent[] = await fetchVspoEvents();
-    const eventsByMonth = groupEventsByYearMonth(fetchEvents);
+  const fetchedEvents = await fetchEvents();
+  const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
 
-    const paths = Object.keys(eventsByMonth).map((yearMonth) => ({
-      params: { yearMonth },
-    }));
+  const paths = Object.keys(eventsByMonth).map((yearMonth) => ({
+    params: { yearMonth },
+  }));
 
-    return { paths, fallback: true };
-  } catch (error) {
-    console.error("Failed to fetch events in getStaticPaths", error);
-    throw error;
-  }
+  return { paths, fallback: true };
 };
 
 export const getStaticProps: GetStaticProps<Props, Params> = async ({
@@ -122,52 +117,42 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     };
   }
 
-  try {
-    const fetchEvents: VspoEvent[] = await fetchVspoEvents();
-    const eventsByMonth = groupEventsByYearMonth(fetchEvents);
+  const fetchedEvents = await fetchEvents();
+  const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
 
-    const yearMonth = params.yearMonth;
+  const yearMonth = params.yearMonth;
 
-    if (!eventsByMonth[yearMonth]) {
-      return {
-        notFound: true,
-      };
-    }
-
-    const events = eventsByMonth[yearMonth];
-    const yearMonths = Object.keys(eventsByMonth);
-    const currentIndex = yearMonths.indexOf(yearMonth);
-    const nextYearMonth = yearMonths.at(currentIndex + 1) || "";
-    const beforeYearMonth =
-      yearMonths.at(currentIndex - 1) !== yearMonth &&
-      yearMonths.at(currentIndex - 1) !== yearMonths.at(yearMonths.length - 1)
-        ? yearMonths.at(currentIndex - 1)
-        : "";
-
-    const sortedData = events.sort(
-      (a, b) =>
-        new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime(),
-    );
-
-    const latestYearMonth = Object.keys(eventsByMonth).sort().pop();
+  if (!eventsByMonth[yearMonth]) {
     return {
-      props: {
-        events: sortedData,
-        lastUpdateDate: formatWithTimeZone(
-          new Date(),
-          "ja",
-          "yyyy/MM/dd HH:mm",
-        ),
-        beforeYearMonth: beforeYearMonth,
-        nextYearMonth: nextYearMonth,
-        currentYearMonth: yearMonth,
-        latestYearMonth: latestYearMonth,
-      },
+      notFound: true,
     };
-  } catch (error) {
-    console.error("Failed to fetch events in getStaticProps", error);
-    throw error;
   }
+
+  const events = eventsByMonth[yearMonth];
+  const yearMonths = Object.keys(eventsByMonth);
+  const currentIndex = yearMonths.indexOf(yearMonth);
+  const nextYearMonth = yearMonths.at(currentIndex + 1) || "";
+  const beforeYearMonth =
+    yearMonths.at(currentIndex - 1) !== yearMonth &&
+    yearMonths.at(currentIndex - 1) !== yearMonths.at(yearMonths.length - 1)
+      ? yearMonths.at(currentIndex - 1)
+      : "";
+
+  const sortedData = events.sort(
+    (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime(),
+  );
+
+  const latestYearMonth = Object.keys(eventsByMonth).sort().pop();
+  return {
+    props: {
+      events: sortedData,
+      lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
+      beforeYearMonth: beforeYearMonth,
+      nextYearMonth: nextYearMonth,
+      currentYearMonth: yearMonth,
+      latestYearMonth: latestYearMonth,
+    },
+  };
 };
 
 const IndexPage: NextPageWithLayout<Props> = ({

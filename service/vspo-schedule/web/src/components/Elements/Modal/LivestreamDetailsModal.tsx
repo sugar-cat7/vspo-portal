@@ -522,10 +522,7 @@ const InfoTabs: React.FC<{
         </TypographySmallOnMobileDescription>
       </TabPanel>
       <TabPanel value={value} index={1}>
-        <RelatedVideos
-          channnelId={videoInfo.channelId}
-          videoId={videoInfo.id}
-        />
+        <RelatedVideos channelId={videoInfo.channelId} videoId={videoInfo.id} />
       </TabPanel>
       {showChatTab && (
         <TabPanel value={value} index={2}>

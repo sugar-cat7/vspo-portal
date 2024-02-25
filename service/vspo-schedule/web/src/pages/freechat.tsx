@@ -7,7 +7,7 @@ import { NextPageWithLayout } from "./_app";
 import { Livestream } from "@/types/streaming";
 import { Grid } from "@mui/material";
 import { members } from "@/data/members";
-import { fetchFreeChat } from "@/lib/api";
+import { fetchFreeChats } from "@/lib/api";
 
 type FreeChatsProps = {
   freeChats: Livestream[];
@@ -27,7 +27,7 @@ const FreeChatPage: NextPageWithLayout<FreeChatsProps> = ({ freeChats }) => {
 };
 
 export const getStaticProps: GetStaticProps<FreeChatsProps> = async () => {
-  const freeChats = await fetchFreeChat();
+  const freeChats = await fetchFreeChats();
 
   // Create a mapping of channelId to id for members
   const memberIdMap = new Map(

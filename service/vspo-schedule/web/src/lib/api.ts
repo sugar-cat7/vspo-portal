@@ -11,8 +11,9 @@ import {
   shuffleClips,
 } from "./utils";
 import { API_ROOT, ENVIRONMENT } from "./Const";
+import { members } from "@/data/members";
 
-export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
+export const fetchEvents = async (): Promise<VspoEvent[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<VspoEvent[]>(
@@ -38,12 +39,12 @@ export const fetchVspoEvents = async (): Promise<VspoEvent[]> => {
       return mockEvents;
     }
   } catch (error) {
-    console.error("Failed to fetch eventss:", error);
+    console.error("Failed to fetch events:", error);
     throw error;
   }
 };
 
-export const fetchVspoLivestreams = async ({
+export const fetchLivestreams = async ({
   limit = 300,
 }: {
   limit?: number;
@@ -66,33 +67,12 @@ export const fetchVspoLivestreams = async ({
       return convertThumbnailQualityInObjects(mockLivestreams);
     }
   } catch (error) {
-    console.error("Failed to fetch livestream:", error);
+    console.error("Failed to fetch livestreams:", error);
     throw error;
   }
 };
 
-export const fetchVspoClips = async (): Promise<Clip[]> => {
-  try {
-    if (ENVIRONMENT === "production") {
-      const response = await axios.get<{ pastClips: Clip[] }>(
-        `${API_ROOT}/api/clips/youtube`,
-        {
-          headers: {
-            "x-api-key": process.env.API_KEY,
-          },
-        },
-      );
-      return convertThumbnailQualityInObjects(response.data.pastClips);
-    } else {
-      return mockClips;
-    }
-  } catch (error) {
-    console.error("Failed to fetch eventss:", error);
-    throw error;
-  }
-};
-
-export const fetchFreeChat = async (): Promise<Livestream[]> => {
+export const fetchFreeChats = async (): Promise<Livestream[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<Livestream[]>(
@@ -108,28 +88,72 @@ export const fetchFreeChat = async (): Promise<Livestream[]> => {
       return convertThumbnailQualityInObjects(mockFreeChats);
     }
   } catch (error) {
-    console.error("Failed to fetch freechat:", error);
+    console.error("Failed to fetch freechats:", error);
     throw error;
   }
 };
 
-export const fetchTwitchClips = async (channelId: string): Promise<Clip[]> => {
+export const fetchClips = async (): Promise<Clip[]> => {
   try {
     if (ENVIRONMENT === "production") {
-      const response = await axios.get<Clip[]>(`${API_ROOT}/api/clips/twitch`, {
-        params: {
-          channelId,
+      const response = await axios.get<{ pastClips: Clip[] }>(
+        `${API_ROOT}/api/clips/youtube`,
+        {
+          headers: {
+            "x-api-key": process.env.API_KEY,
+          },
         },
-        headers: {
-          "x-api-key": process.env.API_KEY,
-        },
-      });
-      return response.data;
+      );
+      return convertThumbnailQualityInObjects(response.data.pastClips);
     } else {
-      return convertThumbnailQualityInObjects(mockTwitchClips);
+      return mockClips;
     }
   } catch (error) {
-    console.error(`Failed to fetch clips for channel ID ${channelId}:`, error);
+    console.error("Failed to fetch YouTube clips:", error);
+    throw error;
+  }
+};
+
+export const fetchTwitchClips = async (): Promise<Clip[]> => {
+  try {
+    if (ENVIRONMENT === "production") {
+      const memberClipsPromises = members.map((member) => {
+        return member.twitchChannelId
+          ? fetchMemberTwitchClips(member.twitchChannelId)
+          : Promise.resolve([]);
+      });
+      const settledResults = await Promise.allSettled(memberClipsPromises);
+      return settledResults
+        .filter(
+          (result): result is PromiseFulfilledResult<Clip[]> =>
+            result.status === "fulfilled" && Array.isArray(result.value),
+        )
+        .flatMap((fulfilledResult) => fulfilledResult.value);
+    } else {
+      return mockTwitchClips;
+    }
+  } catch (error) {
+    console.error("Failed to fetch Twitch clips:", error);
+    throw error;
+  }
+};
+
+const fetchMemberTwitchClips = async (channelId: string): Promise<Clip[]> => {
+  try {
+    const response = await axios.get<Clip[]>(`${API_ROOT}/api/clips/twitch`, {
+      params: {
+        channelId,
+      },
+      headers: {
+        "x-api-key": process.env.API_KEY,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Failed to fetch Twitch clips for channel ID ${channelId}:`,
+      error,
+    );
     throw error;
   }
 };
@@ -139,16 +163,16 @@ export type RelatedProps = {
   clips: Clip[];
 };
 
-export const fetchVspoRelatedVideo = async (
+export const fetchRelatedVideos = async (
   page = 1,
   limit = 10,
 ): Promise<RelatedProps> => {
-  const pastLivestreams = await fetchVspoLivestreams({ limit: 50 });
+  const pastLivestreams = await fetchLivestreams({ limit: 50 });
   const liveStreams = pastLivestreams.filter(
     (livestream) => getLiveStatus(livestream) === "live",
   );
 
-  const pastClips = await fetchVspoClips();
+  const pastClips = await fetchClips();
   const shuffledClips = shuffleClips(pastClips);
   return {
     liveStreams: liveStreams.slice((page - 1) * limit, page * limit),

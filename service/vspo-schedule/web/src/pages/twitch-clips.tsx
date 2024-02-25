@@ -2,15 +2,12 @@ import React, { useEffect } from "react";
 import { GetStaticProps } from "next";
 import { Clip } from "@/types/streaming";
 import { filterByTimeframe, formatWithTimeZone } from "@/lib/utils";
-import { mockTwitchClips } from "@/data/mocks/clips";
 import { Box } from "@mui/system";
 import { NextPageWithLayout } from "./_app";
 import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
-import { members } from "@/data/members";
 import { fetchTwitchClips } from "@/lib/api";
-import { ENVIRONMENT } from "@/lib/Const";
 
 type ClipsProps = {
   clips: Clip[];
@@ -60,29 +57,11 @@ const TwitchClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
 };
 
 export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
-  let pastClips: Clip[] = [];
-
-  if (ENVIRONMENT === "production") {
-    const memberClipsPromises = members.map((member) =>
-      member.twitchChannelId
-        ? fetchTwitchClips(member.twitchChannelId)
-        : Promise.resolve([]),
-    );
-
-    const settledResults = await Promise.allSettled(memberClipsPromises);
-
-    settledResults.forEach((result) => {
-      if (result.status === "fulfilled" && Array.isArray(result.value)) {
-        pastClips = [...result.value, ...pastClips];
-      }
-    });
-  } else {
-    pastClips = mockTwitchClips;
-  }
+  const clips = await fetchTwitchClips();
 
   return {
     props: {
-      clips: pastClips,
+      clips,
       lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
     },
     revalidate: 1800,
