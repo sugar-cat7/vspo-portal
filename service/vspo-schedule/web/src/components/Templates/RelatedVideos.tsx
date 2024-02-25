@@ -13,7 +13,7 @@ import {
   Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import useSWRInfinite from "swr/infinite";
 import { Loading } from "../Elements";
 import dynamic from "next/dynamic";
@@ -60,7 +60,7 @@ const StyledTitle = styled(Typography)({
   overflow: "hidden",
 });
 
-const StyledChannnelTitle = styled(Typography)({
+const StyledChannelTitle = styled(Typography)({
   display: "-webkit-box",
   "-webkit-line-clamp": "1",
   "-webkit-box-orient": "vertical",
@@ -74,7 +74,7 @@ type Videos = {
 
 const getRelatedVideos = (
   relatedVideos?: RelatedProps,
-  channnelId?: string,
+  channelId?: string,
   videoId?: string,
 ): Videos => {
   if (!relatedVideos) return { liveStreams: [], clips: [] };
@@ -93,11 +93,7 @@ const getRelatedVideos = (
   );
 
   const relatedClips: Clip[] = relatedVideos.clips.filter((c) => {
-    if (
-      c.channelId === channnelId &&
-      c.id !== videoId &&
-      !clipIdSet.has(c.id)
-    ) {
+    if (c.channelId === channelId && c.id !== videoId && !clipIdSet.has(c.id)) {
       clipIdSet.add(c.id);
       return true;
     }
@@ -128,10 +124,61 @@ const LivestreamDetailsModal = dynamic(
   { ssr: false },
 );
 
+type RelatedVideoCardProps<T extends Livestream | Clip> = {
+  video: T;
+  setSelectedVideo: React.Dispatch<React.SetStateAction<T | null>>;
+  openModal: () => void;
+};
+
+const RelatedVideoCard = <T extends Livestream | Clip>({
+  video,
+  setSelectedVideo,
+  openModal,
+}: RelatedVideoCardProps<T>) => {
+  return (
+    <StyledCard>
+      <CardActionArea
+        onClick={() => {
+          setSelectedVideo(video);
+          openModal();
+        }}
+      >
+        <Box display="flex">
+          <Box sx={{ width: "120px" }}>
+            <StyledCardMedia
+              image={video.thumbnailUrl
+                .replace("%{width}", "320")
+                .replace("%{height}", "180")
+                .replace("-{width}x{height}", "-320x180")
+                .replace("http://", "https://")}
+              title={video.title}
+            />
+          </Box>
+          <StyledCardContent>
+            <StyledTitle variant="h5">{video.title}</StyledTitle>
+            <StyledChannelTitle variant="body2" color="text.secondary">
+              {video.channelTitle}
+            </StyledChannelTitle>
+            <Typography variant="body2" color="text.secondary">
+              {formatWithTimeZone(
+                new Date(
+                  video.scheduledStartTime || video.createdAt || TEMP_TIMESTAMP,
+                ),
+                "ja",
+                "MM/dd (E)",
+              )}
+            </Typography>
+          </StyledCardContent>
+        </Box>
+      </CardActionArea>
+    </StyledCard>
+  );
+};
+
 export const RelatedVideos: React.FC<{
-  channnelId: string;
+  channelId: string;
   videoId: string;
-}> = ({ channnelId, videoId }) => {
+}> = ({ channelId, videoId }) => {
   const { data, error, size, setSize, isValidating } = useSWRInfinite<
     Videos,
     Error
@@ -148,7 +195,7 @@ export const RelatedVideos: React.FC<{
   const [selectedLivestream, setSelectedLivestream] =
     useState<Livestream | null>(null);
   const [selectedClip, setSelectedClip] = useState<Clip | null>(null);
-  const relatedLivestreams: Videos = useMemo(() => {
+  const relatedVideos: Videos = useMemo(() => {
     // Extract data from each page and combine into one RelatedProps object
     const combinedData: RelatedProps = {
       liveStreams: [],
@@ -160,8 +207,8 @@ export const RelatedVideos: React.FC<{
       combinedData.clips.push(...pageData.clips);
     });
 
-    return getRelatedVideos(combinedData, channnelId, videoId);
-  }, [channnelId, data, videoId]);
+    return getRelatedVideos(combinedData, channelId, videoId);
+  }, [channelId, data, videoId]);
 
   const loadMoreData = () => {
     setSize(size + 1); // fetch new data
@@ -174,85 +221,21 @@ export const RelatedVideos: React.FC<{
   return (
     <Box>
       <Box display="flex" sx={{ flexDirection: "column" }}>
-        {relatedLivestreams.liveStreams.map((livestream) => (
-          <StyledCard key={livestream.id}>
-            <CardActionArea
-              onClick={() => {
-                setSelectedLivestream(livestream);
-                openModal();
-              }}
-            >
-              <Box display="flex">
-                <Box sx={{ width: "120px" }}>
-                  <StyledCardMedia
-                    image={livestream.thumbnailUrl
-                      .replace("%{width}", "320")
-                      .replace("%{height}", "180")
-                      .replace("-{width}x{height}", "-320x180")
-                      .replace("http://", "https://")}
-                    title={livestream.title}
-                  />
-                </Box>
-                <StyledCardContent>
-                  <StyledTitle variant="h5">{livestream.title}</StyledTitle>
-                  <StyledChannnelTitle variant="body2" color="text.secondary">
-                    {livestream.channelTitle}
-                  </StyledChannnelTitle>
-                  <Typography variant="body2" color="text.secondary">
-                    {formatWithTimeZone(
-                      new Date(
-                        livestream.scheduledStartTime ||
-                          livestream.createdAt ||
-                          TEMP_TIMESTAMP,
-                      ),
-                      "ja",
-                      "MM/dd (E)",
-                    )}
-                  </Typography>
-                </StyledCardContent>
-              </Box>
-            </CardActionArea>
-          </StyledCard>
+        {relatedVideos.liveStreams.map((livestream) => (
+          <RelatedVideoCard
+            key={livestream.id}
+            video={livestream}
+            setSelectedVideo={setSelectedLivestream}
+            openModal={openModal}
+          />
         ))}
-        {relatedLivestreams.clips.map((livestream) => (
-          <StyledCard key={livestream.id}>
-            <CardActionArea
-              onClick={() => {
-                setSelectedClip(livestream);
-                openModal();
-              }}
-            >
-              <Box display="flex">
-                <Box sx={{ width: "120px" }}>
-                  <StyledCardMedia
-                    image={livestream.thumbnailUrl
-                      .replace("%{width}", "320")
-                      .replace("%{height}", "180")
-                      .replace("-{width}x{height}", "-320x180")
-                      .replace("http://", "https://")}
-                    title={livestream.title}
-                  />
-                </Box>
-                <StyledCardContent>
-                  <StyledTitle variant="h5">{livestream.title}</StyledTitle>
-                  <StyledChannnelTitle variant="body2" color="text.secondary">
-                    {livestream.channelTitle}
-                  </StyledChannnelTitle>
-                  <Typography variant="body2" color="text.secondary">
-                    {formatWithTimeZone(
-                      new Date(
-                        livestream.scheduledStartTime ||
-                          livestream.createdAt ||
-                          TEMP_TIMESTAMP,
-                      ),
-                      "ja",
-                      "MM/dd (E)",
-                    )}
-                  </Typography>
-                </StyledCardContent>
-              </Box>
-            </CardActionArea>
-          </StyledCard>
+        {relatedVideos.clips.map((clip) => (
+          <RelatedVideoCard
+            key={clip.id}
+            video={clip}
+            setSelectedVideo={setSelectedClip}
+            openModal={openModal}
+          />
         ))}
       </Box>
       {isValidating && <Loading />}
