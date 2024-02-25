@@ -278,6 +278,7 @@ HomePage.getLayout = (page, pageProps) => {
       footerMessage="※メン限の配信は掲載しておりません。"
       headTitle={headTitle}
       path={`/schedule/${pageProps.liveStatus}`}
+      canonicalPath={`/schedule/all`}
     >
       {page}
     </ContentLayout>
