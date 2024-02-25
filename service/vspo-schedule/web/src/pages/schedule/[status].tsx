@@ -29,8 +29,10 @@ type LivestreamsProps = {
   eventsByDate: Record<string, VspoEvent[]>;
   lastUpdateDate: string;
   liveStatus: string;
-  todayIndex: number;
-  tabDates: string[];
+  dateTabsInfo?: {
+    tabDates: string[];
+    todayIndex: number;
+  };
 };
 
 const TabBox = styled(Box)(({ theme }) => ({
@@ -51,9 +53,17 @@ const TabBox = styled(Box)(({ theme }) => ({
 const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   livestreamsByDate,
   eventsByDate,
-  todayIndex,
-  tabDates,
+  dateTabsInfo,
 }) => {
+  if (!dateTabsInfo) {
+    return (
+      <LivestreamCards
+        livestreamsByDate={livestreamsByDate}
+        eventsByDate={eventsByDate}
+      />
+    );
+  }
+  const { tabDates, todayIndex } = dateTabsInfo;
   return (
     <TabContext value={todayIndex.toString()}>
       {/* Date */}
@@ -211,6 +221,25 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     }
   });
 
+  const lastUpdateDate = formatWithTimeZone(
+    new Date(),
+    "ja",
+    "yyyy/MM/dd HH:mm",
+  );
+  const revalidateWindow = 30;
+
+  if (["archive", "live", "upcoming"].includes(params.status)) {
+    return {
+      props: {
+        livestreamsByDate,
+        eventsByDate,
+        lastUpdateDate,
+        liveStatus: params.status,
+      },
+      revalidate: revalidateWindow,
+    };
+  }
+
   const allDates = uniqueLivestreams.map((livestream) =>
     formatWithTimeZone(livestream.scheduledStartTime, "ja", "yyyy-MM-dd"),
   );
@@ -231,14 +260,16 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
 
   return {
     props: {
-      livestreamsByDate: livestreamsByDate,
-      eventsByDate: eventsByDate,
-      lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
+      livestreamsByDate,
+      eventsByDate,
+      lastUpdateDate,
       liveStatus: params.status,
-      todayIndex: todayIndex >= 0 ? todayIndex : tabDates.length - 1,
-      tabDates: tabDates,
+      dateTabsInfo: {
+        todayIndex: todayIndex >= 0 ? todayIndex : tabDates.length - 1,
+        tabDates: tabDates,
+      },
     },
-    revalidate: 30,
+    revalidate: revalidateWindow,
   };
 };
 
