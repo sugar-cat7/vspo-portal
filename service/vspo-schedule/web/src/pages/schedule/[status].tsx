@@ -16,7 +16,7 @@ import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { NextPageWithLayout } from "../_app";
 import { LivestreamCards } from "@/components/Templates";
 import { freeChatVideoIds } from "@/data/freechat-video-ids";
-import { fetchFreeChats, fetchEvents, fetchLivestreams } from "@/lib/api";
+import { fetchEvents, fetchLivestreams } from "@/lib/api";
 import { VspoEvent } from "@/types/events";
 import Link from "next/link";
 
@@ -124,14 +124,11 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     };
   }
 
-  const freeChats = await fetchFreeChats();
-  const freeChatIds = freeChats.map((f) => f.id);
   const pastLivestreams = await fetchLivestreams({ limit: 300 });
-
   const events = await fetchEvents();
 
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
-    (l) => !freeChatIds.includes(l.id),
+    (livestream) => !freeChatVideoIds.includes(livestream.id),
   );
 
   const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
