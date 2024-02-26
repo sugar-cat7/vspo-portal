@@ -17,6 +17,11 @@
           {
             "name": "@mui/icons-material",
             "message": "Use default import from @mui/icons-material/IconName instead."
+          },
+          {
+            "name": "@mui/system",
+            "importNames": ["styled"],
+            "message": "Import 'styled' from @mui/material/styles instead."
           }
         ]
       }
