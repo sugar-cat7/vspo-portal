@@ -205,10 +205,11 @@ export const Header: React.FC<Props> = ({ title }) => {
             "&:hover": {
               backgroundColor: "transparent", // ホバーエフェクトを無効にする
             },
+            borderRadius: 0,
           }}
         >
           <SettingsIcon />
-          <Typography variant="body1" style={{ marginLeft: "10px" }}>
+          <Typography variant="body1" sx={{ marginLeft: "10px" }}>
             設定
           </Typography>
         </IconButton>
