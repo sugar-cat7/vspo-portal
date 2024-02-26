@@ -23,6 +23,12 @@
             "importNames": ["styled"],
             "message": "Import 'styled' from @mui/material/styles instead."
           }
+        ],
+        "patterns": [
+          {
+            "group": ["@mui/*/*/*"],
+            "message": "Imports three levels deep into @mui are considered private."
+          }
         ]
       }
     ]
