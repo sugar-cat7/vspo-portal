@@ -75,6 +75,8 @@ const TypographySmallOnMobile = styled(Typography)(({ theme }) => ({
 }));
 
 const TypographySmallOnMobileDescription = styled(Typography)(({ theme }) => ({
+  whiteSpace: "pre-wrap",
+
   // メディアクエリ: 幅600px以下の場合
   [theme.breakpoints.down("sm")]: {
     fontSize: "0.8rem",
@@ -397,6 +399,7 @@ const InfoTabs: React.FC<{
     isLivestream(videoInfo) &&
     isOnPlatformWithChat(videoInfo) &&
     getLiveStatus(videoInfo) === "live";
+  const urlRegex = /(https?:\/\/\S+)/;
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -496,28 +499,20 @@ const InfoTabs: React.FC<{
           </Box>
         </Box>
         <TypographySmallOnMobileDescription variant="body1">
-          {videoInfo.description.split("\n").map((text, index) => {
-            const isUrl =
-              text.startsWith("http://") || text.startsWith("https://");
-            if (isUrl) {
-              return (
-                <Link
-                  href={text}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  key={index}
-                >
-                  {text}
-                </Link>
-              );
-            } else {
-              return (
-                <React.Fragment key={index}>
-                  {text}
-                  <br />
-                </React.Fragment>
-              );
+          {videoInfo.description.split(urlRegex).map((text, index) => {
+            if (index % 2 === 0) {
+              return <React.Fragment key={index}>{text}</React.Fragment>;
             }
+            return (
+              <Link
+                href={text}
+                target="_blank"
+                rel="noopener noreferrer"
+                key={index}
+              >
+                {text}
+              </Link>
+            );
           })}
         </TypographySmallOnMobileDescription>
       </TabPanel>
