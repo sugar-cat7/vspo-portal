@@ -15,7 +15,7 @@ import { styled } from "@mui/material/styles";
 import { Clip, Platform } from "@/types/streaming";
 import { isTrending } from "@/lib/utils";
 import { members } from "@/data/members";
-import { PlayArrow } from "@mui/icons-material";
+import PlayArrow from "@mui/icons-material/PlayArrow";
 import { useModal } from "@/hooks";
 import dynamic from "next/dynamic";
 import Image from "next/image";
