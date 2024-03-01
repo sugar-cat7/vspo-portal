@@ -7,6 +7,7 @@ import { format, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
 import { Locale } from "date-fns";
 import { TEMP_TIMESTAMP } from "./Const";
+import { platforms } from "@/constants/platforms";
 
 /**
  * Group an array of items by a specified key.
@@ -33,6 +34,7 @@ export const groupBy = <T>(
 
   return groupedItems;
 };
+
 type GetLivestreamUrl = {
   videoId: string;
   platform: Platform;
@@ -59,30 +61,32 @@ export const getLivestreamUrl = ({
   isClip,
 }: GetLivestreamUrl): string => {
   switch (platform) {
-    case Platform.YouTube:
+    case "youtube":
       return `https://www.youtube.com/watch?v=${videoId}`;
-    case Platform.Twitch:
+    case "twitch":
       return isClip && externalLink
         ? externalLink
         : !twitchPastVideoId
           ? `https://www.twitch.tv/${twitchUsername}`
           : `https://www.twitch.tv/videos/${twitchPastVideoId}`;
-    case Platform.TwitCasting:
+    case "twitcasting":
       return externalLink?.includes("movie")
         ? externalLink
         : `https://twitcasting.tv/${
             members.filter((m) => m.name === memberName).at(0)
               ?.twitcastingScreenId
           }/movie/${videoId}` || "";
-    case Platform.NicoNico:
+    case "nicovideo":
       return `https://live.nicovideo.jp/watch/${videoId}`;
-    default:
+    default: {
+      const supportedPlatforms = platforms.map(({ id }) => id);
       throw new Error(
         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        `Unsupported platform: ${platform}. Supported platforms are: ${Object.values(
-          Platform,
-        ).join(", ")}`,
+        `Unsupported platform: ${platform}. Supported platforms are: ${supportedPlatforms.join(
+          ", ",
+        )}`,
       );
+    }
   }
 };
 
@@ -527,7 +531,7 @@ export const isTrending = (clip: Clip) => {
 
   return TRENDING_THRESHOLDS.some(({ days }) => {
     const trendThreshold =
-      clip.platform === Platform.YouTube
+      clip.platform === "youtube"
         ? YOUTUBE_TRENDING_THRESHOLDS * days
         : TWITCH_TRENDING_THRESHOLDS * days * 1.25;
     return isOlderThan(days) && viewCount >= trendThreshold;

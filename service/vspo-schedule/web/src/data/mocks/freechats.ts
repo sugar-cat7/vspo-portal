@@ -1,4 +1,4 @@
-import { Livestream, Platform } from "@/types/streaming";
+import { Livestream } from "@/types/streaming";
 
 export const mockFreeChats: Livestream[] = [
   {
@@ -479,4 +479,4 @@ export const mockFreeChats: Livestream[] = [
     twitchName: "",
     twitchPastVideoId: "",
   },
-].map((stream) => ({ ...stream, platform: stream.platform as Platform }));
+];

@@ -1,4 +1,4 @@
-import { Clip, Platform } from "@/types/streaming";
+import { Clip } from "@/types/streaming";
 
 const today = new Date();
 const tomorrow = new Date(today);
@@ -540,7 +540,7 @@ export const mockClips: Clip[] = [
     commentCount: "6",
     createdAt: "2023-03-20T09:00:00.000Z",
   },
-].map((clip) => ({ ...clip, platform: clip.platform as Platform }));
+];
 
 export const mockTwitchClips: Clip[] = [
   {
@@ -1610,4 +1610,4 @@ export const mockTwitchClips: Clip[] = [
     createdAt: "2023-04-23T05:51:57.000Z",
     link: "https://clips.twitch.tv/InquisitiveDullWitchOSkomodo--2P_Ka5ysPSXyj3S",
   },
-].map((clip) => ({ ...clip, platform: clip.platform as Platform }));
+];
