@@ -4,6 +4,7 @@ import (
 	"context"
 
 	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/cron"
+	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase"
 )
 
 // Handler is an interface for handling clip operations.
@@ -12,9 +13,15 @@ type Handler interface {
 }
 
 // VH is Handler implementation.
-type VH struct{}
+type VH struct {
+	videoInteractor usecase.VideoInteractor
+}
 
 // NewHandler returns a new instance of a clip handler.
-func NewHandler() VH {
-	return VH{}
+func NewHandler(
+	videoInteractor usecase.VideoInteractor,
+) VH {
+	return VH{
+		videoInteractor: videoInteractor,
+	}
 }

@@ -169,24 +169,12 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 				return res, errors.Wrap(err, "security \"YoutubeApiKey\"")
 			}
 		}
-		{
-			stage = "Security:TwitchApiKey"
-			switch err := c.securityTwitchApiKey(ctx, "ChannelsPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 2
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TwitchApiKey\"")
-			}
-		}
 
 		if ok := func() bool {
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
 				{0b00000010},
-				{0b00000100},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {
@@ -300,24 +288,12 @@ func (c *Client) sendVideosPost(ctx context.Context, request *VideosPostReq) (re
 				return res, errors.Wrap(err, "security \"YoutubeApiKey\"")
 			}
 		}
-		{
-			stage = "Security:TwitchApiKey"
-			switch err := c.securityTwitchApiKey(ctx, "VideosPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 2
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"TwitchApiKey\"")
-			}
-		}
 
 		if ok := func() bool {
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
 				{0b00000010},
-				{0b00000100},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {

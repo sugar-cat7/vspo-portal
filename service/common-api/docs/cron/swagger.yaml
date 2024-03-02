@@ -35,21 +35,46 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "404":
           description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
       security:
         - ApiKeyAuth: []
         - YoutubeApiKey: []
-        - TwitchApiKey: []
   /videos:
     post:
       tags:
@@ -81,21 +106,46 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "401":
           description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "404":
           description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
       security:
         - ApiKeyAuth: []
         - YoutubeApiKey: []
-        - TwitchApiKey: []
 
 components:
   securitySchemes:
@@ -107,14 +157,16 @@ components:
       type: apiKey
       in: header
       name: X-Youtube-API-Key
-    TwitchApiKey:
-      type: apiKey
-      in: header
-      name: X-Twitch-API-Key
+  schemas:
+    CronResponse:
+      type: object
+      properties:
+        message:
+         type: string
+         example: success
 security:
   - ApiKeyAuth: []
   - YoutubeApiKey: []
-  - TwitchApiKey: []
 
 tags:
   - name: Channels

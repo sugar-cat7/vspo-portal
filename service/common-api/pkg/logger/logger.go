@@ -5,7 +5,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewLogger() *zap.Logger {
+func New() *zap.Logger {
 	l, err := zapdriver.NewProduction()
 	defer l.Sync()
 	if err != nil {
@@ -13,5 +13,3 @@ func NewLogger() *zap.Logger {
 	}
 	return l
 }
-
-var DefaultLogger = NewLogger()

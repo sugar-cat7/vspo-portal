@@ -13,12 +13,3 @@ type RootHandler struct {
 	// video.VH
 	oas.UnimplementedHandler
 }
-
-// NewRootHandler returns a new Handler.
-func NewRootHandler() *RootHandler {
-	// di := dependency.Inject()
-
-	return &RootHandler{
-		// VH: video.NewHandler(),
-	}
-}
