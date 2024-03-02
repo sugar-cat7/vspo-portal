@@ -6,6 +6,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/environment"
 )
 
+// TwitcastingService is ...
 type TwitcastingService struct {
 	client *Client
 	env    *environment.Environment
@@ -14,14 +15,15 @@ type TwitcastingService struct {
 // Client is twitcasting client.
 type Client struct {
 	httpClient *http.Client
-	env        *environment.Environment
 }
 
 // NewClient is ...
-func NewClient(env *environment.Environment) *Client {
+func NewClient(env *environment.Environment) *TwitcastingService {
 	c := http.DefaultClient
-	return &Client{
-		httpClient: c,
-		env:        env,
+	return &TwitcastingService{
+		client: &Client{
+			httpClient: c,
+		},
+		env: env,
 	}
 }

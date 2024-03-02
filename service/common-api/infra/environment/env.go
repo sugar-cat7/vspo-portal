@@ -1,9 +1,16 @@
 package environment
 
 type Environment struct {
+	ServerEnvironment
 	DatabaseEnvironment
+	YoutubeEnvironment
 	TwitchEnvironment
 	TwitcastingEnvironment
+}
+
+type ServerEnvironment struct {
+	ENV      string `env:"ENV,required"`
+	LogLevel string `env:"LOG_LEVEL,required"`
 }
 
 type DatabaseEnvironment struct {
@@ -11,6 +18,10 @@ type DatabaseEnvironment struct {
 	DBUser     string `env:"DB_USER,required"`
 	DBPassword string `env:"DB_PASSWORD,required"`
 	DBDatabase string `env:"DB_DATABASE,required"`
+}
+
+type YoutubeEnvironment struct {
+	YoutubeAPIKey string `env:"YOUTUBE_API_KEY,required"`
 }
 
 type TwitchEnvironment struct {

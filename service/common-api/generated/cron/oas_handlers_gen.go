@@ -97,30 +97,12 @@ func (s *Server) handleChannelsPostRequest(args [0]string, argsEscaped bool, w h
 				ctx = sctx
 			}
 		}
-		{
-			sctx, ok, err := s.securityTwitchApiKey(ctx, "ChannelsPost", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "TwitchApiKey",
-					Err:              err,
-				}
-				recordError("Security:TwitchApiKey", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 2
-				ctx = sctx
-			}
-		}
 
 		if ok := func() bool {
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
 				{0b00000010},
-				{0b00000100},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {
@@ -282,30 +264,12 @@ func (s *Server) handleVideosPostRequest(args [0]string, argsEscaped bool, w htt
 				ctx = sctx
 			}
 		}
-		{
-			sctx, ok, err := s.securityTwitchApiKey(ctx, "VideosPost", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "TwitchApiKey",
-					Err:              err,
-				}
-				recordError("Security:TwitchApiKey", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 2
-				ctx = sctx
-			}
-		}
 
 		if ok := func() bool {
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
 				{0b00000010},
-				{0b00000100},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {

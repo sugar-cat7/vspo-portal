@@ -6,6 +6,7 @@ require (
 	github.com/Adeithe/go-twitch v0.2.3
 	github.com/Code-Hex/synchro v0.5.2
 	github.com/blendle/zapdriver v1.3.1
+	github.com/caarlos0/env/v9 v9.0.0
 	github.com/deckarep/golang-set/v2 v2.6.0
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0

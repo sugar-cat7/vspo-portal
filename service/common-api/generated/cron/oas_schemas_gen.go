@@ -20,29 +20,25 @@ func (s *ApiKeyAuth) SetAPIKey(val string) {
 	s.APIKey = val
 }
 
-// ChannelsPostBadRequest is response for ChannelsPost operation.
-type ChannelsPostBadRequest struct{}
+type ChannelsPostBadRequest CronResponse
 
 func (*ChannelsPostBadRequest) channelsPostRes() {}
 
-// ChannelsPostForbidden is response for ChannelsPost operation.
-type ChannelsPostForbidden struct{}
+type ChannelsPostForbidden CronResponse
 
 func (*ChannelsPostForbidden) channelsPostRes() {}
 
-// ChannelsPostInternalServerError is response for ChannelsPost operation.
-type ChannelsPostInternalServerError struct{}
+type ChannelsPostInternalServerError CronResponse
 
 func (*ChannelsPostInternalServerError) channelsPostRes() {}
 
-// ChannelsPostNotFound is response for ChannelsPost operation.
-type ChannelsPostNotFound struct{}
+type ChannelsPostNotFound CronResponse
 
 func (*ChannelsPostNotFound) channelsPostRes() {}
 
-type ChannelsPostOKApplicationJSON string
+type ChannelsPostOK CronResponse
 
-func (*ChannelsPostOKApplicationJSON) channelsPostRes() {}
+func (*ChannelsPostOK) channelsPostRes() {}
 
 type ChannelsPostReq struct {
 	// Video's platform type.
@@ -190,10 +186,24 @@ func (s *ChannelsPostReqPlatformType) UnmarshalText(data []byte) error {
 	}
 }
 
-// ChannelsPostUnauthorized is response for ChannelsPost operation.
-type ChannelsPostUnauthorized struct{}
+type ChannelsPostUnauthorized CronResponse
 
 func (*ChannelsPostUnauthorized) channelsPostRes() {}
+
+// Ref: #/components/schemas/CronResponse
+type CronResponse struct {
+	Message OptString `json:"message"`
+}
+
+// GetMessage returns the value of Message.
+func (s *CronResponse) GetMessage() OptString {
+	return s.Message
+}
+
+// SetMessage sets the value of Message.
+func (s *CronResponse) SetMessage(val OptString) {
+	s.Message = val
+}
 
 // NewOptChannelsPostReqPeriod returns new OptChannelsPostReqPeriod with value set to v.
 func NewOptChannelsPostReqPeriod(v ChannelsPostReqPeriod) OptChannelsPostReqPeriod {
@@ -281,6 +291,52 @@ func (o OptChannelsPostReqPlatformType) Get() (v ChannelsPostReqPlatformType, ok
 
 // Or returns value if set, or given parameter if does not.
 func (o OptChannelsPostReqPlatformType) Or(d ChannelsPostReqPlatformType) ChannelsPostReqPlatformType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptString returns new OptString with value set to v.
+func NewOptString(v string) OptString {
+	return OptString{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptString is optional string.
+type OptString struct {
+	Value string
+	Set   bool
+}
+
+// IsSet returns true if OptString was set.
+func (o OptString) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptString) Reset() {
+	var v string
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptString) SetTo(v string) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptString) Get() (v string, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptString) Or(d string) string {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -425,43 +481,25 @@ func (o OptVideosPostReqVideoType) Or(d VideosPostReqVideoType) VideosPostReqVid
 	return d
 }
 
-type TwitchApiKey struct {
-	APIKey string
-}
-
-// GetAPIKey returns the value of APIKey.
-func (s *TwitchApiKey) GetAPIKey() string {
-	return s.APIKey
-}
-
-// SetAPIKey sets the value of APIKey.
-func (s *TwitchApiKey) SetAPIKey(val string) {
-	s.APIKey = val
-}
-
-// VideosPostBadRequest is response for VideosPost operation.
-type VideosPostBadRequest struct{}
+type VideosPostBadRequest CronResponse
 
 func (*VideosPostBadRequest) videosPostRes() {}
 
-// VideosPostForbidden is response for VideosPost operation.
-type VideosPostForbidden struct{}
+type VideosPostForbidden CronResponse
 
 func (*VideosPostForbidden) videosPostRes() {}
 
-// VideosPostInternalServerError is response for VideosPost operation.
-type VideosPostInternalServerError struct{}
+type VideosPostInternalServerError CronResponse
 
 func (*VideosPostInternalServerError) videosPostRes() {}
 
-// VideosPostNotFound is response for VideosPost operation.
-type VideosPostNotFound struct{}
+type VideosPostNotFound CronResponse
 
 func (*VideosPostNotFound) videosPostRes() {}
 
-type VideosPostOKApplicationJSON string
+type VideosPostOK CronResponse
 
-func (*VideosPostOKApplicationJSON) videosPostRes() {}
+func (*VideosPostOK) videosPostRes() {}
 
 type VideosPostReq struct {
 	// Video's platform type.
@@ -675,8 +713,7 @@ func (s *VideosPostReqVideoType) UnmarshalText(data []byte) error {
 	}
 }
 
-// VideosPostUnauthorized is response for VideosPost operation.
-type VideosPostUnauthorized struct{}
+type VideosPostUnauthorized CronResponse
 
 func (*VideosPostUnauthorized) videosPostRes() {}
 

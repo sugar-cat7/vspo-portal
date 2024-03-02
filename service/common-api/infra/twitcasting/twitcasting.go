@@ -18,8 +18,8 @@ type twitcastingServiceImpl struct {
 	service *TwitcastingService
 }
 
-// NewTwitcastingService ...
-func NewTwitcastingService(service *TwitcastingService) twitcasting.TwitcastingClient {
+// NewService ...
+func NewService(service *TwitcastingService) twitcasting.TwitcastingClient {
 	return &twitcastingServiceImpl{
 		service: service,
 	}

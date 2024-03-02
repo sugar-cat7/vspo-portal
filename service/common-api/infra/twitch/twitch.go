@@ -19,8 +19,8 @@ type twitchServiceImpl struct {
 	service *TwitchService
 }
 
-// NewTwitchService is ...
-func NewTwitchService(service *TwitchService) doamin_twitch.TwitchClient {
+// NewService is ...
+func NewService(service *TwitchService) doamin_twitch.TwitchClient {
 	return &twitchServiceImpl{
 		service: service,
 	}
