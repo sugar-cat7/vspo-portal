@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   AppBar,
+  Button,
   IconButton,
   Menu,
   MenuItem,
@@ -47,6 +48,23 @@ const StyledSubtitle = styled(Typography)({
 const StyledAlert = styled(Alert)({
   backgroundColor: "#e5f6fd",
   color: "#014361",
+});
+
+const StyledButton = styled(Button)({
+  display: "flex",
+  justifyContent: "flex-start",
+  paddingLeft: "16px",
+  "&:hover": {
+    backgroundColor: "transparent", // ホバーエフェクトを無効にする
+  },
+  borderRadius: 0,
+  fontSize: "1rem",
+  "& .MuiButton-startIcon": {
+    marginLeft: 0,
+    "& .MuiSvgIcon-root": {
+      fontSize: "24px",
+    },
+  },
 });
 
 const SocialIconLink: React.FC<{
@@ -192,27 +210,16 @@ export const Header: React.FC<Props> = ({ title }) => {
         }}
       >
         <CustomDrawer />
-        <IconButton
+        <StyledButton
           aria-label="settings"
           aria-controls="settings-menu"
           aria-haspopup="true"
           onClick={handleSettingsClick}
           color="inherit"
-          sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            paddingLeft: "16px",
-            "&:hover": {
-              backgroundColor: "transparent", // ホバーエフェクトを無効にする
-            },
-            borderRadius: 0,
-          }}
+          startIcon={<SettingsIcon />}
         >
-          <SettingsIcon />
-          <Typography variant="body1" sx={{ marginLeft: "10px" }}>
-            設定
-          </Typography>
-        </IconButton>
+          設定
+        </StyledButton>
         <Menu
           id="settings-menu"
           anchorEl={settingsAnchorEl}
