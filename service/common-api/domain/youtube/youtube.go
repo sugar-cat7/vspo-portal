@@ -7,18 +7,23 @@ import (
 )
 
 type YoutubeClient interface {
-	GetVideos(ctx context.Context, param YoutubeVideosParam) (model.Videos, error)
-	SearchVideos(ctx context.Context, param YoutubeSearchVideosParam) (model.Videos, error)
+	GetVideos(ctx context.Context, param VideosParam) (model.Videos, error)
+	SearchVideos(ctx context.Context, param SearchVideosParam) (model.Videos, error)
+	Channels(ctx context.Context, param ChannelsParam) (model.Channels, error)
 }
 
-type YoutubeVideosParam struct {
+type VideosParam struct {
 	UserIDs  []string
 	VideoIDs []string
 }
 
-type YoutubeSearchVideosParam struct {
+type SearchVideosParam struct {
 	SearchQuery SearchQuery
 	EventType   EventType
+}
+
+type ChannelsParam struct {
+	ChannelIDs []string
 }
 
 type SearchQuery string

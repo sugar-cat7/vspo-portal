@@ -50,10 +50,39 @@ func (s *ChannelsPostReq) Validate() error {
 			Error: err,
 		})
 	}
+	if err := func() error {
+		if value, ok := s.ChannelType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "channel_type",
+			Error: err,
+		})
+	}
 	if len(failures) > 0 {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s ChannelsPostReqChannelType) Validate() error {
+	switch s {
+	case "vspo":
+		return nil
+	case "all":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }
 
 func (s ChannelsPostReqPeriod) Validate() error {

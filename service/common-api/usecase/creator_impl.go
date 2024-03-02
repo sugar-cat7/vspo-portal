@@ -14,6 +14,7 @@ type creatorInteractor struct {
 	creatorRepository repository.Creator
 }
 
+// NewCreatorInteractor is ...
 func NewCreatorInteractor(
 	creatorRepository repository.Creator,
 ) CreatorInteractor {

@@ -60,7 +60,7 @@ func (s Status) String() string {
 	return string(s)
 }
 
-// Filter videos that need to be updated
+// FilterUpdateTarget videos that need to be updated
 func (vs Videos) FilterUpdateTarget(comparisonVideos Videos) Videos {
 	return lo.Filter(vs, func(newVideo *Video, _ int) bool {
 		// Check if the deleted video is included in the existing videos

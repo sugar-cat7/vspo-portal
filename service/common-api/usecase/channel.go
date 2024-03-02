@@ -7,10 +7,10 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/input"
 )
 
-// VideoInteractor is ...
-type VideoInteractor interface {
+// ChannelInteractor is ...
+type ChannelInteractor interface {
 	UpsertAll(
 		ctx context.Context,
-		param *input.UpsertAllVideos,
-	) (model.Videos, error)
+		param *input.UpsertAllChannels,
+	) (model.Channels, error)
 }

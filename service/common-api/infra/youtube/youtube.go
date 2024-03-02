@@ -26,7 +26,7 @@ func NewService(apiKey string) domain_youtube.YoutubeClient {
 }
 
 // GetVideos returns a list of videos by their IDs.
-func (y *youtubeServiceImpl) GetVideos(ctx context.Context, param domain_youtube.YoutubeVideosParam) (model.Videos, error) {
+func (y *youtubeServiceImpl) GetVideos(ctx context.Context, param domain_youtube.VideosParam) (model.Videos, error) {
 	var videos []*youtube.Video
 	videoIDChunks, err := pkg.Chunk(param.VideoIDs, 50)
 	if err != nil {
@@ -48,7 +48,7 @@ func (y *youtubeServiceImpl) GetVideos(ctx context.Context, param domain_youtube
 }
 
 // Search returns a list of videos by their search query.
-func (y *youtubeServiceImpl) SearchVideos(ctx context.Context, param domain_youtube.YoutubeSearchVideosParam) (model.Videos, error) {
+func (y *youtubeServiceImpl) SearchVideos(ctx context.Context, param domain_youtube.SearchVideosParam) (model.Videos, error) {
 	call := y.service.Search.List([]string{"snippet", "liveStreamingDetails"}).Q(param.SearchQuery.String()).Type("video").MaxResults(50).EventType(param.EventType.String())
 
 	response, err := call.Do()
@@ -60,4 +60,19 @@ func (y *youtubeServiceImpl) SearchVideos(ctx context.Context, param domain_yout
 		return nil, err
 	}
 	return v, nil
+}
+
+// Channels returns a list of channels by their IDs.
+func (y *youtubeServiceImpl) Channels(ctx context.Context, param domain_youtube.ChannelsParam) (model.Channels, error) {
+	call := y.service.Channels.List([]string{"snippet"}).Id(strings.Join(param.ChannelIDs, ","))
+
+	response, err := call.Do()
+	if err != nil {
+		return nil, fmt.Errorf("error making Channels.List call: %v", err)
+	}
+	c, err := dto.YtChannelsToChannels(response)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }

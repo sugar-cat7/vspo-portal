@@ -28,6 +28,10 @@ paths:
                     type: string
                     enum: [all, day, month, week]
                     description: Period for performing updates.
+                channel_type:
+                    type: string
+                    enum: [vspo, all]
+                    description: Period for performing updates.
         required: true
       responses:
         "200":
