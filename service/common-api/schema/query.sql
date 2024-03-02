@@ -10,4 +10,14 @@ JOIN
 LEFT JOIN
     Video v ON ch.id = v.channelId
 WHERE
-    cr.id = $1;
+    cr.member_type = 'vspo_jp'
+LIMIT $1 OFFSET $2;
+
+-- -- name: GetTotalCountByCreator
+-- SELECT COUNT(*)
+-- FROM
+--     Creator cr
+-- JOIN
+--     Channel ch ON cr.id = ch.creatorId
+-- WHERE
+--     cr.id = $1;

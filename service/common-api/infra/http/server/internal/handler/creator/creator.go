@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/api"
-	dto "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/internal/handler/creator/internal"
+	dto "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/server/internal/handler/creator/internal"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/input"
 )
 
