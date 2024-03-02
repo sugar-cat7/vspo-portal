@@ -10,7 +10,6 @@ import (
 
 // VideosPost implements the POST /channels/{channel_id}/videos endpoint.
 func (h *VH) VideosPost(ctx context.Context, req *api.VideosPostReq) (api.VideosPostRes, error) {
-
 	vs, err := h.videoInteractor.UpsertAll(
 		ctx,
 		input.NewUpsertAllVideoInput(

@@ -105,3 +105,28 @@ func ytSearchResultToVideo(ytSearchResult *youtube.SearchResult) (*model.Video, 
 
 	return m, nil
 }
+
+// YtChannelsToChannels is ...
+func YtChannelsToChannels(ytChannels *youtube.ChannelListResponse) (model.Channels, error) {
+	channels := make(model.Channels, len(ytChannels.Items))
+	for i, ytChannel := range ytChannels.Items {
+		c, err := ytChannelToChannel(ytChannel)
+		if err != nil {
+			return nil, err
+		}
+		channels[i] = c
+	}
+	return channels, nil
+}
+
+func ytChannelToChannel(ytChannel *youtube.Channel) (*model.Channel, error) {
+	m := &model.Channel{
+		Youtube: model.ChannelSnippet{
+			ID:           ytChannel.Id,
+			Name:         ytChannel.Snippet.Title,
+			Description:  ytChannel.Snippet.Description,
+			ThumbnailURL: model.ThumbnailURL(ytChannel.Snippet.Thumbnails.Default.Url),
+		},
+	}
+	return m, nil
+}

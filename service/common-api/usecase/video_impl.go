@@ -14,7 +14,7 @@ import (
 )
 
 type videoInteractor struct {
-	createRepository  repository.Creator
+	creatorRepository repository.Creator
 	videoRepository   repository.Video
 	youtubeClient     youtube.YoutubeClient
 	twitchClient      twitch.TwitchClient
@@ -23,14 +23,14 @@ type videoInteractor struct {
 
 // NewVideoInteractor creates a new VideoInteractor
 func NewVideoInteractor(
-	createRepository repository.Creator,
+	creatorRepository repository.Creator,
 	videoRepository repository.Video,
 	youtubeClient youtube.YoutubeClient,
 	twitchClient twitch.TwitchClient,
 	twitcastingClient twitcasting.TwitcastingClient,
 ) VideoInteractor {
 	return &videoInteractor{
-		createRepository,
+		creatorRepository,
 		videoRepository,
 		youtubeClient,
 		twitchClient,
@@ -42,7 +42,7 @@ func (i *videoInteractor) UpsertAll(
 	ctx context.Context,
 	param *input.UpsertAllVideos,
 ) (model.Videos, error) {
-	cs, err := i.createRepository.List(
+	cs, err := i.creatorRepository.List(
 		ctx,
 		repository.ListCreatorsQuery{
 			IsOnlyVspoMember: model.VideoType(param.VideoType) == model.VideoTypeVspoBroadcast,
@@ -102,7 +102,7 @@ func (i *videoInteractor) youtubeVideos(
 	existVideos model.Videos,
 ) (model.Videos, error) {
 	// Retrieve new videos via youtube api
-	liveYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.YoutubeSearchVideosParam{
+	liveYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
 		SearchQuery: youtube.SearchQueryVspoJp,
 		EventType:   youtube.EventTypeLive,
 	})
@@ -111,7 +111,7 @@ func (i *videoInteractor) youtubeVideos(
 		return nil, err
 	}
 
-	upcomingYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.YoutubeSearchVideosParam{
+	upcomingYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
 		SearchQuery: youtube.SearchQueryVspoJp,
 		EventType:   youtube.EventTypeUpcoming,
 	})
@@ -130,7 +130,7 @@ func (i *videoInteractor) youtubeVideos(
 	// Retrieve video details via youtube api
 	youtubeVideos, err := i.youtubeClient.GetVideos(
 		ctx,
-		youtube.YoutubeVideosParam{
+		youtube.VideosParam{
 			VideoIDs: m.ToSlice(),
 		},
 	)
@@ -147,7 +147,7 @@ func (i *videoInteractor) twitchVideos(
 	existVideos model.Videos,
 ) (model.Videos, error) {
 	twitchUserIDs := lo.Map(cs, func(c *model.Creator, _ int) string {
-		return c.Channel.Twitch.ChannelID
+		return c.Channel.Twitch.ID
 	})
 	newTwitchVideos, err := i.twitchClient.GetVideos(ctx, twitch.TwitchVideosParam{
 		UserIDs: twitchUserIDs,
@@ -166,7 +166,7 @@ func (i *videoInteractor) twitCastingVideos(
 	existVideos model.Videos,
 ) (model.Videos, error) {
 	twitCastingUserIDs := lo.Map(cs, func(c *model.Creator, _ int) string {
-		return c.Channel.TwitCasting.ChannelID
+		return c.Channel.TwitCasting.ID
 	})
 	newTwitcastingVideos, err := i.twitcastingClient.GetVideos(ctx, twitcasting.TwitcastingVideosParam{
 		UserIDs: twitCastingUserIDs,

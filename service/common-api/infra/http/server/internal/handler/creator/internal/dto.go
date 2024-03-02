@@ -52,7 +52,7 @@ func ChannelResponse(c *model.Channel) api.ChannelResponse {
 func platformSnippetResponse(ps model.ChannelSnippet) api.OptChannelPlatformSnippet {
 	return api.OptChannelPlatformSnippet{
 		Value: api.ChannelPlatformSnippet{
-			ChannelID:    api.OptString{Value: ps.ChannelID},
+			ChannelID:    api.OptString{Value: ps.ID},
 			Name:         api.OptString{Value: ps.Name},
 			Description:  api.OptString{Value: ps.Description},
 			ThumbnailURL: api.OptString{Value: ps.ThumbnailURL.String()},

@@ -218,11 +218,18 @@ func (s *ChannelsPostReq) encodeFields(e *jx.Encoder) {
 			s.Period.Encode(e)
 		}
 	}
+	{
+		if s.ChannelType.Set {
+			e.FieldStart("channel_type")
+			s.ChannelType.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfChannelsPostReq = [2]string{
+var jsonFieldsNameOfChannelsPostReq = [3]string{
 	0: "platform_type",
 	1: "period",
+	2: "channel_type",
 }
 
 // Decode decodes ChannelsPostReq from json.
@@ -253,6 +260,16 @@ func (s *ChannelsPostReq) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"period\"")
 			}
+		case "channel_type":
+			if err := func() error {
+				s.ChannelType.Reset()
+				if err := s.ChannelType.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"channel_type\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -273,6 +290,46 @@ func (s *ChannelsPostReq) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *ChannelsPostReq) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsPostReqChannelType as json.
+func (s ChannelsPostReqChannelType) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes ChannelsPostReqChannelType from json.
+func (s *ChannelsPostReqChannelType) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ChannelsPostReqChannelType to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch ChannelsPostReqChannelType(v) {
+	case ChannelsPostReqChannelTypeVspo:
+		*s = ChannelsPostReqChannelTypeVspo
+	case ChannelsPostReqChannelTypeAll:
+		*s = ChannelsPostReqChannelTypeAll
+	default:
+		*s = ChannelsPostReqChannelType(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ChannelsPostReqChannelType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ChannelsPostReqChannelType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -464,6 +521,39 @@ func (s *CronResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *CronResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ChannelsPostReqChannelType as json.
+func (o OptChannelsPostReqChannelType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes ChannelsPostReqChannelType from json.
+func (o *OptChannelsPostReqChannelType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptChannelsPostReqChannelType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptChannelsPostReqChannelType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptChannelsPostReqChannelType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

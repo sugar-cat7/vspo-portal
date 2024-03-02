@@ -45,6 +45,8 @@ type ChannelsPostReq struct {
 	PlatformType OptChannelsPostReqPlatformType `json:"platform_type"`
 	// Period for performing updates.
 	Period OptChannelsPostReqPeriod `json:"period"`
+	// Period for performing updates.
+	ChannelType OptChannelsPostReqChannelType `json:"channel_type"`
 }
 
 // GetPlatformType returns the value of PlatformType.
@@ -57,6 +59,11 @@ func (s *ChannelsPostReq) GetPeriod() OptChannelsPostReqPeriod {
 	return s.Period
 }
 
+// GetChannelType returns the value of ChannelType.
+func (s *ChannelsPostReq) GetChannelType() OptChannelsPostReqChannelType {
+	return s.ChannelType
+}
+
 // SetPlatformType sets the value of PlatformType.
 func (s *ChannelsPostReq) SetPlatformType(val OptChannelsPostReqPlatformType) {
 	s.PlatformType = val
@@ -65,6 +72,53 @@ func (s *ChannelsPostReq) SetPlatformType(val OptChannelsPostReqPlatformType) {
 // SetPeriod sets the value of Period.
 func (s *ChannelsPostReq) SetPeriod(val OptChannelsPostReqPeriod) {
 	s.Period = val
+}
+
+// SetChannelType sets the value of ChannelType.
+func (s *ChannelsPostReq) SetChannelType(val OptChannelsPostReqChannelType) {
+	s.ChannelType = val
+}
+
+// Period for performing updates.
+type ChannelsPostReqChannelType string
+
+const (
+	ChannelsPostReqChannelTypeVspo ChannelsPostReqChannelType = "vspo"
+	ChannelsPostReqChannelTypeAll  ChannelsPostReqChannelType = "all"
+)
+
+// AllValues returns all ChannelsPostReqChannelType values.
+func (ChannelsPostReqChannelType) AllValues() []ChannelsPostReqChannelType {
+	return []ChannelsPostReqChannelType{
+		ChannelsPostReqChannelTypeVspo,
+		ChannelsPostReqChannelTypeAll,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ChannelsPostReqChannelType) MarshalText() ([]byte, error) {
+	switch s {
+	case ChannelsPostReqChannelTypeVspo:
+		return []byte(s), nil
+	case ChannelsPostReqChannelTypeAll:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ChannelsPostReqChannelType) UnmarshalText(data []byte) error {
+	switch ChannelsPostReqChannelType(data) {
+	case ChannelsPostReqChannelTypeVspo:
+		*s = ChannelsPostReqChannelTypeVspo
+		return nil
+	case ChannelsPostReqChannelTypeAll:
+		*s = ChannelsPostReqChannelTypeAll
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // Period for performing updates.
@@ -203,6 +257,52 @@ func (s *CronResponse) GetMessage() OptString {
 // SetMessage sets the value of Message.
 func (s *CronResponse) SetMessage(val OptString) {
 	s.Message = val
+}
+
+// NewOptChannelsPostReqChannelType returns new OptChannelsPostReqChannelType with value set to v.
+func NewOptChannelsPostReqChannelType(v ChannelsPostReqChannelType) OptChannelsPostReqChannelType {
+	return OptChannelsPostReqChannelType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptChannelsPostReqChannelType is optional ChannelsPostReqChannelType.
+type OptChannelsPostReqChannelType struct {
+	Value ChannelsPostReqChannelType
+	Set   bool
+}
+
+// IsSet returns true if OptChannelsPostReqChannelType was set.
+func (o OptChannelsPostReqChannelType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptChannelsPostReqChannelType) Reset() {
+	var v ChannelsPostReqChannelType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptChannelsPostReqChannelType) SetTo(v ChannelsPostReqChannelType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptChannelsPostReqChannelType) Get() (v ChannelsPostReqChannelType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptChannelsPostReqChannelType) Or(d ChannelsPostReqChannelType) ChannelsPostReqChannelType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
 }
 
 // NewOptChannelsPostReqPeriod returns new OptChannelsPostReqPeriod with value set to v.
