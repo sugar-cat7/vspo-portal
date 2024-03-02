@@ -63,9 +63,6 @@
             "checksVoidReturn": false
           }
         ],
-        // Allow string enum value to be compared with string literal
-        // e.g. getLiveStatus(livestream) === "live"
-        "@typescript-eslint/no-unsafe-enum-comparison": "off",
 
         /* Additional rules */
         // Disallow trivially inferrable types, for reduced cognitive load

@@ -1,4 +1,4 @@
-import { Livestream, Platform } from "@/types/streaming";
+import { Livestream } from "@/types/streaming";
 
 const today = new Date();
 const tomorrow = new Date(today);
@@ -296,4 +296,4 @@ export const mockLivestreams: Livestream[] = [
       "https://yt3.googleusercontent.com/ytc/AL5GRJXuaEZn-og4JbkC4QJvCtmhWfPrJlOUBYQMl1RA=s176-c-k-c0x00ffffff-no-rj",
     platform: "youtube",
   },
-].map((stream) => ({ ...stream, platform: stream.platform as Platform }));
+];

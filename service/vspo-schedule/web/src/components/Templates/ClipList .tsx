@@ -12,7 +12,7 @@ import {
   PaletteColor,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Clip, Platform } from "@/types/streaming";
+import { Clip } from "@/types/streaming";
 import { isTrending } from "@/lib/utils";
 import { members } from "@/data/members";
 import PlayArrow from "@mui/icons-material/PlayArrow";
@@ -84,7 +84,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
       <Grid container spacing={3}>
         {paginatedClips.map((clip) => {
           const iconUrl =
-            clip.platform === Platform.Twitch
+            clip.platform === "twitch"
               ? members
                   .filter((m) => m.twitchChannelId === clip.channelId)
                   .at(0)?.iconUrl

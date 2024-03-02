@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Tabs, Tab } from "@mui/material";
-import { Clip, Platform } from "@/types/streaming";
+import { Clip } from "@/types/streaming";
 import { ClipList } from "./ClipList ";
 import { isTrending, shuffleClips, sortClipsByPopularity } from "@/lib/utils";
 import { styled } from "@mui/material/styles";
@@ -20,7 +20,7 @@ const StyledTabs = styled(Tabs)(({ theme }) => ({
 
 export const ClipTabs: React.FC<Props> = ({ clips }) => {
   const [value, setValue] = useState(
-    clips.at(0)?.platform === Platform.YouTube ? 0 : 1,
+    clips.at(0)?.platform === "youtube" ? 0 : 1,
   );
   const [sortedClips, setSortedClips] = useState(clips);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {

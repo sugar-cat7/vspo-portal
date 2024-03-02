@@ -1,15 +1,5 @@
-export enum LiveStatus {
-  Archive = "archive",
-  Live = "live",
-  Upcoming = "upcoming",
-}
-
-export enum Platform {
-  YouTube = "youtube",
-  Twitch = "twitch",
-  TwitCasting = "twitcasting",
-  NicoNico = "nicovideo",
-}
+export type LiveStatus = "archive" | "live" | "upcoming";
+export type Platform = "youtube" | "twitch" | "twitcasting" | "nicovideo";
 
 export type Livestream = {
   id: string;

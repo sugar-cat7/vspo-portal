@@ -117,24 +117,24 @@ const VideoPlayerOrLinkComponent: React.FC<{
   if (!livestream && !clip) return <></>;
   let embedUrl;
   if (livestream) {
-    if (livestream.platform === Platform.YouTube) {
+    if (livestream.platform === "youtube") {
       embedUrl = url.replace("watch?v=", "embed/");
-    } else if (livestream.platform === Platform.Twitch) {
+    } else if (livestream.platform === "twitch") {
       const tid = !livestream.twitchPastVideoId
         ? `channel=${livestream.twitchName}`
         : `video=${livestream.twitchPastVideoId}`;
       embedUrl = `https://player.twitch.tv/?${tid}&parent=${document.location.hostname}&autoplay=false`;
-    } else if (livestream.platform === Platform.TwitCasting) {
+    } else if (livestream.platform === "twitcasting") {
       // Assuming livestream.id is the Twitcasting live id
       embedUrl = url;
-    } else if (livestream.platform === Platform.NicoNico) {
+    } else if (livestream.platform === "nicovideo") {
       // Assuming livestream.id is the NicoNico live id
       embedUrl = `https://live.nicovideo.jp/embed/${livestream.id}/`;
     }
   } else if (clip) {
-    if (clip.platform === Platform.YouTube) {
+    if (clip.platform === "youtube") {
       embedUrl = url.replace("watch?v=", "embed/");
-    } else if (clip.platform === Platform.Twitch) {
+    } else if (clip.platform === "twitch") {
       embedUrl = `https://clips.twitch.tv/embed?clip=${clip.id}&parent=${document.location.hostname}&autoplay=false`;
     }
   }
@@ -169,14 +169,16 @@ const getYouTubeChatEmbedUrl = (
 };
 
 const ChatEmbed: React.FC<{
-  livestream: Livestream & { platform: Platform.Twitch | Platform.YouTube };
+  livestream: Livestream & {
+    platform: Extract<Livestream["platform"], "twitch" | "youtube">;
+  };
 }> = ({ livestream }) => {
   const { colorScheme } = useColorScheme();
   const [isLoading, setIsLoading] = React.useState(true);
 
   const isDarkMode = colorScheme === "dark";
   const chatEmbedUrl =
-    livestream.platform === Platform.Twitch
+    livestream.platform === "twitch"
       ? getTwitchChatEmbedUrl(livestream, isDarkMode)
       : getYouTubeChatEmbedUrl(livestream, isDarkMode);
 
@@ -218,7 +220,7 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
           })
         : getLivestreamUrl({
             videoId: clip?.id || "",
-            platform: clip?.platform || Platform.YouTube,
+            platform: clip?.platform || "youtube",
             isClip: true,
             externalLink: clip?.link,
           });
@@ -230,7 +232,7 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
 
   const iconUrl = livestream
     ? livestream.iconUrl
-    : clip?.platform === Platform.Twitch
+    : clip?.platform === "twitch"
       ? members.filter((m) => m.twitchChannelId === clip.channelId).at(0)
           ?.iconUrl
       : clip?.iconUrl;
@@ -374,10 +376,8 @@ const isLivestream = (video: Livestream | Clip): video is Livestream => {
 
 const isOnPlatformWithChat = <T extends { platform: Platform }>(
   video: T,
-): video is T & { platform: Platform.Twitch | Platform.YouTube } => {
-  return (
-    video.platform === Platform.Twitch || video.platform === Platform.YouTube
-  );
+): video is T & { platform: Extract<Platform, "twitch" | "youtube"> } => {
+  return video.platform === "twitch" || video.platform === "youtube";
 };
 
 const InfoTabs: React.FC<{
