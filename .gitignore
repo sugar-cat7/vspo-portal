@@ -36,6 +36,11 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# sitemaps
+**/public/robots.txt
+**/public/sitemap.xml
+**/public/sitemap-0.xml
+
 **/public/sw.js
 **/public/workbox-*.js
 **/public/worker-*.js
