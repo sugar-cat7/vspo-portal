@@ -306,10 +306,14 @@ export const LivestreamDetailsModal: React.FC<LivestreamDetailsModalProps> = ({
           alignItems: "center",
         }}
       >
-        <IconButton onClick={onClose} color="inherit">
-          <ArrowBackIcon />
-          <Typography>戻る</Typography>
-        </IconButton>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          sx={{ height: "100%", borderRadius: 0 }}
+          onClick={onClose}
+          color="inherit"
+        >
+          戻る
+        </Button>
         <Typography
           variant="body1"
           sx={{

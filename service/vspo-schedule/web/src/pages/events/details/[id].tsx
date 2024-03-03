@@ -77,7 +77,7 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
     <>
       <Toolbar disableGutters>
         <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()}>
-          Back
+          戻る
         </Button>
       </Toolbar>
 
