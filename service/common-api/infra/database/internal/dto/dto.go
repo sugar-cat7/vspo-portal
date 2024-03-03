@@ -26,3 +26,27 @@ func VideoToModel(v *db_sqlc.Video) *model.Video {
 		Description: v.Description,
 	}
 }
+
+func ChannelModelToCreateChannelParams(m *model.Channel) db_sqlc.CreateChannelParams {
+	return db_sqlc.CreateChannelParams{}
+}
+
+func VideoModelToCreateVideoParams(m *model.Video) db_sqlc.CreateVideoParams {
+	return db_sqlc.CreateVideoParams{}
+}
+
+func CreatorModelToCreateCreatorParams(m *model.Creator) db_sqlc.CreateCreatorParams {
+	return db_sqlc.CreateCreatorParams{}
+}
+
+func ChannelModelsToCreateChannelParams(m model.Channels) []db_sqlc.CreateChannelParams {
+	return []db_sqlc.CreateChannelParams{}
+}
+
+func VideoModelsToCreateVideoParams(m model.Videos) []db_sqlc.CreateVideoParams {
+	return []db_sqlc.CreateVideoParams{}
+}
+
+func CreatorModelsToCreateCreatorParams(m model.Creators) []db_sqlc.CreateCreatorParams {
+	return []db_sqlc.CreateCreatorParams{}
+}

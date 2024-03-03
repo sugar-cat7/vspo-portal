@@ -7,6 +7,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/repository"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/database"
 	db_sqlc "github.com/sugar-cat7/vspo-portal/service/common-api/infra/database/internal/db"
+	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/database/internal/dto"
 )
 
 type creator struct{}
@@ -14,6 +15,8 @@ type creator struct{}
 func NewCreator() repository.Creator {
 	return &creator{}
 }
+
+var _ repository.Creator = (*creator)(nil)
 
 func (r *creator) List(
 	ctx context.Context,
@@ -43,4 +46,26 @@ func (r *creator) Count(
 ) (uint64, error) {
 	// FIXME: implement
 	return 0, nil
+}
+
+func (r *creator) UpsertAll(
+	ctx context.Context,
+	m model.Creators,
+) (model.Creators, error) {
+	c, err := database.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	br := c.Queries.CreateCreator(ctx, dto.CreatorModelsToCreateCreatorParams(m))
+	defer br.Close()
+
+	var i model.Creators
+	br.QueryRow(func(_ int, ch db_sqlc.Creator, err error) {
+		if err != nil {
+			return
+		}
+		i = append(i, dto.CreatorToModel(&ch))
+	})
+
+	return i, nil
 }

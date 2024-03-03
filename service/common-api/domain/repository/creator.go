@@ -17,6 +17,10 @@ type Creator interface {
 		ctx context.Context,
 		query ListCreatorsQuery,
 	) (uint64, error)
+	UpsertAll(
+		ctx context.Context,
+		m model.Creators,
+	) (model.Creators, error)
 }
 
 type GetCreatorQuery struct {

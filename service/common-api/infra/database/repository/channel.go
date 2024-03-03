@@ -10,54 +10,54 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/database/internal/dto"
 )
 
-type video struct{}
+type channel struct{}
 
-func NewVideo() repository.Video {
-	return &video{}
+func NewChannel() repository.Channel {
+	return &channel{}
 }
 
-var _ repository.Video = (*video)(nil)
+var _ repository.Channel = (*channel)(nil)
 
-func (r *video) List(
+func (r *channel) List(
 	ctx context.Context,
-	query repository.ListVideosQuery,
-) (model.Videos, error) {
+	query repository.ListChannelsQuery,
+) (model.Channels, error) {
 	_, err := database.FromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	res := model.Videos{}
+	res := model.Channels{}
 	if query.Page.Valid && query.Limit.Valid {
 
 	}
 	return res, nil
 }
 
-func (r *video) Count(
+func (r *channel) Count(
 	ctx context.Context,
-	query repository.ListVideosQuery,
+	query repository.ListChannelsQuery,
 ) (uint64, error) {
 	// FIXME: implement
 	return 0, nil
 }
 
-func (r *video) UpsertAll(
+func (r *channel) UpsertAll(
 	ctx context.Context,
-	m model.Videos,
-) (model.Videos, error) {
+	m model.Channels,
+) (model.Channels, error) {
 	c, err := database.FromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	br := c.Queries.CreateVideo(ctx, dto.VideoModelsToCreateVideoParams(m))
+	br := c.Queries.CreateChannel(ctx, dto.ChannelModelsToCreateChannelParams(m))
 	defer br.Close()
 
-	var i model.Videos
-	br.QueryRow(func(_ int, ch db_sqlc.Video, err error) {
+	var i model.Channels
+	br.QueryRow(func(_ int, ch db_sqlc.Channel, err error) {
 		if err != nil {
 			return
 		}
-		i = append(i, dto.VideoToModel(&ch))
+		i = append(i, dto.ChannelToModel(&ch))
 	})
 
 	return i, nil
