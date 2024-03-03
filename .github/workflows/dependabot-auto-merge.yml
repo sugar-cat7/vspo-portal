@@ -24,6 +24,7 @@ jobs:
         if: >-
           (steps.metadata.outputs.update-type == 'version-update:semver-minor' ||
           steps.metadata.outputs.update-type == 'version-update:semver-patch')
-        run: gh pr review --approve --body "Auto-merging patch and minor updates in service/common-api" && gh pr merge --auto --merge ${{ github.event.pull_request.html_url }}
+        run: gh pr review --approve "$PR_URL" && gh pr merge --auto --merge "$PR_URL"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
