@@ -34,22 +34,6 @@ export const mockFreeChats: Livestream[] = [
     twitchPastVideoId: "",
   },
   {
-    id: "Fs4QLxzm-Fc",
-    title: "🌩 FREE CHAT 🌩",
-    description:
-      "たまに周回する～   好きに使ってちょまげェ！！！ ˗ˋˏ ぶいすぽっ！所属 ˎˊ˗ 神成きゅぴ  (Kaminari Qpi） ↳ 褐色ばぶ ...",
-    channelId: "UCMp55EbT_ZlqiMS3lCj01BQ",
-    channelTitle: "神成きゅぴ / Kaminari Qpi",
-    thumbnailUrl: "https://i.ytimg.com/vi/Fs4QLxzm-Fc/hqdefault_live.jpg",
-    scheduledStartTime: "2023-05-17T15:00:00.000Z",
-    actualEndTime: "1998-01-01T12:00:00Z",
-    iconUrl:
-      "https://yt3.googleusercontent.com/83sEziNDVt1HoBeo4JXIBXjA3DMGCxxyCLmCig9nml-h7f5bPMvczmtgh8TQUqzaOEoc-0lFgg=s176-c-k-c0x00ffffff-no-rj",
-    platform: "youtube",
-    twitchName: "",
-    twitchPastVideoId: "",
-  },
-  {
     id: "HC8rMmTWBGk",
     title: "フリーチャット🍒✨",
     description:
