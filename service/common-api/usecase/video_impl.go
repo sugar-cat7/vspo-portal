@@ -42,10 +42,26 @@ func (i *videoInteractor) UpsertAll(
 	ctx context.Context,
 	param *input.UpsertAllVideos,
 ) (model.Videos, error) {
+	// validate input
+	videoType, err := model.NewVideoType(param.VideoType)
+	if err != nil {
+		return nil, err
+	}
+	startedAt, endedAt, err := model.NewPeriod(param.Period)
+	if err != nil {
+		return nil, err
+	}
+
+	platformTypes, err := model.NewPlatformStringTypes(param.PlatformTypes)
+	if err != nil {
+		return nil, err
+	}
+
+	// Retrieve creators
 	cs, err := i.creatorRepository.List(
 		ctx,
 		repository.ListCreatorsQuery{
-			IsOnlyVspoMember: model.VideoType(param.VideoType) == model.VideoTypeVspoBroadcast,
+			MemberTypes: model.VideoTypeToMemberTypes(videoType),
 		},
 	)
 	if err != nil {
@@ -53,7 +69,18 @@ func (i *videoInteractor) UpsertAll(
 	}
 
 	// Retrieve existing videos
-	q := repository.ListVideosQuery{}
+	q := repository.ListVideosQuery{
+		VideoIDs:      param.VideoIDs,
+		PlatformTypes: platformTypes,
+		VideoType:     videoType.String(),
+		BroadcastStatus: []string{
+			model.StatusLive.String(),
+			model.StatusUpcoming.String(),
+			model.StatusEnded.String(),
+		},
+		StartedAt: startedAt,
+		EndedAt:   endedAt,
+	}
 	vs, err := i.videoRepository.List(
 		ctx,
 		q,
@@ -61,33 +88,19 @@ func (i *videoInteractor) UpsertAll(
 	if err != nil {
 		return nil, err
 	}
-	var updatedVideos model.Videos
-	if param.PlatformType == model.PlatformYouTube.String() {
-		newYoutubeVideos, err := i.youtubeVideos(ctx, cs, vs)
-		if err != nil {
-			return nil, err
-		}
-		updatedVideos = append(updatedVideos, newYoutubeVideos...)
-	}
-	if param.PlatformType == model.PlatformTwitch.String() {
-		newTwitchVideos, err := i.twitchVideos(ctx, cs, vs)
-		if err != nil {
-			return nil, err
-		}
-		updatedVideos = append(updatedVideos, newTwitchVideos...)
-	}
-	if param.PlatformType == model.PlatformTwitCasting.String() {
-		newTwitcastingVideos, err := i.twitCastingVideos(ctx, cs, vs)
-		if err != nil {
-			return nil, err
-		}
-		updatedVideos = append(updatedVideos, newTwitcastingVideos...)
-	}
+
+	// Update videos by platform types
+	uvs, err := i.updateVideosByPlatformTypes(
+		ctx,
+		cs,
+		vs,
+		param,
+	)
 
 	// Upsert Videos All
-	updatedVideos, err = i.videoRepository.UpsertAll(
+	updatedVideos, err := i.videoRepository.UpsertAll(
 		ctx,
-		updatedVideos,
+		uvs,
 	)
 	if err != nil {
 		return nil, err
@@ -98,7 +111,7 @@ func (i *videoInteractor) UpsertAll(
 
 func (i *videoInteractor) youtubeVideos(
 	ctx context.Context,
-	cs model.Creators,
+	_ model.Creators,
 	existVideos model.Videos,
 ) (model.Videos, error) {
 	// Retrieve new videos via youtube api
@@ -137,8 +150,8 @@ func (i *videoInteractor) youtubeVideos(
 	if err != nil {
 		return nil, err
 	}
-
-	return youtubeVideos.FilterUpdateTarget(existVideos).FilterCreator(cs), nil
+	// FIXME: Filter Logic
+	return youtubeVideos.FilterUpdateTarget(existVideos), nil
 }
 
 func (i *videoInteractor) twitchVideos(
@@ -156,8 +169,8 @@ func (i *videoInteractor) twitchVideos(
 	if err != nil {
 		return nil, err
 	}
-
-	return newTwitchVideos.FilterUpdateTarget(existVideos).FilterCreator(cs), nil
+	// FIXME: Filter Logic
+	return newTwitchVideos.FilterUpdateTarget(existVideos), nil
 }
 
 func (i *videoInteractor) twitCastingVideos(
@@ -175,6 +188,38 @@ func (i *videoInteractor) twitCastingVideos(
 	if err != nil {
 		return nil, err
 	}
+	// FIXME: Filter Logic
+	return newTwitcastingVideos.FilterUpdateTarget(existVideos), nil
+}
 
-	return newTwitcastingVideos.FilterUpdateTarget(existVideos).FilterCreator(cs), nil
+func (i *videoInteractor) updateVideosByPlatformTypes(
+	ctx context.Context,
+	cs model.Creators,
+	existVideos model.Videos,
+	param *input.UpsertAllVideos,
+) (model.Videos, error) {
+	var updatedVideos model.Videos
+	for _, platformType := range param.PlatformTypes {
+		switch platformType {
+		case model.PlatformYouTube.String():
+			newYoutubeVideos, err := i.youtubeVideos(ctx, cs, existVideos)
+			if err != nil {
+				return nil, err
+			}
+			updatedVideos = append(updatedVideos, newYoutubeVideos...)
+		case model.PlatformTwitch.String():
+			newTwitchVideos, err := i.twitchVideos(ctx, cs, existVideos)
+			if err != nil {
+				return nil, err
+			}
+			updatedVideos = append(updatedVideos, newTwitchVideos...)
+		case model.PlatformTwitCasting.String():
+			newTwitcastingVideos, err := i.twitCastingVideos(ctx, cs, existVideos)
+			if err != nil {
+				return nil, err
+			}
+			updatedVideos = append(updatedVideos, newTwitcastingVideos...)
+		}
+	}
+	return updatedVideos, nil
 }

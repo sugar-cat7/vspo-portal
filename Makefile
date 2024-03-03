@@ -3,6 +3,7 @@ DRIVER ?= postgres
 DBSTRING ?= host=localhost user=user password=password dbname=vspo sslmode=disable
 ogen:
 	@echo "Generating swagger files..."
+	rm -rf ./service/common-api/generated
 	go generate service/common-api/tool/generate.go
 ddl:
 	@echo "Generating new ddl files..."

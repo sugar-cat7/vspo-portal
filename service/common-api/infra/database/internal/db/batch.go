@@ -19,11 +19,11 @@ var (
 
 const createChannel = `-- name: CreateChannel :batchone
 INSERT INTO channel (
-    id, creator_id, platform_name, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, is_deleted
+    id, creator_id, platform_type, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, is_deleted
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12
 )
-RETURNING id, creator_id, platform_name, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, is_deleted
+RETURNING id, creator_id, platform_type, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, is_deleted
 `
 
 type CreateChannelBatchResults struct {
@@ -35,7 +35,7 @@ type CreateChannelBatchResults struct {
 type CreateChannelParams struct {
 	ID                    string
 	CreatorID             string
-	PlatformName          string
+	PlatformType          string
 	Title                 string
 	Description           string
 	PublishedAt           pgtype.Timestamptz
@@ -53,7 +53,7 @@ func (q *Queries) CreateChannel(ctx context.Context, arg []CreateChannelParams) 
 		vals := []interface{}{
 			a.ID,
 			a.CreatorID,
-			a.PlatformName,
+			a.PlatformType,
 			a.Title,
 			a.Description,
 			a.PublishedAt,
@@ -84,7 +84,7 @@ func (b *CreateChannelBatchResults) QueryRow(f func(int, Channel, error)) {
 		err := row.Scan(
 			&i.ID,
 			&i.CreatorID,
-			&i.PlatformName,
+			&i.PlatformType,
 			&i.Title,
 			&i.Description,
 			&i.PublishedAt,
@@ -166,11 +166,11 @@ func (b *CreateCreatorBatchResults) Close() error {
 
 const createVideo = `-- name: CreateVideo :batchone
 INSERT INTO video (
-    id, channel_id, platform_name, title, description, video_type, published_at, start_at, end_at, broadcast_status, tags, view_count, thumbnail_url, is_deleted
+    id, channel_id, platform_type, title, description, video_type, published_at, started_at, ended_at, broadcast_status, tags, view_count, thumbnail_url, is_deleted
 ) VALUES (
     $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
 )
-RETURNING id, channel_id, platform_name, title, description, video_type, published_at, start_at, end_at, broadcast_status, tags, view_count, thumbnail_url, is_deleted
+RETURNING id, channel_id, platform_type, title, description, video_type, published_at, started_at, ended_at, broadcast_status, tags, view_count, thumbnail_url, is_deleted
 `
 
 type CreateVideoBatchResults struct {
@@ -182,13 +182,13 @@ type CreateVideoBatchResults struct {
 type CreateVideoParams struct {
 	ID              string
 	ChannelID       string
-	PlatformName    string
+	PlatformType    string
 	Title           string
 	Description     string
 	VideoType       string
 	PublishedAt     pgtype.Timestamptz
-	StartAt         pgtype.Timestamptz
-	EndAt           pgtype.Timestamptz
+	StartedAt       pgtype.Timestamptz
+	EndedAt         pgtype.Timestamptz
 	BroadcastStatus string
 	Tags            string
 	ViewCount       int32
@@ -202,13 +202,13 @@ func (q *Queries) CreateVideo(ctx context.Context, arg []CreateVideoParams) *Cre
 		vals := []interface{}{
 			a.ID,
 			a.ChannelID,
-			a.PlatformName,
+			a.PlatformType,
 			a.Title,
 			a.Description,
 			a.VideoType,
 			a.PublishedAt,
-			a.StartAt,
-			a.EndAt,
+			a.StartedAt,
+			a.EndedAt,
 			a.BroadcastStatus,
 			a.Tags,
 			a.ViewCount,
@@ -235,13 +235,13 @@ func (b *CreateVideoBatchResults) QueryRow(f func(int, Video, error)) {
 		err := row.Scan(
 			&i.ID,
 			&i.ChannelID,
-			&i.PlatformName,
+			&i.PlatformType,
 			&i.Title,
 			&i.Description,
 			&i.VideoType,
 			&i.PublishedAt,
-			&i.StartAt,
-			&i.EndAt,
+			&i.StartedAt,
+			&i.EndedAt,
 			&i.BroadcastStatus,
 			&i.Tags,
 			&i.ViewCount,

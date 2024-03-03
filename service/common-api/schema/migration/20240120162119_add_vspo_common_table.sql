@@ -12,7 +12,7 @@ CREATE TABLE creator (
 CREATE TABLE channel (
     id text PRIMARY KEY,                          -- Unique identifier for the channel
     creator_id text NOT NULL,                     -- Identifier for the creator of the channel
-    platform_name text NOT NULL,                  -- Name of the platform (e.g. YouTube, Twitch)
+    platform_type text NOT NULL,                  -- Name of the platform (e.g. YouTube, Twitch)
     title text NOT NULL,                          -- Title of the channel
     description text NOT NULL,                    -- Description of the channel
     published_at timestamp with time zone NOT NULL, -- The date and time the channel was created
@@ -28,13 +28,13 @@ CREATE TABLE channel (
 CREATE TABLE video (
     id text PRIMARY KEY,                           -- Unique identifier for the video
     channel_id text NOT NULL,                      -- Identifier for the channel the video belongs to
-    platform_name text NOT NULL,                   -- Name of the platform (e.g. YouTube, Twitch)
+    platform_type text NOT NULL,                   -- Name of the platform (e.g. YouTube, Twitch)
     title text NOT NULL,                           -- Title of the video
     description text NOT NULL,                     -- Description of the video
     video_type text NOT NULL,                      -- Type of stream (e.g. vspo_broadcast, freechat, clip)
     published_at timestamp with time zone NOT NULL,-- The date and time the video was published
-    start_at timestamp with time zone NOT NULL,    -- The date and time the video started
-    end_at timestamp with time zone NOT NULL,      -- The date and time the video ended
+    started_at timestamp with time zone NOT NULL,    -- The date and time the video started
+    ended_at timestamp with time zone NOT NULL,      -- The date and time the video ended
     broadcast_status text NOT NULL,                -- Status of the video (e.g. live, upcoming)
     tags text NOT NULL,                            -- Tags associated with the video
     view_count integer NOT NULL,                   -- Number of views of the video

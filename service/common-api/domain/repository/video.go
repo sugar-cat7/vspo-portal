@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	"github.com/volatiletech/null/v8"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_repository
@@ -23,12 +23,19 @@ type Video interface {
 	) (model.Videos, error)
 }
 
+// GetVideoQuery is ...
 type GetVideoQuery struct {
-	ID null.String
+	ID string
 	BaseGetOptions
 }
 
+// ListVideosQuery is ...
 type ListVideosQuery struct {
-	VideoIDs []*null.String
+	VideoIDs        []string
+	PlatformTypes   []string
+	BroadcastStatus []string
+	VideoType       string
+	StartedAt       time.Time
+	EndedAt         time.Time
 	BaseListOptions
 }

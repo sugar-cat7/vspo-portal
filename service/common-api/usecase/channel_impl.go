@@ -34,9 +34,7 @@ func (i *channelInteractor) UpsertAll(
 ) (model.Channels, error) {
 	cs, err := i.creatorRepository.List(
 		ctx,
-		repository.ListCreatorsQuery{
-			IsOnlyVspoMember: param.ChannelType == "vspo",
-		},
+		repository.ListCreatorsQuery{},
 	)
 	if err != nil {
 		return nil, err

@@ -287,11 +287,11 @@ components:
           type: string
           example: 2020-12-31T12:34:56+09:00
           format: date-time
-        start_at:
+        started_at:
           type: string
           example: 2020-12-31T12:34:56+09:00
           format: date-time
-        end_at:
+        ended_at:
           type: string
           example: 2020-12-31T12:34:56+09:00
           format: date-time

@@ -12,6 +12,7 @@ import (
 
 type channel struct{}
 
+// NewChannel is ...
 func NewChannel() repository.Channel {
 	return &channel{}
 }

@@ -1,21 +1,22 @@
 package input
 
-// UpsertAllVideo is the input for UpsertAllVideo
+// UpsertAllVideos is the input for UpsertAllVideo
 type UpsertAllVideos struct {
-	PlatformType string
-	Period       string
-	VideoType    string
+	VideoIDs      []string
+	PlatformTypes []string
+	VideoType     string
+	Period        string
 }
 
 // NewUpsertAllVideoInput returns a new UpsertAllVideoInput
 func NewUpsertAllVideoInput(
-	platformType string,
-	period string,
+	platformTypes []string,
 	videoType string,
+	period string,
 ) *UpsertAllVideos {
 	return &UpsertAllVideos{
-		PlatformType: platformType,
-		Period:       period,
-		VideoType:    videoType,
+		PlatformTypes: platformTypes,
+		Period:        period,
+		VideoType:     videoType,
 	}
 }

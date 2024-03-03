@@ -6,18 +6,27 @@ INSERT INTO creator (
 )
 RETURNING *;
 
--- name: GetChannelsAndVideosByCreator :many
+-- name: GetCreatorsWithChannels :many
 SELECT
     sqlc.embed(cr),
-    sqlc.embed(ch),
-    sqlc.embed(v)
+    sqlc.embed(ch)
 FROM
     Creator cr
 JOIN
     Channel ch ON cr.id = ch.creatorId
-LEFT JOIN
-    Video v ON ch.id = v.channelId
 WHERE
-    cr.member_type = 'vspo_jp'
+    cr.member_type = ANY(@member_types::text[])
 LIMIT $1 OFFSET $2;
 
+
+-- name: GetCreatorsByIDs :many
+SELECT
+    sqlc.embed(cr),
+    sqlc.embed(ch)
+FROM
+    Creator cr
+JOIN
+    Channel ch ON cr.id = ch.creatorId
+WHERE
+    cr.id = ANY(@ids::text[])
+LIMIT $1 OFFSET $2;

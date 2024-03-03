@@ -1,9 +1,8 @@
 package dto
 
 import (
-	"github.com/Code-Hex/synchro"
-	"github.com/Code-Hex/synchro/tz"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
+	utime "github.com/sugar-cat7/vspo-portal/service/common-api/pkg/time"
 )
 
 type TwitCastingVideo struct {
@@ -16,7 +15,7 @@ type TwitCastingVideo struct {
 }
 
 func twStreamToVideo(twStream TwitCastingVideo) *model.Video {
-	t := synchro.Unix[tz.UTC](int64(twStream.StartedAt), 0)
+	t := utime.Utc.UnixToTime(int64(twStream.StartedAt), 0)
 	m := &model.Video{
 		ID:           twStream.ID,
 		Title:        twStream.Title,
@@ -24,8 +23,8 @@ func twStreamToVideo(twStream TwitCastingVideo) *model.Video {
 		ViewCount:    uint64(twStream.ViewCount),
 		ThumbnailURL: model.ThumbnailURL(twStream.ThumbnailURL),
 		Status:       status(twStream.IsLive),
-		PublishedAt:  t.StdTime(),
-		StartAt:      t.StdTime(),
+		PublishedAt:  t,
+		StartAt:      t,
 	}
 
 	return m

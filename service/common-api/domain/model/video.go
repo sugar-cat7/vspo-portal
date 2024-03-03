@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/samber/lo"
@@ -29,6 +30,7 @@ type Videos []*Video
 // CreatorInfo represents the information about the creator of a video.
 type CreatorInfo struct {
 	ID           string
+	ChannelID    string
 	Name         string
 	ThumbnailURL ThumbnailURL
 }
@@ -42,6 +44,16 @@ const (
 	VideoTypeClip          VideoType = "clip"
 	VideoTypeFreechat      VideoType = "freechat"
 )
+
+// NewVideoType is ...
+func NewVideoType(s string) (VideoType, error) {
+	switch s {
+	case "all", "vspo_broadcast", "clip", "freechat":
+		return VideoType(s), nil
+	default:
+		return "", fmt.Errorf("invalid VideoType: %s", s)
+	}
+}
 
 func (t VideoType) String() string {
 	return string(t)
@@ -85,7 +97,7 @@ func (vs Videos) FilterCreator(cs Creators) Videos {
 	}
 	return lo.Filter(vs, func(video *Video, _ int) bool {
 		return lo.Contains(lo.Map(cs, func(c *Creator, _ int) string {
-			return c.ID
-		}), video.CreatorInfo.ID)
+			return c.Channel.Youtube.ID
+		}), video.CreatorInfo.ChannelID)
 	})
 }

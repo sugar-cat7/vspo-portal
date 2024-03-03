@@ -9,49 +9,46 @@ import (
 	"context"
 )
 
-const getChannelsAndVideosByCreator = `-- name: GetChannelsAndVideosByCreator :many
+const getCreatorsByIDs = `-- name: GetCreatorsByIDs :many
 SELECT
     cr.id, cr.name, cr.member_type,
-    ch.id, ch.creator_id, ch.platform_name, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted,
-    v.id, v.channel_id, v.platform_name, v.title, v.description, v.video_type, v.published_at, v.start_at, v.end_at, v.broadcast_status, v.tags, v.view_count, v.thumbnail_url, v.is_deleted
+    ch.id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
 FROM
     Creator cr
 JOIN
     Channel ch ON cr.id = ch.creatorId
-LEFT JOIN
-    Video v ON ch.id = v.channelId
 WHERE
-    cr.member_type = 'vspo_jp'
+    cr.id = ANY($3::text[])
 LIMIT $1 OFFSET $2
 `
 
-type GetChannelsAndVideosByCreatorParams struct {
+type GetCreatorsByIDsParams struct {
 	Limit  int32
 	Offset int32
+	Ids    []string
 }
 
-type GetChannelsAndVideosByCreatorRow struct {
+type GetCreatorsByIDsRow struct {
 	Creator Creator
 	Channel Channel
-	Video   Video
 }
 
-func (q *Queries) GetChannelsAndVideosByCreator(ctx context.Context, arg GetChannelsAndVideosByCreatorParams) ([]GetChannelsAndVideosByCreatorRow, error) {
-	rows, err := q.db.Query(ctx, getChannelsAndVideosByCreator, arg.Limit, arg.Offset)
+func (q *Queries) GetCreatorsByIDs(ctx context.Context, arg GetCreatorsByIDsParams) ([]GetCreatorsByIDsRow, error) {
+	rows, err := q.db.Query(ctx, getCreatorsByIDs, arg.Limit, arg.Offset, arg.Ids)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetChannelsAndVideosByCreatorRow
+	var items []GetCreatorsByIDsRow
 	for rows.Next() {
-		var i GetChannelsAndVideosByCreatorRow
+		var i GetCreatorsByIDsRow
 		if err := rows.Scan(
 			&i.Creator.ID,
 			&i.Creator.Name,
 			&i.Creator.MemberType,
 			&i.Channel.ID,
 			&i.Channel.CreatorID,
-			&i.Channel.PlatformName,
+			&i.Channel.PlatformType,
 			&i.Channel.Title,
 			&i.Channel.Description,
 			&i.Channel.PublishedAt,
@@ -61,20 +58,66 @@ func (q *Queries) GetChannelsAndVideosByCreator(ctx context.Context, arg GetChan
 			&i.Channel.TotalVideoCount,
 			&i.Channel.ThumbnailUrl,
 			&i.Channel.IsDeleted,
-			&i.Video.ID,
-			&i.Video.ChannelID,
-			&i.Video.PlatformName,
-			&i.Video.Title,
-			&i.Video.Description,
-			&i.Video.VideoType,
-			&i.Video.PublishedAt,
-			&i.Video.StartAt,
-			&i.Video.EndAt,
-			&i.Video.BroadcastStatus,
-			&i.Video.Tags,
-			&i.Video.ViewCount,
-			&i.Video.ThumbnailUrl,
-			&i.Video.IsDeleted,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getCreatorsWithChannels = `-- name: GetCreatorsWithChannels :many
+SELECT
+    cr.id, cr.name, cr.member_type,
+    ch.id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
+FROM
+    Creator cr
+JOIN
+    Channel ch ON cr.id = ch.creatorId
+WHERE
+    cr.member_type = ANY($3::text[])
+LIMIT $1 OFFSET $2
+`
+
+type GetCreatorsWithChannelsParams struct {
+	Limit       int32
+	Offset      int32
+	MemberTypes []string
+}
+
+type GetCreatorsWithChannelsRow struct {
+	Creator Creator
+	Channel Channel
+}
+
+func (q *Queries) GetCreatorsWithChannels(ctx context.Context, arg GetCreatorsWithChannelsParams) ([]GetCreatorsWithChannelsRow, error) {
+	rows, err := q.db.Query(ctx, getCreatorsWithChannels, arg.Limit, arg.Offset, arg.MemberTypes)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetCreatorsWithChannelsRow
+	for rows.Next() {
+		var i GetCreatorsWithChannelsRow
+		if err := rows.Scan(
+			&i.Creator.ID,
+			&i.Creator.Name,
+			&i.Creator.MemberType,
+			&i.Channel.ID,
+			&i.Channel.CreatorID,
+			&i.Channel.PlatformType,
+			&i.Channel.Title,
+			&i.Channel.Description,
+			&i.Channel.PublishedAt,
+			&i.Channel.TotalViewCount,
+			&i.Channel.SubscriberCount,
+			&i.Channel.HiddenSubscriberCount,
+			&i.Channel.TotalVideoCount,
+			&i.Channel.ThumbnailUrl,
+			&i.Channel.IsDeleted,
 		); err != nil {
 			return nil, err
 		}

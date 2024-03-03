@@ -11,7 +11,7 @@ import (
 type Channel struct {
 	ID                    string
 	CreatorID             string
-	PlatformName          string
+	PlatformType          string
 	Title                 string
 	Description           string
 	PublishedAt           pgtype.Timestamptz
@@ -32,13 +32,13 @@ type Creator struct {
 type Video struct {
 	ID              string
 	ChannelID       string
-	PlatformName    string
+	PlatformType    string
 	Title           string
 	Description     string
 	VideoType       string
 	PublishedAt     pgtype.Timestamptz
-	StartAt         pgtype.Timestamptz
-	EndAt           pgtype.Timestamptz
+	StartedAt       pgtype.Timestamptz
+	EndedAt         pgtype.Timestamptz
 	BroadcastStatus string
 	Tags            string
 	ViewCount       int32

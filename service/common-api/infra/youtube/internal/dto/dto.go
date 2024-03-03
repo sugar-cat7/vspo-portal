@@ -1,10 +1,8 @@
 package dto
 
 import (
-	"github.com/Code-Hex/synchro"
-	"github.com/Code-Hex/synchro/tz"
-
 	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
+	utime "github.com/sugar-cat7/vspo-portal/service/common-api/pkg/time"
 	"google.golang.org/api/youtube/v3"
 )
 
@@ -30,24 +28,24 @@ func ytVideoToVideo(ytVideo *youtube.Video) (*model.Video, error) {
 		m.Status = model.StatusEnded
 	}
 
-	publishedAt, err := synchro.ParseISO[tz.UTC](ytVideo.Snippet.PublishedAt)
+	publishedAt, err := utime.Utc.ISOStringToTime(ytVideo.Snippet.PublishedAt)
 	if err != nil {
 		return nil, err
 	}
-	m.PublishedAt = publishedAt.StdTime()
+	m.PublishedAt = publishedAt
 
-	startAt, err := synchro.ParseISO[tz.UTC](ytVideo.LiveStreamingDetails.ScheduledStartTime)
+	startAt, err := utime.Utc.ISOStringToTime(ytVideo.LiveStreamingDetails.ScheduledStartTime)
 	if err != nil {
 		return nil, err
 	}
-	m.StartAt = startAt.StdTime()
+	m.StartAt = startAt
 
 	if ytVideo.LiveStreamingDetails.ActualEndTime != "" {
-		endAt, err := synchro.ParseISO[tz.UTC](ytVideo.LiveStreamingDetails.ActualEndTime)
+		endAt, err := utime.Utc.ISOStringToTime(ytVideo.LiveStreamingDetails.ActualEndTime)
 		if err != nil {
 			return nil, err
 		}
-		m.EndAt = endAt.StdTime()
+		m.EndAt = endAt
 	}
 	return m, nil
 }
@@ -97,11 +95,11 @@ func ytSearchResultToVideo(ytSearchResult *youtube.SearchResult) (*model.Video, 
 		m.Status = model.StatusEnded
 	}
 
-	publishedAt, err := synchro.ParseISO[tz.UTC](ytSearchResult.Snippet.PublishedAt)
+	publishedAt, err := utime.Utc.ISOStringToTime(ytSearchResult.Snippet.PublishedAt)
 	if err != nil {
 		return nil, err
 	}
-	m.PublishedAt = publishedAt.StdTime()
+	m.PublishedAt = publishedAt
 
 	return m, nil
 }

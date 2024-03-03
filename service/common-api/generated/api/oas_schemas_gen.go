@@ -1107,8 +1107,8 @@ type VideoResponse struct {
 	Title        OptString                   `json:"title"`
 	Description  OptString                   `json:"description"`
 	PublishedAt  OptDateTime                 `json:"published_at"`
-	StartAt      OptDateTime                 `json:"start_at"`
-	EndAt        OptDateTime                 `json:"end_at"`
+	StartedAt    OptDateTime                 `json:"started_at"`
+	EndedAt      OptDateTime                 `json:"ended_at"`
 	Tags         []string                    `json:"tags"`
 	ThumbnailURL OptString                   `json:"thumbnail_url"`
 	Platform     OptVideoResponsePlatform    `json:"platform"`
@@ -1136,14 +1136,14 @@ func (s *VideoResponse) GetPublishedAt() OptDateTime {
 	return s.PublishedAt
 }
 
-// GetStartAt returns the value of StartAt.
-func (s *VideoResponse) GetStartAt() OptDateTime {
-	return s.StartAt
+// GetStartedAt returns the value of StartedAt.
+func (s *VideoResponse) GetStartedAt() OptDateTime {
+	return s.StartedAt
 }
 
-// GetEndAt returns the value of EndAt.
-func (s *VideoResponse) GetEndAt() OptDateTime {
-	return s.EndAt
+// GetEndedAt returns the value of EndedAt.
+func (s *VideoResponse) GetEndedAt() OptDateTime {
+	return s.EndedAt
 }
 
 // GetTags returns the value of Tags.
@@ -1191,14 +1191,14 @@ func (s *VideoResponse) SetPublishedAt(val OptDateTime) {
 	s.PublishedAt = val
 }
 
-// SetStartAt sets the value of StartAt.
-func (s *VideoResponse) SetStartAt(val OptDateTime) {
-	s.StartAt = val
+// SetStartedAt sets the value of StartedAt.
+func (s *VideoResponse) SetStartedAt(val OptDateTime) {
+	s.StartedAt = val
 }
 
-// SetEndAt sets the value of EndAt.
-func (s *VideoResponse) SetEndAt(val OptDateTime) {
-	s.EndAt = val
+// SetEndedAt sets the value of EndedAt.
+func (s *VideoResponse) SetEndedAt(val OptDateTime) {
+	s.EndedAt = val
 }
 
 // SetTags sets the value of Tags.

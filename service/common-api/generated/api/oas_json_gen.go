@@ -947,15 +947,15 @@ func (s *VideoResponse) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.StartAt.Set {
-			e.FieldStart("start_at")
-			s.StartAt.Encode(e, json.EncodeDateTime)
+		if s.StartedAt.Set {
+			e.FieldStart("started_at")
+			s.StartedAt.Encode(e, json.EncodeDateTime)
 		}
 	}
 	{
-		if s.EndAt.Set {
-			e.FieldStart("end_at")
-			s.EndAt.Encode(e, json.EncodeDateTime)
+		if s.EndedAt.Set {
+			e.FieldStart("ended_at")
+			s.EndedAt.Encode(e, json.EncodeDateTime)
 		}
 	}
 	{
@@ -999,8 +999,8 @@ var jsonFieldsNameOfVideoResponse = [11]string{
 	1:  "title",
 	2:  "description",
 	3:  "published_at",
-	4:  "start_at",
-	5:  "end_at",
+	4:  "started_at",
+	5:  "ended_at",
 	6:  "tags",
 	7:  "thumbnail_url",
 	8:  "platform",
@@ -1056,25 +1056,25 @@ func (s *VideoResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"published_at\"")
 			}
-		case "start_at":
+		case "started_at":
 			if err := func() error {
-				s.StartAt.Reset()
-				if err := s.StartAt.Decode(d, json.DecodeDateTime); err != nil {
+				s.StartedAt.Reset()
+				if err := s.StartedAt.Decode(d, json.DecodeDateTime); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"start_at\"")
+				return errors.Wrap(err, "decode field \"started_at\"")
 			}
-		case "end_at":
+		case "ended_at":
 			if err := func() error {
-				s.EndAt.Reset()
-				if err := s.EndAt.Decode(d, json.DecodeDateTime); err != nil {
+				s.EndedAt.Reset()
+				if err := s.EndedAt.Decode(d, json.DecodeDateTime); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"end_at\"")
+				return errors.Wrap(err, "decode field \"ended_at\"")
 			}
 		case "tags":
 			if err := func() error {

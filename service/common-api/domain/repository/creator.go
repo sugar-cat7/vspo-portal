@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	"github.com/volatiletech/null/v8"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_repository
@@ -24,12 +23,13 @@ type Creator interface {
 }
 
 type GetCreatorQuery struct {
-	ID null.String
+	ID string
 	BaseGetOptions
 }
 
+// ListCreatorsQuery is ...
 type ListCreatorsQuery struct {
-	CreatorIDs       []*null.String
-	IsOnlyVspoMember bool
+	CreatorIDs  []string
+	MemberTypes []string
 	BaseListOptions
 }

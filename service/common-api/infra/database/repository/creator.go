@@ -12,6 +12,7 @@ import (
 
 type creator struct{}
 
+// NewCreator is ...
 func NewCreator() repository.Creator {
 	return &creator{}
 }
@@ -28,14 +29,30 @@ func (r *creator) List(
 	}
 	res := model.Creators{}
 	if query.Page.Valid && query.Limit.Valid {
-
-		_, err := client.Queries.GetChannelsAndVideosByCreator(ctx, db_sqlc.GetChannelsAndVideosByCreatorParams{
-			Offset: int32(query.Page.Uint64),
-			Limit:  int32(query.Limit.Uint64),
+		// If CreatorIDs are specified, search by CreatorIDs
+		if len(query.CreatorIDs) > 0 {
+			cs, err := client.Queries.GetCreatorsByIDs(ctx, db_sqlc.GetCreatorsByIDsParams{
+				Ids:    query.CreatorIDs,
+				Limit:  int32(query.Limit.Uint64),
+				Offset: int32(query.Page.Uint64) * int32(query.Limit.Uint64),
+			})
+			if err != nil {
+				return nil, err
+			}
+			res = dto.CreatorsByIDsRowsToModel(cs)
+			return res, nil
+		}
+		// If MemberType is specified, search by MemberType
+		cs, err := client.Queries.GetCreatorsWithChannels(ctx, db_sqlc.GetCreatorsWithChannelsParams{
+			MemberTypes: query.MemberTypes,
+			Limit:       int32(query.Limit.Uint64),
+			Offset:      int32(query.Page.Uint64) * int32(query.Limit.Uint64),
 		})
 		if err != nil {
 			return nil, err
 		}
+		res = dto.CreatorsWithChannelsRowsToModel(cs)
+		return res, nil
 	}
 	return res, nil
 }

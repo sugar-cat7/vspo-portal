@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	"github.com/volatiletech/null/v8"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_repository
@@ -24,11 +23,11 @@ type Channel interface {
 }
 
 type GetChannelQuery struct {
-	ID null.String
+	ID string
 	BaseGetOptions
 }
 
 type ListChannelsQuery struct {
-	ChannelIDs []*null.String
+	ChannelIDs []string
 	BaseListOptions
 }
