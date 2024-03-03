@@ -1,0 +1,35 @@
+name: Dependabot auto-merge
+on: pull_request
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Check for changes in 'service/common-api'
+        id: check_files
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | grep -qe "service/common-api"; then
+            echo "PATH_MATCHED=true" >> $GITHUB_ENV
+          else
+            echo "PATH_MATCHED=false" >> $GITHUB_ENV
+          fi
+      - name: Auto-merge
+        if: >-
+          (steps.metadata.outputs.update-type == 'version-update:semver-minor' ||
+          steps.metadata.outputs.update-type == 'version-update:semver-patch') &&
+          env.PATH_MATCHED == 'true'
+        run: gh pr review --approve --body "Auto-merging patch and minor updates in service/common-api" && gh pr merge --auto --merge ${{ github.event.pull_request.html_url }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
