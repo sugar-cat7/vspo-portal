@@ -4,52 +4,15 @@
   margin: 0;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+html {
   height: 100%;
+}
+
+body {
+  min-height: 100%;
 }
 
 a {
   color: inherit;
   text-decoration: none;
-}
-#onesignal-bell-container.onesignal-reset.onesignal-bell-container-bottom-right {
-  top: 83px;
-  right: 24px !important;
-  bottom: unset !important;
-  border-color: transparent !important;
-  display: none !important;
-}
-
-@media screen and (max-width: 599px) {
-  #onesignal-bell-container.onesignal-reset.onesignal-bell-container-bottom-right {
-    top: 79px;
-    right: 16px !important;
-  }
-}
-
-#onesignal-bell-container.onesignal-reset
-  .onesignal-bell-launcher
-  .onesignal-bell-launcher-button
-  svg {
-  width: 36px !important;
-  height: 36px !important;
-}
-
-#onesignal-bell-container.onesignal-reset
-  .onesignal-bell-launcher.onesignal-bell-launcher-theme-default
-  .onesignal-bell-launcher-button
-  svg
-  .background {
-  fill: transparent !important;
-}
-
-#onesignal-bell-container.onesignal-reset
-  .onesignal-bell-launcher.onesignal-bell-launcher-theme-default
-  .onesignal-bell-launcher-button
-  svg
-  .stroke {
-  stroke: transparent !important;
 }
