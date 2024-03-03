@@ -1,3 +1,11 @@
+-- name: CreateCreator :batchone
+INSERT INTO creator (
+    id, name, member_type
+) VALUES (
+    $1, $2, $3
+)
+RETURNING *;
+
 -- name: GetChannelsAndVideosByCreator :many
 SELECT
     sqlc.embed(cr),
@@ -13,11 +21,3 @@ WHERE
     cr.member_type = 'vspo_jp'
 LIMIT $1 OFFSET $2;
 
--- -- name: GetTotalCountByCreator
--- SELECT COUNT(*)
--- FROM
---     Creator cr
--- JOIN
---     Channel ch ON cr.id = ch.creatorId
--- WHERE
---     cr.id = $1;

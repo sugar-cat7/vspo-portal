@@ -20,8 +20,7 @@ type Channel struct {
 	HiddenSubscriberCount bool
 	TotalVideoCount       int32
 	ThumbnailUrl          string
-	ThumbnailHeight       int32
-	ThumbnailWidth        int32
+	IsDeleted             bool
 }
 
 type Creator struct {
@@ -36,14 +35,13 @@ type Video struct {
 	PlatformName    string
 	Title           string
 	Description     string
-	StreamType      string
+	VideoType       string
 	PublishedAt     pgtype.Timestamptz
 	StartAt         pgtype.Timestamptz
 	EndAt           pgtype.Timestamptz
-	Status          string
+	BroadcastStatus string
 	Tags            string
 	ViewCount       int32
 	ThumbnailUrl    string
-	ThumbnailHeight int32
-	ThumbnailWidth  int32
+	IsDeleted       bool
 }

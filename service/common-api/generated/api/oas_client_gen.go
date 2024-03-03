@@ -395,15 +395,15 @@ func (c *Client) sendVideosGet(ctx context.Context, params VideosGetParams) (res
 		}
 	}
 	{
-		// Encode "broadcast_type" parameter.
+		// Encode "broadcast_status" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "broadcast_type",
+			Name:    "broadcast_status",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.BroadcastType.Get(); ok {
+			if val, ok := params.BroadcastStatus.Get(); ok {
 				return e.EncodeValue(conv.StringToString(string(val)))
 			}
 			return nil

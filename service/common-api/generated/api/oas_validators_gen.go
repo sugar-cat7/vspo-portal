@@ -68,7 +68,7 @@ func (s VideoResponsePlatform) Validate() error {
 	}
 }
 
-func (s VideosGetBroadcastType) Validate() error {
+func (s VideosGetBroadcastStatus) Validate() error {
 	switch s {
 	case "all":
 		return nil

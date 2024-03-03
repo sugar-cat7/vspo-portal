@@ -1,4 +1,4 @@
-DIR ?= ./service/common-api/schema/migrations
+DIR ?= ./service/common-api/schema/migration
 DRIVER ?= postgres
 DBSTRING ?= host=localhost user=user password=password dbname=vspo sslmode=disable
 ogen:
@@ -6,7 +6,7 @@ ogen:
 	go generate service/common-api/tool/generate.go
 ddl:
 	@echo "Generating new ddl files..."
-	goose -dir ./service/common-api/schema/migrations create $(name) sql
+	goose -dir ./service/common-api/schema/migration create $(name) sql
 	@echo "Generating new ddl files...done"
 local-db-setup:
 	@echo "Setting up local database..."
@@ -18,5 +18,5 @@ migrate:
 	@echo "Migrating database...done"
 sqlc:
 	@echo "Generating sqlc files..."
-	cd ./service/common-api && sqlc generate
+	cd ./service/common-api && rm -rf ./infra/database/internal/db && sqlc generate
 	@echo "Generating sqlc files...done"

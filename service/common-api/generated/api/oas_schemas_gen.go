@@ -755,38 +755,38 @@ func (o OptVideoResponsePlatform) Or(d VideoResponsePlatform) VideoResponsePlatf
 	return d
 }
 
-// NewOptVideosGetBroadcastType returns new OptVideosGetBroadcastType with value set to v.
-func NewOptVideosGetBroadcastType(v VideosGetBroadcastType) OptVideosGetBroadcastType {
-	return OptVideosGetBroadcastType{
+// NewOptVideosGetBroadcastStatus returns new OptVideosGetBroadcastStatus with value set to v.
+func NewOptVideosGetBroadcastStatus(v VideosGetBroadcastStatus) OptVideosGetBroadcastStatus {
+	return OptVideosGetBroadcastStatus{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptVideosGetBroadcastType is optional VideosGetBroadcastType.
-type OptVideosGetBroadcastType struct {
-	Value VideosGetBroadcastType
+// OptVideosGetBroadcastStatus is optional VideosGetBroadcastStatus.
+type OptVideosGetBroadcastStatus struct {
+	Value VideosGetBroadcastStatus
 	Set   bool
 }
 
-// IsSet returns true if OptVideosGetBroadcastType was set.
-func (o OptVideosGetBroadcastType) IsSet() bool { return o.Set }
+// IsSet returns true if OptVideosGetBroadcastStatus was set.
+func (o OptVideosGetBroadcastStatus) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptVideosGetBroadcastType) Reset() {
-	var v VideosGetBroadcastType
+func (o *OptVideosGetBroadcastStatus) Reset() {
+	var v VideosGetBroadcastStatus
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptVideosGetBroadcastType) SetTo(v VideosGetBroadcastType) {
+func (o *OptVideosGetBroadcastStatus) SetTo(v VideosGetBroadcastStatus) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptVideosGetBroadcastType) Get() (v VideosGetBroadcastType, ok bool) {
+func (o OptVideosGetBroadcastStatus) Get() (v VideosGetBroadcastStatus, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -794,7 +794,7 @@ func (o OptVideosGetBroadcastType) Get() (v VideosGetBroadcastType, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptVideosGetBroadcastType) Or(d VideosGetBroadcastType) VideosGetBroadcastType {
+func (o OptVideosGetBroadcastStatus) Or(d VideosGetBroadcastStatus) VideosGetBroadcastStatus {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1329,35 +1329,35 @@ type VideosGetBadRequest struct{}
 
 func (*VideosGetBadRequest) videosGetRes() {}
 
-type VideosGetBroadcastType string
+type VideosGetBroadcastStatus string
 
 const (
-	VideosGetBroadcastTypeAll      VideosGetBroadcastType = "all"
-	VideosGetBroadcastTypeLive     VideosGetBroadcastType = "live"
-	VideosGetBroadcastTypeUpcoming VideosGetBroadcastType = "upcoming"
-	VideosGetBroadcastTypeArchive  VideosGetBroadcastType = "archive"
+	VideosGetBroadcastStatusAll      VideosGetBroadcastStatus = "all"
+	VideosGetBroadcastStatusLive     VideosGetBroadcastStatus = "live"
+	VideosGetBroadcastStatusUpcoming VideosGetBroadcastStatus = "upcoming"
+	VideosGetBroadcastStatusArchive  VideosGetBroadcastStatus = "archive"
 )
 
-// AllValues returns all VideosGetBroadcastType values.
-func (VideosGetBroadcastType) AllValues() []VideosGetBroadcastType {
-	return []VideosGetBroadcastType{
-		VideosGetBroadcastTypeAll,
-		VideosGetBroadcastTypeLive,
-		VideosGetBroadcastTypeUpcoming,
-		VideosGetBroadcastTypeArchive,
+// AllValues returns all VideosGetBroadcastStatus values.
+func (VideosGetBroadcastStatus) AllValues() []VideosGetBroadcastStatus {
+	return []VideosGetBroadcastStatus{
+		VideosGetBroadcastStatusAll,
+		VideosGetBroadcastStatusLive,
+		VideosGetBroadcastStatusUpcoming,
+		VideosGetBroadcastStatusArchive,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s VideosGetBroadcastType) MarshalText() ([]byte, error) {
+func (s VideosGetBroadcastStatus) MarshalText() ([]byte, error) {
 	switch s {
-	case VideosGetBroadcastTypeAll:
+	case VideosGetBroadcastStatusAll:
 		return []byte(s), nil
-	case VideosGetBroadcastTypeLive:
+	case VideosGetBroadcastStatusLive:
 		return []byte(s), nil
-	case VideosGetBroadcastTypeUpcoming:
+	case VideosGetBroadcastStatusUpcoming:
 		return []byte(s), nil
-	case VideosGetBroadcastTypeArchive:
+	case VideosGetBroadcastStatusArchive:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1365,19 +1365,19 @@ func (s VideosGetBroadcastType) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *VideosGetBroadcastType) UnmarshalText(data []byte) error {
-	switch VideosGetBroadcastType(data) {
-	case VideosGetBroadcastTypeAll:
-		*s = VideosGetBroadcastTypeAll
+func (s *VideosGetBroadcastStatus) UnmarshalText(data []byte) error {
+	switch VideosGetBroadcastStatus(data) {
+	case VideosGetBroadcastStatusAll:
+		*s = VideosGetBroadcastStatusAll
 		return nil
-	case VideosGetBroadcastTypeLive:
-		*s = VideosGetBroadcastTypeLive
+	case VideosGetBroadcastStatusLive:
+		*s = VideosGetBroadcastStatusLive
 		return nil
-	case VideosGetBroadcastTypeUpcoming:
-		*s = VideosGetBroadcastTypeUpcoming
+	case VideosGetBroadcastStatusUpcoming:
+		*s = VideosGetBroadcastStatusUpcoming
 		return nil
-	case VideosGetBroadcastTypeArchive:
-		*s = VideosGetBroadcastTypeArchive
+	case VideosGetBroadcastStatusArchive:
+		*s = VideosGetBroadcastStatusArchive
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

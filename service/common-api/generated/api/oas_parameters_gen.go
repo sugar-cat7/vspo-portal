@@ -266,7 +266,7 @@ type VideosGetParams struct {
 	VideoType OptVideosGetVideoType
 	// A filter used to filter the list of videos by the video's vspo_broadcast type.(The default is
 	// "all".).
-	BroadcastType OptVideosGetBroadcastType
+	BroadcastStatus OptVideosGetBroadcastStatus
 	// A filter used to filter the list of videos by when they were published.(The default is "all".).
 	Period OptVideosGetPeriod
 	// The order to sort the returned videos.(The default is "time".).
@@ -320,11 +320,11 @@ func unpackVideosGetParams(packed middleware.Parameters) (params VideosGetParams
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "broadcast_type",
+			Name: "broadcast_status",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.BroadcastType = v.(OptVideosGetBroadcastType)
+			params.BroadcastStatus = v.(OptVideosGetBroadcastStatus)
 		}
 	}
 	{
@@ -556,17 +556,17 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 			Err:  err,
 		}
 	}
-	// Decode query: broadcast_type.
+	// Decode query: broadcast_status.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "broadcast_type",
+			Name:    "broadcast_status",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotBroadcastTypeVal VideosGetBroadcastType
+				var paramsDotBroadcastStatusVal VideosGetBroadcastStatus
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -578,18 +578,18 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 						return err
 					}
 
-					paramsDotBroadcastTypeVal = VideosGetBroadcastType(c)
+					paramsDotBroadcastStatusVal = VideosGetBroadcastStatus(c)
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.BroadcastType.SetTo(paramsDotBroadcastTypeVal)
+				params.BroadcastStatus.SetTo(paramsDotBroadcastStatusVal)
 				return nil
 			}); err != nil {
 				return err
 			}
 			if err := func() error {
-				if value, ok := params.BroadcastType.Get(); ok {
+				if value, ok := params.BroadcastStatus.Get(); ok {
 					if err := func() error {
 						if err := value.Validate(); err != nil {
 							return err
@@ -607,7 +607,7 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "broadcast_type",
+			Name: "broadcast_status",
 			In:   "query",
 			Err:  err,
 		}

@@ -87,7 +87,7 @@ paths:
           type: string
           enum: [all, vspo_broadcast, clip, freechat]
         example: broadcast
-      - name: broadcast_type
+      - name: broadcast_status
         in: query
         description: A filter used to filter the list of videos by the video's vspo_broadcast type.(The default is "all".)
         schema:

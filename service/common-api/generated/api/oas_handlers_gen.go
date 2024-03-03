@@ -302,9 +302,9 @@ func (s *Server) handleVideosGetRequest(args [0]string, argsEscaped bool, w http
 					In:   "query",
 				}: params.VideoType,
 				{
-					Name: "broadcast_type",
+					Name: "broadcast_status",
 					In:   "query",
-				}: params.BroadcastType,
+				}: params.BroadcastStatus,
 				{
 					Name: "period",
 					In:   "query",
