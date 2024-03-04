@@ -19,6 +19,7 @@ import { ReactNode } from "react";
 const parseMarkdown = (text: string): JSX.Element[] => {
   const linkPattern = /\[(.+?)\]\((https?:\/\/.+?)\)/g;
   const imagePattern = /!\[(.*?)\]\((.+?)\)/g;
+  const maxImageWidth = "500px";
   const lines = text.split("\n");
 
   return lines.map((line, i) => {
@@ -31,13 +32,14 @@ const parseMarkdown = (text: string): JSX.Element[] => {
         elements.push(line.slice(start, match.index));
       }
       elements.push(
-        <Box sx={{ maxWidth: "500px", margin: "20px" }} key={`img-${i}`}>
+        <Box sx={{ maxWidth: maxImageWidth, margin: "20px" }} key={`img-${i}`}>
           <Image
             src={match[2]}
             alt={match[1]}
-            layout="responsive"
-            width={500}
-            height={300}
+            width="0"
+            height="0"
+            sizes={maxImageWidth}
+            style={{ width: "100%", height: "auto" }}
           />
         </Box>,
       );
