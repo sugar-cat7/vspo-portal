@@ -24,17 +24,17 @@ type ContentLayoutProps = {
 
 type StyledContainerProps = Pick<ContentLayoutProps, "padTop">;
 
-const StyledContainer = styled(Container)<StyledContainerProps>(
-  ({ theme, padTop }) => ({
-    padding: theme.spacing(3),
-    paddingTop: padTop ? theme.spacing(4) : 0,
+const StyledContainer = styled(Container, {
+  shouldForwardProp: (prop) => prop !== "padTop",
+})<StyledContainerProps>(({ theme, padTop }) => ({
+  padding: theme.spacing(3),
+  paddingTop: padTop ? theme.spacing(4) : 0,
 
-    [theme.breakpoints.down("sm")]: {
-      padding: theme.spacing(2),
-      paddingTop: padTop ? theme.spacing(3) : 0,
-    },
-  }),
-) as OverridableComponent<ContainerTypeMap<StyledContainerProps>>;
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(2),
+    paddingTop: padTop ? theme.spacing(3) : 0,
+  },
+})) as OverridableComponent<ContainerTypeMap<StyledContainerProps>>;
 
 export const ContentLayout = ({
   children,
