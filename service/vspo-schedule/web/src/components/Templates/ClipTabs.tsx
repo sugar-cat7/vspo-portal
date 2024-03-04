@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Tabs, Tab } from "@mui/material";
 import { Clip } from "@/types/streaming";
-import { ClipList } from "./ClipList ";
+import { ClipList } from "./ClipList";
 import { isTrending, shuffleClips, sortClipsByPopularity } from "@/lib/utils";
 import { styled } from "@mui/material/styles";
 
