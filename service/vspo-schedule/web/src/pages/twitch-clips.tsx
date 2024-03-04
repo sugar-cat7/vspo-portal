@@ -49,7 +49,6 @@ const TwitchClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
       <SearchDialog
         clips={clips}
         setFilteredClips={setFilteredClips}
-        searchTarget="clip"
         setIsProcessing={setIsProcessing}
       />
     </>

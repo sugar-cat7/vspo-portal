@@ -17,21 +17,14 @@ import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import React from "react";
 import SearchIcon from "@mui/icons-material/Search";
-import { applyFilters, filterLivestreams } from "@/lib/utils";
-import { Clip, Livestream } from "@/types/streaming";
+import { applyFilters } from "@/lib/utils";
+import { Clip } from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
-import { platforms } from "@/constants/platforms";
 import { timeframes } from "@/constants/timeframes";
-import { PlatformIcon } from "../Icon";
 
 type Props = {
-  livestreamsByDate?: Record<string, Livestream[]>;
-  setFilteredLivestreamsByDate?: React.Dispatch<
-    React.SetStateAction<Record<string, Livestream[]>>
-  >;
-  clips?: Clip[];
-  setFilteredClips?: React.Dispatch<React.SetStateAction<Clip[]>>;
-  searchTarget: "livestream" | "clip";
+  clips: Clip[];
+  setFilteredClips: React.Dispatch<React.SetStateAction<Clip[]>>;
   setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -64,28 +57,17 @@ const StyledAlert = styled(Alert)(({ theme }) => ({
   },
 }));
 
-const StyledTextField = styled(TextField)(() => ({
-  minWidth: "150px",
-}));
-
 export const SearchDialog: React.FC<Props> = ({
-  livestreamsByDate,
-  setFilteredLivestreamsByDate,
   clips,
   setFilteredClips,
-  searchTarget,
   setIsProcessing,
 }) => {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [searchStartDate, setSearchStartDate] = React.useState<string | null>(
-    null,
-  );
-  const [searchEndDate, setSearchEndDate] = React.useState<string | null>(null);
   const [searchMemberIds, setSearchMemberIds] = React.useState<number[]>([]);
-  const [searchPlatforms, setSearchPlatforms] = React.useState<string[]>([]);
   const [searchClipTimeframe, setSearchClipTimeframe] =
     React.useState<Timeframe | null>(null);
   const [searchKeyword, setSearchKeyword] = React.useState<string>("");
+
   const handleClickOpen = () => {
     setIsDialogOpen(true);
   };
@@ -96,41 +78,13 @@ export const SearchDialog: React.FC<Props> = ({
 
   const handleSearch = () => {
     setIsProcessing(true);
-    if (searchTarget === "livestream") {
-      if (livestreamsByDate && setFilteredLivestreamsByDate) {
-        if (
-          !searchStartDate &&
-          !searchEndDate &&
-          searchMemberIds.length === 0 &&
-          searchPlatforms.length === 0 &&
-          searchKeyword === ""
-        ) {
-          setFilteredLivestreamsByDate(livestreamsByDate);
-        } else {
-          const filteredLivestreams = filterLivestreams(
-            livestreamsByDate,
-            searchStartDate,
-            searchEndDate,
-            searchMemberIds,
-            searchPlatforms,
-            searchKeyword,
-          );
-          setFilteredLivestreamsByDate(filteredLivestreams);
-        }
-      }
-    } else {
-      if (searchTarget === "clip") {
-        if (clips && setFilteredClips) {
-          const filteredClips = applyFilters(
-            clips,
-            searchClipTimeframe,
-            searchMemberIds,
-            searchKeyword,
-          );
-          setFilteredClips(filteredClips);
-        }
-      }
-    }
+    const filteredClips = applyFilters(
+      clips,
+      searchClipTimeframe,
+      searchMemberIds,
+      searchKeyword,
+    );
+    setFilteredClips(filteredClips);
     dialogClose();
   };
 
@@ -143,82 +97,25 @@ export const SearchDialog: React.FC<Props> = ({
       <Dialog open={isDialogOpen} onClose={dialogClose} maxWidth="md" fullWidth>
         <DialogTitle>詳細検索</DialogTitle>
         <DialogContent>
-          {searchTarget === "livestream" && (
-            <>
-              <StyledAlert severity="info" sx={{ marginBottom: 2 }}>
-                現在1週間以上前の配信は検索できません。
-              </StyledAlert>
-              <StyledTextField
-                label="開始日"
-                type="date"
-                value={searchStartDate || ""}
-                onChange={(e) => setSearchStartDate(e.target.value)}
-                sx={{ margin: "1rem 1rem 1rem 0" }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-              <StyledTextField
-                label="終了日"
-                type="date"
-                value={searchEndDate || ""}
-                onChange={(e) => setSearchEndDate(e.target.value)}
-                sx={{ margin: "1rem 0 1rem 0" }}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
-            </>
-          )}
-          {searchTarget === "clip" && (
-            <>
-              <StyledAlert severity="info" sx={{ marginBottom: 2 }}>
-                現在1ヶ月以上前の切り抜きは検索できません。
-              </StyledAlert>
-              <TextField
-                select
-                label="期間"
-                value={searchClipTimeframe || "1week"}
-                onChange={(e) =>
-                  setSearchClipTimeframe(e.target.value as Timeframe)
-                }
-                sx={{ margin: "1rem 0", width: "100px" }}
-              >
-                {timeframes.map((timeframe) => (
-                  <MenuItem key={timeframe.value} value={timeframe.value}>
-                    {timeframe.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </>
-          )}
+          <StyledAlert severity="info" sx={{ marginBottom: 2 }}>
+            現在1ヶ月以上前の切り抜きは検索できません。
+          </StyledAlert>
+          <TextField
+            select
+            label="期間"
+            value={searchClipTimeframe || "1week"}
+            onChange={(e) =>
+              setSearchClipTimeframe(e.target.value as Timeframe)
+            }
+            sx={{ margin: "1rem 0", width: "100px" }}
+          >
+            {timeframes.map((timeframe) => (
+              <MenuItem key={timeframe.value} value={timeframe.value}>
+                {timeframe.label}
+              </MenuItem>
+            ))}
+          </TextField>
           <FormControl fullWidth sx={{ margin: "1rem 0" }}>
-            {searchTarget === "livestream" && (
-              <Autocomplete
-                multiple
-                id="platform-select"
-                options={platforms}
-                getOptionLabel={(option) => option.name}
-                value={platforms.filter((platform) =>
-                  searchPlatforms.includes(platform.id),
-                )}
-                onChange={(event, newValue) =>
-                  setSearchPlatforms(newValue.map((item) => item.id))
-                }
-                renderOption={(props, option) => (
-                  <Box component="li" {...props}>
-                    <PlatformIcon platform={option.id} />
-                    <Box component="span" sx={{ marginLeft: 1 }}>
-                      {option.name}
-                    </Box>
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <TextField {...params} label="配信場所" />
-                )}
-                sx={{ margin: "1rem 0" }}
-              />
-            )}
             <Autocomplete
               multiple
               id="member-select"
@@ -240,7 +137,9 @@ export const SearchDialog: React.FC<Props> = ({
                   {option.name}
                 </Box>
               )}
-              renderInput={(params) => <TextField {...params} label="配信者" />}
+              renderInput={(params) => (
+                <TextField {...params} label="配信者" variant="outlined" />
+              )}
             />
             <Autocomplete
               freeSolo
