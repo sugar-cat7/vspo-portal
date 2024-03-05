@@ -13,11 +13,10 @@ import {
   Tabs,
   BottomNavigation,
 } from "@mui/material";
-import { styled, useColorScheme } from "@mui/material/styles";
-import { Livestream, PlatformWithChat, Video } from "@/types/streaming";
+import { styled } from "@mui/material/styles";
+import { Video } from "@/types/streaming";
 import {
   formatWithTimeZone,
-  getChatEmbedUrl,
   getLiveStatus,
   getVideoEmbedUrl,
   getVideoIconUrl,
@@ -25,13 +24,14 @@ import {
   isLivestream,
   isOnPlatformWithChat,
 } from "@/lib/utils";
-import { Loading, PlatformIcon } from "..";
+import { PlatformIcon } from "..";
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
 import { RelatedVideos } from "@/components/Templates";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { ChatEmbed } from "../ChatEmbed";
 
 type VideoModalProps = {
   video: Video;
@@ -94,19 +94,7 @@ const ResponsiveIframeWrapper = styled("div")(({ theme }) => ({
   },
 }));
 
-const ResponsiveChatIframeWrapper = styled("div")({
-  overflow: "hidden",
-  width: "100%",
-  height: "100%",
-});
-
 const ResponsiveIframe = styled("iframe")({
-  width: "100%",
-  height: "100%",
-  border: "0",
-});
-
-const ResponsiveChatIframe = styled("iframe")({
   width: "100%",
   height: "100%",
   border: "0",
@@ -128,135 +116,6 @@ const VideoPlayerComponent: React.FC<{ video: Video }> = ({ video }) => {
 };
 
 const VideoPlayer = React.memo(VideoPlayerComponent);
-
-const ChatEmbed: React.FC<{
-  livestream: Livestream & { platform: PlatformWithChat };
-}> = ({ livestream }) => {
-  const { colorScheme } = useColorScheme();
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  const isDarkMode = colorScheme === "dark";
-  const chatEmbedUrl = getChatEmbedUrl(livestream, isDarkMode);
-
-  return (
-    <>
-      {isLoading && <Loading />}
-      <ResponsiveChatIframeWrapper
-        style={{ display: isLoading ? "none" : "block" }}
-      >
-        <ResponsiveChatIframe
-          src={chatEmbedUrl}
-          title={`${livestream.platform} chat embed`}
-          onLoad={() => setIsLoading(false)}
-        />
-      </ResponsiveChatIframeWrapper>
-    </>
-  );
-};
-
-export const VideoModal: React.FC<VideoModalProps> = ({
-  video,
-  open,
-  onClose,
-}) => {
-  const router = useRouter();
-  return (
-    <Dialog open={open} onClose={onClose} fullScreen>
-      <StyledDialogTitle>
-        <Box display="flex" alignItems="center">
-          {/* <NextLink href="/"> */}
-          <Box
-            flexGrow={1}
-            display="flex"
-            alignItems="center"
-            sx={{ gap: "10px", cursor: "pointer" }}
-            onClick={() => router.push("/schedule/all")}
-          >
-            <Image
-              src="/icon-top_transparent.png"
-              alt="Page Icon"
-              width={30}
-              height={30}
-            />
-            <TypographySmallOnMobile
-              sx={{ fontWeight: "bold", paddingTop: "3px" }}
-            >
-              すぽじゅーる
-            </TypographySmallOnMobile>
-          </Box>
-          {/* </NextLink> */}
-        </Box>
-      </StyledDialogTitle>
-      <StyledDialogContent
-        sx={{
-          display: "grid",
-          grid: {
-            // 2 rows, 1 col
-            // InfoTabs fills vertical space left below VideoPlayer
-            xs: "auto minmax(0, 1fr) / 1fr",
-            // 1 row, 2 cols
-            // VideoPlayer spans 2/3 dialog width, InfoTabs spans 1/3
-            md: "minmax(0, 1fr) / 2fr 1fr",
-          },
-        }}
-      >
-        <VideoPlayer video={video} />
-        <InfoTabs video={video} />
-      </StyledDialogContent>
-      <Box
-        sx={{
-          position: "absolute",
-          top: 3,
-          right: 0,
-        }}
-      >
-        <IconButton
-          onClick={() => {
-            onClose();
-            router.push("/");
-          }}
-        >
-          <CloseIcon style={{ color: "white" }} />
-        </IconButton>
-      </Box>
-      <BottomNavigation
-        sx={{
-          flex: "none",
-          borderTop: "1px solid #ddd",
-          height: "60px",
-          display: "flex",
-          justifyContent: "flex-start",
-          alignItems: "center",
-        }}
-      >
-        <Button
-          startIcon={<ArrowBackIcon />}
-          sx={{ height: "100%", borderRadius: 0 }}
-          onClick={onClose}
-          color="inherit"
-        >
-          戻る
-        </Button>
-        <Typography
-          variant="body1"
-          sx={{
-            display: "-webkit-box",
-            "-webkit-line-clamp": "2",
-            "-webkit-box-orient": "vertical",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            width: "80%", // 適宜調整してください
-            textAlign: "left",
-            paddingLeft: "8px",
-            paddingRight: "8px",
-          }}
-        >
-          {video.title}
-        </Typography>
-      </BottomNavigation>
-    </Dialog>
-  );
-};
 
 interface TabPanelProps {
   value: number;
@@ -438,5 +297,109 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
         </TabPanel>
       )}
     </Box>
+  );
+};
+
+export const VideoModal: React.FC<VideoModalProps> = ({
+  video,
+  open,
+  onClose,
+}) => {
+  const router = useRouter();
+  return (
+    <Dialog open={open} onClose={onClose} fullScreen>
+      <StyledDialogTitle>
+        <Box display="flex" alignItems="center">
+          {/* <NextLink href="/"> */}
+          <Box
+            flexGrow={1}
+            display="flex"
+            alignItems="center"
+            sx={{ gap: "10px", cursor: "pointer" }}
+            onClick={() => router.push("/schedule/all")}
+          >
+            <Image
+              src="/icon-top_transparent.png"
+              alt="Page Icon"
+              width={30}
+              height={30}
+            />
+            <TypographySmallOnMobile
+              sx={{ fontWeight: "bold", paddingTop: "3px" }}
+            >
+              すぽじゅーる
+            </TypographySmallOnMobile>
+          </Box>
+          {/* </NextLink> */}
+        </Box>
+      </StyledDialogTitle>
+      <StyledDialogContent
+        sx={{
+          display: "grid",
+          grid: {
+            // 2 rows, 1 col
+            // InfoTabs fills vertical space left below VideoPlayer
+            xs: "auto minmax(0, 1fr) / 1fr",
+            // 1 row, 2 cols
+            // VideoPlayer spans 2/3 dialog width, InfoTabs spans 1/3
+            md: "minmax(0, 1fr) / 2fr 1fr",
+          },
+        }}
+      >
+        <VideoPlayer video={video} />
+        <InfoTabs video={video} />
+      </StyledDialogContent>
+      <Box
+        sx={{
+          position: "absolute",
+          top: 3,
+          right: 0,
+        }}
+      >
+        <IconButton
+          onClick={() => {
+            onClose();
+            router.push("/");
+          }}
+        >
+          <CloseIcon style={{ color: "white" }} />
+        </IconButton>
+      </Box>
+      <BottomNavigation
+        sx={{
+          flex: "none",
+          borderTop: "1px solid #ddd",
+          height: "60px",
+          display: "flex",
+          justifyContent: "flex-start",
+          alignItems: "center",
+        }}
+      >
+        <Button
+          startIcon={<ArrowBackIcon />}
+          sx={{ height: "100%", borderRadius: 0 }}
+          onClick={onClose}
+          color="inherit"
+        >
+          戻る
+        </Button>
+        <Typography
+          variant="body1"
+          sx={{
+            display: "-webkit-box",
+            "-webkit-line-clamp": "2",
+            "-webkit-box-orient": "vertical",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            width: "80%", // 適宜調整してください
+            textAlign: "left",
+            paddingLeft: "8px",
+            paddingRight: "8px",
+          }}
+        >
+          {video.title}
+        </Typography>
+      </BottomNavigation>
+    </Dialog>
   );
 };
