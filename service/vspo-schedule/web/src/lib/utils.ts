@@ -45,10 +45,21 @@ export const groupBy = <T>(
 /**
  * Determines whether a video is a livestream.
  * @param video - The video to perform the check on.
- * @returns True if the video is a livestream, false otherwise (if it is a clip).
+ * @returns true if the video is a livestream, false otherwise (if it is a clip).
  */
 export const isLivestream = (video: Video): video is Livestream => {
   return "actualEndTime" in video;
+};
+
+/**
+ * Determines whether a livestream is on a platform which has embeddable chat.
+ * @param livestream - The livestream to perform the check on.
+ * @returns true if the livestream is on a platform which has embeddable chat, false otherwise.
+ */
+export const isOnPlatformWithChat = (
+  livestream: Livestream,
+): livestream is Livestream & { platform: PlatformWithChat } => {
+  return livestream.platform === "twitch" || livestream.platform === "youtube";
 };
 
 const supportedPlatforms = platforms.map((platform) => platform.id);
@@ -58,18 +69,12 @@ const unsupportedPlatformErrorMessage = (platform: Platform) => {
   )}`;
 };
 
-export const isOnPlatformWithChat = (
-  livestream: Livestream,
-): livestream is Livestream & { platform: PlatformWithChat } => {
-  return livestream.platform === "twitch" || livestream.platform === "youtube";
-};
-
 /**
  * Gets the URL for a video.
  * @param video - The video to generate the URL for.
  * @returns The URL for the video.
  */
-export const getVideoUrl = (video: Video): string =>
+export const getVideoUrl = (video: Video) =>
   isLivestream(video) ? getLivestreamUrl(video) : getClipUrl(video);
 
 const getLivestreamUrl = ({
@@ -91,7 +96,7 @@ const getLivestreamUrl = ({
     case "twitch":
       return twitchPastVideoId
         ? `https://www.twitch.tv/videos/${twitchPastVideoId}`
-        : `https://www.twitch.tv/${twitchName}`;
+        : `https://www.twitch.tv/${twitchName!}`;
     case "twitcasting": {
       if (link?.includes("movie")) {
         return link;
@@ -113,7 +118,7 @@ const getClipUrl = ({ id, platform, link }: Clip) => {
     case "youtube":
       return `https://www.youtube.com/watch?v=${id}`;
     case "twitch":
-      return link || "https://www.twitch.tv/";
+      return link;
     default:
       throw new Error(unsupportedPlatformErrorMessage(platform));
   }
@@ -121,10 +126,11 @@ const getClipUrl = ({ id, platform, link }: Clip) => {
 
 /**
  * Gets the embed URL for a video.
+ * Requires access to the document object.
  * @param video - The video to generate the embed URL for.
  * @returns The embed URL for the video.
  */
-export const getVideoEmbedUrl = (video: Video): string =>
+export const getVideoEmbedUrl = (video: Video) =>
   isLivestream(video) ? getLivestreamEmbedUrl(video) : getClipEmbedUrl(video);
 
 const getLivestreamEmbedUrl = (livestream: Livestream) => {
@@ -134,7 +140,7 @@ const getLivestreamEmbedUrl = (livestream: Livestream) => {
     case "twitch": {
       const tid = livestream.twitchPastVideoId
         ? `video=${livestream.twitchPastVideoId}`
-        : `channel=${livestream.twitchName}`;
+        : `channel=${livestream.twitchName!}`;
       return `https://player.twitch.tv/?${tid}&parent=${document.location.hostname}&autoplay=false`;
     }
     case "twitcasting":
@@ -159,6 +165,7 @@ const getClipEmbedUrl = ({ id, platform }: Clip) => {
 
 /**
  * Gets the chat embed URL for the livestream in the given color scheme.
+ * Requires access to the document object.
  * @param livestream - The livestream to generate the chat embed URL for.
  * @param isDarkMode - Whether the chat embed should use dark mode.
  * @returns The chat embed URL for the livestream in the given color scheme.
@@ -166,8 +173,8 @@ const getClipEmbedUrl = ({ id, platform }: Clip) => {
 export const getChatEmbedUrl = (
   livestream: Livestream & { platform: PlatformWithChat },
   isDarkMode: boolean,
-): string => {
-  const domain = window.location.hostname;
+) => {
+  const domain = document.location.hostname;
   if (livestream.platform === "twitch") {
     const chatEmbedUrl = `https://www.twitch.tv/embed/${livestream.twitchName!}/chat?parent=${domain}`;
     return isDarkMode ? `${chatEmbedUrl}&darkpopout` : chatEmbedUrl;
