@@ -190,6 +190,11 @@ export const Header: React.FC<Props> = ({ title }) => {
           keepMounted: true,
           disablePortal: true,
         }}
+        SwipeAreaProps={{
+          style: {
+            position: "absolute",
+          },
+        }}
       >
         <CustomDrawer />
         <IconButton
