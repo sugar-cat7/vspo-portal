@@ -1,3 +1,5 @@
+// @ts-check
+
 const withPWA = require("next-pwa")({
   dest: "public",
   register: true,
@@ -20,21 +22,30 @@ const withPWA = require("next-pwa")({
     },
   ],
 });
-module.exports = withPWA({
+
+/** @type {import("next").NextConfig} */
+const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ["react-tweet"],
   images: {
-    domains: [
-      "i.ytimg.com",
-      "localhost",
-      "play-lh.googleusercontent.com",
-      "vod-secure.twitch.tv",
-      "static-cdn.jtvnw.net",
-      "imagegw03.twitcasting.tv",
-      "secure-dcdn.cdn.nimg.jp",
-      "yt3.googleusercontent.com",
-      "yt3.ggpht.com",
-      "clips-media-assets2.twitch.tv",
+    remotePatterns: [
+      { hostname: "localhost", protocol: "http", port: "3000" },
+      ...[
+        "i.ytimg.com",
+        "play-lh.googleusercontent.com",
+        "vod-secure.twitch.tv",
+        "static-cdn.jtvnw.net",
+        "imagegw03.twitcasting.tv",
+        "secure-dcdn.cdn.nimg.jp",
+        "yt3.googleusercontent.com",
+        "yt3.ggpht.com",
+        "clips-media-assets2.twitch.tv",
+      ].map((hostname) => ({
+        hostname,
+        /** @type {"https"} */
+        protocol: "https",
+        port: "",
+      })),
     ],
   },
   async redirects() {
@@ -46,4 +57,6 @@ module.exports = withPWA({
       },
     ];
   },
-});
+};
+
+module.exports = withPWA(nextConfig);

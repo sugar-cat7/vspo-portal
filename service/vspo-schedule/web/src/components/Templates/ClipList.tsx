@@ -173,16 +173,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
                           >
                             {clip.channelTitle}
                           </Typography>
-                          <StyledAvatar>
-                            {iconUrl && (
-                              <Image
-                                src={iconUrl}
-                                alt={clip.channelTitle}
-                                fill
-                                style={{ objectFit: "cover" }}
-                              />
-                            )}
-                          </StyledAvatar>
+                          <StyledAvatar src={iconUrl} alt={clip.channelTitle} />
                         </Box>
                         {clip.viewCount && Number(clip.viewCount) > 100000 && (
                           <Chip

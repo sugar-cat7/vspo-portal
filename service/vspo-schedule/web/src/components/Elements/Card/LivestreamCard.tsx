@@ -198,16 +198,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
                   <PlatformIcon platform={platform} />
                 </ResponsiveTypography>
               )}
-              <StyledAvatar>
-                {iconUrl && (
-                  <Image
-                    src={iconUrl}
-                    alt={channelTitle}
-                    fill
-                    style={{ objectFit: "cover" }}
-                  />
-                )}
-              </StyledAvatar>
+              <StyledAvatar src={iconUrl} alt={channelTitle} />
             </Box>
           </StyledCardContent>
         </CardActionArea>
