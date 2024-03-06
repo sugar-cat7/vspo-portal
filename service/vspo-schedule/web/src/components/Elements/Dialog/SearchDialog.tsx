@@ -68,6 +68,11 @@ export const SearchDialog: React.FC<Props> = ({
     React.useState<Timeframe | null>(null);
   const [searchKeyword, setSearchKeyword] = React.useState<string>("");
 
+  const selectableMembers =
+    clips.at(0)?.platform === "twitch"
+      ? members.filter((member) => member.twitchChannelId)
+      : members;
+
   const handleClickOpen = () => {
     setIsDialogOpen(true);
   };
@@ -89,7 +94,7 @@ export const SearchDialog: React.FC<Props> = ({
   };
 
   const handleSelectMember = (memberIds: number[]) => {
-    setSearchMemberIds(memberIds.map(Number));
+    setSearchMemberIds(memberIds);
   };
 
   return (
@@ -119,9 +124,9 @@ export const SearchDialog: React.FC<Props> = ({
             <Autocomplete
               multiple
               id="member-select"
-              options={members}
+              options={selectableMembers}
               getOptionLabel={(option) => option.name}
-              value={members.filter((member) =>
+              value={selectableMembers.filter((member) =>
                 searchMemberIds.includes(member.id),
               )}
               onChange={(event, newValue) =>
