@@ -1,5 +1,8 @@
 export type LiveStatus = "archive" | "live" | "upcoming";
 export type Platform = "youtube" | "twitch" | "twitcasting" | "nicovideo";
+export type PlatformWithChat = Extract<Platform, "youtube" | "twitch">;
+
+export type Video = Livestream | Clip;
 
 export type Livestream = {
   id: string;

@@ -13,15 +13,14 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Clip } from "@/types/streaming";
-import { isTrending } from "@/lib/utils";
-import { members } from "@/data/members";
+import { getVideoIconUrl, isTrending } from "@/lib/utils";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import { useModal } from "@/hooks";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 
-const LivestreamDetailsModal = dynamic(
-  () => import("../Elements/Modal").then((mod) => mod.LivestreamDetailsModal),
+const VideoModal = dynamic(
+  () => import("../Elements/Modal").then((mod) => mod.VideoModal),
   { ssr: false },
 );
 
@@ -83,14 +82,9 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
     <>
       <Grid container spacing={3}>
         {paginatedClips.map((clip) => {
-          const iconUrl =
-            clip.platform === "twitch"
-              ? members
-                  .filter((m) => m.twitchChannelId === clip.channelId)
-                  .at(0)?.iconUrl
-              : clip.iconUrl;
-
+          const iconUrl = getVideoIconUrl(clip);
           const clipLabel = getClipLabel(clip);
+
           return (
             <Grid item xs={12} sm={6} md={4} key={clip.id}>
               <Box sx={{ position: "relative" }}>
@@ -229,9 +223,9 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
         />
       </Box>
       {clickedClip && (
-        <LivestreamDetailsModal
+        <VideoModal
           key={clickedClip.id}
-          clip={clickedClip}
+          video={clickedClip}
           open={isOpen}
           onClose={() => {
             setClickedClip(null);

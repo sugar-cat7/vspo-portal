@@ -1,7 +1,14 @@
 import { freeChatVideoIds } from "@/data/freechat-video-ids";
 import { members } from "@/data/members";
 import { VspoEvent } from "@/types/events";
-import { Clip, LiveStatus, Livestream, Platform } from "@/types/streaming";
+import {
+  Clip,
+  LiveStatus,
+  Livestream,
+  Platform,
+  PlatformWithChat,
+  Video,
+} from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
 import { format, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
@@ -35,59 +42,158 @@ export const groupBy = <T>(
   return groupedItems;
 };
 
-type GetLivestreamUrl = {
-  videoId: string;
-  platform: Platform;
-  externalLink?: string;
-  memberName?: string;
-  twitchUsername?: string;
-  actualEndTime?: string;
-  twitchPastVideoId?: string;
-  isClip?: boolean;
-};
 /**
- * Get the livestream URL for a video ID and platform.
- * @param videoId - The video ID to generate the URL for.
- * @param platform - The platform of the livestream (e.g., "youtube", "twitch", "twitcasting").
- * @returns - The livestream URL for the video ID and platform.
+ * Determines whether a video is a livestream.
+ * @param video - The video to perform the check on.
+ * @returns true if the video is a livestream, false otherwise (if it is a clip).
  */
-export const getLivestreamUrl = ({
-  videoId,
+export const isLivestream = (video: Video): video is Livestream => {
+  return "actualEndTime" in video;
+};
+
+/**
+ * Determines whether a livestream is on a platform which has embeddable chat.
+ * @param livestream - The livestream to perform the check on.
+ * @returns true if the livestream is on a platform which has embeddable chat, false otherwise.
+ */
+export const isOnPlatformWithChat = (
+  livestream: Livestream,
+): livestream is Livestream & { platform: PlatformWithChat } => {
+  return livestream.platform === "twitch" || livestream.platform === "youtube";
+};
+
+const supportedPlatforms = platforms.map((platform) => platform.id);
+const unsupportedPlatformErrorMessage = (platform: Platform) => {
+  return `Unsupported platform: ${platform}. Supported platforms are: ${supportedPlatforms.join(
+    ", ",
+  )}`;
+};
+
+/**
+ * Gets the URL for a video.
+ * @param video - The video to generate the URL for.
+ * @returns The URL for the video.
+ */
+export const getVideoUrl = (video: Video) =>
+  isLivestream(video) ? getLivestreamUrl(video) : getClipUrl(video);
+
+const getLivestreamUrl = ({
+  id,
   platform,
-  externalLink,
-  memberName,
-  twitchUsername,
+  link,
+  channelTitle,
+  twitchName,
   twitchPastVideoId,
-  isClip,
-}: GetLivestreamUrl): string => {
+  isTemp,
+  tempUrl,
+}: Livestream) => {
+  if (isTemp && tempUrl) {
+    return tempUrl;
+  }
   switch (platform) {
     case "youtube":
-      return `https://www.youtube.com/watch?v=${videoId}`;
+      return `https://www.youtube.com/watch?v=${id}`;
     case "twitch":
-      return isClip && externalLink
-        ? externalLink
-        : !twitchPastVideoId
-          ? `https://www.twitch.tv/${twitchUsername}`
-          : `https://www.twitch.tv/videos/${twitchPastVideoId}`;
-    case "twitcasting":
-      return externalLink?.includes("movie")
-        ? externalLink
-        : `https://twitcasting.tv/${
-            members.filter((m) => m.name === memberName).at(0)
-              ?.twitcastingScreenId
-          }/movie/${videoId}` || "";
-    case "nicovideo":
-      return `https://live.nicovideo.jp/watch/${videoId}`;
-    default: {
-      const supportedPlatforms = platforms.map(({ id }) => id);
-      throw new Error(
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-        `Unsupported platform: ${platform}. Supported platforms are: ${supportedPlatforms.join(
-          ", ",
-        )}`,
-      );
+      return twitchPastVideoId
+        ? `https://www.twitch.tv/videos/${twitchPastVideoId}`
+        : `https://www.twitch.tv/${twitchName!}`;
+    case "twitcasting": {
+      if (link?.includes("movie")) {
+        return link;
+      }
+      const member = members.find((m) => m.name === channelTitle);
+      return member?.twitcastingScreenId
+        ? `https://twitcasting.tv/${member.twitcastingScreenId}/movie/${id}`
+        : "";
     }
+    case "nicovideo":
+      return `https://live.nicovideo.jp/watch/${id}`;
+    default:
+      throw new Error(unsupportedPlatformErrorMessage(platform));
   }
+};
+
+const getClipUrl = ({ id, platform, link }: Clip) => {
+  switch (platform) {
+    case "youtube":
+      return `https://www.youtube.com/watch?v=${id}`;
+    case "twitch":
+      return link;
+    default:
+      throw new Error(unsupportedPlatformErrorMessage(platform));
+  }
+};
+
+/**
+ * Gets the embed URL for a video.
+ * Requires access to the document object.
+ * @param video - The video to generate the embed URL for.
+ * @returns The embed URL for the video.
+ */
+export const getVideoEmbedUrl = (video: Video) =>
+  isLivestream(video) ? getLivestreamEmbedUrl(video) : getClipEmbedUrl(video);
+
+const getLivestreamEmbedUrl = (livestream: Livestream) => {
+  switch (livestream.platform) {
+    case "youtube":
+      return `https://www.youtube.com/embed/${livestream.id}`;
+    case "twitch": {
+      const tid = livestream.twitchPastVideoId
+        ? `video=${livestream.twitchPastVideoId}`
+        : `channel=${livestream.twitchName!}`;
+      return `https://player.twitch.tv/?${tid}&parent=${document.location.hostname}&autoplay=false`;
+    }
+    case "twitcasting":
+      return getLivestreamUrl(livestream);
+    case "nicovideo":
+      return `https://live.nicovideo.jp/embed/${livestream.id}`;
+    default:
+      throw new Error(unsupportedPlatformErrorMessage(livestream.platform));
+  }
+};
+
+const getClipEmbedUrl = ({ id, platform }: Clip) => {
+  switch (platform) {
+    case "youtube":
+      return `https://www.youtube.com/embed/${id}`;
+    case "twitch":
+      return `https://clips.twitch.tv/embed?clip=${id}&parent=${document.location.hostname}&autoplay=false`;
+    default:
+      throw new Error(unsupportedPlatformErrorMessage(platform));
+  }
+};
+
+/**
+ * Gets the chat embed URL for the livestream in the given color scheme.
+ * Requires access to the document object.
+ * @param livestream - The livestream to generate the chat embed URL for.
+ * @param isDarkMode - Whether the chat embed should use dark mode.
+ * @returns The chat embed URL for the livestream in the given color scheme.
+ */
+export const getChatEmbedUrl = (
+  livestream: Livestream & { platform: PlatformWithChat },
+  isDarkMode: boolean,
+) => {
+  const domain = document.location.hostname;
+  if (livestream.platform === "twitch") {
+    const chatEmbedUrl = `https://www.twitch.tv/embed/${livestream.twitchName!}/chat?parent=${domain}`;
+    return isDarkMode ? `${chatEmbedUrl}&darkpopout` : chatEmbedUrl;
+  }
+  const chatEmbedUrl = `https://www.youtube.com/live_chat?v=${livestream.id}&embed_domain=${domain}`;
+  return isDarkMode ? `${chatEmbedUrl}&dark_theme=1` : chatEmbedUrl;
+};
+
+/**
+ * Gets the icon URL for a video.
+ * @param video - The video to generate the icon URL for.
+ * @returns The icon URL for the video.
+ */
+export const getVideoIconUrl = (video: Video) => {
+  if (!isLivestream(video) && video.platform === "twitch") {
+    const member = members.find((m) => m.twitchChannelId === video.channelId);
+    return member?.iconUrl;
+  }
+  return video.iconUrl;
 };
 
 /**

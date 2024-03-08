@@ -127,8 +127,8 @@ const FontSizeOnTypography = styled(Typography)(
   }),
 );
 
-const LivestreamDetailsModal = dynamic(
-  () => import("../Modal").then((mod) => mod.LivestreamDetailsModal),
+const VideoModal = dynamic(
+  () => import("../Modal").then((mod) => mod.VideoModal),
   { ssr: false },
 );
 
@@ -202,9 +202,9 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
             </Box>
           </StyledCardContent>
         </CardActionArea>
-        <LivestreamDetailsModal
+        <VideoModal
           key={livestream.id}
-          livestream={livestream}
+          video={livestream}
           open={isOpen}
           onClose={closeModal}
         />
