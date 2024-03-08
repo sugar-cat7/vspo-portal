@@ -28,7 +28,7 @@ const drawerContents = [
   { id: "clip", name: "切り抜き一覧" },
   { id: "twitch-clip", name: "クリップ一覧" },
   { id: "about", name: "すぽじゅーるについて" },
-  { id: "notification", name: "お知らせ" },
+  { id: "site-news", name: "お知らせ" },
   { id: "qa", name: "お問い合わせ" },
   { id: "discord", name: "Discord Bot" },
 ] as const satisfies { id: NavigationRouteId; name: string }[];

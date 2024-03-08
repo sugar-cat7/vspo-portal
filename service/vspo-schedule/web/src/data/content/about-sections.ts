@@ -49,7 +49,7 @@ export const aboutSections = [
     ⑥お知らせ枠ページ
     当サイトのコンテンツに関するアップデートの情報を掲載しています。
 
-    ![image](/about/page/notifications.png)
+    ![image](/about/page/site-news.png)
     `,
   },
   {

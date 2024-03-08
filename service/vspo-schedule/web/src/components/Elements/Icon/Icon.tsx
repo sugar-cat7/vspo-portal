@@ -80,7 +80,7 @@ export const DrawerIcon: React.FC<DrawerIconProps> = ({ id }) => {
       return <AttachFileIcon />;
     case "support":
       return <CreditCardIcon />;
-    case "notification":
+    case "site-news":
       return <NotificationsIcon />;
     case "event":
       return <EventIcon />;

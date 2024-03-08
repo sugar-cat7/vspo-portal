@@ -13,7 +13,7 @@ const internalRoutes = {
     return `/events/${formatWithTimeZone(new Date(), "ja", "yyyy-MM")}`;
   },
   about: "/about",
-  notification: "/notifications",
+  "site-news": "/site-news",
 } as const satisfies Record<string, string>;
 
 const externalRoutes = {

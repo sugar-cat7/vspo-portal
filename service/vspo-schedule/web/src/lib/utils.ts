@@ -593,7 +593,7 @@ export const getColor = (tag: string) => {
 };
 
 export const pathNames: { [key: string]: string } = {
-  notifications: "お知らせ",
+  "site-news": "お知らせ",
   contact: "お問い合わせ",
   about: "このサイトについて",
   terms: "利用規約",

@@ -1,5 +1,4 @@
-// interfaces.ts
-export type Notice = {
+export type SiteNewsItem = {
   id: number;
   title: string;
   content: string;
