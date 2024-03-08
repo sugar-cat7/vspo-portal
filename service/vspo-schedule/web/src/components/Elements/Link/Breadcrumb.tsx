@@ -10,9 +10,9 @@ export const Breadcrumb = () => {
 
   return (
     <Breadcrumbs aria-label="breadcrumb">
-      <NextLink href="/" passHref>
-        <Link color="inherit">ホーム</Link>
-      </NextLink>
+      <Link href="/" component={NextLink} color="inherit">
+        ホーム
+      </Link>
       {pathnames.map((value, index) => {
         const last = index === pathnames.length - 1;
         const to = `/${pathnames.slice(0, index + 1).join("/")}`;
@@ -23,9 +23,9 @@ export const Breadcrumb = () => {
             {name}
           </Typography>
         ) : (
-          <NextLink href={to} passHref key={to}>
-            <Link color="inherit">{name}</Link>
-          </NextLink>
+          <Link key={to} href={to} component={NextLink} color="inherit">
+            {name}
+          </Link>
         );
       })}
     </Breadcrumbs>
