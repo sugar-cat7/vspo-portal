@@ -55,6 +55,11 @@ const nextConfig = {
         destination: "/schedule/all",
         permanent: true,
       },
+      {
+        source: "/notifications",
+        destination: "/site-news",
+        permanent: true,
+      },
     ];
   },
 };
