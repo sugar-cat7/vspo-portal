@@ -14,7 +14,7 @@ func twVideoToVideo(twVideo twitch.Video) *model.Video {
 		ThumbnailURL: model.ThumbnailURL(twVideo.ThumbnailURL),
 		Status:       model.StatusEnded,
 		PublishedAt:  twVideo.PublishedAt,
-		// EndAt:
+		// EndedAt:
 	}
 }
 
@@ -37,7 +37,7 @@ func twStreamToVideo(twStream twitch.Stream) *model.Video {
 		ThumbnailURL: model.ThumbnailURL(twStream.ThumbnailURL),
 		Status:       model.StatusLive,
 		PublishedAt:  twStream.StartedAt,
-		StartAt:      twStream.StartedAt,
+		StartedAt:    twStream.StartedAt,
 	}
 
 	return m

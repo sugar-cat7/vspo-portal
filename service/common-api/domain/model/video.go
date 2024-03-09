@@ -13,8 +13,8 @@ type Video struct {
 	Title        string
 	Description  string
 	PublishedAt  time.Time
-	StartAt      time.Time
-	EndAt        time.Time
+	StartedAt    time.Time
+	EndedAt      time.Time
 	Platform     Platform
 	Status       Status
 	Tags         []string

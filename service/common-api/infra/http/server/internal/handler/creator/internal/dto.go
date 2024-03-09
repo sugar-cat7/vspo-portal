@@ -72,11 +72,11 @@ func VideoResponse(v *model.Video) api.VideoResponse {
 		PublishedAt: api.OptDateTime{
 			Value: v.PublishedAt,
 		},
-		StartAt: api.OptDateTime{
-			Value: v.StartAt,
+		StartedAt: api.OptDateTime{
+			Value: v.StartedAt,
 		},
-		EndAt: api.OptDateTime{
-			Value: v.EndAt,
+		EndedAt: api.OptDateTime{
+			Value: v.EndedAt,
 		},
 		Tags: v.Tags,
 		Platform: api.OptVideoResponsePlatform{

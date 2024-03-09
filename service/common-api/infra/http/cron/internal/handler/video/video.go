@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/cron"
+	dto "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/cron/internal/handler/video/internal"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/input"
 )
 
@@ -13,9 +14,9 @@ func (h *VH) VideosPost(ctx context.Context, req *api.VideosPostReq) (api.Videos
 	vs, err := h.videoInteractor.UpsertAll(
 		ctx,
 		input.NewUpsertAllVideoInput(
-			string(req.PlatformType.Value),
-			string(req.Period.Value),
+			dto.ConvertPlatFormTypeOgenToReqSlice(req.PlatformType),
 			string(req.VideoType.Value),
+			string(req.Period.Value),
 		),
 	)
 

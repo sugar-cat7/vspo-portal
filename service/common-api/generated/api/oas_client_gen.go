@@ -386,10 +386,16 @@ func (c *Client) sendVideosGet(ctx context.Context, params VideosGetParams) (res
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.VideoType.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.VideoType {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(item))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}
@@ -403,10 +409,16 @@ func (c *Client) sendVideosGet(ctx context.Context, params VideosGetParams) (res
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.BroadcastStatus.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.BroadcastStatus {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(item))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}
@@ -454,10 +466,16 @@ func (c *Client) sendVideosGet(ctx context.Context, params VideosGetParams) (res
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.PlatformType.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
-			}
-			return nil
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.PlatformType {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(item))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
 		}); err != nil {
 			return res, errors.Wrap(err, "encode query")
 		}

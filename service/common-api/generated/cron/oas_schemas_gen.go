@@ -83,15 +83,15 @@ func (s *ChannelsPostReq) SetChannelType(val OptChannelsPostReqChannelType) {
 type ChannelsPostReqChannelType string
 
 const (
-	ChannelsPostReqChannelTypeVspo ChannelsPostReqChannelType = "vspo"
-	ChannelsPostReqChannelTypeAll  ChannelsPostReqChannelType = "all"
+	ChannelsPostReqChannelTypeVspo    ChannelsPostReqChannelType = "vspo"
+	ChannelsPostReqChannelTypeGeneral ChannelsPostReqChannelType = "general"
 )
 
 // AllValues returns all ChannelsPostReqChannelType values.
 func (ChannelsPostReqChannelType) AllValues() []ChannelsPostReqChannelType {
 	return []ChannelsPostReqChannelType{
 		ChannelsPostReqChannelTypeVspo,
-		ChannelsPostReqChannelTypeAll,
+		ChannelsPostReqChannelTypeGeneral,
 	}
 }
 
@@ -100,7 +100,7 @@ func (s ChannelsPostReqChannelType) MarshalText() ([]byte, error) {
 	switch s {
 	case ChannelsPostReqChannelTypeVspo:
 		return []byte(s), nil
-	case ChannelsPostReqChannelTypeAll:
+	case ChannelsPostReqChannelTypeGeneral:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -113,8 +113,8 @@ func (s *ChannelsPostReqChannelType) UnmarshalText(data []byte) error {
 	case ChannelsPostReqChannelTypeVspo:
 		*s = ChannelsPostReqChannelTypeVspo
 		return nil
-	case ChannelsPostReqChannelTypeAll:
-		*s = ChannelsPostReqChannelTypeAll
+	case ChannelsPostReqChannelTypeGeneral:
+		*s = ChannelsPostReqChannelTypeGeneral
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -125,32 +125,32 @@ func (s *ChannelsPostReqChannelType) UnmarshalText(data []byte) error {
 type ChannelsPostReqPeriod string
 
 const (
-	ChannelsPostReqPeriodAll   ChannelsPostReqPeriod = "all"
 	ChannelsPostReqPeriodDay   ChannelsPostReqPeriod = "day"
-	ChannelsPostReqPeriodMonth ChannelsPostReqPeriod = "month"
 	ChannelsPostReqPeriodWeek  ChannelsPostReqPeriod = "week"
+	ChannelsPostReqPeriodMonth ChannelsPostReqPeriod = "month"
+	ChannelsPostReqPeriodYear  ChannelsPostReqPeriod = "year"
 )
 
 // AllValues returns all ChannelsPostReqPeriod values.
 func (ChannelsPostReqPeriod) AllValues() []ChannelsPostReqPeriod {
 	return []ChannelsPostReqPeriod{
-		ChannelsPostReqPeriodAll,
 		ChannelsPostReqPeriodDay,
-		ChannelsPostReqPeriodMonth,
 		ChannelsPostReqPeriodWeek,
+		ChannelsPostReqPeriodMonth,
+		ChannelsPostReqPeriodYear,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
 func (s ChannelsPostReqPeriod) MarshalText() ([]byte, error) {
 	switch s {
-	case ChannelsPostReqPeriodAll:
-		return []byte(s), nil
 	case ChannelsPostReqPeriodDay:
+		return []byte(s), nil
+	case ChannelsPostReqPeriodWeek:
 		return []byte(s), nil
 	case ChannelsPostReqPeriodMonth:
 		return []byte(s), nil
-	case ChannelsPostReqPeriodWeek:
+	case ChannelsPostReqPeriodYear:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -160,17 +160,17 @@ func (s ChannelsPostReqPeriod) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *ChannelsPostReqPeriod) UnmarshalText(data []byte) error {
 	switch ChannelsPostReqPeriod(data) {
-	case ChannelsPostReqPeriodAll:
-		*s = ChannelsPostReqPeriodAll
-		return nil
 	case ChannelsPostReqPeriodDay:
 		*s = ChannelsPostReqPeriodDay
+		return nil
+	case ChannelsPostReqPeriodWeek:
+		*s = ChannelsPostReqPeriodWeek
 		return nil
 	case ChannelsPostReqPeriodMonth:
 		*s = ChannelsPostReqPeriodMonth
 		return nil
-	case ChannelsPostReqPeriodWeek:
-		*s = ChannelsPostReqPeriodWeek
+	case ChannelsPostReqPeriodYear:
+		*s = ChannelsPostReqPeriodYear
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -181,7 +181,6 @@ func (s *ChannelsPostReqPeriod) UnmarshalText(data []byte) error {
 type ChannelsPostReqPlatformType string
 
 const (
-	ChannelsPostReqPlatformTypeAll         ChannelsPostReqPlatformType = "all"
 	ChannelsPostReqPlatformTypeYoutube     ChannelsPostReqPlatformType = "youtube"
 	ChannelsPostReqPlatformTypeTwitch      ChannelsPostReqPlatformType = "twitch"
 	ChannelsPostReqPlatformTypeTwitcasting ChannelsPostReqPlatformType = "twitcasting"
@@ -191,7 +190,6 @@ const (
 // AllValues returns all ChannelsPostReqPlatformType values.
 func (ChannelsPostReqPlatformType) AllValues() []ChannelsPostReqPlatformType {
 	return []ChannelsPostReqPlatformType{
-		ChannelsPostReqPlatformTypeAll,
 		ChannelsPostReqPlatformTypeYoutube,
 		ChannelsPostReqPlatformTypeTwitch,
 		ChannelsPostReqPlatformTypeTwitcasting,
@@ -202,8 +200,6 @@ func (ChannelsPostReqPlatformType) AllValues() []ChannelsPostReqPlatformType {
 // MarshalText implements encoding.TextMarshaler.
 func (s ChannelsPostReqPlatformType) MarshalText() ([]byte, error) {
 	switch s {
-	case ChannelsPostReqPlatformTypeAll:
-		return []byte(s), nil
 	case ChannelsPostReqPlatformTypeYoutube:
 		return []byte(s), nil
 	case ChannelsPostReqPlatformTypeTwitch:
@@ -220,9 +216,6 @@ func (s ChannelsPostReqPlatformType) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *ChannelsPostReqPlatformType) UnmarshalText(data []byte) error {
 	switch ChannelsPostReqPlatformType(data) {
-	case ChannelsPostReqPlatformTypeAll:
-		*s = ChannelsPostReqPlatformTypeAll
-		return nil
 	case ChannelsPostReqPlatformTypeYoutube:
 		*s = ChannelsPostReqPlatformTypeYoutube
 		return nil
@@ -489,52 +482,6 @@ func (o OptVideosPostReqPeriod) Or(d VideosPostReqPeriod) VideosPostReqPeriod {
 	return d
 }
 
-// NewOptVideosPostReqPlatformType returns new OptVideosPostReqPlatformType with value set to v.
-func NewOptVideosPostReqPlatformType(v VideosPostReqPlatformType) OptVideosPostReqPlatformType {
-	return OptVideosPostReqPlatformType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptVideosPostReqPlatformType is optional VideosPostReqPlatformType.
-type OptVideosPostReqPlatformType struct {
-	Value VideosPostReqPlatformType
-	Set   bool
-}
-
-// IsSet returns true if OptVideosPostReqPlatformType was set.
-func (o OptVideosPostReqPlatformType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptVideosPostReqPlatformType) Reset() {
-	var v VideosPostReqPlatformType
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptVideosPostReqPlatformType) SetTo(v VideosPostReqPlatformType) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptVideosPostReqPlatformType) Get() (v VideosPostReqPlatformType, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptVideosPostReqPlatformType) Or(d VideosPostReqPlatformType) VideosPostReqPlatformType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptVideosPostReqVideoType returns new OptVideosPostReqVideoType with value set to v.
 func NewOptVideosPostReqVideoType(v VideosPostReqVideoType) OptVideosPostReqVideoType {
 	return OptVideosPostReqVideoType{
@@ -603,14 +550,14 @@ func (*VideosPostOK) videosPostRes() {}
 
 type VideosPostReq struct {
 	// Video's platform type.
-	PlatformType OptVideosPostReqPlatformType `json:"platform_type"`
+	PlatformType []VideosPostReqPlatformTypeItem `json:"platform_type"`
 	// Period for performing updates.
 	Period    OptVideosPostReqPeriod    `json:"period"`
 	VideoType OptVideosPostReqVideoType `json:"video_type"`
 }
 
 // GetPlatformType returns the value of PlatformType.
-func (s *VideosPostReq) GetPlatformType() OptVideosPostReqPlatformType {
+func (s *VideosPostReq) GetPlatformType() []VideosPostReqPlatformTypeItem {
 	return s.PlatformType
 }
 
@@ -625,7 +572,7 @@ func (s *VideosPostReq) GetVideoType() OptVideosPostReqVideoType {
 }
 
 // SetPlatformType sets the value of PlatformType.
-func (s *VideosPostReq) SetPlatformType(val OptVideosPostReqPlatformType) {
+func (s *VideosPostReq) SetPlatformType(val []VideosPostReqPlatformTypeItem) {
 	s.PlatformType = val
 }
 
@@ -643,7 +590,6 @@ func (s *VideosPostReq) SetVideoType(val OptVideosPostReqVideoType) {
 type VideosPostReqPeriod string
 
 const (
-	VideosPostReqPeriodAll   VideosPostReqPeriod = "all"
 	VideosPostReqPeriodDay   VideosPostReqPeriod = "day"
 	VideosPostReqPeriodMonth VideosPostReqPeriod = "month"
 	VideosPostReqPeriodWeek  VideosPostReqPeriod = "week"
@@ -652,7 +598,6 @@ const (
 // AllValues returns all VideosPostReqPeriod values.
 func (VideosPostReqPeriod) AllValues() []VideosPostReqPeriod {
 	return []VideosPostReqPeriod{
-		VideosPostReqPeriodAll,
 		VideosPostReqPeriodDay,
 		VideosPostReqPeriodMonth,
 		VideosPostReqPeriodWeek,
@@ -662,8 +607,6 @@ func (VideosPostReqPeriod) AllValues() []VideosPostReqPeriod {
 // MarshalText implements encoding.TextMarshaler.
 func (s VideosPostReqPeriod) MarshalText() ([]byte, error) {
 	switch s {
-	case VideosPostReqPeriodAll:
-		return []byte(s), nil
 	case VideosPostReqPeriodDay:
 		return []byte(s), nil
 	case VideosPostReqPeriodMonth:
@@ -678,9 +621,6 @@ func (s VideosPostReqPeriod) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *VideosPostReqPeriod) UnmarshalText(data []byte) error {
 	switch VideosPostReqPeriod(data) {
-	case VideosPostReqPeriodAll:
-		*s = VideosPostReqPeriodAll
-		return nil
 	case VideosPostReqPeriodDay:
 		*s = VideosPostReqPeriodDay
 		return nil
@@ -695,40 +635,35 @@ func (s *VideosPostReqPeriod) UnmarshalText(data []byte) error {
 	}
 }
 
-// Video's platform type.
-type VideosPostReqPlatformType string
+type VideosPostReqPlatformTypeItem string
 
 const (
-	VideosPostReqPlatformTypeAll         VideosPostReqPlatformType = "all"
-	VideosPostReqPlatformTypeYoutube     VideosPostReqPlatformType = "youtube"
-	VideosPostReqPlatformTypeTwitch      VideosPostReqPlatformType = "twitch"
-	VideosPostReqPlatformTypeTwitcasting VideosPostReqPlatformType = "twitcasting"
-	VideosPostReqPlatformTypeNiconico    VideosPostReqPlatformType = "niconico"
+	VideosPostReqPlatformTypeItemYoutube     VideosPostReqPlatformTypeItem = "youtube"
+	VideosPostReqPlatformTypeItemTwitch      VideosPostReqPlatformTypeItem = "twitch"
+	VideosPostReqPlatformTypeItemTwitcasting VideosPostReqPlatformTypeItem = "twitcasting"
+	VideosPostReqPlatformTypeItemNiconico    VideosPostReqPlatformTypeItem = "niconico"
 )
 
-// AllValues returns all VideosPostReqPlatformType values.
-func (VideosPostReqPlatformType) AllValues() []VideosPostReqPlatformType {
-	return []VideosPostReqPlatformType{
-		VideosPostReqPlatformTypeAll,
-		VideosPostReqPlatformTypeYoutube,
-		VideosPostReqPlatformTypeTwitch,
-		VideosPostReqPlatformTypeTwitcasting,
-		VideosPostReqPlatformTypeNiconico,
+// AllValues returns all VideosPostReqPlatformTypeItem values.
+func (VideosPostReqPlatformTypeItem) AllValues() []VideosPostReqPlatformTypeItem {
+	return []VideosPostReqPlatformTypeItem{
+		VideosPostReqPlatformTypeItemYoutube,
+		VideosPostReqPlatformTypeItemTwitch,
+		VideosPostReqPlatformTypeItemTwitcasting,
+		VideosPostReqPlatformTypeItemNiconico,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s VideosPostReqPlatformType) MarshalText() ([]byte, error) {
+func (s VideosPostReqPlatformTypeItem) MarshalText() ([]byte, error) {
 	switch s {
-	case VideosPostReqPlatformTypeAll:
+	case VideosPostReqPlatformTypeItemYoutube:
 		return []byte(s), nil
-	case VideosPostReqPlatformTypeYoutube:
+	case VideosPostReqPlatformTypeItemTwitch:
 		return []byte(s), nil
-	case VideosPostReqPlatformTypeTwitch:
+	case VideosPostReqPlatformTypeItemTwitcasting:
 		return []byte(s), nil
-	case VideosPostReqPlatformTypeTwitcasting:
-		return []byte(s), nil
-	case VideosPostReqPlatformTypeNiconico:
+	case VideosPostReqPlatformTypeItemNiconico:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -736,22 +671,19 @@ func (s VideosPostReqPlatformType) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *VideosPostReqPlatformType) UnmarshalText(data []byte) error {
-	switch VideosPostReqPlatformType(data) {
-	case VideosPostReqPlatformTypeAll:
-		*s = VideosPostReqPlatformTypeAll
+func (s *VideosPostReqPlatformTypeItem) UnmarshalText(data []byte) error {
+	switch VideosPostReqPlatformTypeItem(data) {
+	case VideosPostReqPlatformTypeItemYoutube:
+		*s = VideosPostReqPlatformTypeItemYoutube
 		return nil
-	case VideosPostReqPlatformTypeYoutube:
-		*s = VideosPostReqPlatformTypeYoutube
+	case VideosPostReqPlatformTypeItemTwitch:
+		*s = VideosPostReqPlatformTypeItemTwitch
 		return nil
-	case VideosPostReqPlatformTypeTwitch:
-		*s = VideosPostReqPlatformTypeTwitch
+	case VideosPostReqPlatformTypeItemTwitcasting:
+		*s = VideosPostReqPlatformTypeItemTwitcasting
 		return nil
-	case VideosPostReqPlatformTypeTwitcasting:
-		*s = VideosPostReqPlatformTypeTwitcasting
-		return nil
-	case VideosPostReqPlatformTypeNiconico:
-		*s = VideosPostReqPlatformTypeNiconico
+	case VideosPostReqPlatformTypeItemNiconico:
+		*s = VideosPostReqPlatformTypeItemNiconico
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -761,7 +693,6 @@ func (s *VideosPostReqPlatformType) UnmarshalText(data []byte) error {
 type VideosPostReqVideoType string
 
 const (
-	VideosPostReqVideoTypeAll           VideosPostReqVideoType = "all"
 	VideosPostReqVideoTypeVspoBroadcast VideosPostReqVideoType = "vspo_broadcast"
 	VideosPostReqVideoTypeClip          VideosPostReqVideoType = "clip"
 	VideosPostReqVideoTypeFreechat      VideosPostReqVideoType = "freechat"
@@ -770,7 +701,6 @@ const (
 // AllValues returns all VideosPostReqVideoType values.
 func (VideosPostReqVideoType) AllValues() []VideosPostReqVideoType {
 	return []VideosPostReqVideoType{
-		VideosPostReqVideoTypeAll,
 		VideosPostReqVideoTypeVspoBroadcast,
 		VideosPostReqVideoTypeClip,
 		VideosPostReqVideoTypeFreechat,
@@ -780,8 +710,6 @@ func (VideosPostReqVideoType) AllValues() []VideosPostReqVideoType {
 // MarshalText implements encoding.TextMarshaler.
 func (s VideosPostReqVideoType) MarshalText() ([]byte, error) {
 	switch s {
-	case VideosPostReqVideoTypeAll:
-		return []byte(s), nil
 	case VideosPostReqVideoTypeVspoBroadcast:
 		return []byte(s), nil
 	case VideosPostReqVideoTypeClip:
@@ -796,9 +724,6 @@ func (s VideosPostReqVideoType) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *VideosPostReqVideoType) UnmarshalText(data []byte) error {
 	switch VideosPostReqVideoType(data) {
-	case VideosPostReqVideoTypeAll:
-		*s = VideosPostReqVideoTypeAll
-		return nil
 	case VideosPostReqVideoTypeVspoBroadcast:
 		*s = VideosPostReqVideoTypeVspoBroadcast
 		return nil

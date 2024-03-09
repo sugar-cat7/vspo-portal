@@ -312,8 +312,8 @@ func (s *ChannelsPostReqChannelType) Decode(d *jx.Decoder) error {
 	switch ChannelsPostReqChannelType(v) {
 	case ChannelsPostReqChannelTypeVspo:
 		*s = ChannelsPostReqChannelTypeVspo
-	case ChannelsPostReqChannelTypeAll:
-		*s = ChannelsPostReqChannelTypeAll
+	case ChannelsPostReqChannelTypeGeneral:
+		*s = ChannelsPostReqChannelTypeGeneral
 	default:
 		*s = ChannelsPostReqChannelType(v)
 	}
@@ -350,14 +350,14 @@ func (s *ChannelsPostReqPeriod) Decode(d *jx.Decoder) error {
 	}
 	// Try to use constant string.
 	switch ChannelsPostReqPeriod(v) {
-	case ChannelsPostReqPeriodAll:
-		*s = ChannelsPostReqPeriodAll
 	case ChannelsPostReqPeriodDay:
 		*s = ChannelsPostReqPeriodDay
-	case ChannelsPostReqPeriodMonth:
-		*s = ChannelsPostReqPeriodMonth
 	case ChannelsPostReqPeriodWeek:
 		*s = ChannelsPostReqPeriodWeek
+	case ChannelsPostReqPeriodMonth:
+		*s = ChannelsPostReqPeriodMonth
+	case ChannelsPostReqPeriodYear:
+		*s = ChannelsPostReqPeriodYear
 	default:
 		*s = ChannelsPostReqPeriod(v)
 	}
@@ -394,8 +394,6 @@ func (s *ChannelsPostReqPlatformType) Decode(d *jx.Decoder) error {
 	}
 	// Try to use constant string.
 	switch ChannelsPostReqPlatformType(v) {
-	case ChannelsPostReqPlatformTypeAll:
-		*s = ChannelsPostReqPlatformTypeAll
 	case ChannelsPostReqPlatformTypeYoutube:
 		*s = ChannelsPostReqPlatformTypeYoutube
 	case ChannelsPostReqPlatformTypeTwitch:
@@ -692,39 +690,6 @@ func (s *OptVideosPostReqPeriod) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostReqPlatformType as json.
-func (o OptVideosPostReqPlatformType) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes VideosPostReqPlatformType from json.
-func (o *OptVideosPostReqPlatformType) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptVideosPostReqPlatformType to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptVideosPostReqPlatformType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptVideosPostReqPlatformType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes VideosPostReqVideoType as json.
 func (o OptVideosPostReqVideoType) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -958,9 +923,13 @@ func (s *VideosPostReq) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *VideosPostReq) encodeFields(e *jx.Encoder) {
 	{
-		if s.PlatformType.Set {
+		if s.PlatformType != nil {
 			e.FieldStart("platform_type")
-			s.PlatformType.Encode(e)
+			e.ArrStart()
+			for _, elem := range s.PlatformType {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
 		}
 	}
 	{
@@ -993,8 +962,15 @@ func (s *VideosPostReq) Decode(d *jx.Decoder) error {
 		switch string(k) {
 		case "platform_type":
 			if err := func() error {
-				s.PlatformType.Reset()
-				if err := s.PlatformType.Decode(d); err != nil {
+				s.PlatformType = make([]VideosPostReqPlatformTypeItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem VideosPostReqPlatformTypeItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.PlatformType = append(s.PlatformType, elem)
+					return nil
+				}); err != nil {
 					return err
 				}
 				return nil
@@ -1061,8 +1037,6 @@ func (s *VideosPostReqPeriod) Decode(d *jx.Decoder) error {
 	}
 	// Try to use constant string.
 	switch VideosPostReqPeriod(v) {
-	case VideosPostReqPeriodAll:
-		*s = VideosPostReqPeriodAll
 	case VideosPostReqPeriodDay:
 		*s = VideosPostReqPeriodDay
 	case VideosPostReqPeriodMonth:
@@ -1089,48 +1063,46 @@ func (s *VideosPostReqPeriod) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostReqPlatformType as json.
-func (s VideosPostReqPlatformType) Encode(e *jx.Encoder) {
+// Encode encodes VideosPostReqPlatformTypeItem as json.
+func (s VideosPostReqPlatformTypeItem) Encode(e *jx.Encoder) {
 	e.Str(string(s))
 }
 
-// Decode decodes VideosPostReqPlatformType from json.
-func (s *VideosPostReqPlatformType) Decode(d *jx.Decoder) error {
+// Decode decodes VideosPostReqPlatformTypeItem from json.
+func (s *VideosPostReqPlatformTypeItem) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostReqPlatformType to nil")
+		return errors.New("invalid: unable to decode VideosPostReqPlatformTypeItem to nil")
 	}
 	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
 	// Try to use constant string.
-	switch VideosPostReqPlatformType(v) {
-	case VideosPostReqPlatformTypeAll:
-		*s = VideosPostReqPlatformTypeAll
-	case VideosPostReqPlatformTypeYoutube:
-		*s = VideosPostReqPlatformTypeYoutube
-	case VideosPostReqPlatformTypeTwitch:
-		*s = VideosPostReqPlatformTypeTwitch
-	case VideosPostReqPlatformTypeTwitcasting:
-		*s = VideosPostReqPlatformTypeTwitcasting
-	case VideosPostReqPlatformTypeNiconico:
-		*s = VideosPostReqPlatformTypeNiconico
+	switch VideosPostReqPlatformTypeItem(v) {
+	case VideosPostReqPlatformTypeItemYoutube:
+		*s = VideosPostReqPlatformTypeItemYoutube
+	case VideosPostReqPlatformTypeItemTwitch:
+		*s = VideosPostReqPlatformTypeItemTwitch
+	case VideosPostReqPlatformTypeItemTwitcasting:
+		*s = VideosPostReqPlatformTypeItemTwitcasting
+	case VideosPostReqPlatformTypeItemNiconico:
+		*s = VideosPostReqPlatformTypeItemNiconico
 	default:
-		*s = VideosPostReqPlatformType(v)
+		*s = VideosPostReqPlatformTypeItem(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s VideosPostReqPlatformType) MarshalJSON() ([]byte, error) {
+func (s VideosPostReqPlatformTypeItem) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostReqPlatformType) UnmarshalJSON(data []byte) error {
+func (s *VideosPostReqPlatformTypeItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1151,8 +1123,6 @@ func (s *VideosPostReqVideoType) Decode(d *jx.Decoder) error {
 	}
 	// Try to use constant string.
 	switch VideosPostReqVideoType(v) {
-	case VideosPostReqVideoTypeAll:
-		*s = VideosPostReqVideoTypeAll
 	case VideosPostReqVideoTypeVspoBroadcast:
 		*s = VideosPostReqVideoTypeVspoBroadcast
 	case VideosPostReqVideoTypeClip:

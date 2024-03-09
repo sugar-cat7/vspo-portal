@@ -9,14 +9,27 @@ import (
 	"context"
 )
 
+const countCreator = `-- name: CountCreator :one
+SELECT COUNT(*)
+FROM
+    creator
+`
+
+func (q *Queries) CountCreator(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countCreator)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getCreatorsByIDs = `-- name: GetCreatorsByIDs :many
 SELECT
     cr.id, cr.name, cr.member_type,
     ch.id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
 FROM
-    Creator cr
+    creator cr
 JOIN
-    Channel ch ON cr.id = ch.creatorId
+    channel ch ON cr.id = ch.creatorId
 WHERE
     cr.id = ANY($3::text[])
 LIMIT $1 OFFSET $2
@@ -74,9 +87,9 @@ SELECT
     cr.id, cr.name, cr.member_type,
     ch.id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
 FROM
-    Creator cr
+    creator cr
 JOIN
-    Channel ch ON cr.id = ch.creatorId
+    channel ch ON cr.id = ch.creatorId
 WHERE
     cr.member_type = ANY($3::text[])
 LIMIT $1 OFFSET $2

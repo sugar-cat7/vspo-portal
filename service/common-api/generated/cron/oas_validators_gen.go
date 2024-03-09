@@ -3,6 +3,8 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/go-faster/errors"
 
 	"github.com/ogen-go/ogen/validate"
@@ -78,7 +80,7 @@ func (s ChannelsPostReqChannelType) Validate() error {
 	switch s {
 	case "vspo":
 		return nil
-	case "all":
+	case "general":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -87,13 +89,13 @@ func (s ChannelsPostReqChannelType) Validate() error {
 
 func (s ChannelsPostReqPeriod) Validate() error {
 	switch s {
-	case "all":
-		return nil
 	case "day":
+		return nil
+	case "week":
 		return nil
 	case "month":
 		return nil
-	case "week":
+	case "year":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -102,8 +104,6 @@ func (s ChannelsPostReqPeriod) Validate() error {
 
 func (s ChannelsPostReqPlatformType) Validate() error {
 	switch s {
-	case "all":
-		return nil
 	case "youtube":
 		return nil
 	case "twitch":
@@ -124,15 +124,22 @@ func (s *VideosPostReq) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.PlatformType.Get(); ok {
+		var failures []validate.FieldError
+		for i, elem := range s.PlatformType {
 			if err := func() error {
-				if err := value.Validate(); err != nil {
+				if err := elem.Validate(); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return err
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
 			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
@@ -185,8 +192,6 @@ func (s *VideosPostReq) Validate() error {
 
 func (s VideosPostReqPeriod) Validate() error {
 	switch s {
-	case "all":
-		return nil
 	case "day":
 		return nil
 	case "month":
@@ -198,10 +203,8 @@ func (s VideosPostReqPeriod) Validate() error {
 	}
 }
 
-func (s VideosPostReqPlatformType) Validate() error {
+func (s VideosPostReqPlatformTypeItem) Validate() error {
 	switch s {
-	case "all":
-		return nil
 	case "youtube":
 		return nil
 	case "twitch":
@@ -217,8 +220,6 @@ func (s VideosPostReqPlatformType) Validate() error {
 
 func (s VideosPostReqVideoType) Validate() error {
 	switch s {
-	case "all":
-		return nil
 	case "vspo_broadcast":
 		return nil
 	case "clip":

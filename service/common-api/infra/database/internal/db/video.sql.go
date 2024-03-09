@@ -11,6 +11,19 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const countVideo = `-- name: CountVideo :one
+SELECT COUNT(*)
+FROM
+    video
+`
+
+func (q *Queries) CountVideo(ctx context.Context) (int64, error) {
+	row := q.db.QueryRow(ctx, countVideo)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}
+
 const getVideosByIDs = `-- name: GetVideosByIDs :many
 SELECT
      v.id, v.channel_id, v.platform_type, v.title, v.description, v.video_type, v.published_at, v.started_at, v.ended_at, v.broadcast_status, v.tags, v.view_count, v.thumbnail_url, v.is_deleted

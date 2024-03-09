@@ -65,8 +65,15 @@ func (r *video) Count(
 	ctx context.Context,
 	query repository.ListVideosQuery,
 ) (uint64, error) {
-	// FIXME: implement
-	return 0, nil
+	c, err := database.FromContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+	cn, err := c.Queries.CountVideo(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return uint64(cn), nil
 }
 
 func (r *video) UpsertAll(

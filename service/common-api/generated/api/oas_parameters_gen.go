@@ -17,7 +17,7 @@ type CreatorsGetParams struct {
 	// this parameter for each creator you want to get. The creator_id and creator_id parameters are
 	// mutually exclusive.
 	CreatorIds OptString
-	// A filter used to filter the list of creators by the creator's type.(The default is "all".).
+	// A filter used to filter the list of creators by the creator's type.
 	CreatorType OptCreatorsGetCreatorType
 	// Pagination object. Specify this parameter only if you don't specify the creator_ids query
 	// parameter.
@@ -263,16 +263,15 @@ type VideosGetParams struct {
 	// The ISO 639-1 two-letter code for Japanese (i.e., ja).
 	Language OptString
 	// A filter used to filter the list of videos by the video's type.(The default is "vspo_broadcast".).
-	VideoType OptVideosGetVideoType
-	// A filter used to filter the list of videos by the video's vspo_broadcast type.(The default is
-	// "all".).
-	BroadcastStatus OptVideosGetBroadcastStatus
-	// A filter used to filter the list of videos by when they were published.(The default is "all".).
+	VideoType []string
+	// A filter used to filter the list of videos by the video's vspo_broadcast type.
+	BroadcastStatus []string
+	// A filter used to filter the list of videos by when they were published.
 	Period OptVideosGetPeriod
 	// The order to sort the returned videos.(The default is "time".).
 	Sort OptVideosGetSort
-	// A filter used to filter the list of videos by the video's platform type.(The default is "all".).
-	PlatformType OptVideosGetPlatformType
+	// A filter used to filter the list of videos by the video's platform type.
+	PlatformType []string
 	// Pagination object. Specify this parameter only if you don't specify the creator_id or video_ids
 	// query parameter.
 	Page OptInt
@@ -315,7 +314,7 @@ func unpackVideosGetParams(packed middleware.Parameters) (params VideosGetParams
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.VideoType = v.(OptVideosGetVideoType)
+			params.VideoType = v.([]string)
 		}
 	}
 	{
@@ -324,7 +323,7 @@ func unpackVideosGetParams(packed middleware.Parameters) (params VideosGetParams
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.BroadcastStatus = v.(OptVideosGetBroadcastStatus)
+			params.BroadcastStatus = v.([]string)
 		}
 	}
 	{
@@ -351,7 +350,7 @@ func unpackVideosGetParams(packed middleware.Parameters) (params VideosGetParams
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.PlatformType = v.(OptVideosGetPlatformType)
+			params.PlatformType = v.([]string)
 		}
 	}
 	{
@@ -510,41 +509,28 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotVideoTypeVal VideosGetVideoType
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotVideoTypeVal = VideosGetVideoType(c)
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.VideoType.SetTo(paramsDotVideoTypeVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.VideoType.Get(); ok {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotVideoTypeVal string
 					if err := func() error {
-						if err := value.Validate(); err != nil {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotVideoTypeVal = c
 						return nil
 					}(); err != nil {
 						return err
 					}
-				}
-				return nil
-			}(); err != nil {
+					params.VideoType = append(params.VideoType, paramsDotVideoTypeVal)
+					return nil
+				})
+			}); err != nil {
 				return err
 			}
 		}
@@ -566,41 +552,28 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotBroadcastStatusVal VideosGetBroadcastStatus
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotBroadcastStatusVal = VideosGetBroadcastStatus(c)
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.BroadcastStatus.SetTo(paramsDotBroadcastStatusVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.BroadcastStatus.Get(); ok {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotBroadcastStatusVal string
 					if err := func() error {
-						if err := value.Validate(); err != nil {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotBroadcastStatusVal = c
 						return nil
 					}(); err != nil {
 						return err
 					}
-				}
-				return nil
-			}(); err != nil {
+					params.BroadcastStatus = append(params.BroadcastStatus, paramsDotBroadcastStatusVal)
+					return nil
+				})
+			}); err != nil {
 				return err
 			}
 		}
@@ -734,41 +707,28 @@ func decodeVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (p
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotPlatformTypeVal VideosGetPlatformType
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotPlatformTypeVal = VideosGetPlatformType(c)
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.PlatformType.SetTo(paramsDotPlatformTypeVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.PlatformType.Get(); ok {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotPlatformTypeVal string
 					if err := func() error {
-						if err := value.Validate(); err != nil {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotPlatformTypeVal = c
 						return nil
 					}(); err != nil {
 						return err
 					}
-				}
-				return nil
-			}(); err != nil {
+					params.PlatformType = append(params.PlatformType, paramsDotPlatformTypeVal)
+					return nil
+				})
+			}); err != nil {
 				return err
 			}
 		}

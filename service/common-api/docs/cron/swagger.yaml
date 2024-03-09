@@ -22,16 +22,16 @@ paths:
               properties:
                 platform_type:
                   type: string
-                  enum: [all, youtube, twitch, twitcasting, niconico]
+                  enum: [youtube, twitch, twitcasting, niconico]
                   description: Video's platform type.
                 period:
-                    type: string
-                    enum: [all, day, month, week]
-                    description: Period for performing updates.
+                  type: string
+                  enum: [day, week, month, year]
+                  description: Period for performing updates.
                 channel_type:
-                    type: string
-                    enum: [vspo, all]
-                    description: Period for performing updates.
+                  type: string
+                  enum: [vspo, general]
+                  description: Period for performing updates.
         required: true
       responses:
         "200":
@@ -94,16 +94,18 @@ paths:
               type: object
               properties:
                 platform_type:
-                  type: string
-                  enum: [all, youtube, twitch, twitcasting, niconico]
+                  type: array
+                  items:
+                    type: string
+                    enum: [youtube, twitch, twitcasting, niconico]
                   description: Video's platform type.
                 period:
-                    type: string
-                    enum: [all, day, month, week]
-                    description: Period for performing updates.
+                  type: string
+                  enum: [day, month, week]
+                  description: Period for performing updates.
                 video_type:
-                    type: string
-                    enum: [all, vspo_broadcast, clip, freechat]
+                  type: string
+                  enum: [vspo_broadcast, clip, freechat]
       responses:
         "200":
           description: Videos updated successfully

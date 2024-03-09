@@ -22,11 +22,11 @@ paths:
         example: creator_id1,creator_id2,creator_id3
       - name: creator_type
         in: query
-        description: A filter used to filter the list of creators by the creator's type.(The default is "all".)
+        description: A filter used to filter the list of creators by the creator's type.
         schema:
           type: string
-          enum: [all, vspo_member]
-        example: all
+          enum: [vspo]
+        example: vspo
       - name: page
         in: query
         description: Pagination object. Specify this parameter only if you don't specify the creator_ids query parameter.
@@ -84,22 +84,26 @@ paths:
         in: query
         description: A filter used to filter the list of videos by the video's type.(The default is "vspo_broadcast".)
         schema:
-          type: string
-          enum: [all, vspo_broadcast, clip, freechat]
+          type: array
+          items:
+            type: string
+          enum: [vspo_broadcast, clip, freechat]
         example: broadcast
       - name: broadcast_status
         in: query
-        description: A filter used to filter the list of videos by the video's vspo_broadcast type.(The default is "all".)
+        description: A filter used to filter the list of videos by the video's vspo_broadcast type.
         schema:
-          type: string
-          enum: [all, live, upcoming, archive]
-        example: all
+          type: array
+          items:
+            type: string
+          enum: [live, upcoming, archive]
+        example: live
       - name: period
         in: query
-        description: A filter used to filter the list of videos by when they were published.(The default is "all".)
+        description: A filter used to filter the list of videos by when they were published.
         schema:
           type: string
-          enum: [all, day, month, week]
+          enum: [day, month, week]
         example: day
       - name: sort
         in: query
@@ -110,11 +114,13 @@ paths:
         example: time
       - name: platform_type
         in: query
-        description: A filter used to filter the list of videos by the video's platform type.(The default is "all".)
+        description: A filter used to filter the list of videos by the video's platform type.
         schema:
-          type: string
-          enum: [all, youtube, twitch, twitcasting, niconico]
-        example: all
+          type: array
+          items:
+            type: string
+          enum: [youtube, twitch, twitcasting, niconico]
+        example: youtube
       - name: page
         in: query
         description: Pagination object. Specify this parameter only if you don't specify the creator_id or video_ids query parameter.

@@ -59,10 +59,17 @@ func (r *creator) List(
 
 func (r *creator) Count(
 	ctx context.Context,
-	query repository.ListCreatorsQuery,
+	_ repository.ListCreatorsQuery,
 ) (uint64, error) {
-	// FIXME: implement
-	return 0, nil
+	c, err := database.FromContext(ctx)
+	if err != nil {
+		return 0, err
+	}
+	cn, err := c.Queries.CountCreator(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return uint64(cn), nil
 }
 
 func (r *creator) UpsertAll(

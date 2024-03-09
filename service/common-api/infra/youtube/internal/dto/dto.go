@@ -38,14 +38,14 @@ func ytVideoToVideo(ytVideo *youtube.Video) (*model.Video, error) {
 	if err != nil {
 		return nil, err
 	}
-	m.StartAt = startAt
+	m.StartedAt = startAt
 
 	if ytVideo.LiveStreamingDetails.ActualEndTime != "" {
 		endAt, err := utime.Utc.ISOStringToTime(ytVideo.LiveStreamingDetails.ActualEndTime)
 		if err != nil {
 			return nil, err
 		}
-		m.EndAt = endAt
+		m.EndedAt = endAt
 	}
 	return m, nil
 }

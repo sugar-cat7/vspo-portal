@@ -28,3 +28,8 @@ FROM
 WHERE
     id = ANY(@ids::text[])
 LIMIT $1 OFFSET $2;
+
+-- name: CountVideo :one
+SELECT COUNT(*)
+FROM
+    video;

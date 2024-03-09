@@ -12,9 +12,7 @@ import (
 
 func (s CreatorsGetCreatorType) Validate() error {
 	switch s {
-	case "all":
-		return nil
-	case "vspo_member":
+	case "vspo":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -68,47 +66,13 @@ func (s VideoResponsePlatform) Validate() error {
 	}
 }
 
-func (s VideosGetBroadcastStatus) Validate() error {
-	switch s {
-	case "all":
-		return nil
-	case "live":
-		return nil
-	case "upcoming":
-		return nil
-	case "archive":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
 func (s VideosGetPeriod) Validate() error {
 	switch s {
-	case "all":
-		return nil
 	case "day":
 		return nil
 	case "month":
 		return nil
 	case "week":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
-func (s VideosGetPlatformType) Validate() error {
-	switch s {
-	case "all":
-		return nil
-	case "youtube":
-		return nil
-	case "twitch":
-		return nil
-	case "twitcasting":
-		return nil
-	case "niconico":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -122,21 +86,6 @@ func (s VideosGetSort) Validate() error {
 	case "trending":
 		return nil
 	case "views":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
-func (s VideosGetVideoType) Validate() error {
-	switch s {
-	case "all":
-		return nil
-	case "vspo_broadcast":
-		return nil
-	case "clip":
-		return nil
-	case "freechat":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

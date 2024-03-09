@@ -24,7 +24,7 @@ func twStreamToVideo(twStream TwitCastingVideo) *model.Video {
 		ThumbnailURL: model.ThumbnailURL(twStream.ThumbnailURL),
 		Status:       status(twStream.IsLive),
 		PublishedAt:  t,
-		StartAt:      t,
+		StartedAt:    t,
 	}
 
 	return m
