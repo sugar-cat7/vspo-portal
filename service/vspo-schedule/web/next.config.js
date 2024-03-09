@@ -56,8 +56,8 @@ const nextConfig = {
         permanent: true,
       },
       {
-        source: "/notifications",
-        destination: "/site-news",
+        source: "/notifications/:id*",
+        destination: "/site-news/:id*",
         permanent: true,
       },
     ];
