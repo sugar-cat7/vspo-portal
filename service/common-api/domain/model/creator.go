@@ -6,6 +6,7 @@ import "fmt"
 type Creator struct {
 	ID           string
 	Name         string
+	MemberType   MemberType
 	ThumbnailURL ThumbnailURL
 	Channel      Channel
 }

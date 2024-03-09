@@ -5,6 +5,8 @@ import "fmt"
 // Platform represents a live platform.
 type Platform string
 
+type Platforms []Platform
+
 const (
 	PlatformYouTube     Platform = "youtube"
 	PlatformTwitch      Platform = "twitch"
@@ -31,16 +33,29 @@ func NewPlatform(
 	}
 }
 
+// NewPlatforms creates a new Platform type based on the provided string slice.
+func NewPlatforms(
+	platforms []string,
+) (Platforms, error) {
+	var res []Platform
+	for _, p := range platforms {
+		platform, err := NewPlatform(p)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, platform)
+	}
+	return res, nil
+}
+
 func (p Platform) String() string {
 	return string(p)
 }
 
-// NewPlatformStringTypes is ...
-func NewPlatformStringTypes(s []string) ([]string, error) {
-	for _, v := range s {
-		if _, err := NewPlatform(v); err != nil {
-			return nil, err
-		}
+func (p Platforms) String() []string {
+	var res []string
+	for _, platform := range p {
+		res = append(res, platform.String())
 	}
-	return s, nil
+	return res
 }

@@ -52,7 +52,7 @@ func (i *videoInteractor) UpsertAll(
 		return nil, err
 	}
 
-	platformTypes, err := model.NewPlatformStringTypes(param.PlatformTypes)
+	platformTypes, err := model.NewPlatforms(param.PlatformTypes)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +71,7 @@ func (i *videoInteractor) UpsertAll(
 	// Retrieve existing videos
 	q := repository.ListVideosQuery{
 		VideoIDs:      param.VideoIDs,
-		PlatformTypes: platformTypes,
+		PlatformTypes: platformTypes.String(),
 		VideoType:     videoType.String(),
 		BroadcastStatus: []string{
 			model.StatusLive.String(),
@@ -94,7 +94,8 @@ func (i *videoInteractor) UpsertAll(
 		ctx,
 		cs,
 		vs,
-		param,
+		platformTypes,
+		videoType,
 	)
 
 	// Upsert Videos All
@@ -109,10 +110,11 @@ func (i *videoInteractor) UpsertAll(
 	return updatedVideos, nil
 }
 
-func (i *videoInteractor) youtubeVideos(
+func (i *videoInteractor) ytVideos(
 	ctx context.Context,
-	_ model.Creators,
-	existVideos model.Videos,
+	cs model.Creators,
+	evs model.Videos,
+	vt model.VideoType,
 ) (model.Videos, error) {
 	// Retrieve new videos via youtube api
 	liveYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
@@ -141,7 +143,7 @@ func (i *videoInteractor) youtubeVideos(
 	}
 
 	// Retrieve video details via youtube api
-	youtubeVideos, err := i.youtubeClient.GetVideos(
+	ytVideos, err := i.youtubeClient.GetVideos(
 		ctx,
 		youtube.VideosParam{
 			VideoIDs: m.ToSlice(),
@@ -150,14 +152,19 @@ func (i *videoInteractor) youtubeVideos(
 	if err != nil {
 		return nil, err
 	}
+
+	if vt == model.VideoTypeVspoBroadcast || vt == model.VideoTypeFreechat {
+		ytVideos = ytVideos.FilterCreator(cs)
+	}
+
 	// FIXME: Filter Logic
-	return youtubeVideos.FilterUpdateTarget(existVideos), nil
+	return ytVideos.FilterUpdateTarget(evs), nil
 }
 
 func (i *videoInteractor) twitchVideos(
 	ctx context.Context,
 	cs model.Creators,
-	existVideos model.Videos,
+	evs model.Videos,
 ) (model.Videos, error) {
 	twitchUserIDs := lo.Map(cs, func(c *model.Creator, _ int) string {
 		return c.Channel.Twitch.ID
@@ -170,13 +177,13 @@ func (i *videoInteractor) twitchVideos(
 		return nil, err
 	}
 	// FIXME: Filter Logic
-	return newTwitchVideos.FilterUpdateTarget(existVideos), nil
+	return newTwitchVideos.FilterUpdateTarget(evs), nil
 }
 
 func (i *videoInteractor) twitCastingVideos(
 	ctx context.Context,
 	cs model.Creators,
-	existVideos model.Videos,
+	evs model.Videos,
 ) (model.Videos, error) {
 	twitCastingUserIDs := lo.Map(cs, func(c *model.Creator, _ int) string {
 		return c.Channel.TwitCasting.ID
@@ -189,32 +196,33 @@ func (i *videoInteractor) twitCastingVideos(
 		return nil, err
 	}
 	// FIXME: Filter Logic
-	return newTwitcastingVideos.FilterUpdateTarget(existVideos), nil
+	return newTwitcastingVideos.FilterUpdateTarget(evs), nil
 }
 
 func (i *videoInteractor) updateVideosByPlatformTypes(
 	ctx context.Context,
 	cs model.Creators,
-	existVideos model.Videos,
-	param *input.UpsertAllVideos,
+	evs model.Videos,
+	pts model.Platforms,
+	vt model.VideoType,
 ) (model.Videos, error) {
 	var updatedVideos model.Videos
-	for _, platformType := range param.PlatformTypes {
+	for _, platformType := range pts.String() {
 		switch platformType {
 		case model.PlatformYouTube.String():
-			newYoutubeVideos, err := i.youtubeVideos(ctx, cs, existVideos)
+			newYoutubeVideos, err := i.ytVideos(ctx, cs, evs, vt)
 			if err != nil {
 				return nil, err
 			}
 			updatedVideos = append(updatedVideos, newYoutubeVideos...)
 		case model.PlatformTwitch.String():
-			newTwitchVideos, err := i.twitchVideos(ctx, cs, existVideos)
+			newTwitchVideos, err := i.twitchVideos(ctx, cs, evs)
 			if err != nil {
 				return nil, err
 			}
 			updatedVideos = append(updatedVideos, newTwitchVideos...)
 		case model.PlatformTwitCasting.String():
-			newTwitcastingVideos, err := i.twitCastingVideos(ctx, cs, existVideos)
+			newTwitcastingVideos, err := i.twitCastingVideos(ctx, cs, evs)
 			if err != nil {
 				return nil, err
 			}

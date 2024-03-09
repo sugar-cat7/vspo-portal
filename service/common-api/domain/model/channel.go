@@ -1,9 +1,14 @@
 package model
 
-import "github.com/samber/lo"
+import (
+	"time"
+
+	"github.com/samber/lo"
+)
 
 // Channel represents a channel.
 type Channel struct {
+	CreatorID   string
 	Youtube     ChannelSnippet
 	Twitch      ChannelSnippet
 	TwitCasting ChannelSnippet
@@ -12,11 +17,15 @@ type Channel struct {
 
 // ChannelSnippet represents a channel snippet.
 type ChannelSnippet struct {
-	ID           string
-	Name         string
-	Description  string
-	ThumbnailURL ThumbnailURL
-	IsDeleted    bool
+	ID              string
+	Name            string
+	Description     string
+	ThumbnailURL    ThumbnailURL
+	PublishedAt     time.Time
+	TotalViewCount  int
+	SubscriberCount int
+	TotalVideoCount int
+	IsDeleted       bool
 }
 
 // Channels represents a list of channels.
