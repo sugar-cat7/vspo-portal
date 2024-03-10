@@ -2,12 +2,8 @@ import React, { useEffect, useState } from "react";
 import {
   Alert,
   AppBar,
-  Button,
   IconButton,
-  Menu,
-  MenuItem,
   Snackbar,
-  SwipeableDrawer,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -19,8 +15,7 @@ import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
 import Link from "next/link";
-import { CustomDrawer, ThemeToggleButton } from "../Elements";
-import SettingsIcon from "@mui/icons-material/Settings";
+import { CustomDrawer } from "../Elements";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: "#7266cf",
@@ -48,23 +43,6 @@ const StyledSubtitle = styled(Typography)({
 const StyledAlert = styled(Alert)({
   backgroundColor: "#e5f6fd",
   color: "#014361",
-});
-
-const StyledButton = styled(Button)({
-  display: "flex",
-  justifyContent: "flex-start",
-  paddingLeft: "16px",
-  "&:hover": {
-    backgroundColor: "transparent", // ホバーエフェクトを無効にする
-  },
-  borderRadius: 0,
-  fontSize: "1rem",
-  "& .MuiButton-startIcon": {
-    marginLeft: 0,
-    "& .MuiSvgIcon-root": {
-      fontSize: "24px",
-    },
-  },
 });
 
 const SocialIconLink: React.FC<{
@@ -98,17 +76,6 @@ type Props = {
 };
 export const Header: React.FC<Props> = ({ title }) => {
   const [alertOpen, setAlertOpen] = useState<boolean>(false);
-  const [settingsAnchorEl, setSettingsAnchorEl] = useState<null | HTMLElement>(
-    null,
-  );
-
-  const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
-    setSettingsAnchorEl(event.currentTarget);
-  };
-
-  const handleSettingsClose = () => {
-    setSettingsAnchorEl(null);
-  };
 
   const handleClose = () => {
     setAlertOpen(false);
@@ -190,63 +157,11 @@ export const Header: React.FC<Props> = ({ title }) => {
 
       <AppBarOffset />
 
-      <SwipeableDrawer
-        anchor="left"
+      <CustomDrawer
         open={mobileOpen}
-        onClose={handleDrawerToggle}
         onOpen={handleDrawerToggle}
-        PaperProps={{
-          style: {
-            width: "240px",
-            zIndex: 1200,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "space-between",
-          },
-        }}
-        ModalProps={{
-          keepMounted: true,
-          disablePortal: true,
-        }}
-        SwipeAreaProps={{
-          style: {
-            position: "absolute",
-          },
-        }}
-      >
-        <CustomDrawer />
-        <StyledButton
-          aria-label="settings"
-          aria-controls="settings-menu"
-          aria-haspopup="true"
-          onClick={handleSettingsClick}
-          color="inherit"
-          startIcon={<SettingsIcon />}
-        >
-          設定
-        </StyledButton>
-        <Menu
-          id="settings-menu"
-          anchorEl={settingsAnchorEl}
-          open={Boolean(settingsAnchorEl)}
-          onClose={handleSettingsClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
-          sx={{ top: "-30px" }}
-        >
-          <MenuItem
-            // onClick={handleSettingsClose}
-            sx={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              padding: 0,
-            }}
-          >
-            <ThemeToggleButton />
-          </MenuItem>
-        </Menu>
-      </SwipeableDrawer>
+        onClose={handleDrawerToggle}
+      />
 
       <Snackbar
         open={alertOpen}
