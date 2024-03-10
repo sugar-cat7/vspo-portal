@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  AppBar,
-  IconButton,
-  Snackbar,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import CloseIcon from "@mui/icons-material/Close";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from "@mui/system";
 import Image from "next/image";
@@ -16,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
 import Link from "next/link";
 import { CustomDrawer } from "../Elements";
+import { AlertSnackbar } from "../Elements/Snackbar";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: "#7266cf",
@@ -30,7 +23,6 @@ const StyledTypography = styled(Typography)({
     "'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro', 'Hiragino Mincho Pro', 'ヒラギノ明朝 Pro', 'Hiragino Maru Gothic Pro', 'ヒラギノ丸ゴ Pro', sans-serif",
   fontWeight: "bold",
   fontSize: "0.9rem",
-  // paddingTop: "3px",
 });
 const StyledSubtitle = styled(Typography)({
   fontFamily:
@@ -38,11 +30,6 @@ const StyledSubtitle = styled(Typography)({
   fontWeight: "normal",
   fontSize: "0.5rem",
   paddingLeft: "0px",
-});
-
-const StyledAlert = styled(Alert)({
-  backgroundColor: "#e5f6fd",
-  color: "#014361",
 });
 
 const SocialIconLink: React.FC<{
@@ -75,15 +62,15 @@ type Props = {
   title: string;
 };
 export const Header: React.FC<Props> = ({ title }) => {
-  const [alertOpen, setAlertOpen] = useState<boolean>(false);
+  const [alertOpen, setAlertOpen] = useState(false);
 
-  const handleClose = () => {
+  const handleAlertClose = () => {
     setAlertOpen(false);
-    localStorage.setItem("headerAlertSeen5", "false");
+    localStorage.setItem("alertSeen", "true");
   };
 
   useEffect(() => {
-    const hasSeenAlert = localStorage.getItem("headerAlertSeen5");
+    const hasSeenAlert = localStorage.getItem("alertSeen");
 
     if (!hasSeenAlert) {
       setAlertOpen(true);
@@ -163,35 +150,7 @@ export const Header: React.FC<Props> = ({ title }) => {
         onClose={toggleDrawerOpen}
       />
 
-      <Snackbar
-        open={alertOpen}
-        autoHideDuration={6000}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "center",
-        }}
-        sx={{ marginTop: "48px" }}
-      >
-        <StyledAlert
-          severity="info"
-          action={
-            <IconButton
-              size="small"
-              aria-label="close"
-              color="inherit"
-              onClick={handleClose}
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          }
-        >
-          [お知らせ]
-          <br />
-          配信情報を通知するDiscord Botを公開しました！
-          <br />
-          サイドバーから追加できます。
-        </StyledAlert>
-      </Snackbar>
+      <AlertSnackbar open={alertOpen} onClose={handleAlertClose} />
     </>
   );
 };
