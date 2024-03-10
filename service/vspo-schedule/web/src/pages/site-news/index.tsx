@@ -1,7 +1,6 @@
-import { notifications } from "@/data/content/notifications";
+import { siteNewsItems } from "@/data/content/site-news";
 import { NextPageWithLayout } from "../_app";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
-import { Notice } from "@/types/notice";
 import {
   TableContainer,
   Paper,
@@ -18,7 +17,7 @@ import Link from "next/link";
 import { getColor } from "@/lib/utils";
 import { Breadcrumb } from "@/components/Elements";
 
-const Notifications: NextPageWithLayout = () => {
+const SiteNewsPage: NextPageWithLayout = () => {
   return (
     <>
       <Toolbar disableGutters variant="dense" sx={{ alignItems: "end" }}>
@@ -70,22 +69,22 @@ const Notifications: NextPageWithLayout = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {notifications.map((notice: Notice) => (
-              <TableRow key={notice.id}>
+            {siteNewsItems.map((siteNewsItem) => (
+              <TableRow key={siteNewsItem.id}>
                 <TableCell sx={{ fontSize: "16px", padding: "24px" }}>
-                  <Link href={`/notifications/${notice.id}`} passHref>
+                  <Link href={`/site-news/${siteNewsItem.id}`} passHref>
                     <Box sx={{ textDecoration: "none", color: "inherit" }}>
-                      {notice.content}
+                      {siteNewsItem.content}
                     </Box>
                   </Link>
                 </TableCell>
                 <TableCell
                   sx={{ fontSize: "16px", padding: "24px 4px", minWidth: 120 }}
                 >
-                  {notice.updated}
+                  {siteNewsItem.updated}
                 </TableCell>
                 <TableCell sx={{ fontSize: "16px", padding: "24px" }}>
-                  {notice.tags.map((tag) => (
+                  {siteNewsItem.tags.map((tag) => (
                     <Chip
                       key={tag}
                       label={tag}
@@ -104,12 +103,12 @@ const Notifications: NextPageWithLayout = () => {
   );
 };
 
-Notifications.getLayout = (page) => {
+SiteNewsPage.getLayout = (page) => {
   return (
     <ContentLayout
       title="すぽじゅーるからのお知らせ"
       description="バグ改善や新機能追加に関してのお知らせを表示します。"
-      path="/notifications"
+      path="/site-news"
       maxPageWidth="md"
     >
       {page}
@@ -117,4 +116,4 @@ Notifications.getLayout = (page) => {
   );
 };
 
-export default Notifications;
+export default SiteNewsPage;

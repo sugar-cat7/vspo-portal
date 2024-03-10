@@ -6,13 +6,14 @@ import ContentCutIcon from "@mui/icons-material/ContentCut";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import LiveTvIcon from "@mui/icons-material/LiveTv";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import AllInboxIcon from "@mui/icons-material/AllInbox";
 import EventIcon from "@mui/icons-material/Event";
 import InfoIcon from "@mui/icons-material/Info";
+import { NavigationRouteId } from "@/constants/navigation";
+import { Platform } from "@/types/streaming";
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)(({ theme }) => ({
   color: "black",
@@ -22,9 +23,9 @@ const StyledFontAwesomeIcon = styled(FontAwesomeIcon)(({ theme }) => ({
   },
 }));
 
-type Props = { platform: string };
+type PlatformIconProps = { platform: Platform };
 
-export const PlatformIcon: React.FC<Props> = ({ platform }) => {
+export const PlatformIcon: React.FC<PlatformIconProps> = ({ platform }) => {
   switch (platform) {
     case "youtube":
       return (
@@ -58,7 +59,7 @@ export const PlatformIcon: React.FC<Props> = ({ platform }) => {
   }
 };
 
-type DrawerIconProps = { id: string };
+type DrawerIconProps = { id: NavigationRouteId };
 
 export const DrawerIcon: React.FC<DrawerIconProps> = ({ id }) => {
   switch (id) {
@@ -78,9 +79,7 @@ export const DrawerIcon: React.FC<DrawerIconProps> = ({ id }) => {
       return <ChatBubbleOutlineIcon />;
     case "twitch-clip":
       return <AttachFileIcon />;
-    case "support":
-      return <CreditCardIcon />;
-    case "notification":
+    case "site-news":
       return <NotificationsIcon />;
     case "event":
       return <EventIcon />;

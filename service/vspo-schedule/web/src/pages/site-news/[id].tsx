@@ -1,10 +1,10 @@
 import { GetStaticProps, GetStaticPaths } from "next";
-import { Notice } from "@/types/notice";
+import { SiteNewsItem } from "@/types/site-news";
 import { ContentLayout } from "@/components/Layout";
 import { NextPageWithLayout } from "../_app";
 import { Typography, Chip, Box, Toolbar } from "@mui/material";
 import { Breadcrumb, TweetEmbed } from "@/components/Elements";
-import { notifications } from "@/data/content/notifications";
+import { siteNewsItems } from "@/data/content/site-news";
 import { getColor } from "@/lib/utils";
 
 type Params = {
@@ -12,10 +12,10 @@ type Params = {
 };
 
 type Props = {
-  notice: Notice;
+  siteNewsItem: SiteNewsItem;
 };
 
-const NoticePage: NextPageWithLayout<Props> = ({ notice }) => {
+const SiteNewsItemPage: NextPageWithLayout<Props> = ({ siteNewsItem }) => {
   return (
     <>
       <Toolbar disableGutters variant="dense" sx={{ alignItems: "end" }}>
@@ -29,14 +29,14 @@ const NoticePage: NextPageWithLayout<Props> = ({ notice }) => {
           gutterBottom
           sx={{ marginTop: "10px" }}
         >
-          {notice.title}
+          {siteNewsItem.title}
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
-          更新日: {notice.updated}
+          更新日: {siteNewsItem.updated}
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
           Tags:
-          {notice.tags.map((tag) => (
+          {siteNewsItem.tags.map((tag) => (
             <Chip
               key={tag}
               label={tag}
@@ -47,20 +47,22 @@ const NoticePage: NextPageWithLayout<Props> = ({ notice }) => {
           ))}
         </Typography>
         <Typography variant="body1" paragraph>
-          {notice.content}
+          {siteNewsItem.content}
         </Typography>
-        {notice.tweetLink && <TweetEmbed tweetLink={notice.tweetLink} />}
+        {siteNewsItem.tweetLink && (
+          <TweetEmbed tweetLink={siteNewsItem.tweetLink} />
+        )}
       </Box>
     </>
   );
 };
 
-NoticePage.getLayout = (page, pageProps) => {
+SiteNewsItemPage.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
       title="すぽじゅーるからのお知らせ"
-      description={pageProps.notice.content}
-      path={`/notifications/${pageProps.notice.id}`}
+      description={pageProps.siteNewsItem.content}
+      path={`/site-news/${pageProps.siteNewsItem.id}`}
       maxPageWidth="md"
     >
       {page}
@@ -76,8 +78,10 @@ export const getStaticProps: GetStaticProps<Props, Params> = ({ params }) => {
   }
 
   const id = params.id;
-  const notice = notifications.find((notice) => notice.id === Number(id));
-  if (!notice) {
+  const siteNewsItem = siteNewsItems.find(
+    (siteNewsItem) => siteNewsItem.id === Number(id),
+  );
+  if (!siteNewsItem) {
     return {
       notFound: true,
     };
@@ -85,16 +89,16 @@ export const getStaticProps: GetStaticProps<Props, Params> = ({ params }) => {
 
   return {
     props: {
-      notice,
+      siteNewsItem,
     },
   };
 };
 
 export const getStaticPaths: GetStaticPaths<Params> = () => {
-  const paths = notifications.map((notice) => ({
-    params: { id: notice.id.toString() },
+  const paths = siteNewsItems.map((siteNewsItem) => ({
+    params: { id: siteNewsItem.id.toString() },
   }));
   return { paths, fallback: false };
 };
 
-export default NoticePage;
+export default SiteNewsItemPage;

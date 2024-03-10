@@ -1,6 +1,6 @@
-import { Notice } from "@/types/notice";
+import { SiteNewsItem } from "@/types/site-news";
 
-export const notifications: Notice[] = [
+export const siteNewsItems: SiteNewsItem[] = [
   {
     id: 14,
     title: "配信情報を通知するDiscord Botを公開しました。",
