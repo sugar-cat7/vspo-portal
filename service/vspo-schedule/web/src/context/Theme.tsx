@@ -23,6 +23,7 @@ const theme = extendTheme({
   components: {
     MuiCssBaseline: {
       styleOverrides: ({ mixins }) => ({
+        html: mixins.scrollbar,
         body: mixins.scrollbar,
       }),
     },

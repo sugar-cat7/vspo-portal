@@ -26,9 +26,8 @@ export const GoogleAd: React.FC = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        // height: "100vh",
         marginBottom: "80px",
-        width: "100vw",
+        width: "100%",
       }}
     >
       <ins

@@ -8,7 +8,7 @@ type Props = {
 };
 export const Footer: React.FC<Props> = ({ lastUpdateDate, description }) => {
   return (
-    <Box mt={4} mb={8} textAlign="center">
+    <Box mt={4} mb={2} textAlign="center">
       {description && (
         <Typography variant="body2" color="text.secondary">
           {description}

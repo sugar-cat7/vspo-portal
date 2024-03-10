@@ -28,6 +28,12 @@ const getActiveNavOption = (activePath: string) => {
   });
 };
 
+const bottomNavigationHeight = "56px";
+
+const BottomNavigationOffset = () => (
+  <div style={{ height: bottomNavigationHeight }}></div>
+);
+
 export const CustomBottomNavigation: React.FC = () => {
   const [value, setValue] = useState("");
   const router = useRouter();
@@ -38,19 +44,26 @@ export const CustomBottomNavigation: React.FC = () => {
   }, [router.asPath]);
 
   return (
-    <Box sx={{ width: "100%", position: "fixed", bottom: 0, zIndex: 1000 }}>
-      <BottomNavigation value={value} showLabels>
-        {bottomNavigationContents.map(({ id, name }) => (
-          <BottomNavigationAction
-            component={Link}
-            href={getNavigationRouteInfo(id).link}
-            key={id}
-            label={name}
-            value={id}
-            icon={<DrawerIcon id={id} />}
-          />
-        ))}
-      </BottomNavigation>
-    </Box>
+    <>
+      <BottomNavigationOffset />
+      <Box sx={{ width: "100%", position: "fixed", bottom: 0, zIndex: 1000 }}>
+        <BottomNavigation
+          value={value}
+          showLabels
+          sx={{ height: bottomNavigationHeight }}
+        >
+          {bottomNavigationContents.map(({ id, name }) => (
+            <BottomNavigationAction
+              component={Link}
+              href={getNavigationRouteInfo(id).link}
+              key={id}
+              label={name}
+              value={id}
+              icon={<DrawerIcon id={id} />}
+            />
+          ))}
+        </BottomNavigation>
+      </Box>
+    </>
   );
 };
