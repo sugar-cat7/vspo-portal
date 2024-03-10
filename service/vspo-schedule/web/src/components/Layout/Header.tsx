@@ -90,10 +90,10 @@ export const Header: React.FC<Props> = ({ title }) => {
     }
   }, []);
 
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
+  const toggleDrawerOpen = () => {
+    setDrawerOpen(!drawerOpen);
   };
 
   return (
@@ -109,9 +109,9 @@ export const Header: React.FC<Props> = ({ title }) => {
           >
             <IconButton
               color="inherit"
-              aria-label="open drawer"
+              aria-label="toggle drawer"
               edge="start"
-              onClick={handleDrawerToggle}
+              onClick={toggleDrawerOpen}
               sx={{ mr: 1 }}
             >
               <MenuIcon />
@@ -158,9 +158,9 @@ export const Header: React.FC<Props> = ({ title }) => {
       <AppBarOffset />
 
       <CustomDrawer
-        open={mobileOpen}
-        onOpen={handleDrawerToggle}
-        onClose={handleDrawerToggle}
+        open={drawerOpen}
+        onOpen={toggleDrawerOpen}
+        onClose={toggleDrawerOpen}
       />
 
       <Snackbar
