@@ -12,9 +12,7 @@ export const GoogleAd: React.FC = () => {
   useEffect(() => {
     try {
       // eslint-disable-next-line
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
-        {},
-      );
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (error) {
       console.error(error);
     }
@@ -31,6 +29,7 @@ export const GoogleAd: React.FC = () => {
       }}
     >
       <ins
+        key={pathname}
         className="adsbygoogle"
         style={{
           display: "flex",
