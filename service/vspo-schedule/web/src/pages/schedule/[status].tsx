@@ -44,6 +44,7 @@ const TabBox = styled(Box)(({ theme }) => ({
   display: "flex",
   justifyContent: "center",
   position: "sticky",
+  margin: "0 -2px",
 
   [theme.breakpoints.down("sm")]: {
     top: "56px",
