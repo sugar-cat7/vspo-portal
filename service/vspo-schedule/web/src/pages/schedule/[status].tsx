@@ -15,7 +15,7 @@ import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { NextPageWithLayout } from "../_app";
 import { LivestreamCards } from "@/components/Templates";
-import { freeChatVideoIds } from "@/data/freechat-video-ids";
+import { freechatVideoIds } from "@/data/freechat-video-ids";
 import { fetchEvents, fetchLivestreams } from "@/lib/api";
 import { VspoEvent } from "@/types/events";
 import Link from "next/link";
@@ -138,7 +138,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   const events = await fetchEvents();
 
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
-    (livestream) => !freeChatVideoIds.includes(livestream.id),
+    (livestream) => !freechatVideoIds.includes(livestream.id),
   );
 
   const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
@@ -169,7 +169,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       return (
         scheduledStartTime >= oneWeekAgo &&
         scheduledStartTime <= oneWeekLater &&
-        !freeChatVideoIds.includes(livestream.id) &&
+        !freechatVideoIds.includes(livestream.id) &&
         params.status === getLiveStatus(livestream)
       );
     }

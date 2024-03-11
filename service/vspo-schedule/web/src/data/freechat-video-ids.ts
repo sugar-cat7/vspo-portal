@@ -1,4 +1,4 @@
-export const freeChatVideoIds = [
+export const freechatVideoIds = [
   "tFFq_vUblrs",
   "Rfuu2gkj18w",
   "bx1-cTN0Zas",
