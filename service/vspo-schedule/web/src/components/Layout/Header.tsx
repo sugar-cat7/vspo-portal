@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -8,7 +8,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
 import Link from "next/link";
 import { CustomDrawer } from "../Elements";
-import { AlertSnackbar } from "../Elements/Snackbar";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: "#7266cf",
@@ -62,21 +61,6 @@ type Props = {
   title: string;
 };
 export const Header: React.FC<Props> = ({ title }) => {
-  const [alertOpen, setAlertOpen] = useState(false);
-
-  const handleAlertClose = () => {
-    setAlertOpen(false);
-    localStorage.setItem("alertSeen", "true");
-  };
-
-  useEffect(() => {
-    const hasSeenAlert = localStorage.getItem("alertSeen");
-
-    if (!hasSeenAlert) {
-      setAlertOpen(true);
-    }
-  }, []);
-
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const toggleDrawerOpen = () => {
@@ -149,8 +133,6 @@ export const Header: React.FC<Props> = ({ title }) => {
         onOpen={toggleDrawerOpen}
         onClose={toggleDrawerOpen}
       />
-
-      <AlertSnackbar open={alertOpen} onClose={handleAlertClose} />
     </>
   );
 };

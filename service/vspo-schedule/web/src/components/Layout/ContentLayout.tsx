@@ -1,10 +1,9 @@
-import * as React from "react";
-
+import React, { useEffect, useState } from "react";
 import { CustomHead } from "../Head/Head";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
-import { GoogleAd } from "../Elements/Google/GoogleAd";
-import { CustomBottomNavigation } from "@/components/Layout/Navigation";
+import { CustomBottomNavigation } from "./Navigation";
+import { AlertSnackbar, GoogleAd } from "../Elements";
 import { Breakpoint, Container, ContainerTypeMap } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
@@ -48,6 +47,21 @@ export const ContentLayout = ({
   maxPageWidth,
   padTop,
 }: ContentLayoutProps) => {
+  const [alertOpen, setAlertOpen] = useState(false);
+
+  const handleAlertClose = () => {
+    setAlertOpen(false);
+    localStorage.setItem("alertSeen", "true");
+  };
+
+  useEffect(() => {
+    const hasSeenAlert = localStorage.getItem("alertSeen");
+
+    if (!hasSeenAlert) {
+      setAlertOpen(true);
+    }
+  }, []);
+
   return (
     <>
       <CustomHead
@@ -57,6 +71,7 @@ export const ContentLayout = ({
         canonicalPath={canonicalPath}
       />
       <Header title={title} />
+      <AlertSnackbar open={alertOpen} onClose={handleAlertClose} />
       <StyledContainer component="main" maxWidth={maxPageWidth} padTop={padTop}>
         {children}
       </StyledContainer>
