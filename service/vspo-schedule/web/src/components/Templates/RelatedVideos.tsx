@@ -2,7 +2,7 @@ import { memberNames } from "@/data/members";
 import { TEMP_TIMESTAMP } from "@/lib/Const";
 import { RelatedProps, fetcher } from "@/lib/api";
 import { formatWithTimeZone } from "@/lib/utils";
-import { Clip, Livestream } from "@/types/streaming";
+import { Clip, Livestream, Video } from "@/types/streaming";
 import {
   Card,
   CardActionArea,
@@ -124,25 +124,18 @@ const VideoModal = dynamic(
   { ssr: false },
 );
 
-type RelatedVideoCardProps<T extends Livestream | Clip> = {
-  video: T;
-  setSelectedVideo: React.Dispatch<React.SetStateAction<T | null>>;
-  openModal: () => void;
+type RelatedVideoCardProps = {
+  video: Video;
+  onClick: () => void;
 };
 
-const RelatedVideoCard = <T extends Livestream | Clip>({
+const RelatedVideoCard: React.FC<RelatedVideoCardProps> = ({
   video,
-  setSelectedVideo,
-  openModal,
-}: RelatedVideoCardProps<T>) => {
+  onClick,
+}) => {
   return (
     <StyledCard>
-      <CardActionArea
-        onClick={() => {
-          setSelectedVideo(video);
-          openModal();
-        }}
-      >
+      <CardActionArea onClick={onClick}>
         <Box display="flex">
           <Box sx={{ width: "120px" }}>
             <StyledCardMedia
@@ -192,9 +185,7 @@ export const RelatedVideos: React.FC<{
     },
   );
   const { isOpen, openModal, closeModal } = useModal();
-  const [selectedLivestream, setSelectedLivestream] =
-    useState<Livestream | null>(null);
-  const [selectedClip, setSelectedClip] = useState<Clip | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const relatedVideos: Videos = useMemo(() => {
     // Extract data from each page and combine into one RelatedProps object
     const combinedData: RelatedProps = {
@@ -221,20 +212,14 @@ export const RelatedVideos: React.FC<{
   return (
     <Box>
       <Box display="flex" sx={{ flexDirection: "column" }}>
-        {relatedVideos.liveStreams.map((livestream) => (
+        {[...relatedVideos.liveStreams, ...relatedVideos.clips].map((video) => (
           <RelatedVideoCard
-            key={livestream.id}
-            video={livestream}
-            setSelectedVideo={setSelectedLivestream}
-            openModal={openModal}
-          />
-        ))}
-        {relatedVideos.clips.map((clip) => (
-          <RelatedVideoCard
-            key={clip.id}
-            video={clip}
-            setSelectedVideo={setSelectedClip}
-            openModal={openModal}
+            key={video.id}
+            video={video}
+            onClick={() => {
+              setSelectedVideo(video);
+              openModal();
+            }}
           />
         ))}
       </Box>
@@ -246,18 +231,10 @@ export const RelatedVideos: React.FC<{
       >
         もっと見る
       </Button>
-      {selectedLivestream && (
+      {selectedVideo && (
         <VideoModal
-          key={selectedLivestream.id}
-          video={selectedLivestream}
-          open={isOpen}
-          onClose={closeModal}
-        />
-      )}
-      {selectedClip && (
-        <VideoModal
-          key={selectedClip.id}
-          video={selectedClip}
+          key={selectedVideo.id}
+          video={selectedVideo}
           open={isOpen}
           onClose={closeModal}
         />
