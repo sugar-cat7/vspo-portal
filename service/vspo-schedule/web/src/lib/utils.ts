@@ -1,4 +1,4 @@
-import { freeChatVideoIds } from "@/data/freechat-video-ids";
+import { freechatVideoIds } from "@/data/freechat-video-ids";
 import { members } from "@/data/members";
 import { VspoEvent } from "@/types/events";
 import {
@@ -383,7 +383,7 @@ export const formatWithTimeZone = (
 export const getLiveStatus = (
   livestream: Livestream,
 ): LiveStatus | "freechat" => {
-  if (freeChatVideoIds.includes(livestream.id)) {
+  if (freechatVideoIds.includes(livestream.id)) {
     return "freechat";
   }
 

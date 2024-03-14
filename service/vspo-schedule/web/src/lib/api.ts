@@ -3,7 +3,7 @@ import { VspoEvent } from "@/types/events";
 import { Clip, Livestream } from "@/types/streaming";
 import { mockClips, mockTwitchClips } from "@/data/mocks/clips";
 import { mockEvents } from "@/data/mocks/events";
-import { mockFreeChats } from "@/data/mocks/freechats";
+import { mockFreechats } from "@/data/mocks/freechats";
 import { mockLivestreams } from "@/data/mocks/livestreams";
 import {
   convertThumbnailQualityInObjects,
@@ -72,7 +72,7 @@ export const fetchLivestreams = async ({
   }
 };
 
-export const fetchFreeChats = async (): Promise<Livestream[]> => {
+export const fetchFreechats = async (): Promise<Livestream[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<Livestream[]>(
@@ -85,7 +85,7 @@ export const fetchFreeChats = async (): Promise<Livestream[]> => {
       );
       return convertThumbnailQualityInObjects(response.data);
     } else {
-      return convertThumbnailQualityInObjects(mockFreeChats);
+      return convertThumbnailQualityInObjects(mockFreechats);
     }
   } catch (error) {
     console.error("Failed to fetch freechats:", error);

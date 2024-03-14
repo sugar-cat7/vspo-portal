@@ -1,6 +1,6 @@
 import { Livestream } from "@/types/streaming";
 
-export const mockFreeChats: Livestream[] = [
+export const mockFreechats: Livestream[] = [
   {
     id: "7-rmkxy7SSg",
     title: "Free chat",
