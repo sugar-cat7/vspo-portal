@@ -8,3 +8,4 @@ export * from "./Icon";
 export * from "./Link";
 export * from "./Loading";
 export * from "./Modal";
+export * from "./Snackbar";
