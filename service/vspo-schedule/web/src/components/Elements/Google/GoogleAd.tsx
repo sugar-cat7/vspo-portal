@@ -1,4 +1,4 @@
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/router";
 import { useEffect } from "react";
 
 declare global {
@@ -7,18 +7,16 @@ declare global {
   }
 }
 export const GoogleAd: React.FC = () => {
-  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     try {
       // eslint-disable-next-line
-      ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push(
-        {},
-      );
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
     } catch (error) {
       console.error(error);
     }
-  }, [pathname]);
+  }, [router.asPath]);
 
   return (
     <div
@@ -31,6 +29,7 @@ export const GoogleAd: React.FC = () => {
       }}
     >
       <ins
+        key={router.asPath}
         className="adsbygoogle"
         style={{
           display: "flex",
