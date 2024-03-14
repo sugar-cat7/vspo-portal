@@ -13,11 +13,10 @@ import {
   Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import useSWRInfinite from "swr/infinite";
 import { Loading } from "../Elements";
-import dynamic from "next/dynamic";
-import { useModal } from "@/hooks";
+import { useVideoModalContext } from "@/hooks";
 
 const StyledCard = styled(Card)({
   marginTop: "8px",
@@ -119,11 +118,6 @@ const getRelatedVideos = (
   return relatedVideosArray;
 };
 
-const VideoModal = dynamic(
-  () => import("../Elements/Modal").then((mod) => mod.VideoModal),
-  { ssr: false },
-);
-
 type RelatedVideoCardProps = {
   video: Video;
   onClick: () => void;
@@ -172,6 +166,7 @@ export const RelatedVideos: React.FC<{
   channelId: string;
   videoId: string;
 }> = ({ channelId, videoId }) => {
+  const { pushVideo } = useVideoModalContext();
   const { data, error, size, setSize, isValidating } = useSWRInfinite<
     Videos,
     Error
@@ -184,8 +179,6 @@ export const RelatedVideos: React.FC<{
       shouldRetryOnError: false,
     },
   );
-  const { isOpen, openModal, closeModal } = useModal();
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const relatedVideos: Videos = useMemo(() => {
     // Extract data from each page and combine into one RelatedProps object
     const combinedData: RelatedProps = {
@@ -216,10 +209,7 @@ export const RelatedVideos: React.FC<{
           <RelatedVideoCard
             key={video.id}
             video={video}
-            onClick={() => {
-              setSelectedVideo(video);
-              openModal();
-            }}
+            onClick={() => pushVideo(video)}
           />
         ))}
       </Box>
@@ -231,14 +221,6 @@ export const RelatedVideos: React.FC<{
       >
         もっと見る
       </Button>
-      {selectedVideo && (
-        <VideoModal
-          key={selectedVideo.id}
-          video={selectedVideo}
-          open={isOpen}
-          onClose={closeModal}
-        />
-      )}
     </Box>
   );
 };
