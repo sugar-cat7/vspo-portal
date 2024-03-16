@@ -2,10 +2,11 @@ package http
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
-	"github.com/caarlos0/env/v9"
+	"github.com/caarlos0/env/v10"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/generated/api"
 	cron "github.com/sugar-cat7/vspo-portal/service/common-api/generated/cron"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/dependency"
@@ -30,7 +31,8 @@ func Run(w http.ResponseWriter, r *http.Request) {
 	d := &dependency.Dependency{}
 	d.Inject(ctx, e)
 
-	logger.Info("[START] server.")
+	logger.Info(fmt.Sprintf("%s %s", r.Method, r.URL.Path))
+
 	// Cron
 	cs, err := cron.NewServer(
 		cron_handler.NewHandler(
