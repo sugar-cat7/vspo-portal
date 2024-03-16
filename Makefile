@@ -9,9 +9,9 @@ ddl:
 	@echo "Generating new ddl files..."
 	goose -dir ./service/common-api/schema/migration create $(name) sql
 	@echo "Generating new ddl files...done"
-local-db-setup:
+local:
 	@echo "Setting up local database..."
-	docker-compose -f ./docker/docker-compose.local.yml up -d
+	docker-compose -f ./docker/docker-compose.local.yml up
 	@echo "Setting up local database...done"
 migrate:
 	@echo "Migrating database..."

@@ -11,11 +11,12 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/dependency"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/environment"
 	cron_handler "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/cron"
+
 	http_handler "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/server"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/pkg/logger"
-	"go.uber.org/zap"
 )
 
+// Run starts the server.
 func Run(w http.ResponseWriter, r *http.Request) {
 	e := &environment.Environment{}
 	if err := env.Parse(e); err != nil {
@@ -32,35 +33,24 @@ func Run(w http.ResponseWriter, r *http.Request) {
 	logger.Info("[START] server.")
 	// Cron
 	cs, err := cron.NewServer(
-		&cron_handler.RootHandler{},
-		&cron_handler.SecurityHandler{},
+		cron_handler.NewHandler(
+			d.ChannelInteractor,
+			d.VideosInteractor,
+		),
+		cron_handler.NewSecurityHandler(),
 	)
 	if err != nil {
 		panic(err)
 	}
 	// API
 	hs, err := api.NewServer(
-		&http_handler.RootHandler{},
-		&http_handler.SecurityHandler{},
+		http_handler.NewHandler(
+			d.CreatorInteractor,
+			d.VideosInteractor),
+		http_handler.NewSecurityHandler(),
 	)
 	if err != nil {
 		panic(err)
-	}
-
-	if e.ServerEnvironment.ENV == "local" {
-		// In a local environment, listen on different ports
-		go func() {
-			logger.Info("Starting cron server on :8081")
-			if err := http.ListenAndServe(":8081", cs); err != nil {
-				logger.Error("Cron server failed to start", zap.Error(err))
-			}
-		}()
-
-		logger.Info("Starting API server on :8080")
-		if err := http.ListenAndServe(":8080", hs); err != nil {
-			logger.Error("API server failed to start", zap.Error(err))
-		}
-		return
 	}
 
 	// In a production environment, listen on the same port
