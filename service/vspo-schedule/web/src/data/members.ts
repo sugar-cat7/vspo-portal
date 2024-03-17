@@ -214,6 +214,14 @@ export const members: Member[] = [
       "https://yt3.ggpht.com/s5yBpdTfsald7IesR0XOLBAE49k5P9e5aLqE6AsmPf2pb8GSQ9-srQz-eSiAUWrkfCTTcDZWZA=s88-c-k-c0x00ffffff-no-rj",
     keywords: [],
   },
+  {
+    id: 21,
+    name: "紡木こかげ",
+    channelId: "UC-WX1CXssCtCtc2TNIRnJzg",
+    iconUrl:
+      "https://yt3.googleusercontent.com/uBemMrpiQtcdsbmAkxsCfyqr6lVkxa9FGwrs4URjOZgm97CbPDbilJBLcAy9SQYGfh8-__x7tw0=s176-c-k-c0x00ffffff-no-rj",
+    keywords: [],
+  },
 ].map((member) => ({
   ...member,
   keywords: [...member.keywords, member.name],
