@@ -123,7 +123,7 @@ export const getStaticPaths: GetStaticPaths<Params> = () => {
     const formattedDate = formatWithTimeZone(newDate, "ja", "yyyy-MM-dd");
     datePaths.push({ params: { status: formattedDate } });
   }
-  return { paths: [...statusPaths, ...datePaths], fallback: false };
+  return { paths: [...statusPaths, ...datePaths], fallback: true };
 };
 
 export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
