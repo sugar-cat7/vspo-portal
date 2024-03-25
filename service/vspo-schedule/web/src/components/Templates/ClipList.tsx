@@ -15,14 +15,8 @@ import { styled } from "@mui/material/styles";
 import { Clip } from "@/types/streaming";
 import { getVideoIconUrl, isTrending } from "@/lib/utils";
 import PlayArrow from "@mui/icons-material/PlayArrow";
-import { useModal } from "@/hooks";
-import dynamic from "next/dynamic";
 import Image from "next/image";
-
-const VideoModal = dynamic(
-  () => import("../Elements/Modal").then((mod) => mod.VideoModal),
-  { ssr: false },
-);
+import { useVideoModalContext } from "@/hooks";
 
 type Props = {
   clips: Clip[];
@@ -60,17 +54,12 @@ const getClipLabel = (clip: Clip) => {
 };
 
 export const ClipList: React.FC<Props> = ({ clips }) => {
+  const { pushVideo } = useVideoModalContext();
   const [page, setPage] = useState(1);
-  const { isOpen, openModal: baseOpenModal, closeModal } = useModal();
-  const [clickedClip, setClickedClip] = useState<Clip | null>(null);
   const clipsPerPage = 24;
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
-  };
-  const openModal = (clip: Clip) => {
-    setClickedClip(clip);
-    baseOpenModal();
   };
 
   const paginatedClips = clips.slice(
@@ -118,7 +107,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
                     ...(clipLabel ? { border: "3px solid red" } : {}),
                   }}
                 >
-                  <CardActionArea onClick={() => openModal(clip)}>
+                  <CardActionArea onClick={() => pushVideo(clip)}>
                     <StyledCardMedia position="relative">
                       <Image
                         src={clip.thumbnailUrl}
@@ -222,17 +211,6 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
           showLastButton
         />
       </Box>
-      {clickedClip && (
-        <VideoModal
-          key={clickedClip.id}
-          video={clickedClip}
-          open={isOpen}
-          onClose={() => {
-            setClickedClip(null);
-            closeModal();
-          }}
-        />
-      )}
     </>
   );
 };

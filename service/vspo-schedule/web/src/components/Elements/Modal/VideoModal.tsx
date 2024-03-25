@@ -32,12 +32,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { ChatEmbed } from "../ChatEmbed";
-
-type VideoModalProps = {
-  video: Video;
-  open: boolean;
-  onClose: () => void;
-};
+import { useVideoModalContext } from "@/hooks";
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   backgroundColor: "#7266cf",
@@ -300,14 +295,12 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
   );
 };
 
-export const VideoModal: React.FC<VideoModalProps> = ({
-  video,
-  open,
-  onClose,
-}) => {
+export const VideoModal: React.FC = () => {
   const router = useRouter();
+  const { activeVideo, popVideo, clearVideos } = useVideoModalContext();
+
   return (
-    <Dialog open={open} onClose={onClose} fullScreen>
+    <Dialog open={activeVideo !== undefined} fullScreen>
       <StyledDialogTitle>
         <Box display="flex" alignItems="center">
           {/* <NextLink href="/"> */}
@@ -316,7 +309,10 @@ export const VideoModal: React.FC<VideoModalProps> = ({
             display="flex"
             alignItems="center"
             sx={{ gap: "10px", cursor: "pointer" }}
-            onClick={() => router.push("/schedule/all")}
+            onClick={() => {
+              router.push("/schedule/all");
+              clearVideos();
+            }}
           >
             <Image
               src="/icon-top_transparent.png"
@@ -333,22 +329,6 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           {/* </NextLink> */}
         </Box>
       </StyledDialogTitle>
-      <StyledDialogContent
-        sx={{
-          display: "grid",
-          grid: {
-            // 2 rows, 1 col
-            // InfoTabs fills vertical space left below VideoPlayer
-            xs: "auto minmax(0, 1fr) / 1fr",
-            // 1 row, 2 cols
-            // VideoPlayer spans 2/3 dialog width, InfoTabs spans 1/3
-            md: "minmax(0, 1fr) / 2fr 1fr",
-          },
-        }}
-      >
-        <VideoPlayer video={video} />
-        <InfoTabs video={video} />
-      </StyledDialogContent>
       <Box
         sx={{
           position: "absolute",
@@ -356,15 +336,29 @@ export const VideoModal: React.FC<VideoModalProps> = ({
           right: 0,
         }}
       >
-        <IconButton
-          onClick={() => {
-            onClose();
-            router.push("/");
-          }}
-        >
+        <IconButton onClick={clearVideos}>
           <CloseIcon style={{ color: "white" }} />
         </IconButton>
       </Box>
+      {activeVideo && (
+        <StyledDialogContent
+          key={activeVideo.id}
+          sx={{
+            display: "grid",
+            grid: {
+              // 2 rows, 1 col
+              // InfoTabs fills vertical space left below VideoPlayer
+              xs: "auto minmax(0, 1fr) / 1fr",
+              // 1 row, 2 cols
+              // VideoPlayer spans 2/3 dialog width, InfoTabs spans 1/3
+              md: "minmax(0, 1fr) / 2fr 1fr",
+            },
+          }}
+        >
+          <VideoPlayer video={activeVideo} />
+          <InfoTabs video={activeVideo} />
+        </StyledDialogContent>
+      )}
       <BottomNavigation
         sx={{
           flex: "none",
@@ -378,7 +372,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
         <Button
           startIcon={<ArrowBackIcon />}
           sx={{ height: "100%", borderRadius: 0 }}
-          onClick={onClose}
+          onClick={popVideo}
           color="inherit"
         >
           戻る
@@ -397,7 +391,7 @@ export const VideoModal: React.FC<VideoModalProps> = ({
             paddingRight: "8px",
           }}
         >
-          {video.title}
+          {activeVideo && activeVideo.title}
         </Typography>
       </BottomNavigation>
     </Dialog>
