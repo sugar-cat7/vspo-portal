@@ -19,6 +19,8 @@ import { freechatVideoIds } from "@/data/freechat-video-ids";
 import { fetchEvents, fetchLivestreams } from "@/lib/api";
 import { VspoEvent } from "@/types/events";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { Loading } from "@/components/Elements";
 
 type Params = {
   status: string;
@@ -56,6 +58,11 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   eventsByDate,
   dateTabsInfo,
 }) => {
+  const router = useRouter();
+  if (router.isFallback) {
+    return <Loading />;
+  }
+
   if (!dateTabsInfo) {
     return (
       <LivestreamCards
