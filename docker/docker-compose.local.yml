@@ -1,12 +1,23 @@
 version: '3.8'
 
 services:
-  postgres:
-    container_name: vspo-common-db
-    image: postgres:latest
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: vspo
+  # postgres:
+  #   container_name: vspo-common-db
+  #   image: postgres:latest
+  #   environment:
+  #     POSTGRES_USER: user
+  #     POSTGRES_PASSWORD: password
+  #     POSTGRES_DB: vspo
+  #   ports:
+  #     - "5432:5432"
+  go:
+    container_name: vspo-common-go
+    volumes:
+      - ../service/common-api:/project/
+    working_dir: /project
+    tty: true
+    build: "./docker"
     ports:
-      - "5432:5432"
+      - 8080:8080
+      - 8081:8081
+    command: sh -c 'go mod tidy && air'

@@ -1,15 +1,8 @@
 package model
 
-// Thumbnail represents a Video/Icon thumbnail.
-type Thumbnail struct {
-	URL    string
-	Width  int
-	Height int
-}
+// ThumbnailURL is a struct that represents the thumbnail of a video
+type ThumbnailURL string
 
-// Thumbnails represents a Video/Icon thumbnails.
-type Thumbnails struct {
-	Default Thumbnail
-	Medium  Thumbnail
-	High    Thumbnail
+func (t ThumbnailURL) String() string {
+	return string(t)
 }

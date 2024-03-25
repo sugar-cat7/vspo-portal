@@ -19,3 +19,9 @@ Vspo Portal is a repository for providing fan-made services related to Vspo. ([X
 ### How to Contribute
 Please refer to “[CONTRIBUTING.md](./CONTRIBUTING.md).”
 
+### Local Setup
+
+#### Prerequisites
+- Container: [Docker](https://www.docker.com/)
+- DB Migration: [goose](https://github.com/pressly/goose)
+

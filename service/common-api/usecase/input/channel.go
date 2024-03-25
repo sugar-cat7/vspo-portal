@@ -1,37 +1,21 @@
 package input
 
-type GetChannel struct {
-	ID string
+// UpsertAllChannels is the input for UpsertAllChannel
+type UpsertAllChannels struct {
+	ChannelType  string
+	PlatformType string
+	Period       string
 }
 
-func NewGetChannel(
-	id string,
-) *GetChannel {
-	return &GetChannel{
-		ID: id,
-	}
-}
-
-type ListChannels struct {
-	ids   []string
-	Page  uint64
-	Limit uint64
-}
-
-func NewListChannels(
-	ids []string,
-	page uint64,
-	limit uint64,
-) *ListChannels {
-	if page == 0 {
-		page = 1
-	}
-	if limit == 0 {
-		limit = 30
-	}
-	return &ListChannels{
-		ids:   ids,
-		Page:  page,
-		Limit: limit,
+// NewUpsertAllChannelInput returns a new UpsertAllChannelInput
+func NewUpsertAllChannelInput(
+	channelType string,
+	platformType string,
+	period string,
+) *UpsertAllChannels {
+	return &UpsertAllChannels{
+		ChannelType:  channelType,
+		PlatformType: platformType,
+		Period:       period,
 	}
 }

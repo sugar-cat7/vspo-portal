@@ -40,7 +40,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.notFound(w, r)
 		return
 	}
-	args := [1]string{}
 
 	// Static code generated router with unwrapped path search.
 	switch {
@@ -49,78 +48,67 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/channels"
-			if l := len("/channels"); len(elem) >= l && elem[0:l] == "/channels" {
+		case '/': // Prefix: "/"
+			origElem := elem
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch r.Method {
-				case "GET":
-					s.handleChannelsGetRequest([0]string{}, elemIsEscaped, w, r)
-				case "POST":
-					s.handleChannelsPostRequest([0]string{}, elemIsEscaped, w, r)
-				case "PUT":
-					s.handleChannelsPutRequest([0]string{}, elemIsEscaped, w, r)
-				default:
-					s.notAllowed(w, r, "GET,POST,PUT")
-				}
-
-				return
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			case 'c': // Prefix: "creators"
+				origElem := elem
+				if l := len("creators"); len(elem) >= l && elem[0:l] == "creators" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "channel_id"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
 				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleCreatorsGetRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
+				}
+
+				elem = origElem
+			case 'v': // Prefix: "videos"
+				origElem := elem
+				if l := len("videos"); len(elem) >= l && elem[0:l] == "videos" {
+					elem = elem[l:]
+				} else {
 					break
 				}
-				switch elem[0] {
-				case '/': // Prefix: "/videos"
-					if l := len("/videos"); len(elem) >= l && elem[0:l] == "/videos" {
-						elem = elem[l:]
-					} else {
-						break
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleVideosGetRequest([0]string{}, elemIsEscaped, w, r)
+					case "POST":
+						s.handleVideosPostRequest([0]string{}, elemIsEscaped, w, r)
+					case "PUT":
+						s.handleVideosPutRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET,POST,PUT")
 					}
 
-					if len(elem) == 0 {
-						// Leaf node.
-						switch r.Method {
-						case "GET":
-							s.handleChannelsChannelIDVideosGetRequest([1]string{
-								args[0],
-							}, elemIsEscaped, w, r)
-						case "POST":
-							s.handleChannelsChannelIDVideosPostRequest([1]string{
-								args[0],
-							}, elemIsEscaped, w, r)
-						case "PUT":
-							s.handleChannelsChannelIDVideosPutRequest([1]string{
-								args[0],
-							}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "GET,POST,PUT")
-						}
-
-						return
-					}
+					return
 				}
+
+				elem = origElem
 			}
+
+			elem = origElem
 		}
 	}
 	s.notFound(w, r)
@@ -133,7 +121,7 @@ type Route struct {
 	operationID string
 	pathPattern string
 	count       int
-	args        [1]string
+	args        [0]string
 }
 
 // Name returns ogen operation name.
@@ -201,106 +189,89 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/channels"
-			if l := len("/channels"); len(elem) >= l && elem[0:l] == "/channels" {
+		case '/': // Prefix: "/"
+			origElem := elem
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch method {
-				case "GET":
-					r.name = "ChannelsGet"
-					r.summary = "Get Channels"
-					r.operationID = ""
-					r.pathPattern = "/channels"
-					r.args = args
-					r.count = 0
-					return r, true
-				case "POST":
-					r.name = "ChannelsPost"
-					r.summary = "Create Channels from Youtube"
-					r.operationID = ""
-					r.pathPattern = "/channels"
-					r.args = args
-					r.count = 0
-					return r, true
-				case "PUT":
-					r.name = "ChannelsPut"
-					r.summary = "Update Channels from Youtube"
-					r.operationID = ""
-					r.pathPattern = "/channels"
-					r.args = args
-					r.count = 0
-					return r, true
-				default:
-					return
-				}
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			case 'c': // Prefix: "creators"
+				origElem := elem
+				if l := len("creators"); len(elem) >= l && elem[0:l] == "creators" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "channel_id"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
 				if len(elem) == 0 {
+					switch method {
+					case "GET":
+						// Leaf: CreatorsGet
+						r.name = "CreatorsGet"
+						r.summary = "Get Creators"
+						r.operationID = ""
+						r.pathPattern = "/creators"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
+			case 'v': // Prefix: "videos"
+				origElem := elem
+				if l := len("videos"); len(elem) >= l && elem[0:l] == "videos" {
+					elem = elem[l:]
+				} else {
 					break
 				}
-				switch elem[0] {
-				case '/': // Prefix: "/videos"
-					if l := len("/videos"); len(elem) >= l && elem[0:l] == "/videos" {
-						elem = elem[l:]
-					} else {
-						break
-					}
 
-					if len(elem) == 0 {
-						switch method {
-						case "GET":
-							// Leaf: ChannelsChannelIDVideosGet
-							r.name = "ChannelsChannelIDVideosGet"
-							r.summary = "Get all videos for a specific channel"
-							r.operationID = ""
-							r.pathPattern = "/channels/{channel_id}/videos"
-							r.args = args
-							r.count = 1
-							return r, true
-						case "POST":
-							// Leaf: ChannelsChannelIDVideosPost
-							r.name = "ChannelsChannelIDVideosPost"
-							r.summary = "Create videos for a specific channel"
-							r.operationID = ""
-							r.pathPattern = "/channels/{channel_id}/videos"
-							r.args = args
-							r.count = 1
-							return r, true
-						case "PUT":
-							// Leaf: ChannelsChannelIDVideosPut
-							r.name = "ChannelsChannelIDVideosPut"
-							r.summary = "Update videos for a specific channel"
-							r.operationID = ""
-							r.pathPattern = "/channels/{channel_id}/videos"
-							r.args = args
-							r.count = 1
-							return r, true
-						default:
-							return
-						}
+				if len(elem) == 0 {
+					switch method {
+					case "GET":
+						// Leaf: VideosGet
+						r.name = "VideosGet"
+						r.summary = "Get all videos for a specific creator"
+						r.operationID = ""
+						r.pathPattern = "/videos"
+						r.args = args
+						r.count = 0
+						return r, true
+					case "POST":
+						// Leaf: VideosPost
+						r.name = "VideosPost"
+						r.summary = "Create videos for a specific creator"
+						r.operationID = ""
+						r.pathPattern = "/videos"
+						r.args = args
+						r.count = 0
+						return r, true
+					case "PUT":
+						// Leaf: VideosPut
+						r.name = "VideosPut"
+						r.summary = "Update videos for a specific creator"
+						r.operationID = ""
+						r.pathPattern = "/videos"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
 					}
 				}
+
+				elem = origElem
 			}
+
+			elem = origElem
 		}
 	}
 	return r, false

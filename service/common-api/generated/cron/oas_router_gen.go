@@ -40,7 +40,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		s.notFound(w, r)
 		return
 	}
-	args := [1]string{}
 
 	// Static code generated router with unwrapped path search.
 	switch {
@@ -49,72 +48,63 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/channels"
-			if l := len("/channels"); len(elem) >= l && elem[0:l] == "/channels" {
+		case '/': // Prefix: "/"
+			origElem := elem
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch r.Method {
-				case "POST":
-					s.handleChannelsPostRequest([0]string{}, elemIsEscaped, w, r)
-				case "PUT":
-					s.handleChannelsPutRequest([0]string{}, elemIsEscaped, w, r)
-				default:
-					s.notAllowed(w, r, "POST,PUT")
-				}
-
-				return
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			case 'c': // Prefix: "channels"
+				origElem := elem
+				if l := len("channels"); len(elem) >= l && elem[0:l] == "channels" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "channel_id"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
 				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "POST":
+						s.handleChannelsPostRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "POST")
+					}
+
+					return
+				}
+
+				elem = origElem
+			case 'v': // Prefix: "videos"
+				origElem := elem
+				if l := len("videos"); len(elem) >= l && elem[0:l] == "videos" {
+					elem = elem[l:]
+				} else {
 					break
 				}
-				switch elem[0] {
-				case '/': // Prefix: "/videos"
-					if l := len("/videos"); len(elem) >= l && elem[0:l] == "/videos" {
-						elem = elem[l:]
-					} else {
-						break
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "POST":
+						s.handleVideosPostRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "POST")
 					}
 
-					if len(elem) == 0 {
-						// Leaf node.
-						switch r.Method {
-						case "POST":
-							s.handleChannelsChannelIDVideosPostRequest([1]string{
-								args[0],
-							}, elemIsEscaped, w, r)
-						case "PUT":
-							s.handleChannelsChannelIDVideosPutRequest([1]string{
-								args[0],
-							}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "POST,PUT")
-						}
-
-						return
-					}
+					return
 				}
+
+				elem = origElem
 			}
+
+			elem = origElem
 		}
 	}
 	s.notFound(w, r)
@@ -127,7 +117,7 @@ type Route struct {
 	operationID string
 	pathPattern string
 	count       int
-	args        [1]string
+	args        [0]string
 }
 
 // Name returns ogen operation name.
@@ -195,89 +185,71 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/channels"
-			if l := len("/channels"); len(elem) >= l && elem[0:l] == "/channels" {
+		case '/': // Prefix: "/"
+			origElem := elem
+			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch method {
-				case "POST":
-					r.name = "ChannelsPost"
-					r.summary = "Create Channels from Youtube"
-					r.operationID = ""
-					r.pathPattern = "/channels"
-					r.args = args
-					r.count = 0
-					return r, true
-				case "PUT":
-					r.name = "ChannelsPut"
-					r.summary = "Update Channels from Youtube"
-					r.operationID = ""
-					r.pathPattern = "/channels"
-					r.args = args
-					r.count = 0
-					return r, true
-				default:
-					return
-				}
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			case 'c': // Prefix: "channels"
+				origElem := elem
+				if l := len("channels"); len(elem) >= l && elem[0:l] == "channels" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "channel_id"
-				// Match until "/"
-				idx := strings.IndexByte(elem, '/')
-				if idx < 0 {
-					idx = len(elem)
-				}
-				args[0] = elem[:idx]
-				elem = elem[idx:]
-
 				if len(elem) == 0 {
+					switch method {
+					case "POST":
+						// Leaf: ChannelsPost
+						r.name = "ChannelsPost"
+						r.summary = "Upsert Channel(Youtube/Twitch/Twitcasting)"
+						r.operationID = ""
+						r.pathPattern = "/channels"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
+			case 'v': // Prefix: "videos"
+				origElem := elem
+				if l := len("videos"); len(elem) >= l && elem[0:l] == "videos" {
+					elem = elem[l:]
+				} else {
 					break
 				}
-				switch elem[0] {
-				case '/': // Prefix: "/videos"
-					if l := len("/videos"); len(elem) >= l && elem[0:l] == "/videos" {
-						elem = elem[l:]
-					} else {
-						break
-					}
 
-					if len(elem) == 0 {
-						switch method {
-						case "POST":
-							// Leaf: ChannelsChannelIDVideosPost
-							r.name = "ChannelsChannelIDVideosPost"
-							r.summary = "Create videos for a specific channel"
-							r.operationID = ""
-							r.pathPattern = "/channels/{channel_id}/videos"
-							r.args = args
-							r.count = 1
-							return r, true
-						case "PUT":
-							// Leaf: ChannelsChannelIDVideosPut
-							r.name = "ChannelsChannelIDVideosPut"
-							r.summary = "Update videos for a specific channel"
-							r.operationID = ""
-							r.pathPattern = "/channels/{channel_id}/videos"
-							r.args = args
-							r.count = 1
-							return r, true
-						default:
-							return
-						}
+				if len(elem) == 0 {
+					switch method {
+					case "POST":
+						// Leaf: VideosPost
+						r.name = "VideosPost"
+						r.summary = "Upsert videos"
+						r.operationID = ""
+						r.pathPattern = "/videos"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
 					}
 				}
+
+				elem = origElem
 			}
+
+			elem = origElem
 		}
 	}
 	return r, false

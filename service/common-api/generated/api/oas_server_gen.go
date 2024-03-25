@@ -8,42 +8,30 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
-	// ChannelsChannelIDVideosGet implements GET /channels/{channel_id}/videos operation.
+	// CreatorsGet implements GET /creators operation.
 	//
-	// Retrieve all videos related to a specific channel.
+	// Retrieves all creators based on provided IDs.
 	//
-	// GET /channels/{channel_id}/videos
-	ChannelsChannelIDVideosGet(ctx context.Context, params ChannelsChannelIDVideosGetParams) (ChannelsChannelIDVideosGetRes, error)
-	// ChannelsChannelIDVideosPost implements POST /channels/{channel_id}/videos operation.
+	// GET /creators
+	CreatorsGet(ctx context.Context, params CreatorsGetParams) (CreatorsGetRes, error)
+	// VideosGet implements GET /videos operation.
 	//
-	// Update videos related to a specific channel based on provided cronType.
+	// Retrieve all videos related to a specific creator.
 	//
-	// POST /channels/{channel_id}/videos
-	ChannelsChannelIDVideosPost(ctx context.Context, req *ChannelsChannelIDVideosPostReq, params ChannelsChannelIDVideosPostParams) (ChannelsChannelIDVideosPostRes, error)
-	// ChannelsChannelIDVideosPut implements PUT /channels/{channel_id}/videos operation.
+	// GET /videos
+	VideosGet(ctx context.Context, params VideosGetParams) (VideosGetRes, error)
+	// VideosPost implements POST /videos operation.
 	//
-	// Update videos related to a specific channel based on provided cronType.
+	// Update videos related to a specific creator based on provided cronType.
 	//
-	// PUT /channels/{channel_id}/videos
-	ChannelsChannelIDVideosPut(ctx context.Context, req *ChannelsChannelIDVideosPutReq, params ChannelsChannelIDVideosPutParams) (ChannelsChannelIDVideosPutRes, error)
-	// ChannelsGet implements GET /channels operation.
+	// POST /videos
+	VideosPost(ctx context.Context, req *VideosPostReq) (VideosPostRes, error)
+	// VideosPut implements PUT /videos operation.
 	//
-	// Retrieves all channels based on provided IDs.
+	// Update videos related to a specific creator based on provided cronType.
 	//
-	// GET /channels
-	ChannelsGet(ctx context.Context, params ChannelsGetParams) (ChannelsGetRes, error)
-	// ChannelsPost implements POST /channels operation.
-	//
-	// Creates channels by fetching from Youtube using provided Channel IDs.
-	//
-	// POST /channels
-	ChannelsPost(ctx context.Context, req *ChannelsPostReq) (ChannelsPostRes, error)
-	// ChannelsPut implements PUT /channels operation.
-	//
-	// Updates channels by fetching from Youtube using provided Channel IDs.
-	//
-	// PUT /channels
-	ChannelsPut(ctx context.Context, req *ChannelsPutReq) (ChannelsPutRes, error)
+	// PUT /videos
+	VideosPut(ctx context.Context, req *VideosPutReq) (VideosPutRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and
