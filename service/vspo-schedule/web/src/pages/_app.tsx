@@ -8,6 +8,7 @@ import { NextPage } from "next";
 import { ThemeModeProvider } from "@/context/Theme";
 import { GoogleAnalytics } from "@/components/Elements";
 import { config } from "@fortawesome/fontawesome-svg-core";
+import { VideoModalContextProvider } from "@/context/VideoModalContext";
 
 config.autoAddCss = false;
 
@@ -25,8 +26,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
       <ThemeModeProvider>
-        {/* eslint-disable-next-line @typescript-eslint/no-unsafe-argument */}
-        {getLayout(<Component {...pageProps} />, pageProps)}
+        <VideoModalContextProvider>
+          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-argument */}
+          {getLayout(<Component {...pageProps} />, pageProps)}
+        </VideoModalContextProvider>
       </ThemeModeProvider>
       <Analytics />
       <GoogleAnalytics />

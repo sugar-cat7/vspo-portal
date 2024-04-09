@@ -11,9 +11,8 @@ import { Box } from "@mui/system";
 import { LiveStatus, Livestream } from "@/types/streaming";
 import { getLiveStatus, formatWithTimeZone } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
-import { useModal } from "@/hooks";
-import dynamic from "next/dynamic";
 import Image from "next/image";
+import { useVideoModalContext } from "@/hooks";
 
 type StyledCardProps = {
   liveStatus: LiveStatus | "freechat";
@@ -127,11 +126,6 @@ const FontSizeOnTypography = styled(Typography)(
   }),
 );
 
-const VideoModal = dynamic(
-  () => import("../Modal").then((mod) => mod.VideoModal),
-  { ssr: false },
-);
-
 type LivestreamCardProps = {
   livestream: Livestream;
 };
@@ -139,7 +133,7 @@ type LivestreamCardProps = {
 export const LivestreamCard: React.FC<LivestreamCardProps> = ({
   livestream,
 }) => {
-  const { isOpen, openModal, closeModal } = useModal();
+  const { pushVideo } = useVideoModalContext();
   const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
     livestream;
   const livestreamStatus = useMemo(
@@ -153,7 +147,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
         <LiveLabel isUpcoming>配信予定</LiveLabel>
       )}
       <StyledCard liveStatus={livestreamStatus}>
-        <CardActionArea onClick={openModal}>
+        <CardActionArea onClick={() => pushVideo(livestream)}>
           <StyledCardMedia position="relative">
             <Image
               src={livestream.thumbnailUrl}
@@ -202,12 +196,6 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
             </Box>
           </StyledCardContent>
         </CardActionArea>
-        <VideoModal
-          key={livestream.id}
-          video={livestream}
-          open={isOpen}
-          onClose={closeModal}
-        />
       </StyledCard>
     </CardBox>
   );
