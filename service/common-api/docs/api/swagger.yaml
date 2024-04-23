@@ -7,29 +7,34 @@ info:
 servers:
 - url: /api
 paths:
-  /channels:
+  /creators:
     get:
       tags:
-        - Channels
-      summary: Get Channels
-      description: Retrieves all channels based on provided IDs.
+        - Creators
+      summary: Get Creators
+      description: Retrieves all creators based on provided IDs.
       parameters:
-      - name: ids
+      - name: creator_ids
         in: query
-        description: Comma-separated list of channel IDs
-        style: form
-        explode: false
+        description: A list of IDs that identify the creators you want to get. To get more than one creator, include this parameter for each creator you want to get. The creator_id and creator_id parameters are mutually exclusive.
         schema:
           type: string
-        example: abc,cde
+        example: creator_id1,creator_id2,creator_id3
+      - name: creator_type
+        in: query
+        description: A filter used to filter the list of creators by the creator's type.
+        schema:
+          type: string
+          enum: [vspo]
+        example: vspo
       - name: page
         in: query
-        description: page
+        description: Pagination object. Specify this parameter only if you don't specify the creator_ids query parameter.
         schema:
           type: integer
       - name: limit
         in: query
-        description: page limit
+        description: The maximum number of items to return per page(The default is 20.) Specify this parameter only if you don't specify the creator_ids query parameter.
         schema:
           type: integer
       responses:
@@ -39,11 +44,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/ChannelsResponse'
-                  pagination:
-                    $ref: '#/components/schemas/Pagination'
+                $ref: '#/components/schemas/CreatorsResponse'
         "400":
           description: Bad Request
         "401":
@@ -54,121 +55,80 @@ paths:
           description: Not Found
         "500":
           description: Internal Server Error
-    put:
-      tags:
-        - Channels
-      summary: Update Channels from Youtube
-      description: Updates channels by fetching from Youtube using provided Channel IDs.
-      requestBody:
-        description: Array of Channel IDs
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  items:
-                    type: string
-                  description: Array of YouTube channel IDs.
-              example:
-                ids: ["UCiMG6VdScBabPhJ1ZtaVmbw", "UC0g1AE0DOjBYnLhkgoRWN1w"]
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ChannelsResponse'
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-      x-codegen-request-body-name: channelIds
-    post:
-      tags:
-        - Channels
-      summary: Create Channels from Youtube
-      description: Creates channels by fetching from Youtube using provided Channel IDs.
-      requestBody:
-        description: Array of Channel IDs
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                ids:
-                  type: array
-                  items:
-                    type: string
-                  description: Array of YouTube channel IDs.
-              example:
-                ids: ["UCiMG6VdScBabPhJ1ZtaVmbw", "UC0g1AE0DOjBYnLhkgoRWN1w"]
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ChannelsResponse'
-        "400":
-          description: Bad Request
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-        "404":
-          description: Not Found
-        "500":
-          description: Internal Server Error
-      x-codegen-request-body-name: channelIds
-  /channels/{channel_id}/videos:
+  /videos:
     get:
       tags:
         - Videos
-      summary: Get all videos for a specific channel
-      description: Retrieve all videos related to a specific channel
+      summary: Get all videos for a specific creator
+      description: Retrieve all videos related to a specific creator
       parameters:
-      - name: channel_id
-        in: path
-        required: true
-        description: Unique identifier of the channel
-        schema:
-          type: string
-      - name: ids
+      - name: video_ids
         in: query
-        description: Comma-separated list of videos IDs
+        description: A list of IDs that identify the videos you want to get. To get more than one video, include this parameter for each video you want to get. The video_id and creator_id parameters are mutually exclusive.
         schema:
           type: string
-        example: abc,cde
-      - name: start_date
+        example: video_id1,video_id2,video_id3
+      - name: creator_id
         in: query
-        description: Start Date
-        required: true
+        description: The ID of the creator whose list of videos you want to get. The video_id and creator_id parameters are mutually exclusive.
         schema:
           type: string
-      - name: end_date
+        example: creator_id
+      - name: language
         in: query
-        description: End Date
-        required: true
+        description: The ISO 639-1 two-letter code for Japanese (i.e., ja)
         schema:
           type: string
+        example: ja
+      - name: video_type
+        in: query
+        description: A filter used to filter the list of videos by the video's type.(The default is "vspo_broadcast".)
+        schema:
+          type: array
+          items:
+            type: string
+          enum: [vspo_broadcast, clip, freechat]
+        example: broadcast
+      - name: broadcast_status
+        in: query
+        description: A filter used to filter the list of videos by the video's vspo_broadcast type.
+        schema:
+          type: array
+          items:
+            type: string
+          enum: [live, upcoming, archive]
+        example: live
+      - name: period
+        in: query
+        description: A filter used to filter the list of videos by when they were published.
+        schema:
+          type: string
+          enum: [day, month, week]
+        example: day
+      - name: sort
+        in: query
+        description: The order to sort the returned videos.(The default is "time".)
+        schema:
+          type: string
+          enum: [time, trending, views]
+        example: time
+      - name: platform_type
+        in: query
+        description: A filter used to filter the list of videos by the video's platform type.
+        schema:
+          type: array
+          items:
+            type: string
+          enum: [youtube, twitch, twitcasting, niconico]
+        example: youtube
       - name: page
         in: query
-        description: page
+        description: Pagination object. Specify this parameter only if you don't specify the creator_id or video_ids query parameter.
         schema:
           type: integer
       - name: limit
         in: query
-        description: page limit
+        description: The maximum number of items to return per page(The default is 20.) Specify this parameter only if you don't specify the creator_id or video_ids query parameter.
         schema:
           type: integer
       responses:
@@ -178,11 +138,7 @@ paths:
             application/json:
               schema:
                 type: object
-                properties:
-                  data:
-                    $ref: '#/components/schemas/VideosResponse'
-                  pagination:
-                    $ref: '#/components/schemas/Pagination'
+                $ref: '#/components/schemas/VideosResponse'
         "400":
           description: Bad Request
         "401":
@@ -196,15 +152,8 @@ paths:
     put:
       tags:
         - Videos
-      summary: Update videos for a specific channel
-      description: Update videos related to a specific channel based on provided cronType
-      parameters:
-      - name: channel_id
-        in: path
-        required: true
-        description: Unique identifier of the channel
-        schema:
-          type: string
+      summary: Update videos for a specific creator
+      description: Update videos related to a specific creator based on provided cronType
       requestBody:
         description: Type of the cron
         required: true
@@ -213,7 +162,7 @@ paths:
             schema:
               type: object
               properties:
-                ids:
+                video_ids:
                   type: array
                   items:
                     type: string
@@ -238,15 +187,8 @@ paths:
     post:
       tags:
         - Videos
-      summary: Create videos for a specific channel
-      description: Update videos related to a specific channel based on provided cronType
-      parameters:
-      - name: channel_id
-        in: path
-        required: true
-        description: Unique identifier of the channel
-        schema:
-          type: string
+      summary: Create videos for a specific creator
+      description: Update videos related to a specific creator based on provided cronType
       requestBody:
         description: Type of the cron
         required: true
@@ -255,7 +197,7 @@ paths:
             schema:
               type: object
               properties:
-                ids:
+                video_ids:
                   type: array
                   items:
                     type: string
@@ -284,6 +226,48 @@ components:
       in: header
       name: x-api-key
   schemas:
+    CreatorsResponse:
+      type: object
+      properties:
+        creators:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatorResponse'
+        pagination:
+            $ref: '#/components/schemas/Pagination'
+    CreatorResponse:
+      type: object
+      properties:
+        creator_id:
+          type: string
+          example: UCiMG6VdScBabPhJ1ZtaVmbw
+        creator_name:
+          type: string
+          example:
+        channel_info:
+          $ref: '#/components/schemas/ChannelResponse'
+    ChannelResponse:
+      type: object
+      properties:
+        youtube:
+          $ref: '#/components/schemas/ChannelPlatformSnippet'
+        twitch:
+          $ref: '#/components/schemas/ChannelPlatformSnippet'
+        twitCasting:
+          $ref: '#/components/schemas/ChannelPlatformSnippet'
+        niconico:
+          $ref: '#/components/schemas/ChannelPlatformSnippet'
+    ChannelPlatformSnippet:
+      type: object
+      properties:
+        channel_id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        thumbnail_url:
+          type: string
     VideosResponse:
       type: object
       properties:
@@ -291,98 +275,57 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/VideoResponse'
-    ChannelsResponse:
-      type: object
-      properties:
-        channels:
-          type: array
-          items:
-            $ref: '#/components/schemas/ChannelResponse'
-    ChannelResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          example: UCiMG6VdScBabPhJ1ZtaVmbw
-        snippet:
-          $ref: '#/components/schemas/ChannelSnippetResponse'
-        statistics:
-          $ref: '#/components/schemas/ChannelStatisticsResponse'
-    ChannelSnippetResponse:
-      type: object
-      properties:
-        Youtube:
-          $ref: '#/components/schemas/PlatformSnippet'
-        Twitch:
-          $ref: '#/components/schemas/PlatformSnippet'
-        TwitCasting:
-          $ref: '#/components/schemas/PlatformSnippet'
-        Niconico:
-          $ref: '#/components/schemas/PlatformSnippet'
-
-    ChannelStatisticsResponse:
-      type: object
-      properties:
-        Youtube:
-          $ref: '#/components/schemas/PlatformStatistics'
-        Twitch:
-          $ref: '#/components/schemas/PlatformStatistics'
-        TwitCasting:
-          $ref: '#/components/schemas/PlatformStatistics'
-        Niconico:
-          $ref: '#/components/schemas/PlatformStatistics'
-    ThumbnailResponse:
-      type: object
-      properties:
-        height:
-          type: integer
-          example: 90
-        url:
-          type: string
-          example: https://i.ytimg.com/vi/Qh6aSTTkmEs/default.jpg
-        width:
-          type: integer
-          example: 120
-    ThumbnailsResponse:
-      type: object
-      properties:
-        default:
-          $ref: '#/components/schemas/ThumbnailResponse'
-        high:
-          $ref: '#/components/schemas/ThumbnailResponse'
-        maxres:
-          $ref: '#/components/schemas/ThumbnailResponse'
-        medium:
-          $ref: '#/components/schemas/ThumbnailResponse'
-        standard:
-          $ref: '#/components/schemas/ThumbnailResponse'
+        pagination:
+            $ref: '#/components/schemas/Pagination'
     VideoResponse:
       type: object
       properties:
-        channelId:
+        video_id:
           type: string
-          example: UCiMG6VdScBabPhJ1ZtaVmbw
-        channelTitle:
+          example: Qh6aSTTkmEs
+        title:
           type: string
-          example: 花芽なずな / Nazuna Kaga
+          example: 【ぶいすぽっ！】Blessing ~12人で歌ってみた~
         description:
           type: string
           example: ""
-        id:
-          type: string
-          example: Qh6aSTTkmEs
-        publishedAt:
+        published_at:
           type: string
           example: 2020-12-31T12:34:56+09:00
+          format: date-time
+        started_at:
+          type: string
+          example: 2020-12-31T12:34:56+09:00
+          format: date-time
+        ended_at:
+          type: string
+          example: 2020-12-31T12:34:56+09:00
+          format: date-time
         tags:
           type: array
           items:
             type: string
-        thumbnails:
-          $ref: '#/components/schemas/ThumbnailsResponse'
-        title:
+        thumbnail_url:
           type: string
-          example: 【ぶいすぽっ！】Blessing ~12人で歌ってみた~
+          example: https://i.ytimg.com/vi/Qh6aSTTkmEs/default.jpg
+        platform:
+          type: string
+          example: youtube
+          enum: [youtube, twitch, twitcasting, niconico, unknown]
+        views:
+          $ref: '#/components/schemas/ViewsResponse'
+        creator_info:
+          type: object
+          properties:
+            creator_id:
+              type: string
+              example: creator_id
+            creator_name:
+              type: string
+              example: 花芽なずな
+            thumbnail_url:
+              type: string
+              example: https://i.ytimg.com/vi/Qh6aSTTkmEs/default.jpg
     ViewsResponse:
       type: object
       properties:
@@ -401,54 +344,29 @@ components:
     Pagination:
       type: object
       properties:
-        CurrentPage:
+        currentPage:
           type: integer
           format: int64
-        PrevPage:
+        prevPage:
           type: integer
           format: int64
-        NextPage:
+        nextPage:
           type: integer
           format: int64
-        TotalPage:
+        totalPage:
           type: integer
           format: int64
-        TotalCount:
+        totalCount:
           type: integer
           format: int64
-        HasNext:
+        hasNext:
           type: boolean
-    PlatformSnippet:
-      type: object
-      properties:
-        Title:
-          type: string
-        Description:
-          type: string
-        CustomURL:
-          type: string
-        PublishedAt:
-          type: string
-          format: date-time
-        Thumbnails:
-          $ref: '#/components/schemas/ThumbnailsResponse'
-    PlatformStatistics:
-      type: object
-      properties:
-        ViewCount:
-          type: string
-        SubscriberCount:
-          type: string
-        HiddenSubscriberCount:
-          type: boolean
-        VideoCount:
-          type: string
 security:
   - ApiKeyAuth: []
 
 tags:
-  - name: Channels
-    description: Operations related to channels
+  - name: Creators
+    description: Operations related to creators
   - name: Videos
     description: Operations related to videos
 

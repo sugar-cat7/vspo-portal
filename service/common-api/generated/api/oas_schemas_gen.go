@@ -4,6 +4,8 @@ package api
 
 import (
 	"time"
+
+	"github.com/go-faster/errors"
 )
 
 type ApiKeyAuth struct {
@@ -20,420 +22,225 @@ func (s *ApiKeyAuth) SetAPIKey(val string) {
 	s.APIKey = val
 }
 
+// Ref: #/components/schemas/ChannelPlatformSnippet
+type ChannelPlatformSnippet struct {
+	ChannelID    OptString `json:"channel_id"`
+	Name         OptString `json:"name"`
+	Description  OptString `json:"description"`
+	ThumbnailURL OptString `json:"thumbnail_url"`
+}
+
+// GetChannelID returns the value of ChannelID.
+func (s *ChannelPlatformSnippet) GetChannelID() OptString {
+	return s.ChannelID
+}
+
+// GetName returns the value of Name.
+func (s *ChannelPlatformSnippet) GetName() OptString {
+	return s.Name
+}
+
+// GetDescription returns the value of Description.
+func (s *ChannelPlatformSnippet) GetDescription() OptString {
+	return s.Description
+}
+
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *ChannelPlatformSnippet) GetThumbnailURL() OptString {
+	return s.ThumbnailURL
+}
+
+// SetChannelID sets the value of ChannelID.
+func (s *ChannelPlatformSnippet) SetChannelID(val OptString) {
+	s.ChannelID = val
+}
+
+// SetName sets the value of Name.
+func (s *ChannelPlatformSnippet) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetDescription sets the value of Description.
+func (s *ChannelPlatformSnippet) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *ChannelPlatformSnippet) SetThumbnailURL(val OptString) {
+	s.ThumbnailURL = val
+}
+
 // Ref: #/components/schemas/ChannelResponse
 type ChannelResponse struct {
-	ID         OptString                    `json:"id"`
-	Snippet    OptChannelSnippetResponse    `json:"snippet"`
-	Statistics OptChannelStatisticsResponse `json:"statistics"`
-}
-
-// GetID returns the value of ID.
-func (s *ChannelResponse) GetID() OptString {
-	return s.ID
-}
-
-// GetSnippet returns the value of Snippet.
-func (s *ChannelResponse) GetSnippet() OptChannelSnippetResponse {
-	return s.Snippet
-}
-
-// GetStatistics returns the value of Statistics.
-func (s *ChannelResponse) GetStatistics() OptChannelStatisticsResponse {
-	return s.Statistics
-}
-
-// SetID sets the value of ID.
-func (s *ChannelResponse) SetID(val OptString) {
-	s.ID = val
-}
-
-// SetSnippet sets the value of Snippet.
-func (s *ChannelResponse) SetSnippet(val OptChannelSnippetResponse) {
-	s.Snippet = val
-}
-
-// SetStatistics sets the value of Statistics.
-func (s *ChannelResponse) SetStatistics(val OptChannelStatisticsResponse) {
-	s.Statistics = val
-}
-
-// Ref: #/components/schemas/ChannelSnippetResponse
-type ChannelSnippetResponse struct {
-	Youtube     OptPlatformSnippet `json:"Youtube"`
-	Twitch      OptPlatformSnippet `json:"Twitch"`
-	TwitCasting OptPlatformSnippet `json:"TwitCasting"`
-	Niconico    OptPlatformSnippet `json:"Niconico"`
+	Youtube     OptChannelPlatformSnippet `json:"youtube"`
+	Twitch      OptChannelPlatformSnippet `json:"twitch"`
+	TwitCasting OptChannelPlatformSnippet `json:"twitCasting"`
+	Niconico    OptChannelPlatformSnippet `json:"niconico"`
 }
 
 // GetYoutube returns the value of Youtube.
-func (s *ChannelSnippetResponse) GetYoutube() OptPlatformSnippet {
+func (s *ChannelResponse) GetYoutube() OptChannelPlatformSnippet {
 	return s.Youtube
 }
 
 // GetTwitch returns the value of Twitch.
-func (s *ChannelSnippetResponse) GetTwitch() OptPlatformSnippet {
+func (s *ChannelResponse) GetTwitch() OptChannelPlatformSnippet {
 	return s.Twitch
 }
 
 // GetTwitCasting returns the value of TwitCasting.
-func (s *ChannelSnippetResponse) GetTwitCasting() OptPlatformSnippet {
+func (s *ChannelResponse) GetTwitCasting() OptChannelPlatformSnippet {
 	return s.TwitCasting
 }
 
 // GetNiconico returns the value of Niconico.
-func (s *ChannelSnippetResponse) GetNiconico() OptPlatformSnippet {
+func (s *ChannelResponse) GetNiconico() OptChannelPlatformSnippet {
 	return s.Niconico
 }
 
 // SetYoutube sets the value of Youtube.
-func (s *ChannelSnippetResponse) SetYoutube(val OptPlatformSnippet) {
+func (s *ChannelResponse) SetYoutube(val OptChannelPlatformSnippet) {
 	s.Youtube = val
 }
 
 // SetTwitch sets the value of Twitch.
-func (s *ChannelSnippetResponse) SetTwitch(val OptPlatformSnippet) {
+func (s *ChannelResponse) SetTwitch(val OptChannelPlatformSnippet) {
 	s.Twitch = val
 }
 
 // SetTwitCasting sets the value of TwitCasting.
-func (s *ChannelSnippetResponse) SetTwitCasting(val OptPlatformSnippet) {
+func (s *ChannelResponse) SetTwitCasting(val OptChannelPlatformSnippet) {
 	s.TwitCasting = val
 }
 
 // SetNiconico sets the value of Niconico.
-func (s *ChannelSnippetResponse) SetNiconico(val OptPlatformSnippet) {
+func (s *ChannelResponse) SetNiconico(val OptChannelPlatformSnippet) {
 	s.Niconico = val
 }
 
-// Ref: #/components/schemas/ChannelStatisticsResponse
-type ChannelStatisticsResponse struct {
-	Youtube     OptPlatformStatistics `json:"Youtube"`
-	Twitch      OptPlatformStatistics `json:"Twitch"`
-	TwitCasting OptPlatformStatistics `json:"TwitCasting"`
-	Niconico    OptPlatformStatistics `json:"Niconico"`
+// Ref: #/components/schemas/CreatorResponse
+type CreatorResponse struct {
+	CreatorID   OptString          `json:"creator_id"`
+	CreatorName OptString          `json:"creator_name"`
+	ChannelInfo OptChannelResponse `json:"channel_info"`
 }
 
-// GetYoutube returns the value of Youtube.
-func (s *ChannelStatisticsResponse) GetYoutube() OptPlatformStatistics {
-	return s.Youtube
+// GetCreatorID returns the value of CreatorID.
+func (s *CreatorResponse) GetCreatorID() OptString {
+	return s.CreatorID
 }
 
-// GetTwitch returns the value of Twitch.
-func (s *ChannelStatisticsResponse) GetTwitch() OptPlatformStatistics {
-	return s.Twitch
+// GetCreatorName returns the value of CreatorName.
+func (s *CreatorResponse) GetCreatorName() OptString {
+	return s.CreatorName
 }
 
-// GetTwitCasting returns the value of TwitCasting.
-func (s *ChannelStatisticsResponse) GetTwitCasting() OptPlatformStatistics {
-	return s.TwitCasting
+// GetChannelInfo returns the value of ChannelInfo.
+func (s *CreatorResponse) GetChannelInfo() OptChannelResponse {
+	return s.ChannelInfo
 }
 
-// GetNiconico returns the value of Niconico.
-func (s *ChannelStatisticsResponse) GetNiconico() OptPlatformStatistics {
-	return s.Niconico
+// SetCreatorID sets the value of CreatorID.
+func (s *CreatorResponse) SetCreatorID(val OptString) {
+	s.CreatorID = val
 }
 
-// SetYoutube sets the value of Youtube.
-func (s *ChannelStatisticsResponse) SetYoutube(val OptPlatformStatistics) {
-	s.Youtube = val
+// SetCreatorName sets the value of CreatorName.
+func (s *CreatorResponse) SetCreatorName(val OptString) {
+	s.CreatorName = val
 }
 
-// SetTwitch sets the value of Twitch.
-func (s *ChannelStatisticsResponse) SetTwitch(val OptPlatformStatistics) {
-	s.Twitch = val
+// SetChannelInfo sets the value of ChannelInfo.
+func (s *CreatorResponse) SetChannelInfo(val OptChannelResponse) {
+	s.ChannelInfo = val
 }
 
-// SetTwitCasting sets the value of TwitCasting.
-func (s *ChannelStatisticsResponse) SetTwitCasting(val OptPlatformStatistics) {
-	s.TwitCasting = val
+// CreatorsGetBadRequest is response for CreatorsGet operation.
+type CreatorsGetBadRequest struct{}
+
+func (*CreatorsGetBadRequest) creatorsGetRes() {}
+
+type CreatorsGetCreatorType string
+
+const (
+	CreatorsGetCreatorTypeVspo CreatorsGetCreatorType = "vspo"
+)
+
+// AllValues returns all CreatorsGetCreatorType values.
+func (CreatorsGetCreatorType) AllValues() []CreatorsGetCreatorType {
+	return []CreatorsGetCreatorType{
+		CreatorsGetCreatorTypeVspo,
+	}
 }
 
-// SetNiconico sets the value of Niconico.
-func (s *ChannelStatisticsResponse) SetNiconico(val OptPlatformStatistics) {
-	s.Niconico = val
+// MarshalText implements encoding.TextMarshaler.
+func (s CreatorsGetCreatorType) MarshalText() ([]byte, error) {
+	switch s {
+	case CreatorsGetCreatorTypeVspo:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
 }
 
-// ChannelsChannelIDVideosGetBadRequest is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetBadRequest struct{}
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *CreatorsGetCreatorType) UnmarshalText(data []byte) error {
+	switch CreatorsGetCreatorType(data) {
+	case CreatorsGetCreatorTypeVspo:
+		*s = CreatorsGetCreatorTypeVspo
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
-func (*ChannelsChannelIDVideosGetBadRequest) channelsChannelIDVideosGetRes() {}
+// CreatorsGetForbidden is response for CreatorsGet operation.
+type CreatorsGetForbidden struct{}
 
-// ChannelsChannelIDVideosGetForbidden is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetForbidden struct{}
+func (*CreatorsGetForbidden) creatorsGetRes() {}
 
-func (*ChannelsChannelIDVideosGetForbidden) channelsChannelIDVideosGetRes() {}
+// CreatorsGetInternalServerError is response for CreatorsGet operation.
+type CreatorsGetInternalServerError struct{}
 
-// ChannelsChannelIDVideosGetInternalServerError is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetInternalServerError struct{}
+func (*CreatorsGetInternalServerError) creatorsGetRes() {}
 
-func (*ChannelsChannelIDVideosGetInternalServerError) channelsChannelIDVideosGetRes() {}
+// CreatorsGetNotFound is response for CreatorsGet operation.
+type CreatorsGetNotFound struct{}
 
-// ChannelsChannelIDVideosGetNotFound is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetNotFound struct{}
+func (*CreatorsGetNotFound) creatorsGetRes() {}
 
-func (*ChannelsChannelIDVideosGetNotFound) channelsChannelIDVideosGetRes() {}
+// CreatorsGetUnauthorized is response for CreatorsGet operation.
+type CreatorsGetUnauthorized struct{}
 
-type ChannelsChannelIDVideosGetOK struct {
-	Data       OptVideosResponse `json:"data"`
+func (*CreatorsGetUnauthorized) creatorsGetRes() {}
+
+// Ref: #/components/schemas/CreatorsResponse
+type CreatorsResponse struct {
+	Creators   []CreatorResponse `json:"creators"`
 	Pagination OptPagination     `json:"pagination"`
 }
 
-// GetData returns the value of Data.
-func (s *ChannelsChannelIDVideosGetOK) GetData() OptVideosResponse {
-	return s.Data
+// GetCreators returns the value of Creators.
+func (s *CreatorsResponse) GetCreators() []CreatorResponse {
+	return s.Creators
 }
 
 // GetPagination returns the value of Pagination.
-func (s *ChannelsChannelIDVideosGetOK) GetPagination() OptPagination {
+func (s *CreatorsResponse) GetPagination() OptPagination {
 	return s.Pagination
 }
 
-// SetData sets the value of Data.
-func (s *ChannelsChannelIDVideosGetOK) SetData(val OptVideosResponse) {
-	s.Data = val
+// SetCreators sets the value of Creators.
+func (s *CreatorsResponse) SetCreators(val []CreatorResponse) {
+	s.Creators = val
 }
 
 // SetPagination sets the value of Pagination.
-func (s *ChannelsChannelIDVideosGetOK) SetPagination(val OptPagination) {
+func (s *CreatorsResponse) SetPagination(val OptPagination) {
 	s.Pagination = val
 }
 
-func (*ChannelsChannelIDVideosGetOK) channelsChannelIDVideosGetRes() {}
-
-// ChannelsChannelIDVideosGetUnauthorized is response for ChannelsChannelIDVideosGet operation.
-type ChannelsChannelIDVideosGetUnauthorized struct{}
-
-func (*ChannelsChannelIDVideosGetUnauthorized) channelsChannelIDVideosGetRes() {}
-
-// ChannelsChannelIDVideosPostBadRequest is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostBadRequest struct{}
-
-func (*ChannelsChannelIDVideosPostBadRequest) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPostForbidden is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostForbidden struct{}
-
-func (*ChannelsChannelIDVideosPostForbidden) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPostInternalServerError is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostInternalServerError struct{}
-
-func (*ChannelsChannelIDVideosPostInternalServerError) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPostNotFound is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostNotFound struct{}
-
-func (*ChannelsChannelIDVideosPostNotFound) channelsChannelIDVideosPostRes() {}
-
-type ChannelsChannelIDVideosPostReq struct {
-	// Array of YouTube Video IDs.
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsChannelIDVideosPostReq) GetIds() []string {
-	return s.Ids
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsChannelIDVideosPostReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// ChannelsChannelIDVideosPostUnauthorized is response for ChannelsChannelIDVideosPost operation.
-type ChannelsChannelIDVideosPostUnauthorized struct{}
-
-func (*ChannelsChannelIDVideosPostUnauthorized) channelsChannelIDVideosPostRes() {}
-
-// ChannelsChannelIDVideosPutBadRequest is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutBadRequest struct{}
-
-func (*ChannelsChannelIDVideosPutBadRequest) channelsChannelIDVideosPutRes() {}
-
-// ChannelsChannelIDVideosPutForbidden is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutForbidden struct{}
-
-func (*ChannelsChannelIDVideosPutForbidden) channelsChannelIDVideosPutRes() {}
-
-// ChannelsChannelIDVideosPutInternalServerError is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutInternalServerError struct{}
-
-func (*ChannelsChannelIDVideosPutInternalServerError) channelsChannelIDVideosPutRes() {}
-
-// ChannelsChannelIDVideosPutNotFound is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutNotFound struct{}
-
-func (*ChannelsChannelIDVideosPutNotFound) channelsChannelIDVideosPutRes() {}
-
-type ChannelsChannelIDVideosPutReq struct {
-	// Array of YouTube Video IDs.
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsChannelIDVideosPutReq) GetIds() []string {
-	return s.Ids
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsChannelIDVideosPutReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// ChannelsChannelIDVideosPutUnauthorized is response for ChannelsChannelIDVideosPut operation.
-type ChannelsChannelIDVideosPutUnauthorized struct{}
-
-func (*ChannelsChannelIDVideosPutUnauthorized) channelsChannelIDVideosPutRes() {}
-
-// ChannelsGetBadRequest is response for ChannelsGet operation.
-type ChannelsGetBadRequest struct{}
-
-func (*ChannelsGetBadRequest) channelsGetRes() {}
-
-// ChannelsGetForbidden is response for ChannelsGet operation.
-type ChannelsGetForbidden struct{}
-
-func (*ChannelsGetForbidden) channelsGetRes() {}
-
-// ChannelsGetInternalServerError is response for ChannelsGet operation.
-type ChannelsGetInternalServerError struct{}
-
-func (*ChannelsGetInternalServerError) channelsGetRes() {}
-
-// ChannelsGetNotFound is response for ChannelsGet operation.
-type ChannelsGetNotFound struct{}
-
-func (*ChannelsGetNotFound) channelsGetRes() {}
-
-type ChannelsGetOK struct {
-	Data       OptChannelsResponse `json:"data"`
-	Pagination OptPagination       `json:"pagination"`
-}
-
-// GetData returns the value of Data.
-func (s *ChannelsGetOK) GetData() OptChannelsResponse {
-	return s.Data
-}
-
-// GetPagination returns the value of Pagination.
-func (s *ChannelsGetOK) GetPagination() OptPagination {
-	return s.Pagination
-}
-
-// SetData sets the value of Data.
-func (s *ChannelsGetOK) SetData(val OptChannelsResponse) {
-	s.Data = val
-}
-
-// SetPagination sets the value of Pagination.
-func (s *ChannelsGetOK) SetPagination(val OptPagination) {
-	s.Pagination = val
-}
-
-func (*ChannelsGetOK) channelsGetRes() {}
-
-// ChannelsGetUnauthorized is response for ChannelsGet operation.
-type ChannelsGetUnauthorized struct{}
-
-func (*ChannelsGetUnauthorized) channelsGetRes() {}
-
-// ChannelsPostBadRequest is response for ChannelsPost operation.
-type ChannelsPostBadRequest struct{}
-
-func (*ChannelsPostBadRequest) channelsPostRes() {}
-
-// ChannelsPostForbidden is response for ChannelsPost operation.
-type ChannelsPostForbidden struct{}
-
-func (*ChannelsPostForbidden) channelsPostRes() {}
-
-// ChannelsPostInternalServerError is response for ChannelsPost operation.
-type ChannelsPostInternalServerError struct{}
-
-func (*ChannelsPostInternalServerError) channelsPostRes() {}
-
-// ChannelsPostNotFound is response for ChannelsPost operation.
-type ChannelsPostNotFound struct{}
-
-func (*ChannelsPostNotFound) channelsPostRes() {}
-
-type ChannelsPostReq struct {
-	// Array of YouTube channel IDs.
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsPostReq) GetIds() []string {
-	return s.Ids
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsPostReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// ChannelsPostUnauthorized is response for ChannelsPost operation.
-type ChannelsPostUnauthorized struct{}
-
-func (*ChannelsPostUnauthorized) channelsPostRes() {}
-
-// ChannelsPutBadRequest is response for ChannelsPut operation.
-type ChannelsPutBadRequest struct{}
-
-func (*ChannelsPutBadRequest) channelsPutRes() {}
-
-// ChannelsPutForbidden is response for ChannelsPut operation.
-type ChannelsPutForbidden struct{}
-
-func (*ChannelsPutForbidden) channelsPutRes() {}
-
-// ChannelsPutInternalServerError is response for ChannelsPut operation.
-type ChannelsPutInternalServerError struct{}
-
-func (*ChannelsPutInternalServerError) channelsPutRes() {}
-
-// ChannelsPutNotFound is response for ChannelsPut operation.
-type ChannelsPutNotFound struct{}
-
-func (*ChannelsPutNotFound) channelsPutRes() {}
-
-type ChannelsPutReq struct {
-	// Array of YouTube channel IDs.
-	Ids []string `json:"ids"`
-}
-
-// GetIds returns the value of Ids.
-func (s *ChannelsPutReq) GetIds() []string {
-	return s.Ids
-}
-
-// SetIds sets the value of Ids.
-func (s *ChannelsPutReq) SetIds(val []string) {
-	s.Ids = val
-}
-
-// ChannelsPutUnauthorized is response for ChannelsPut operation.
-type ChannelsPutUnauthorized struct{}
-
-func (*ChannelsPutUnauthorized) channelsPutRes() {}
-
-// Ref: #/components/schemas/ChannelsResponse
-type ChannelsResponse struct {
-	Channels []ChannelResponse `json:"channels"`
-}
-
-// GetChannels returns the value of Channels.
-func (s *ChannelsResponse) GetChannels() []ChannelResponse {
-	return s.Channels
-}
-
-// SetChannels sets the value of Channels.
-func (s *ChannelsResponse) SetChannels(val []ChannelResponse) {
-	s.Channels = val
-}
-
-func (*ChannelsResponse) channelsPostRes() {}
-func (*ChannelsResponse) channelsPutRes()  {}
+func (*CreatorsResponse) creatorsGetRes() {}
 
 // NewOptBool returns new OptBool with value set to v.
 func NewOptBool(v bool) OptBool {
@@ -481,38 +288,38 @@ func (o OptBool) Or(d bool) bool {
 	return d
 }
 
-// NewOptChannelSnippetResponse returns new OptChannelSnippetResponse with value set to v.
-func NewOptChannelSnippetResponse(v ChannelSnippetResponse) OptChannelSnippetResponse {
-	return OptChannelSnippetResponse{
+// NewOptChannelPlatformSnippet returns new OptChannelPlatformSnippet with value set to v.
+func NewOptChannelPlatformSnippet(v ChannelPlatformSnippet) OptChannelPlatformSnippet {
+	return OptChannelPlatformSnippet{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptChannelSnippetResponse is optional ChannelSnippetResponse.
-type OptChannelSnippetResponse struct {
-	Value ChannelSnippetResponse
+// OptChannelPlatformSnippet is optional ChannelPlatformSnippet.
+type OptChannelPlatformSnippet struct {
+	Value ChannelPlatformSnippet
 	Set   bool
 }
 
-// IsSet returns true if OptChannelSnippetResponse was set.
-func (o OptChannelSnippetResponse) IsSet() bool { return o.Set }
+// IsSet returns true if OptChannelPlatformSnippet was set.
+func (o OptChannelPlatformSnippet) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptChannelSnippetResponse) Reset() {
-	var v ChannelSnippetResponse
+func (o *OptChannelPlatformSnippet) Reset() {
+	var v ChannelPlatformSnippet
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptChannelSnippetResponse) SetTo(v ChannelSnippetResponse) {
+func (o *OptChannelPlatformSnippet) SetTo(v ChannelPlatformSnippet) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptChannelSnippetResponse) Get() (v ChannelSnippetResponse, ok bool) {
+func (o OptChannelPlatformSnippet) Get() (v ChannelPlatformSnippet, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -520,45 +327,45 @@ func (o OptChannelSnippetResponse) Get() (v ChannelSnippetResponse, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptChannelSnippetResponse) Or(d ChannelSnippetResponse) ChannelSnippetResponse {
+func (o OptChannelPlatformSnippet) Or(d ChannelPlatformSnippet) ChannelPlatformSnippet {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptChannelStatisticsResponse returns new OptChannelStatisticsResponse with value set to v.
-func NewOptChannelStatisticsResponse(v ChannelStatisticsResponse) OptChannelStatisticsResponse {
-	return OptChannelStatisticsResponse{
+// NewOptChannelResponse returns new OptChannelResponse with value set to v.
+func NewOptChannelResponse(v ChannelResponse) OptChannelResponse {
+	return OptChannelResponse{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptChannelStatisticsResponse is optional ChannelStatisticsResponse.
-type OptChannelStatisticsResponse struct {
-	Value ChannelStatisticsResponse
+// OptChannelResponse is optional ChannelResponse.
+type OptChannelResponse struct {
+	Value ChannelResponse
 	Set   bool
 }
 
-// IsSet returns true if OptChannelStatisticsResponse was set.
-func (o OptChannelStatisticsResponse) IsSet() bool { return o.Set }
+// IsSet returns true if OptChannelResponse was set.
+func (o OptChannelResponse) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptChannelStatisticsResponse) Reset() {
-	var v ChannelStatisticsResponse
+func (o *OptChannelResponse) Reset() {
+	var v ChannelResponse
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptChannelStatisticsResponse) SetTo(v ChannelStatisticsResponse) {
+func (o *OptChannelResponse) SetTo(v ChannelResponse) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptChannelStatisticsResponse) Get() (v ChannelStatisticsResponse, ok bool) {
+func (o OptChannelResponse) Get() (v ChannelResponse, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -566,45 +373,45 @@ func (o OptChannelStatisticsResponse) Get() (v ChannelStatisticsResponse, ok boo
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptChannelStatisticsResponse) Or(d ChannelStatisticsResponse) ChannelStatisticsResponse {
+func (o OptChannelResponse) Or(d ChannelResponse) ChannelResponse {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptChannelsResponse returns new OptChannelsResponse with value set to v.
-func NewOptChannelsResponse(v ChannelsResponse) OptChannelsResponse {
-	return OptChannelsResponse{
+// NewOptCreatorsGetCreatorType returns new OptCreatorsGetCreatorType with value set to v.
+func NewOptCreatorsGetCreatorType(v CreatorsGetCreatorType) OptCreatorsGetCreatorType {
+	return OptCreatorsGetCreatorType{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptChannelsResponse is optional ChannelsResponse.
-type OptChannelsResponse struct {
-	Value ChannelsResponse
+// OptCreatorsGetCreatorType is optional CreatorsGetCreatorType.
+type OptCreatorsGetCreatorType struct {
+	Value CreatorsGetCreatorType
 	Set   bool
 }
 
-// IsSet returns true if OptChannelsResponse was set.
-func (o OptChannelsResponse) IsSet() bool { return o.Set }
+// IsSet returns true if OptCreatorsGetCreatorType was set.
+func (o OptCreatorsGetCreatorType) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptChannelsResponse) Reset() {
-	var v ChannelsResponse
+func (o *OptCreatorsGetCreatorType) Reset() {
+	var v CreatorsGetCreatorType
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptChannelsResponse) SetTo(v ChannelsResponse) {
+func (o *OptCreatorsGetCreatorType) SetTo(v CreatorsGetCreatorType) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptChannelsResponse) Get() (v ChannelsResponse, ok bool) {
+func (o OptCreatorsGetCreatorType) Get() (v CreatorsGetCreatorType, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -612,7 +419,7 @@ func (o OptChannelsResponse) Get() (v ChannelsResponse, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptChannelsResponse) Or(d ChannelsResponse) ChannelsResponse {
+func (o OptCreatorsGetCreatorType) Or(d CreatorsGetCreatorType) CreatorsGetCreatorType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -803,98 +610,6 @@ func (o OptPagination) Or(d Pagination) Pagination {
 	return d
 }
 
-// NewOptPlatformSnippet returns new OptPlatformSnippet with value set to v.
-func NewOptPlatformSnippet(v PlatformSnippet) OptPlatformSnippet {
-	return OptPlatformSnippet{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptPlatformSnippet is optional PlatformSnippet.
-type OptPlatformSnippet struct {
-	Value PlatformSnippet
-	Set   bool
-}
-
-// IsSet returns true if OptPlatformSnippet was set.
-func (o OptPlatformSnippet) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptPlatformSnippet) Reset() {
-	var v PlatformSnippet
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptPlatformSnippet) SetTo(v PlatformSnippet) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptPlatformSnippet) Get() (v PlatformSnippet, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptPlatformSnippet) Or(d PlatformSnippet) PlatformSnippet {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptPlatformStatistics returns new OptPlatformStatistics with value set to v.
-func NewOptPlatformStatistics(v PlatformStatistics) OptPlatformStatistics {
-	return OptPlatformStatistics{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptPlatformStatistics is optional PlatformStatistics.
-type OptPlatformStatistics struct {
-	Value PlatformStatistics
-	Set   bool
-}
-
-// IsSet returns true if OptPlatformStatistics was set.
-func (o OptPlatformStatistics) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptPlatformStatistics) Reset() {
-	var v PlatformStatistics
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptPlatformStatistics) SetTo(v PlatformStatistics) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptPlatformStatistics) Get() (v PlatformStatistics, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptPlatformStatistics) Or(d PlatformStatistics) PlatformStatistics {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -941,38 +656,38 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
-// NewOptThumbnailResponse returns new OptThumbnailResponse with value set to v.
-func NewOptThumbnailResponse(v ThumbnailResponse) OptThumbnailResponse {
-	return OptThumbnailResponse{
+// NewOptVideoResponseCreatorInfo returns new OptVideoResponseCreatorInfo with value set to v.
+func NewOptVideoResponseCreatorInfo(v VideoResponseCreatorInfo) OptVideoResponseCreatorInfo {
+	return OptVideoResponseCreatorInfo{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptThumbnailResponse is optional ThumbnailResponse.
-type OptThumbnailResponse struct {
-	Value ThumbnailResponse
+// OptVideoResponseCreatorInfo is optional VideoResponseCreatorInfo.
+type OptVideoResponseCreatorInfo struct {
+	Value VideoResponseCreatorInfo
 	Set   bool
 }
 
-// IsSet returns true if OptThumbnailResponse was set.
-func (o OptThumbnailResponse) IsSet() bool { return o.Set }
+// IsSet returns true if OptVideoResponseCreatorInfo was set.
+func (o OptVideoResponseCreatorInfo) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptThumbnailResponse) Reset() {
-	var v ThumbnailResponse
+func (o *OptVideoResponseCreatorInfo) Reset() {
+	var v VideoResponseCreatorInfo
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptThumbnailResponse) SetTo(v ThumbnailResponse) {
+func (o *OptVideoResponseCreatorInfo) SetTo(v VideoResponseCreatorInfo) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptThumbnailResponse) Get() (v ThumbnailResponse, ok bool) {
+func (o OptVideoResponseCreatorInfo) Get() (v VideoResponseCreatorInfo, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -980,45 +695,45 @@ func (o OptThumbnailResponse) Get() (v ThumbnailResponse, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptThumbnailResponse) Or(d ThumbnailResponse) ThumbnailResponse {
+func (o OptVideoResponseCreatorInfo) Or(d VideoResponseCreatorInfo) VideoResponseCreatorInfo {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptThumbnailsResponse returns new OptThumbnailsResponse with value set to v.
-func NewOptThumbnailsResponse(v ThumbnailsResponse) OptThumbnailsResponse {
-	return OptThumbnailsResponse{
+// NewOptVideoResponsePlatform returns new OptVideoResponsePlatform with value set to v.
+func NewOptVideoResponsePlatform(v VideoResponsePlatform) OptVideoResponsePlatform {
+	return OptVideoResponsePlatform{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptThumbnailsResponse is optional ThumbnailsResponse.
-type OptThumbnailsResponse struct {
-	Value ThumbnailsResponse
+// OptVideoResponsePlatform is optional VideoResponsePlatform.
+type OptVideoResponsePlatform struct {
+	Value VideoResponsePlatform
 	Set   bool
 }
 
-// IsSet returns true if OptThumbnailsResponse was set.
-func (o OptThumbnailsResponse) IsSet() bool { return o.Set }
+// IsSet returns true if OptVideoResponsePlatform was set.
+func (o OptVideoResponsePlatform) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptThumbnailsResponse) Reset() {
-	var v ThumbnailsResponse
+func (o *OptVideoResponsePlatform) Reset() {
+	var v VideoResponsePlatform
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptThumbnailsResponse) SetTo(v ThumbnailsResponse) {
+func (o *OptVideoResponsePlatform) SetTo(v VideoResponsePlatform) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptThumbnailsResponse) Get() (v ThumbnailsResponse, ok bool) {
+func (o OptVideoResponsePlatform) Get() (v VideoResponsePlatform, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -1026,45 +741,45 @@ func (o OptThumbnailsResponse) Get() (v ThumbnailsResponse, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptThumbnailsResponse) Or(d ThumbnailsResponse) ThumbnailsResponse {
+func (o OptVideoResponsePlatform) Or(d VideoResponsePlatform) VideoResponsePlatform {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptVideosResponse returns new OptVideosResponse with value set to v.
-func NewOptVideosResponse(v VideosResponse) OptVideosResponse {
-	return OptVideosResponse{
+// NewOptVideosGetPeriod returns new OptVideosGetPeriod with value set to v.
+func NewOptVideosGetPeriod(v VideosGetPeriod) OptVideosGetPeriod {
+	return OptVideosGetPeriod{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptVideosResponse is optional VideosResponse.
-type OptVideosResponse struct {
-	Value VideosResponse
+// OptVideosGetPeriod is optional VideosGetPeriod.
+type OptVideosGetPeriod struct {
+	Value VideosGetPeriod
 	Set   bool
 }
 
-// IsSet returns true if OptVideosResponse was set.
-func (o OptVideosResponse) IsSet() bool { return o.Set }
+// IsSet returns true if OptVideosGetPeriod was set.
+func (o OptVideosGetPeriod) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptVideosResponse) Reset() {
-	var v VideosResponse
+func (o *OptVideosGetPeriod) Reset() {
+	var v VideosGetPeriod
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptVideosResponse) SetTo(v VideosResponse) {
+func (o *OptVideosGetPeriod) SetTo(v VideosGetPeriod) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptVideosResponse) Get() (v VideosResponse, ok bool) {
+func (o OptVideosGetPeriod) Get() (v VideosGetPeriod, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -1072,7 +787,99 @@ func (o OptVideosResponse) Get() (v VideosResponse, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptVideosResponse) Or(d VideosResponse) VideosResponse {
+func (o OptVideosGetPeriod) Or(d VideosGetPeriod) VideosGetPeriod {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptVideosGetSort returns new OptVideosGetSort with value set to v.
+func NewOptVideosGetSort(v VideosGetSort) OptVideosGetSort {
+	return OptVideosGetSort{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptVideosGetSort is optional VideosGetSort.
+type OptVideosGetSort struct {
+	Value VideosGetSort
+	Set   bool
+}
+
+// IsSet returns true if OptVideosGetSort was set.
+func (o OptVideosGetSort) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptVideosGetSort) Reset() {
+	var v VideosGetSort
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptVideosGetSort) SetTo(v VideosGetSort) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptVideosGetSort) Get() (v VideosGetSort, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptVideosGetSort) Or(d VideosGetSort) VideosGetSort {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptViewsResponse returns new OptViewsResponse with value set to v.
+func NewOptViewsResponse(v ViewsResponse) OptViewsResponse {
+	return OptViewsResponse{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptViewsResponse is optional ViewsResponse.
+type OptViewsResponse struct {
+	Value ViewsResponse
+	Set   bool
+}
+
+// IsSet returns true if OptViewsResponse was set.
+func (o OptViewsResponse) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptViewsResponse) Reset() {
+	var v ViewsResponse
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptViewsResponse) SetTo(v ViewsResponse) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptViewsResponse) Get() (v ViewsResponse, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptViewsResponse) Or(d ViewsResponse) ViewsResponse {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1081,12 +888,12 @@ func (o OptVideosResponse) Or(d VideosResponse) VideosResponse {
 
 // Ref: #/components/schemas/Pagination
 type Pagination struct {
-	CurrentPage OptInt64 `json:"CurrentPage"`
-	PrevPage    OptInt64 `json:"PrevPage"`
-	NextPage    OptInt64 `json:"NextPage"`
-	TotalPage   OptInt64 `json:"TotalPage"`
-	TotalCount  OptInt64 `json:"TotalCount"`
-	HasNext     OptBool  `json:"HasNext"`
+	CurrentPage OptInt64 `json:"currentPage"`
+	PrevPage    OptInt64 `json:"prevPage"`
+	NextPage    OptInt64 `json:"nextPage"`
+	TotalPage   OptInt64 `json:"totalPage"`
+	TotalCount  OptInt64 `json:"totalCount"`
+	HasNext     OptBool  `json:"hasNext"`
 }
 
 // GetCurrentPage returns the value of CurrentPage.
@@ -1149,254 +956,24 @@ func (s *Pagination) SetHasNext(val OptBool) {
 	s.HasNext = val
 }
 
-// Ref: #/components/schemas/PlatformSnippet
-type PlatformSnippet struct {
-	Title       OptString             `json:"Title"`
-	Description OptString             `json:"Description"`
-	CustomURL   OptString             `json:"CustomURL"`
-	PublishedAt OptDateTime           `json:"PublishedAt"`
-	Thumbnails  OptThumbnailsResponse `json:"Thumbnails"`
-}
-
-// GetTitle returns the value of Title.
-func (s *PlatformSnippet) GetTitle() OptString {
-	return s.Title
-}
-
-// GetDescription returns the value of Description.
-func (s *PlatformSnippet) GetDescription() OptString {
-	return s.Description
-}
-
-// GetCustomURL returns the value of CustomURL.
-func (s *PlatformSnippet) GetCustomURL() OptString {
-	return s.CustomURL
-}
-
-// GetPublishedAt returns the value of PublishedAt.
-func (s *PlatformSnippet) GetPublishedAt() OptDateTime {
-	return s.PublishedAt
-}
-
-// GetThumbnails returns the value of Thumbnails.
-func (s *PlatformSnippet) GetThumbnails() OptThumbnailsResponse {
-	return s.Thumbnails
-}
-
-// SetTitle sets the value of Title.
-func (s *PlatformSnippet) SetTitle(val OptString) {
-	s.Title = val
-}
-
-// SetDescription sets the value of Description.
-func (s *PlatformSnippet) SetDescription(val OptString) {
-	s.Description = val
-}
-
-// SetCustomURL sets the value of CustomURL.
-func (s *PlatformSnippet) SetCustomURL(val OptString) {
-	s.CustomURL = val
-}
-
-// SetPublishedAt sets the value of PublishedAt.
-func (s *PlatformSnippet) SetPublishedAt(val OptDateTime) {
-	s.PublishedAt = val
-}
-
-// SetThumbnails sets the value of Thumbnails.
-func (s *PlatformSnippet) SetThumbnails(val OptThumbnailsResponse) {
-	s.Thumbnails = val
-}
-
-// Ref: #/components/schemas/PlatformStatistics
-type PlatformStatistics struct {
-	ViewCount             OptString `json:"ViewCount"`
-	SubscriberCount       OptString `json:"SubscriberCount"`
-	HiddenSubscriberCount OptBool   `json:"HiddenSubscriberCount"`
-	VideoCount            OptString `json:"VideoCount"`
-}
-
-// GetViewCount returns the value of ViewCount.
-func (s *PlatformStatistics) GetViewCount() OptString {
-	return s.ViewCount
-}
-
-// GetSubscriberCount returns the value of SubscriberCount.
-func (s *PlatformStatistics) GetSubscriberCount() OptString {
-	return s.SubscriberCount
-}
-
-// GetHiddenSubscriberCount returns the value of HiddenSubscriberCount.
-func (s *PlatformStatistics) GetHiddenSubscriberCount() OptBool {
-	return s.HiddenSubscriberCount
-}
-
-// GetVideoCount returns the value of VideoCount.
-func (s *PlatformStatistics) GetVideoCount() OptString {
-	return s.VideoCount
-}
-
-// SetViewCount sets the value of ViewCount.
-func (s *PlatformStatistics) SetViewCount(val OptString) {
-	s.ViewCount = val
-}
-
-// SetSubscriberCount sets the value of SubscriberCount.
-func (s *PlatformStatistics) SetSubscriberCount(val OptString) {
-	s.SubscriberCount = val
-}
-
-// SetHiddenSubscriberCount sets the value of HiddenSubscriberCount.
-func (s *PlatformStatistics) SetHiddenSubscriberCount(val OptBool) {
-	s.HiddenSubscriberCount = val
-}
-
-// SetVideoCount sets the value of VideoCount.
-func (s *PlatformStatistics) SetVideoCount(val OptString) {
-	s.VideoCount = val
-}
-
-// Ref: #/components/schemas/ThumbnailResponse
-type ThumbnailResponse struct {
-	Height OptInt    `json:"height"`
-	URL    OptString `json:"url"`
-	Width  OptInt    `json:"width"`
-}
-
-// GetHeight returns the value of Height.
-func (s *ThumbnailResponse) GetHeight() OptInt {
-	return s.Height
-}
-
-// GetURL returns the value of URL.
-func (s *ThumbnailResponse) GetURL() OptString {
-	return s.URL
-}
-
-// GetWidth returns the value of Width.
-func (s *ThumbnailResponse) GetWidth() OptInt {
-	return s.Width
-}
-
-// SetHeight sets the value of Height.
-func (s *ThumbnailResponse) SetHeight(val OptInt) {
-	s.Height = val
-}
-
-// SetURL sets the value of URL.
-func (s *ThumbnailResponse) SetURL(val OptString) {
-	s.URL = val
-}
-
-// SetWidth sets the value of Width.
-func (s *ThumbnailResponse) SetWidth(val OptInt) {
-	s.Width = val
-}
-
-// Ref: #/components/schemas/ThumbnailsResponse
-type ThumbnailsResponse struct {
-	Default  OptThumbnailResponse `json:"default"`
-	High     OptThumbnailResponse `json:"high"`
-	Maxres   OptThumbnailResponse `json:"maxres"`
-	Medium   OptThumbnailResponse `json:"medium"`
-	Standard OptThumbnailResponse `json:"standard"`
-}
-
-// GetDefault returns the value of Default.
-func (s *ThumbnailsResponse) GetDefault() OptThumbnailResponse {
-	return s.Default
-}
-
-// GetHigh returns the value of High.
-func (s *ThumbnailsResponse) GetHigh() OptThumbnailResponse {
-	return s.High
-}
-
-// GetMaxres returns the value of Maxres.
-func (s *ThumbnailsResponse) GetMaxres() OptThumbnailResponse {
-	return s.Maxres
-}
-
-// GetMedium returns the value of Medium.
-func (s *ThumbnailsResponse) GetMedium() OptThumbnailResponse {
-	return s.Medium
-}
-
-// GetStandard returns the value of Standard.
-func (s *ThumbnailsResponse) GetStandard() OptThumbnailResponse {
-	return s.Standard
-}
-
-// SetDefault sets the value of Default.
-func (s *ThumbnailsResponse) SetDefault(val OptThumbnailResponse) {
-	s.Default = val
-}
-
-// SetHigh sets the value of High.
-func (s *ThumbnailsResponse) SetHigh(val OptThumbnailResponse) {
-	s.High = val
-}
-
-// SetMaxres sets the value of Maxres.
-func (s *ThumbnailsResponse) SetMaxres(val OptThumbnailResponse) {
-	s.Maxres = val
-}
-
-// SetMedium sets the value of Medium.
-func (s *ThumbnailsResponse) SetMedium(val OptThumbnailResponse) {
-	s.Medium = val
-}
-
-// SetStandard sets the value of Standard.
-func (s *ThumbnailsResponse) SetStandard(val OptThumbnailResponse) {
-	s.Standard = val
-}
-
 // Ref: #/components/schemas/VideoResponse
 type VideoResponse struct {
-	ChannelId    OptString             `json:"channelId"`
-	ChannelTitle OptString             `json:"channelTitle"`
-	Description  OptString             `json:"description"`
-	ID           OptString             `json:"id"`
-	PublishedAt  OptString             `json:"publishedAt"`
-	Tags         []string              `json:"tags"`
-	Thumbnails   OptThumbnailsResponse `json:"thumbnails"`
-	Title        OptString             `json:"title"`
+	VideoID      OptString                   `json:"video_id"`
+	Title        OptString                   `json:"title"`
+	Description  OptString                   `json:"description"`
+	PublishedAt  OptDateTime                 `json:"published_at"`
+	StartedAt    OptDateTime                 `json:"started_at"`
+	EndedAt      OptDateTime                 `json:"ended_at"`
+	Tags         []string                    `json:"tags"`
+	ThumbnailURL OptString                   `json:"thumbnail_url"`
+	Platform     OptVideoResponsePlatform    `json:"platform"`
+	Views        OptViewsResponse            `json:"views"`
+	CreatorInfo  OptVideoResponseCreatorInfo `json:"creator_info"`
 }
 
-// GetChannelId returns the value of ChannelId.
-func (s *VideoResponse) GetChannelId() OptString {
-	return s.ChannelId
-}
-
-// GetChannelTitle returns the value of ChannelTitle.
-func (s *VideoResponse) GetChannelTitle() OptString {
-	return s.ChannelTitle
-}
-
-// GetDescription returns the value of Description.
-func (s *VideoResponse) GetDescription() OptString {
-	return s.Description
-}
-
-// GetID returns the value of ID.
-func (s *VideoResponse) GetID() OptString {
-	return s.ID
-}
-
-// GetPublishedAt returns the value of PublishedAt.
-func (s *VideoResponse) GetPublishedAt() OptString {
-	return s.PublishedAt
-}
-
-// GetTags returns the value of Tags.
-func (s *VideoResponse) GetTags() []string {
-	return s.Tags
-}
-
-// GetThumbnails returns the value of Thumbnails.
-func (s *VideoResponse) GetThumbnails() OptThumbnailsResponse {
-	return s.Thumbnails
+// GetVideoID returns the value of VideoID.
+func (s *VideoResponse) GetVideoID() OptString {
+	return s.VideoID
 }
 
 // GetTitle returns the value of Title.
@@ -1404,39 +981,54 @@ func (s *VideoResponse) GetTitle() OptString {
 	return s.Title
 }
 
-// SetChannelId sets the value of ChannelId.
-func (s *VideoResponse) SetChannelId(val OptString) {
-	s.ChannelId = val
+// GetDescription returns the value of Description.
+func (s *VideoResponse) GetDescription() OptString {
+	return s.Description
 }
 
-// SetChannelTitle sets the value of ChannelTitle.
-func (s *VideoResponse) SetChannelTitle(val OptString) {
-	s.ChannelTitle = val
+// GetPublishedAt returns the value of PublishedAt.
+func (s *VideoResponse) GetPublishedAt() OptDateTime {
+	return s.PublishedAt
 }
 
-// SetDescription sets the value of Description.
-func (s *VideoResponse) SetDescription(val OptString) {
-	s.Description = val
+// GetStartedAt returns the value of StartedAt.
+func (s *VideoResponse) GetStartedAt() OptDateTime {
+	return s.StartedAt
 }
 
-// SetID sets the value of ID.
-func (s *VideoResponse) SetID(val OptString) {
-	s.ID = val
+// GetEndedAt returns the value of EndedAt.
+func (s *VideoResponse) GetEndedAt() OptDateTime {
+	return s.EndedAt
 }
 
-// SetPublishedAt sets the value of PublishedAt.
-func (s *VideoResponse) SetPublishedAt(val OptString) {
-	s.PublishedAt = val
+// GetTags returns the value of Tags.
+func (s *VideoResponse) GetTags() []string {
+	return s.Tags
 }
 
-// SetTags sets the value of Tags.
-func (s *VideoResponse) SetTags(val []string) {
-	s.Tags = val
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *VideoResponse) GetThumbnailURL() OptString {
+	return s.ThumbnailURL
 }
 
-// SetThumbnails sets the value of Thumbnails.
-func (s *VideoResponse) SetThumbnails(val OptThumbnailsResponse) {
-	s.Thumbnails = val
+// GetPlatform returns the value of Platform.
+func (s *VideoResponse) GetPlatform() OptVideoResponsePlatform {
+	return s.Platform
+}
+
+// GetViews returns the value of Views.
+func (s *VideoResponse) GetViews() OptViewsResponse {
+	return s.Views
+}
+
+// GetCreatorInfo returns the value of CreatorInfo.
+func (s *VideoResponse) GetCreatorInfo() OptVideoResponseCreatorInfo {
+	return s.CreatorInfo
+}
+
+// SetVideoID sets the value of VideoID.
+func (s *VideoResponse) SetVideoID(val OptString) {
+	s.VideoID = val
 }
 
 // SetTitle sets the value of Title.
@@ -1444,9 +1036,354 @@ func (s *VideoResponse) SetTitle(val OptString) {
 	s.Title = val
 }
 
+// SetDescription sets the value of Description.
+func (s *VideoResponse) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetPublishedAt sets the value of PublishedAt.
+func (s *VideoResponse) SetPublishedAt(val OptDateTime) {
+	s.PublishedAt = val
+}
+
+// SetStartedAt sets the value of StartedAt.
+func (s *VideoResponse) SetStartedAt(val OptDateTime) {
+	s.StartedAt = val
+}
+
+// SetEndedAt sets the value of EndedAt.
+func (s *VideoResponse) SetEndedAt(val OptDateTime) {
+	s.EndedAt = val
+}
+
+// SetTags sets the value of Tags.
+func (s *VideoResponse) SetTags(val []string) {
+	s.Tags = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *VideoResponse) SetThumbnailURL(val OptString) {
+	s.ThumbnailURL = val
+}
+
+// SetPlatform sets the value of Platform.
+func (s *VideoResponse) SetPlatform(val OptVideoResponsePlatform) {
+	s.Platform = val
+}
+
+// SetViews sets the value of Views.
+func (s *VideoResponse) SetViews(val OptViewsResponse) {
+	s.Views = val
+}
+
+// SetCreatorInfo sets the value of CreatorInfo.
+func (s *VideoResponse) SetCreatorInfo(val OptVideoResponseCreatorInfo) {
+	s.CreatorInfo = val
+}
+
+type VideoResponseCreatorInfo struct {
+	CreatorID    OptString `json:"creator_id"`
+	CreatorName  OptString `json:"creator_name"`
+	ThumbnailURL OptString `json:"thumbnail_url"`
+}
+
+// GetCreatorID returns the value of CreatorID.
+func (s *VideoResponseCreatorInfo) GetCreatorID() OptString {
+	return s.CreatorID
+}
+
+// GetCreatorName returns the value of CreatorName.
+func (s *VideoResponseCreatorInfo) GetCreatorName() OptString {
+	return s.CreatorName
+}
+
+// GetThumbnailURL returns the value of ThumbnailURL.
+func (s *VideoResponseCreatorInfo) GetThumbnailURL() OptString {
+	return s.ThumbnailURL
+}
+
+// SetCreatorID sets the value of CreatorID.
+func (s *VideoResponseCreatorInfo) SetCreatorID(val OptString) {
+	s.CreatorID = val
+}
+
+// SetCreatorName sets the value of CreatorName.
+func (s *VideoResponseCreatorInfo) SetCreatorName(val OptString) {
+	s.CreatorName = val
+}
+
+// SetThumbnailURL sets the value of ThumbnailURL.
+func (s *VideoResponseCreatorInfo) SetThumbnailURL(val OptString) {
+	s.ThumbnailURL = val
+}
+
+type VideoResponsePlatform string
+
+const (
+	VideoResponsePlatformYoutube     VideoResponsePlatform = "youtube"
+	VideoResponsePlatformTwitch      VideoResponsePlatform = "twitch"
+	VideoResponsePlatformTwitcasting VideoResponsePlatform = "twitcasting"
+	VideoResponsePlatformNiconico    VideoResponsePlatform = "niconico"
+	VideoResponsePlatformUnknown     VideoResponsePlatform = "unknown"
+)
+
+// AllValues returns all VideoResponsePlatform values.
+func (VideoResponsePlatform) AllValues() []VideoResponsePlatform {
+	return []VideoResponsePlatform{
+		VideoResponsePlatformYoutube,
+		VideoResponsePlatformTwitch,
+		VideoResponsePlatformTwitcasting,
+		VideoResponsePlatformNiconico,
+		VideoResponsePlatformUnknown,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VideoResponsePlatform) MarshalText() ([]byte, error) {
+	switch s {
+	case VideoResponsePlatformYoutube:
+		return []byte(s), nil
+	case VideoResponsePlatformTwitch:
+		return []byte(s), nil
+	case VideoResponsePlatformTwitcasting:
+		return []byte(s), nil
+	case VideoResponsePlatformNiconico:
+		return []byte(s), nil
+	case VideoResponsePlatformUnknown:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VideoResponsePlatform) UnmarshalText(data []byte) error {
+	switch VideoResponsePlatform(data) {
+	case VideoResponsePlatformYoutube:
+		*s = VideoResponsePlatformYoutube
+		return nil
+	case VideoResponsePlatformTwitch:
+		*s = VideoResponsePlatformTwitch
+		return nil
+	case VideoResponsePlatformTwitcasting:
+		*s = VideoResponsePlatformTwitcasting
+		return nil
+	case VideoResponsePlatformNiconico:
+		*s = VideoResponsePlatformNiconico
+		return nil
+	case VideoResponsePlatformUnknown:
+		*s = VideoResponsePlatformUnknown
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// VideosGetBadRequest is response for VideosGet operation.
+type VideosGetBadRequest struct{}
+
+func (*VideosGetBadRequest) videosGetRes() {}
+
+// VideosGetForbidden is response for VideosGet operation.
+type VideosGetForbidden struct{}
+
+func (*VideosGetForbidden) videosGetRes() {}
+
+// VideosGetInternalServerError is response for VideosGet operation.
+type VideosGetInternalServerError struct{}
+
+func (*VideosGetInternalServerError) videosGetRes() {}
+
+// VideosGetNotFound is response for VideosGet operation.
+type VideosGetNotFound struct{}
+
+func (*VideosGetNotFound) videosGetRes() {}
+
+type VideosGetPeriod string
+
+const (
+	VideosGetPeriodDay   VideosGetPeriod = "day"
+	VideosGetPeriodMonth VideosGetPeriod = "month"
+	VideosGetPeriodWeek  VideosGetPeriod = "week"
+)
+
+// AllValues returns all VideosGetPeriod values.
+func (VideosGetPeriod) AllValues() []VideosGetPeriod {
+	return []VideosGetPeriod{
+		VideosGetPeriodDay,
+		VideosGetPeriodMonth,
+		VideosGetPeriodWeek,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VideosGetPeriod) MarshalText() ([]byte, error) {
+	switch s {
+	case VideosGetPeriodDay:
+		return []byte(s), nil
+	case VideosGetPeriodMonth:
+		return []byte(s), nil
+	case VideosGetPeriodWeek:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VideosGetPeriod) UnmarshalText(data []byte) error {
+	switch VideosGetPeriod(data) {
+	case VideosGetPeriodDay:
+		*s = VideosGetPeriodDay
+		return nil
+	case VideosGetPeriodMonth:
+		*s = VideosGetPeriodMonth
+		return nil
+	case VideosGetPeriodWeek:
+		*s = VideosGetPeriodWeek
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type VideosGetSort string
+
+const (
+	VideosGetSortTime     VideosGetSort = "time"
+	VideosGetSortTrending VideosGetSort = "trending"
+	VideosGetSortViews    VideosGetSort = "views"
+)
+
+// AllValues returns all VideosGetSort values.
+func (VideosGetSort) AllValues() []VideosGetSort {
+	return []VideosGetSort{
+		VideosGetSortTime,
+		VideosGetSortTrending,
+		VideosGetSortViews,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s VideosGetSort) MarshalText() ([]byte, error) {
+	switch s {
+	case VideosGetSortTime:
+		return []byte(s), nil
+	case VideosGetSortTrending:
+		return []byte(s), nil
+	case VideosGetSortViews:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *VideosGetSort) UnmarshalText(data []byte) error {
+	switch VideosGetSort(data) {
+	case VideosGetSortTime:
+		*s = VideosGetSortTime
+		return nil
+	case VideosGetSortTrending:
+		*s = VideosGetSortTrending
+		return nil
+	case VideosGetSortViews:
+		*s = VideosGetSortViews
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// VideosGetUnauthorized is response for VideosGet operation.
+type VideosGetUnauthorized struct{}
+
+func (*VideosGetUnauthorized) videosGetRes() {}
+
+// VideosPostBadRequest is response for VideosPost operation.
+type VideosPostBadRequest struct{}
+
+func (*VideosPostBadRequest) videosPostRes() {}
+
+// VideosPostForbidden is response for VideosPost operation.
+type VideosPostForbidden struct{}
+
+func (*VideosPostForbidden) videosPostRes() {}
+
+// VideosPostInternalServerError is response for VideosPost operation.
+type VideosPostInternalServerError struct{}
+
+func (*VideosPostInternalServerError) videosPostRes() {}
+
+// VideosPostNotFound is response for VideosPost operation.
+type VideosPostNotFound struct{}
+
+func (*VideosPostNotFound) videosPostRes() {}
+
+type VideosPostReq struct {
+	// Array of YouTube Video IDs.
+	VideoIds []string `json:"video_ids"`
+}
+
+// GetVideoIds returns the value of VideoIds.
+func (s *VideosPostReq) GetVideoIds() []string {
+	return s.VideoIds
+}
+
+// SetVideoIds sets the value of VideoIds.
+func (s *VideosPostReq) SetVideoIds(val []string) {
+	s.VideoIds = val
+}
+
+// VideosPostUnauthorized is response for VideosPost operation.
+type VideosPostUnauthorized struct{}
+
+func (*VideosPostUnauthorized) videosPostRes() {}
+
+// VideosPutBadRequest is response for VideosPut operation.
+type VideosPutBadRequest struct{}
+
+func (*VideosPutBadRequest) videosPutRes() {}
+
+// VideosPutForbidden is response for VideosPut operation.
+type VideosPutForbidden struct{}
+
+func (*VideosPutForbidden) videosPutRes() {}
+
+// VideosPutInternalServerError is response for VideosPut operation.
+type VideosPutInternalServerError struct{}
+
+func (*VideosPutInternalServerError) videosPutRes() {}
+
+// VideosPutNotFound is response for VideosPut operation.
+type VideosPutNotFound struct{}
+
+func (*VideosPutNotFound) videosPutRes() {}
+
+type VideosPutReq struct {
+	// Array of YouTube Video IDs.
+	VideoIds []string `json:"video_ids"`
+}
+
+// GetVideoIds returns the value of VideoIds.
+func (s *VideosPutReq) GetVideoIds() []string {
+	return s.VideoIds
+}
+
+// SetVideoIds sets the value of VideoIds.
+func (s *VideosPutReq) SetVideoIds(val []string) {
+	s.VideoIds = val
+}
+
+// VideosPutUnauthorized is response for VideosPut operation.
+type VideosPutUnauthorized struct{}
+
+func (*VideosPutUnauthorized) videosPutRes() {}
+
 // Ref: #/components/schemas/VideosResponse
 type VideosResponse struct {
-	Videos []VideoResponse `json:"videos"`
+	Videos     []VideoResponse `json:"videos"`
+	Pagination OptPagination   `json:"pagination"`
 }
 
 // GetVideos returns the value of Videos.
@@ -1454,10 +1391,69 @@ func (s *VideosResponse) GetVideos() []VideoResponse {
 	return s.Videos
 }
 
+// GetPagination returns the value of Pagination.
+func (s *VideosResponse) GetPagination() OptPagination {
+	return s.Pagination
+}
+
 // SetVideos sets the value of Videos.
 func (s *VideosResponse) SetVideos(val []VideoResponse) {
 	s.Videos = val
 }
 
-func (*VideosResponse) channelsChannelIDVideosPostRes() {}
-func (*VideosResponse) channelsChannelIDVideosPutRes()  {}
+// SetPagination sets the value of Pagination.
+func (s *VideosResponse) SetPagination(val OptPagination) {
+	s.Pagination = val
+}
+
+func (*VideosResponse) videosGetRes()  {}
+func (*VideosResponse) videosPostRes() {}
+func (*VideosResponse) videosPutRes()  {}
+
+// Ref: #/components/schemas/ViewsResponse
+type ViewsResponse struct {
+	Daily   OptString `json:"daily"`
+	Monthly OptString `json:"monthly"`
+	Total   OptString `json:"total"`
+	Weekly  OptString `json:"weekly"`
+}
+
+// GetDaily returns the value of Daily.
+func (s *ViewsResponse) GetDaily() OptString {
+	return s.Daily
+}
+
+// GetMonthly returns the value of Monthly.
+func (s *ViewsResponse) GetMonthly() OptString {
+	return s.Monthly
+}
+
+// GetTotal returns the value of Total.
+func (s *ViewsResponse) GetTotal() OptString {
+	return s.Total
+}
+
+// GetWeekly returns the value of Weekly.
+func (s *ViewsResponse) GetWeekly() OptString {
+	return s.Weekly
+}
+
+// SetDaily sets the value of Daily.
+func (s *ViewsResponse) SetDaily(val OptString) {
+	s.Daily = val
+}
+
+// SetMonthly sets the value of Monthly.
+func (s *ViewsResponse) SetMonthly(val OptString) {
+	s.Monthly = val
+}
+
+// SetTotal sets the value of Total.
+func (s *ViewsResponse) SetTotal(val OptString) {
+	s.Total = val
+}
+
+// SetWeekly sets the value of Weekly.
+func (s *ViewsResponse) SetWeekly(val OptString) {
+	s.Weekly = val
+}

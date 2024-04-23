@@ -23,42 +23,30 @@ import (
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
-	// ChannelsChannelIDVideosGet invokes GET /channels/{channel_id}/videos operation.
+	// CreatorsGet invokes GET /creators operation.
 	//
-	// Retrieve all videos related to a specific channel.
+	// Retrieves all creators based on provided IDs.
 	//
-	// GET /channels/{channel_id}/videos
-	ChannelsChannelIDVideosGet(ctx context.Context, params ChannelsChannelIDVideosGetParams) (ChannelsChannelIDVideosGetRes, error)
-	// ChannelsChannelIDVideosPost invokes POST /channels/{channel_id}/videos operation.
+	// GET /creators
+	CreatorsGet(ctx context.Context, params CreatorsGetParams) (CreatorsGetRes, error)
+	// VideosGet invokes GET /videos operation.
 	//
-	// Update videos related to a specific channel based on provided cronType.
+	// Retrieve all videos related to a specific creator.
 	//
-	// POST /channels/{channel_id}/videos
-	ChannelsChannelIDVideosPost(ctx context.Context, request *ChannelsChannelIDVideosPostReq, params ChannelsChannelIDVideosPostParams) (ChannelsChannelIDVideosPostRes, error)
-	// ChannelsChannelIDVideosPut invokes PUT /channels/{channel_id}/videos operation.
+	// GET /videos
+	VideosGet(ctx context.Context, params VideosGetParams) (VideosGetRes, error)
+	// VideosPost invokes POST /videos operation.
 	//
-	// Update videos related to a specific channel based on provided cronType.
+	// Update videos related to a specific creator based on provided cronType.
 	//
-	// PUT /channels/{channel_id}/videos
-	ChannelsChannelIDVideosPut(ctx context.Context, request *ChannelsChannelIDVideosPutReq, params ChannelsChannelIDVideosPutParams) (ChannelsChannelIDVideosPutRes, error)
-	// ChannelsGet invokes GET /channels operation.
+	// POST /videos
+	VideosPost(ctx context.Context, request *VideosPostReq) (VideosPostRes, error)
+	// VideosPut invokes PUT /videos operation.
 	//
-	// Retrieves all channels based on provided IDs.
+	// Update videos related to a specific creator based on provided cronType.
 	//
-	// GET /channels
-	ChannelsGet(ctx context.Context, params ChannelsGetParams) (ChannelsGetRes, error)
-	// ChannelsPost invokes POST /channels operation.
-	//
-	// Creates channels by fetching from Youtube using provided Channel IDs.
-	//
-	// POST /channels
-	ChannelsPost(ctx context.Context, request *ChannelsPostReq) (ChannelsPostRes, error)
-	// ChannelsPut invokes PUT /channels operation.
-	//
-	// Updates channels by fetching from Youtube using provided Channel IDs.
-	//
-	// PUT /channels
-	ChannelsPut(ctx context.Context, request *ChannelsPutReq) (ChannelsPutRes, error)
+	// PUT /videos
+	VideosPut(ctx context.Context, request *VideosPutReq) (VideosPutRes, error)
 }
 
 // Client implements OAS client.
@@ -111,20 +99,20 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 	return u
 }
 
-// ChannelsChannelIDVideosGet invokes GET /channels/{channel_id}/videos operation.
+// CreatorsGet invokes GET /creators operation.
 //
-// Retrieve all videos related to a specific channel.
+// Retrieves all creators based on provided IDs.
 //
-// GET /channels/{channel_id}/videos
-func (c *Client) ChannelsChannelIDVideosGet(ctx context.Context, params ChannelsChannelIDVideosGetParams) (ChannelsChannelIDVideosGetRes, error) {
-	res, err := c.sendChannelsChannelIDVideosGet(ctx, params)
+// GET /creators
+func (c *Client) CreatorsGet(ctx context.Context, params CreatorsGetParams) (CreatorsGetRes, error) {
+	res, err := c.sendCreatorsGet(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendChannelsChannelIDVideosGet(ctx context.Context, params ChannelsChannelIDVideosGetParams) (res ChannelsChannelIDVideosGetRes, err error) {
+func (c *Client) sendCreatorsGet(ctx context.Context, params CreatorsGetParams) (res CreatorsGetRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/channels/{channel_id}/videos"),
+		semconv.HTTPRouteKey.String("/creators"),
 	}
 
 	// Run stopwatch.
@@ -139,465 +127,7 @@ func (c *Client) sendChannelsChannelIDVideosGet(ctx context.Context, params Chan
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ChannelsChannelIDVideosGet",
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/channels/"
-	{
-		// Encode "channel_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "channel_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ChannelID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/videos"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeQueryParams"
-	q := uri.NewQueryEncoder()
-	{
-		// Encode "ids" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "ids",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Ids.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "start_date" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "start_date",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.StartDate))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "end_date" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "end_date",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(params.EndDate))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "page" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "page",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Page.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "limit" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "limit",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Limit.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	u.RawQuery = q.Values().Encode()
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "ChannelsChannelIDVideosGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"ApiKeyAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeChannelsChannelIDVideosGetResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// ChannelsChannelIDVideosPost invokes POST /channels/{channel_id}/videos operation.
-//
-// Update videos related to a specific channel based on provided cronType.
-//
-// POST /channels/{channel_id}/videos
-func (c *Client) ChannelsChannelIDVideosPost(ctx context.Context, request *ChannelsChannelIDVideosPostReq, params ChannelsChannelIDVideosPostParams) (ChannelsChannelIDVideosPostRes, error) {
-	res, err := c.sendChannelsChannelIDVideosPost(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendChannelsChannelIDVideosPost(ctx context.Context, request *ChannelsChannelIDVideosPostReq, params ChannelsChannelIDVideosPostParams) (res ChannelsChannelIDVideosPostRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/channels/{channel_id}/videos"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ChannelsChannelIDVideosPost",
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/channels/"
-	{
-		// Encode "channel_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "channel_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ChannelID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/videos"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeChannelsChannelIDVideosPostRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "ChannelsChannelIDVideosPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"ApiKeyAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeChannelsChannelIDVideosPostResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// ChannelsChannelIDVideosPut invokes PUT /channels/{channel_id}/videos operation.
-//
-// Update videos related to a specific channel based on provided cronType.
-//
-// PUT /channels/{channel_id}/videos
-func (c *Client) ChannelsChannelIDVideosPut(ctx context.Context, request *ChannelsChannelIDVideosPutReq, params ChannelsChannelIDVideosPutParams) (ChannelsChannelIDVideosPutRes, error) {
-	res, err := c.sendChannelsChannelIDVideosPut(ctx, request, params)
-	return res, err
-}
-
-func (c *Client) sendChannelsChannelIDVideosPut(ctx context.Context, request *ChannelsChannelIDVideosPutReq, params ChannelsChannelIDVideosPutParams) (res ChannelsChannelIDVideosPutRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/channels/{channel_id}/videos"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ChannelsChannelIDVideosPut",
-		trace.WithAttributes(otelAttrs...),
-		clientSpanKind,
-	)
-	// Track stage for error reporting.
-	var stage string
-	defer func() {
-		if err != nil {
-			span.RecordError(err)
-			span.SetStatus(codes.Error, stage)
-			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-		}
-		span.End()
-	}()
-
-	stage = "BuildURL"
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/channels/"
-	{
-		// Encode "channel_id" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "channel_id",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ChannelID))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/videos"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "PUT", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeChannelsChannelIDVideosPutRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "ChannelsChannelIDVideosPut", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"ApiKeyAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	stage = "SendRequest"
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	defer resp.Body.Close()
-
-	stage = "DecodeResponse"
-	result, err := decodeChannelsChannelIDVideosPutResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// ChannelsGet invokes GET /channels operation.
-//
-// Retrieves all channels based on provided IDs.
-//
-// GET /channels
-func (c *Client) ChannelsGet(ctx context.Context, params ChannelsGetParams) (ChannelsGetRes, error) {
-	res, err := c.sendChannelsGet(ctx, params)
-	return res, err
-}
-
-func (c *Client) sendChannelsGet(ctx context.Context, params ChannelsGetParams) (res ChannelsGetRes, err error) {
-	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/channels"),
-	}
-
-	// Run stopwatch.
-	startTime := time.Now()
-	defer func() {
-		// Use floating point division here for higher precision (instead of Millisecond method).
-		elapsedDuration := time.Since(startTime)
-		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
-	}()
-
-	// Increment request counter.
-	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
-
-	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ChannelsGet",
+	ctx, span := c.cfg.Tracer.Start(ctx, "CreatorsGet",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -615,22 +145,39 @@ func (c *Client) sendChannelsGet(ctx context.Context, params ChannelsGetParams) 
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/channels"
+	pathParts[0] = "/creators"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
 	{
-		// Encode "ids" parameter.
+		// Encode "creator_ids" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "ids",
+			Name:    "creator_ids",
 			Style:   uri.QueryStyleForm,
-			Explode: false,
+			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Ids.Get(); ok {
+			if val, ok := params.CreatorIds.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "creator_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "creator_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.CreatorType.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
 			}
 			return nil
 		}); err != nil {
@@ -684,7 +231,7 @@ func (c *Client) sendChannelsGet(ctx context.Context, params ChannelsGetParams) 
 		var satisfied bitset
 		{
 			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "ChannelsGet", r); {
+			switch err := c.securityApiKeyAuth(ctx, "CreatorsGet", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -720,7 +267,7 @@ func (c *Client) sendChannelsGet(ctx context.Context, params ChannelsGetParams) 
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeChannelsGetResponse(resp)
+	result, err := decodeCreatorsGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -728,20 +275,20 @@ func (c *Client) sendChannelsGet(ctx context.Context, params ChannelsGetParams) 
 	return result, nil
 }
 
-// ChannelsPost invokes POST /channels operation.
+// VideosGet invokes GET /videos operation.
 //
-// Creates channels by fetching from Youtube using provided Channel IDs.
+// Retrieve all videos related to a specific creator.
 //
-// POST /channels
-func (c *Client) ChannelsPost(ctx context.Context, request *ChannelsPostReq) (ChannelsPostRes, error) {
-	res, err := c.sendChannelsPost(ctx, request)
+// GET /videos
+func (c *Client) VideosGet(ctx context.Context, params VideosGetParams) (VideosGetRes, error) {
+	res, err := c.sendVideosGet(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq) (res ChannelsPostRes, err error) {
+func (c *Client) sendVideosGet(ctx context.Context, params VideosGetParams) (res VideosGetRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/channels"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/videos"),
 	}
 
 	// Run stopwatch.
@@ -756,7 +303,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ChannelsPost",
+	ctx, span := c.cfg.Tracer.Start(ctx, "VideosGet",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -774,7 +321,303 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/channels"
+	pathParts[0] = "/videos"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "video_ids" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "video_ids",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.VideoIds.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "creator_id" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "creator_id",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.CreatorID.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "language" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "language",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Language.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "video_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "video_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.VideoType {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(item))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "broadcast_status" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "broadcast_status",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.BroadcastStatus {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(item))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "period" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Period.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "sort" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Sort.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "platform_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "platform_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.PlatformType {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(item))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "page" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "page",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Page.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+			stage = "Security:ApiKeyAuth"
+			switch err := c.securityApiKeyAuth(ctx, "VideosGet", r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"ApiKeyAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeVideosGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// VideosPost invokes POST /videos operation.
+//
+// Update videos related to a specific creator based on provided cronType.
+//
+// POST /videos
+func (c *Client) VideosPost(ctx context.Context, request *VideosPostReq) (VideosPostRes, error) {
+	res, err := c.sendVideosPost(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendVideosPost(ctx context.Context, request *VideosPostReq) (res VideosPostRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/videos"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "VideosPost",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/videos"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
@@ -782,7 +625,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeChannelsPostRequest(request, r); err != nil {
+	if err := encodeVideosPostRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -791,7 +634,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 		var satisfied bitset
 		{
 			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "ChannelsPost", r); {
+			switch err := c.securityApiKeyAuth(ctx, "VideosPost", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -827,7 +670,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeChannelsPostResponse(resp)
+	result, err := decodeVideosPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -835,20 +678,20 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	return result, nil
 }
 
-// ChannelsPut invokes PUT /channels operation.
+// VideosPut invokes PUT /videos operation.
 //
-// Updates channels by fetching from Youtube using provided Channel IDs.
+// Update videos related to a specific creator based on provided cronType.
 //
-// PUT /channels
-func (c *Client) ChannelsPut(ctx context.Context, request *ChannelsPutReq) (ChannelsPutRes, error) {
-	res, err := c.sendChannelsPut(ctx, request)
+// PUT /videos
+func (c *Client) VideosPut(ctx context.Context, request *VideosPutReq) (VideosPutRes, error) {
+	res, err := c.sendVideosPut(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendChannelsPut(ctx context.Context, request *ChannelsPutReq) (res ChannelsPutRes, err error) {
+func (c *Client) sendVideosPut(ctx context.Context, request *VideosPutReq) (res VideosPutRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPMethodKey.String("PUT"),
-		semconv.HTTPRouteKey.String("/channels"),
+		semconv.HTTPRouteKey.String("/videos"),
 	}
 
 	// Run stopwatch.
@@ -863,7 +706,7 @@ func (c *Client) sendChannelsPut(ctx context.Context, request *ChannelsPutReq) (
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ChannelsPut",
+	ctx, span := c.cfg.Tracer.Start(ctx, "VideosPut",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -881,7 +724,7 @@ func (c *Client) sendChannelsPut(ctx context.Context, request *ChannelsPutReq) (
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/channels"
+	pathParts[0] = "/videos"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
@@ -889,7 +732,7 @@ func (c *Client) sendChannelsPut(ctx context.Context, request *ChannelsPutReq) (
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeChannelsPutRequest(request, r); err != nil {
+	if err := encodeVideosPutRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -898,7 +741,7 @@ func (c *Client) sendChannelsPut(ctx context.Context, request *ChannelsPutReq) (
 		var satisfied bitset
 		{
 			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "ChannelsPut", r); {
+			switch err := c.securityApiKeyAuth(ctx, "VideosPut", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -934,7 +777,7 @@ func (c *Client) sendChannelsPut(ctx context.Context, request *ChannelsPutReq) (
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeChannelsPutResponse(resp)
+	result, err := decodeVideosPutResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

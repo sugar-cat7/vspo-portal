@@ -3,13 +3,14 @@ package usecase
 import (
 	"context"
 
+	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/input"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/output"
 )
 
+// ChannelInteractor is ...
 type ChannelInteractor interface {
-	List(
+	UpsertAll(
 		ctx context.Context,
-		param *input.ListChannels,
-	) (*output.ListChannels, error)
+		param *input.UpsertAllChannels,
+	) (model.Channels, error)
 }

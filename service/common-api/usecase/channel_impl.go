@@ -5,53 +5,52 @@ import (
 
 	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/repository"
+	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/youtube"
 	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/input"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/output"
-	"github.com/volatiletech/null/v8"
 )
 
 type channelInteractor struct {
+	creatorRepository repository.Creator
 	channelRepository repository.Channel
+	youtubeClient     youtube.YoutubeClient
 }
 
+// NewChannelInteractor creates a new ChannelInteractor
 func NewChannelInteractor(
+	creatorRepository repository.Creator,
 	channelRepository repository.Channel,
+	youtubeClient youtube.YoutubeClient,
 ) ChannelInteractor {
 	return &channelInteractor{
+		creatorRepository,
 		channelRepository,
+		youtubeClient,
 	}
 }
 
-func (i *channelInteractor) List(
+func (i *channelInteractor) UpsertAll(
 	ctx context.Context,
-	param *input.ListChannels,
-) (*output.ListChannels, error) {
-	query := repository.ListChannelsQuery{
-		BaseListOptions: repository.BaseListOptions{
-			Page:  null.Uint64From(param.Page),
-			Limit: null.Uint64From(param.Limit),
-		},
-	}
-	channels, err := i.channelRepository.List(
+	param *input.UpsertAllChannels,
+) (model.Channels, error) {
+	cs, err := i.creatorRepository.List(
 		ctx,
-		query,
+		repository.ListCreatorsQuery{},
 	)
 	if err != nil {
 		return nil, err
 	}
-	ttl, err := i.channelRepository.Count(
-		ctx,
-		query,
-	)
+
+	// NOTE: Currently only updating Youtube, treating Youtube as the representative thumbnail
+	ytCs, err := i.youtubeClient.Channels(ctx, youtube.ChannelsParam{
+		ChannelIDs: cs.RetrieveChannels().RetrieveYoutubeIDs(),
+	})
 	if err != nil {
 		return nil, err
 	}
-	return output.NewListChannels(
-		channels,
-		model.NewPagination(
-			param.Page,
-			param.Limit,
-			ttl,
-		),
-	), nil
+
+	chs, err := i.channelRepository.UpsertAll(ctx, ytCs.FilterUpdateTarget(cs.RetrieveChannels()))
+	if err != nil {
+		return nil, err
+	}
+	return chs, nil
 }

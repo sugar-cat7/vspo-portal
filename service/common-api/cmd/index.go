@@ -1,22 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
-	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/api"
-	handler "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http"
+	http_handler "github.com/sugar-cat7/vspo-portal/service/common-api/infra/http"
 )
 
 // debug
 func main() {
-	s, err := api.NewServer(handler.NewRootHandler(), handler.NewSecurityHandler())
+	http.HandleFunc("/", http_handler.Run)
+	port := "8080"
+	log.Printf("Starting server on port %s...\n", port)
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	if err := http.ListenAndServe(":8080", s); err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Error occurred while starting the server: %v", err)
 	}
 }
