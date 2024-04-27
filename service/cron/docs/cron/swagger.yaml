@@ -5,7 +5,7 @@ info:
   contact: {}
   version: "1.0"
 servers:
-- url: /api/cron
+- url: /cron
 paths:
   /channels:
     post:
