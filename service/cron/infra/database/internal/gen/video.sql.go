@@ -24,6 +24,17 @@ func (q *Queries) CountVideo(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const deleteVideosByIDs = `-- name: DeleteVideosByIDs :exec
+DELETE FROM video
+WHERE id = ANY($1::text[])
+RETURNING id, channel_id, platform_type, title, description, video_type, published_at, started_at, ended_at, broadcast_status, tags, view_count, thumbnail_url, is_deleted
+`
+
+func (q *Queries) DeleteVideosByIDs(ctx context.Context, dollar_1 []string) error {
+	_, err := q.db.Exec(ctx, deleteVideosByIDs, dollar_1)
+	return err
+}
+
 const getVideosByIDs = `-- name: GetVideosByIDs :many
 SELECT
      v.id, v.channel_id, v.platform_type, v.title, v.description, v.video_type, v.published_at, v.started_at, v.ended_at, v.broadcast_status, v.tags, v.view_count, v.thumbnail_url, v.is_deleted

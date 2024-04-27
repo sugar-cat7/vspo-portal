@@ -3,9 +3,9 @@ package dto
 import (
 	"strings"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	db_sqlc "github.com/sugar-cat7/vspo-portal/service/common-api/infra/database/internal/db"
-	utime "github.com/sugar-cat7/vspo-portal/service/common-api/pkg/time"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
+	db_sqlc "github.com/sugar-cat7/vspo-portal/service/cron/infra/database/internal/gen"
+	utime "github.com/sugar-cat7/vspo-portal/service/cron/pkg/time"
 )
 
 // CreatorToModel converts db_sqlc.Creator to model.Creator

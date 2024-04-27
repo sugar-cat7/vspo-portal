@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	domain_youtube "github.com/sugar-cat7/vspo-portal/service/common-api/domain/youtube"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/youtube/internal/dto"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/pkg"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
+	domain_youtube "github.com/sugar-cat7/vspo-portal/service/cron/domain/youtube"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/youtube/internal/dto"
+	"github.com/sugar-cat7/vspo-portal/service/cron/pkg"
 	"google.golang.org/api/youtube/v3"
 )
 

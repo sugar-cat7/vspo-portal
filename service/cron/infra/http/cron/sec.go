@@ -3,7 +3,7 @@ package http
 import (
 	"context"
 
-	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/cron"
+	api "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
 )
 
 var _ api.SecurityHandler = (*SecurityHandler)(nil)

@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_repository
@@ -17,7 +17,7 @@ type Video interface {
 		ctx context.Context,
 		query ListVideosQuery,
 	) (uint64, error)
-	UpsertAll(
+	DeleteInsertAll(
 		ctx context.Context,
 		m model.Videos,
 	) (model.Videos, error)

@@ -2,7 +2,7 @@ package twitch
 
 import (
 	twitch "github.com/Adeithe/go-twitch/api"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/environment"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/environment"
 )
 
 type TwitchService struct {

@@ -14,6 +14,26 @@ type Creator struct {
 // Creators is a slice of pointers to Creator.
 type Creators []*Creator
 
+// NewCreator creates a new Creator.
+func NewCreator(id, name string, memberType MemberType, thumbnailURL ThumbnailURL, channel Channel) *Creator {
+	return &Creator{
+		ID:           id,
+		Name:         name,
+		MemberType:   memberType,
+		ThumbnailURL: thumbnailURL,
+		Channel:      channel,
+	}
+}
+
+// NewCreators creates a new Creators.
+func NewCreators(cs []Creator) Creators {
+	creators := make(Creators, len(cs))
+	for i, c := range cs {
+		creators[i] = &c
+	}
+	return creators
+}
+
 // RetrieveChannels is ...
 func (cs Creators) RetrieveChannels() Channels {
 	channels := make(Channels, len(cs))

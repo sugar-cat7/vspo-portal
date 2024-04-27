@@ -33,3 +33,8 @@ LIMIT $1 OFFSET $2;
 SELECT COUNT(*)
 FROM
     video;
+
+-- name: DeleteVideosByIDs :exec
+DELETE FROM video
+WHERE id = ANY($1::text[])
+RETURNING *;

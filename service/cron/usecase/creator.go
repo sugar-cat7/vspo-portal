@@ -3,8 +3,8 @@ package usecase
 import (
 	"context"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/input"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/output"
+	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/input"
+	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/output"
 )
 
 // CreatorInteractor is ...

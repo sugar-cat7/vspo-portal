@@ -3,10 +3,10 @@ package usecase
 import (
 	"context"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/repository"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/input"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/output"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/repository"
+	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/input"
+	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/output"
 	"github.com/volatiletech/null/v8"
 )
 

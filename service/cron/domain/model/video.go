@@ -72,24 +72,6 @@ func (s Status) String() string {
 	return string(s)
 }
 
-// FilterUpdateTarget videos that need to be updated
-func (vs Videos) FilterUpdateTarget(comparisonVideos Videos) Videos {
-	return lo.Filter(vs, func(newVideo *Video, _ int) bool {
-		// Check if the deleted video is included in the existing videos
-		return !lo.SomeBy(comparisonVideos, func(video *Video) bool {
-			if video.ID == newVideo.ID {
-				if video.Status == newVideo.Status {
-					return false
-				}
-				if video.IsDeleted {
-					return false
-				}
-			}
-			return true
-		})
-	})
-}
-
 // FilterCreator filters videos by creator ID
 func (vs Videos) FilterCreator(cs Creators) Videos {
 	if len(cs) == 0 {

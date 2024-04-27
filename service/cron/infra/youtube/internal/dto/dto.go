@@ -1,8 +1,8 @@
 package dto
 
 import (
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	utime "github.com/sugar-cat7/vspo-portal/service/common-api/pkg/time"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
+	utime "github.com/sugar-cat7/vspo-portal/service/cron/pkg/time"
 	"google.golang.org/api/youtube/v3"
 )
 

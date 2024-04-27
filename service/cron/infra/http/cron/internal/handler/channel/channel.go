@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 
-	api "github.com/sugar-cat7/vspo-portal/service/common-api/generated/cron"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/input"
+	api "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
+	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/input"
 )
 
 // ChannelsPost is ...
 func (h *CH) ChannelsPost(ctx context.Context, req *api.ChannelsPostReq) (api.ChannelsPostRes, error) {
-	cs, err := h.channelInteractor.UpsertAll(
+	err := h.channelInteractor.BatchUpdate(
 		ctx,
-		input.NewUpsertAllChannelInput(
+		input.NewUpsertChannelInput(
 			string(req.PlatformType.Value),
 			string(req.Period.Value),
 			string(req.ChannelType.Value),
@@ -22,7 +22,7 @@ func (h *CH) ChannelsPost(ctx context.Context, req *api.ChannelsPostReq) (api.Ch
 	}
 	return &api.ChannelsPostOK{
 		Message: api.OptString{
-			Value: fmt.Sprintf("Updated videos: %d", len(cs)),
+			Value: fmt.Sprintf("Updated videos"),
 		},
 	}, nil
 }

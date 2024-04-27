@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 )
 
 //go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_repository
@@ -16,7 +16,7 @@ type Channel interface {
 		ctx context.Context,
 		query ListChannelsQuery,
 	) (uint64, error)
-	UpsertAll(
+	Upsert(
 		ctx context.Context,
 		m model.Channels,
 	) (model.Channels, error)

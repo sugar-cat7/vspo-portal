@@ -3,14 +3,13 @@ package usecase
 import (
 	"context"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase/input"
+	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/input"
 )
 
 // VideoInteractor is ...
 type VideoInteractor interface {
-	UpsertAll(
+	BatchDeleteInsert(
 		ctx context.Context,
-		param *input.UpsertAllVideos,
-	) (model.Videos, error)
+		param *input.UpsertVideos,
+	) error
 }

@@ -1,6 +1,6 @@
 package output
 
-import "github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
+import "github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 
 type ListCreators struct {
 	Creators   model.Creators

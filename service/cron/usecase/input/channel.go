@@ -1,19 +1,19 @@
 package input
 
-// UpsertAllChannels is the input for UpsertAllChannel
-type UpsertAllChannels struct {
+// UpsertChannels is the input for UpsertChannel
+type UpsertChannels struct {
 	ChannelType  string
 	PlatformType string
 	Period       string
 }
 
-// NewUpsertAllChannelInput returns a new UpsertAllChannelInput
-func NewUpsertAllChannelInput(
+// NewUpsertChannelInput returns a new UpsertChannelInput
+func NewUpsertChannelInput(
 	channelType string,
 	platformType string,
 	period string,
-) *UpsertAllChannels {
-	return &UpsertAllChannels{
+) *UpsertChannels {
+	return &UpsertChannels{
 		ChannelType:  channelType,
 		PlatformType: platformType,
 		Period:       period,

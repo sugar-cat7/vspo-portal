@@ -1,7 +1,7 @@
 package channel
 
 import (
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase"
+	"github.com/sugar-cat7/vspo-portal/service/cron/usecase"
 )
 
 // CH is Handler implementation.

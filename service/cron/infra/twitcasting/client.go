@@ -3,7 +3,7 @@ package twitcasting
 import (
 	"net/http"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/environment"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/environment"
 )
 
 // TwitcastingService is ...

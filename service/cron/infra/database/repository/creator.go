@@ -3,11 +3,11 @@ package repository
 import (
 	"context"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/repository"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/database"
-	db_sqlc "github.com/sugar-cat7/vspo-portal/service/common-api/infra/database/internal/db"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/database/internal/dto"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/repository"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database/internal/dto"
+	db_sqlc "github.com/sugar-cat7/vspo-portal/service/cron/infra/database/internal/gen"
 )
 
 type creator struct{}
@@ -72,7 +72,7 @@ func (r *creator) Count(
 	return uint64(cn), nil
 }
 
-func (r *creator) UpsertAll(
+func (r *creator) Upsert(
 	ctx context.Context,
 	m model.Creators,
 ) (model.Creators, error) {

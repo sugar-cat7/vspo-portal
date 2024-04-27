@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v5"
-	db_sqlc "github.com/sugar-cat7/vspo-portal/service/common-api/infra/database/internal/db"
+	"github.com/jackc/pgx/v5/pgxpool"
+	db_sqlc "github.com/sugar-cat7/vspo-portal/service/cron/infra/database/internal/gen"
 )
 
 // ClientKey is the key for the database connection used within the context.
@@ -14,34 +14,41 @@ type ClientKey struct{}
 // Client is the client for executing database queries.
 type Client struct {
 	Queries *db_sqlc.Queries
+	Pool    *pgxpool.Pool
 }
 
-// NewClient creates a new database client and adds it to the context.
-func NewClient(ctx context.Context, host, user, password, database, sslMode string) (*Client, context.Context) {
+// NewClientPool creates a new database client with a connection pool and adds it to the context.
+func NewClientPool(ctx context.Context, host, user, password, dbname, sslMode string) (*Client, context.Context) {
 	connString := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s sslmode=%s",
 		host,
 		user,
 		password,
-		database,
+		dbname,
 		sslMode,
 	)
-	conn, err := pgx.Connect(ctx, connString)
+	config, err := pgxpool.ParseConfig(connString)
+	if err != nil {
+		panic(err)
+	}
+
+	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		panic(err)
 	}
 
 	client := &Client{
-		Queries: db_sqlc.New(conn),
+		Queries: db_sqlc.New(pool),
+		Pool:    pool,
 	}
 
 	// Add the database client to the context.
 	ctx = context.WithValue(ctx, ClientKey{}, client)
 
-	// Use a goroutine to close the connection when the context ends.
+	// Use a goroutine to close the connection pool when the context ends.
 	go func() {
 		<-ctx.Done()
-		conn.Close(context.Background())
+		pool.Close()
 	}()
 
 	return client, ctx

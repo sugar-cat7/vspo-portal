@@ -2,7 +2,7 @@ package dto
 
 import (
 	twitch "github.com/Adeithe/go-twitch/api"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 )
 
 func twVideoToVideo(twVideo twitch.Video) *model.Video {

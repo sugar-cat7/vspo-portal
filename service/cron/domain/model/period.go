@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	utime "github.com/sugar-cat7/vspo-portal/service/common-api/pkg/time"
+	utime "github.com/sugar-cat7/vspo-portal/service/cron/pkg/time"
 )
 
 type Period string

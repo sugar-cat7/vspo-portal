@@ -1,20 +1,20 @@
 package input
 
-// UpsertAllVideos is the input for UpsertAllVideo
-type UpsertAllVideos struct {
+// UpsertVideos is the input for UpsertVideo
+type UpsertVideos struct {
 	VideoIDs      []string
 	PlatformTypes []string
 	VideoType     string
 	Period        string
 }
 
-// NewUpsertAllVideoInput returns a new UpsertAllVideoInput
-func NewUpsertAllVideoInput(
+// NewUpsertVideoInput returns a new UpsertVideoInput
+func NewUpsertVideoInput(
 	platformTypes []string,
 	videoType string,
 	period string,
-) *UpsertAllVideos {
-	return &UpsertAllVideos{
+) *UpsertVideos {
+	return &UpsertVideos{
 		PlatformTypes: platformTypes,
 		Period:        period,
 		VideoType:     videoType,

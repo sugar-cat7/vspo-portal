@@ -8,9 +8,9 @@ import (
 	"net/http"
 
 	twitch "github.com/Adeithe/go-twitch/api"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	doamin_twitch "github.com/sugar-cat7/vspo-portal/service/common-api/domain/twitch"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/twitch/internal/dto"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
+	doamin_twitch "github.com/sugar-cat7/vspo-portal/service/cron/domain/twitch"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/twitch/internal/dto"
 )
 
 var _ doamin_twitch.TwitchClient = (*twitchServiceImpl)(nil)

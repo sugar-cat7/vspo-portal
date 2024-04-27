@@ -7,9 +7,9 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/twitcasting"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/twitcasting/internal/dto"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/twitcasting"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/twitcasting/internal/dto"
 )
 
 var _ twitcasting.TwitcastingClient = (*twitcastingServiceImpl)(nil)

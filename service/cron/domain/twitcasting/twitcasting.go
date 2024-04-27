@@ -3,7 +3,7 @@ package twitcasting
 import (
 	"context"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-api/domain/model"
+	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 )
 
 type TwitcastingClient interface {

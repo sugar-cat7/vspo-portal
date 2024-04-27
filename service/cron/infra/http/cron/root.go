@@ -1,10 +1,10 @@
 package http
 
 import (
-	oas "github.com/sugar-cat7/vspo-portal/service/common-api/generated/cron"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/cron/internal/handler/channel"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/infra/http/cron/internal/handler/video"
-	"github.com/sugar-cat7/vspo-portal/service/common-api/usecase"
+	oas "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/handler/channel"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/handler/video"
+	"github.com/sugar-cat7/vspo-portal/service/cron/usecase"
 )
 
 // Compile-time check for Handler.
