@@ -1,0 +1,182 @@
+openapi: 3.0.1
+info:
+  title: VSPO Common Cron
+  description: This is the Cron documentation for VSPO Common services.
+  contact: {}
+  version: "1.0"
+servers:
+- url: /cron
+paths:
+  /channels:
+    post:
+      tags:
+        - Channels
+      summary: Upsert Channel(Youtube/Twitch/Twitcasting)
+      description: Creates channels by fetching from Youtube using provided Channel IDs.
+      requestBody:
+        description: Array of Channel IDs
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                platform_type:
+                  type: string
+                  enum: [youtube, twitch, twitcasting, niconico]
+                  description: Video's platform type.
+                period:
+                  type: string
+                  enum: [day, week, month, year]
+                  description: Period for performing updates.
+                channel_type:
+                  type: string
+                  enum: [vspo, general]
+                  description: Period for performing updates.
+        required: true
+      responses:
+        "200":
+          description: Channels created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+      security:
+        - ApiKeyAuth: []
+        - YoutubeApiKey: []
+  /videos:
+    post:
+      tags:
+        - Videos
+      summary: Upsert videos
+      description: Update videos related to a specific channel based on provided cronType
+      requestBody:
+        description: Type of the cron
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                platform_type:
+                  type: array
+                  items:
+                    type: string
+                    enum: [youtube, twitch, twitcasting, niconico]
+                  description: Video's platform type.
+                period:
+                  type: string
+                  enum: [day, month, week]
+                  description: Period for performing updates.
+                video_type:
+                  type: string
+                  enum: [vspo_broadcast, clip, freechat]
+      responses:
+        "200":
+          description: Videos updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+      security:
+        - ApiKeyAuth: []
+        - YoutubeApiKey: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+    YoutubeApiKey:
+      type: apiKey
+      in: header
+      name: X-Youtube-API-Key
+  schemas:
+    CronResponse:
+      type: object
+      properties:
+        message:
+         type: string
+         example: success
+security:
+  - ApiKeyAuth: []
+  - YoutubeApiKey: []
+
+tags:
+  - name: Channels
+    description: Operations related to channels
+  - name: Videos
+    description: Operations related to videos
+
