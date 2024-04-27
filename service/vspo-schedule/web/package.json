@@ -19,7 +19,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@mui/icons-material": "^5.15.15",
     "@mui/lab": "5.0.0-alpha.166",
-    "@mui/material": "^5.15.11",
+    "@mui/material": "^5.15.15",
     "@mui/system": "^5.15.15",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.64",
