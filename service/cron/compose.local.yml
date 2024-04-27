@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  postgres:
+  vspo-db:
     container_name: vspo-db
     image: postgres:latest
     environment:
@@ -10,7 +10,12 @@ services:
       POSTGRES_DB: vspo
     ports:
       - "5432:5432"
-  go:
+    healthcheck:
+      test: ["CMD-SHELL", "psql -U user -d vspo -c 'SELECT 1'"]
+      interval: 2s
+      timeout: 1s
+      retries: 5
+  vspo-cron-go:
     container_name: vspo-cron-go
     build:
       context: .
@@ -20,7 +25,7 @@ services:
     working_dir: /project
     ports:
       - 8080:8080
-  migration:
+  vspo-db-migration:
     container_name: vspo--db-migration
     build:
       context: .
@@ -28,5 +33,7 @@ services:
     volumes:
       - ./infra/database/internal/schema/migration:/migrations
       - .:/project
-    environment:
-      DBSTRING: "host=localhost user=user password=password dbname=vspo sslmode=disable"
+    command: ["goose", "-dir", "/migrations", "postgres", "host=vspo-db user=user dbname=vspo password=password sslmode=disable", "up"]
+    depends_on:
+      vspo-db:
+        condition: service_healthy

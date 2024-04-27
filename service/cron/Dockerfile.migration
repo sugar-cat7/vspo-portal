@@ -1,14 +1,12 @@
 # Dockerfile-migration
 FROM golang:1.22.1-bullseye as builder
 
-# Install goose and sqlc for database migrations and SQL code generation
+# Install goose
 RUN go install github.com/pressly/goose/v3/cmd/goose@latest
-RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 
 # Use alpine for a lightweight final image
 FROM alpine:latest
 COPY --from=builder /go/bin/goose /usr/local/bin/goose
-COPY --from=builder /go/bin/sqlc /usr/local/bin/sqlc
 
 # Install runtime dependencies
 RUN apk add --no-cache libc6-compat
@@ -18,6 +16,3 @@ WORKDIR /project
 
 # Expose the volume for migrations
 VOLUME /migrations
-
-# Set the entrypoint
-ENTRYPOINT ["sh"]

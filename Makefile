@@ -1,13 +1,11 @@
 DIR ?= ./service/cron/infra/database/internal/schema/migration
 DRIVER ?= postgres
+MIGRATION_IMAGE_NAME ?= migration-image
+DBSTRING ?= host=vspo-db user=user password=password dbname=vspo sslmode=disable
 ogen:
 	@echo "Generating swagger files..."
 	rm -rf ./service/cron/infra/http/cron/internal/gen
 	go generate service/cron/tool/generate.go
-ddl:
-	@echo "Generating new ddl files..."
-	docker-compose run --rm migration goose -dir=/migrations create $(name) sql
-	@echo "Generating new ddl files...done"
 local:
 	@echo "Setting up local database..."
 	docker-compose -f ./service/cron/compose.local.yml up
@@ -18,10 +16,19 @@ local-build:
 	@echo "Setting up local database...done"
 migrate:
 	@echo "Migrating database..."
-	docker-compose run --rm migration goose -dir=/migrations postgres "${DBSTRING}" up
+	@ docker run --rm -v ${PWD}/${DIR}:/migrations $(MIGRATION_IMAGE_NAME) goose -dir=/migrations postgres "${DBSTRING}" up
+	goose -dir=${DIR} ${DRIVER} "${DBSTRING}" up
 	@echo "Migrating database...done"
 sqlc:
+	@echo "Pulling sqlc/sqlc Docker image..."
+	docker pull sqlc/sqlc
+	@echo "Removing old generated files..."
+	rm -rf ./infra/database/internal/gen
 	@echo "Generating sqlc files..."
-	docker-compose run --rm migration sh -c "cd /project && rm -rf ./infra/database/internal/gen && sqlc generate"
-	@echo "Generating sqlc files...done"
-
+	docker run --rm -v $$(pwd):/src -w /src/service/cron sqlc/sqlc generate
+ddl:
+	@echo "Building Docker image first..."
+	docker build -f ./service/cron/Dockerfile.migration -t $(MIGRATION_IMAGE_NAME) .
+	@echo "Creating new migration..."
+	docker run --rm -v ${PWD}/${DIR}:/migrations $(MIGRATION_IMAGE_NAME) goose -dir=/migrations create $(name) sql
+	@echo "Creating new migration done."

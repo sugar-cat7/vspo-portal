@@ -11,6 +11,9 @@ COPY . /project
 # Install dependencies
 RUN go mod tidy
 
+# Build the application
+RUN go build -o ./tmp/main ./cmd/index.go
+
 # Expose the port the app runs on
 EXPOSE 8080
 
