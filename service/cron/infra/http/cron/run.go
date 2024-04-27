@@ -9,6 +9,7 @@ import (
 	"github.com/caarlos0/env/v10"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/dependency"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/environment"
+	api "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
 	cron "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
 
 	"github.com/sugar-cat7/vspo-portal/service/cron/pkg/logger"
@@ -29,7 +30,6 @@ func Run(w http.ResponseWriter, r *http.Request) {
 	d.Inject(ctx, e)
 
 	logger.Info(fmt.Sprintf("%s %s", r.Method, r.URL.Path))
-
 	// Cron
 	cs, err := cron.NewServer(
 		NewHandler(
@@ -37,6 +37,7 @@ func Run(w http.ResponseWriter, r *http.Request) {
 			d.VideosInteractor,
 		),
 		NewSecurityHandler(),
+		api.WithMiddleware(),
 	)
 	if err != nil {
 		panic(err)

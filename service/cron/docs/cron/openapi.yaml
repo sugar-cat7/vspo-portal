@@ -5,7 +5,7 @@ info:
   contact: {}
   version: "1.0"
 servers:
-- url: /cron
+- url: http://localhost:8080/cron
 paths:
   /channels:
     post:
@@ -168,8 +168,8 @@ components:
       type: object
       properties:
         message:
-         type: string
-         example: success
+          type: string
+          example: success
 security:
   - ApiKeyAuth: []
   - YoutubeApiKey: []
