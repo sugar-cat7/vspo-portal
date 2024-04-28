@@ -48,9 +48,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/"
+		case '/': // Prefix: "/cron/"
 			origElem := elem
-			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			if l := len("/cron/"); len(elem) >= l && elem[0:l] == "/cron/" {
 				elem = elem[l:]
 			} else {
 				break
@@ -60,9 +60,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			switch elem[0] {
-			case 'c': // Prefix: "channels"
+			case 'c': // Prefix: "creators"
 				origElem := elem
-				if l := len("channels"); len(elem) >= l && elem[0:l] == "channels" {
+				if l := len("creators"); len(elem) >= l && elem[0:l] == "creators" {
 					elem = elem[l:]
 				} else {
 					break
@@ -72,7 +72,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					// Leaf node.
 					switch r.Method {
 					case "POST":
-						s.handleChannelsPostRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleCronCreatorsPostRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "POST")
 					}
@@ -93,7 +93,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					// Leaf node.
 					switch r.Method {
 					case "POST":
-						s.handleVideosPostRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleCronVideosPostRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "POST")
 					}
@@ -185,9 +185,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/"
+		case '/': // Prefix: "/cron/"
 			origElem := elem
-			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			if l := len("/cron/"); len(elem) >= l && elem[0:l] == "/cron/" {
 				elem = elem[l:]
 			} else {
 				break
@@ -197,9 +197,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				break
 			}
 			switch elem[0] {
-			case 'c': // Prefix: "channels"
+			case 'c': // Prefix: "creators"
 				origElem := elem
-				if l := len("channels"); len(elem) >= l && elem[0:l] == "channels" {
+				if l := len("creators"); len(elem) >= l && elem[0:l] == "creators" {
 					elem = elem[l:]
 				} else {
 					break
@@ -208,11 +208,11 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				if len(elem) == 0 {
 					switch method {
 					case "POST":
-						// Leaf: ChannelsPost
-						r.name = "ChannelsPost"
+						// Leaf: CronCreatorsPost
+						r.name = "CronCreatorsPost"
 						r.summary = "Upsert Channel(Youtube/Twitch/Twitcasting)"
 						r.operationID = ""
-						r.pathPattern = "/channels"
+						r.pathPattern = "/cron/creators"
 						r.args = args
 						r.count = 0
 						return r, true
@@ -233,11 +233,11 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				if len(elem) == 0 {
 					switch method {
 					case "POST":
-						// Leaf: VideosPost
-						r.name = "VideosPost"
+						// Leaf: CronVideosPost
+						r.name = "CronVideosPost"
 						r.summary = "Upsert videos"
 						r.operationID = ""
-						r.pathPattern = "/videos"
+						r.pathPattern = "/cron/videos"
 						r.args = args
 						r.count = 0
 						return r, true

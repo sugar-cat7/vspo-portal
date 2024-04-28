@@ -6,16 +6,18 @@ import (
 )
 
 func twVideoToVideo(twVideo twitch.Video) *model.Video {
-	return &model.Video{
+
+	m := &model.Video{
 		ID:           twVideo.ID,
 		Title:        twVideo.Title,
 		Platform:     model.PlatformTwitch,
 		ViewCount:    uint64(twVideo.ViewCount),
 		ThumbnailURL: model.ThumbnailURL(twVideo.ThumbnailURL),
 		Status:       model.StatusEnded,
-		PublishedAt:  twVideo.PublishedAt,
-		// EndedAt:
+		PublishedAt:  &twVideo.PublishedAt,
 	}
+
+	return m
 }
 
 // TwVideosToVideos converts a slice of twitch.Video to a slice of model.Video.
@@ -36,8 +38,8 @@ func twStreamToVideo(twStream twitch.Stream) *model.Video {
 		ViewCount:    uint64(twStream.ViewerCount),
 		ThumbnailURL: model.ThumbnailURL(twStream.ThumbnailURL),
 		Status:       model.StatusLive,
-		PublishedAt:  twStream.StartedAt,
-		StartedAt:    twStream.StartedAt,
+		PublishedAt:  &twStream.StartedAt,
+		StartedAt:    &twStream.StartedAt,
 	}
 
 	return m

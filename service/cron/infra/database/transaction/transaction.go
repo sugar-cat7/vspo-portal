@@ -13,7 +13,7 @@ type clientKey struct{}
 
 // FromContext extracts the database client from the context.
 func FromContext(ctx context.Context) (*database.Client, error) {
-	client, ok := ctx.Value(clientKey{}).(*database.Client)
+	client, ok := ctx.Value(database.ClientKey{}).(*database.Client)
 	if !ok {
 		return nil, fmt.Errorf("database client not found in context")
 	}
@@ -27,13 +27,11 @@ func runTx(ctx context.Context, client *database.Client, fn func(context.Context
 	}
 	defer tx.Rollback(ctx)
 
-	txCtx := context.WithValue(ctx, clientKey{}, &database.Client{Queries: client.Queries.WithTx(tx)})
-
+	txCtx := context.WithValue(ctx, database.ClientKey{}, &database.Client{Queries: client.Queries.WithTx(tx)})
 	err = fn(txCtx)
 	if err != nil {
 		return err
 	}
-
 	if err := tx.Commit(ctx); err != nil {
 		return err
 	}
@@ -41,17 +39,19 @@ func runTx(ctx context.Context, client *database.Client, fn func(context.Context
 	return nil
 }
 
-type transactable struct{}
+type transactable struct {
+	dnClient database.Client
+}
 
 // NewTransactable creates a new Transactable instance.
-func NewTransactable() repository.Transactable {
-	return &transactable{}
+func NewTransactable(
+	dbClient database.Client,
+) repository.Transactable {
+	return &transactable{
+		dnClient: dbClient,
+	}
 }
 
 func (r *transactable) RWTx(ctx context.Context, fn func(ctx context.Context) error) error {
-	client, err := FromContext(ctx)
-	if err != nil {
-		return err
-	}
-	return runTx(ctx, client, fn)
+	return runTx(ctx, &r.dnClient, fn)
 }

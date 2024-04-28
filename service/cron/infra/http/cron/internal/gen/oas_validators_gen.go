@@ -10,7 +10,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func (s *ChannelsPostReq) Validate() error {
+func (s *CronCreatorsPostReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -53,7 +53,7 @@ func (s *ChannelsPostReq) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.ChannelType.Get(); ok {
+		if value, ok := s.CreatorType.Get(); ok {
 			if err := func() error {
 				if err := value.Validate(); err != nil {
 					return err
@@ -66,7 +66,7 @@ func (s *ChannelsPostReq) Validate() error {
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "channel_type",
+			Name:  "creator_type",
 			Error: err,
 		})
 	}
@@ -76,7 +76,7 @@ func (s *ChannelsPostReq) Validate() error {
 	return nil
 }
 
-func (s ChannelsPostReqChannelType) Validate() error {
+func (s CronCreatorsPostReqCreatorType) Validate() error {
 	switch s {
 	case "vspo":
 		return nil
@@ -87,7 +87,7 @@ func (s ChannelsPostReqChannelType) Validate() error {
 	}
 }
 
-func (s ChannelsPostReqPeriod) Validate() error {
+func (s CronCreatorsPostReqPeriod) Validate() error {
 	switch s {
 	case "day":
 		return nil
@@ -102,7 +102,7 @@ func (s ChannelsPostReqPeriod) Validate() error {
 	}
 }
 
-func (s ChannelsPostReqPlatformType) Validate() error {
+func (s CronCreatorsPostReqPlatformType) Validate() error {
 	switch s {
 	case "youtube":
 		return nil
@@ -117,7 +117,7 @@ func (s ChannelsPostReqPlatformType) Validate() error {
 	}
 }
 
-func (s *VideosPostReq) Validate() error {
+func (s *CronVideosPostReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -190,7 +190,7 @@ func (s *VideosPostReq) Validate() error {
 	return nil
 }
 
-func (s VideosPostReqPeriod) Validate() error {
+func (s CronVideosPostReqPeriod) Validate() error {
 	switch s {
 	case "day":
 		return nil
@@ -203,7 +203,7 @@ func (s VideosPostReqPeriod) Validate() error {
 	}
 }
 
-func (s VideosPostReqPlatformTypeItem) Validate() error {
+func (s CronVideosPostReqPlatformTypeItem) Validate() error {
 	switch s {
 	case "youtube":
 		return nil
@@ -218,7 +218,7 @@ func (s VideosPostReqPlatformTypeItem) Validate() error {
 	}
 }
 
-func (s VideosPostReqVideoType) Validate() error {
+func (s CronVideosPostReqVideoType) Validate() error {
 	switch s {
 	case "vspo_broadcast":
 		return nil

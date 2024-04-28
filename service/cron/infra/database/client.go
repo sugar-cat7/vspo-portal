@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	db_sqlc "github.com/sugar-cat7/vspo-portal/service/cron/infra/database/internal/gen"
@@ -18,40 +19,40 @@ type Client struct {
 }
 
 // NewClientPool creates a new database client with a connection pool and adds it to the context.
-func NewClientPool(ctx context.Context, host, user, password, dbname, sslMode string) (*Client, context.Context) {
-	connString := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s sslmode=%s",
-		host,
-		user,
-		password,
-		dbname,
-		sslMode,
-	)
+func NewClientPool(ctx context.Context, host, user, password, dbname, sslMode string) Client {
+	// Connection string with max pool connections
+	connString := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=%s&pool_max_conns=10", user, password, host, dbname, sslMode)
 	config, err := pgxpool.ParseConfig(connString)
 	if err != nil {
-		panic(err)
+		fmt.Println("Failed to parse pool config:", err)
+		os.Exit(1)
 	}
 
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
-		panic(err)
+		fmt.Println("Failed to create pool:", err)
+		os.Exit(1)
 	}
 
-	client := &Client{
+	// Perform a ping to check database connectivity
+	if err := pool.Ping(ctx); err != nil {
+		fmt.Println("Failed to ping database:", err)
+		pool.Close() // Make sure to close the pool if ping fails
+		os.Exit(1)
+	}
+
+	client := Client{
 		Queries: db_sqlc.New(pool),
 		Pool:    pool,
 	}
 
-	// Add the database client to the context.
-	ctx = context.WithValue(ctx, ClientKey{}, client)
-
-	// Use a goroutine to close the connection pool when the context ends.
+	// Use a goroutine to close the connection pool when the context ends
 	go func() {
 		<-ctx.Done()
 		pool.Close()
 	}()
 
-	return client, ctx
+	return client
 }
 
 // FromContext retrieves the database client from the context.

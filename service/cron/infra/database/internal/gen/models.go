@@ -10,6 +10,7 @@ import (
 
 type Channel struct {
 	ID                    string
+	PlatformID            string
 	CreatorID             string
 	PlatformType          string
 	Title                 string

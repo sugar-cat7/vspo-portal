@@ -22,92 +22,25 @@ func (q *Queries) CountCreator(ctx context.Context) (int64, error) {
 	return count, err
 }
 
-const getCreatorsByIDs = `-- name: GetCreatorsByIDs :many
-SELECT
-    cr.id, cr.name, cr.member_type,
-    ch.id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
-FROM
-    creator cr
-JOIN
-    channel ch ON cr.id = ch.creatorId
-WHERE
-    cr.id = ANY($3::text[])
-LIMIT $1 OFFSET $2
-`
-
-type GetCreatorsByIDsParams struct {
-	Limit  int32
-	Offset int32
-	Ids    []string
-}
-
-type GetCreatorsByIDsRow struct {
-	Creator Creator
-	Channel Channel
-}
-
-func (q *Queries) GetCreatorsByIDs(ctx context.Context, arg GetCreatorsByIDsParams) ([]GetCreatorsByIDsRow, error) {
-	rows, err := q.db.Query(ctx, getCreatorsByIDs, arg.Limit, arg.Offset, arg.Ids)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetCreatorsByIDsRow
-	for rows.Next() {
-		var i GetCreatorsByIDsRow
-		if err := rows.Scan(
-			&i.Creator.ID,
-			&i.Creator.Name,
-			&i.Creator.MemberType,
-			&i.Channel.ID,
-			&i.Channel.CreatorID,
-			&i.Channel.PlatformType,
-			&i.Channel.Title,
-			&i.Channel.Description,
-			&i.Channel.PublishedAt,
-			&i.Channel.TotalViewCount,
-			&i.Channel.SubscriberCount,
-			&i.Channel.HiddenSubscriberCount,
-			&i.Channel.TotalVideoCount,
-			&i.Channel.ThumbnailUrl,
-			&i.Channel.IsDeleted,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
 const getCreatorsWithChannels = `-- name: GetCreatorsWithChannels :many
 SELECT
     cr.id, cr.name, cr.member_type,
-    ch.id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
+    ch.id, ch.platform_id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
 FROM
     creator cr
 JOIN
-    channel ch ON cr.id = ch.creatorId
+    channel ch ON cr.id = ch.creator_id
 WHERE
-    cr.member_type = ANY($3::text[])
-LIMIT $1 OFFSET $2
+    cr.member_type = ANY($1::text[])
 `
-
-type GetCreatorsWithChannelsParams struct {
-	Limit       int32
-	Offset      int32
-	MemberTypes []string
-}
 
 type GetCreatorsWithChannelsRow struct {
 	Creator Creator
 	Channel Channel
 }
 
-func (q *Queries) GetCreatorsWithChannels(ctx context.Context, arg GetCreatorsWithChannelsParams) ([]GetCreatorsWithChannelsRow, error) {
-	rows, err := q.db.Query(ctx, getCreatorsWithChannels, arg.Limit, arg.Offset, arg.MemberTypes)
+func (q *Queries) GetCreatorsWithChannels(ctx context.Context, memberTypes []string) ([]GetCreatorsWithChannelsRow, error) {
+	rows, err := q.db.Query(ctx, getCreatorsWithChannels, memberTypes)
 	if err != nil {
 		return nil, err
 	}
@@ -120,6 +53,7 @@ func (q *Queries) GetCreatorsWithChannels(ctx context.Context, arg GetCreatorsWi
 			&i.Creator.Name,
 			&i.Creator.MemberType,
 			&i.Channel.ID,
+			&i.Channel.PlatformID,
 			&i.Channel.CreatorID,
 			&i.Channel.PlatformType,
 			&i.Channel.Title,

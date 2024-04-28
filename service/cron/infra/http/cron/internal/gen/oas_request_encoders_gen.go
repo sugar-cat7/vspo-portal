@@ -11,8 +11,8 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 )
 
-func encodeChannelsPostRequest(
-	req *ChannelsPostReq,
+func encodeCronCreatorsPostRequest(
+	req *CronCreatorsPostReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -25,8 +25,8 @@ func encodeChannelsPostRequest(
 	return nil
 }
 
-func encodeVideosPostRequest(
-	req *VideosPostReq,
+func encodeCronVideosPostRequest(
+	req *CronVideosPostReq,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

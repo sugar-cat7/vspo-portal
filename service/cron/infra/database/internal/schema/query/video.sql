@@ -15,10 +15,7 @@ FROM
 WHERE
     platform_type = ANY(@platform_types::text[])
     AND broadcast_status = ANY(@broadcast_status::text[])
-    AND video_type = $1
-    AND started_at >= $2
-    AND ended_at <= $3
-LIMIT $4 OFFSET $5;
+    AND video_type = $1;
 
 -- name: GetVideosByIDs :many
 SELECT
@@ -36,5 +33,5 @@ FROM
 
 -- name: DeleteVideosByIDs :exec
 DELETE FROM video
-WHERE id = ANY($1::text[])
+WHERE id = ANY(@ids::text[])
 RETURNING *;

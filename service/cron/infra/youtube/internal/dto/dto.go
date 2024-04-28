@@ -16,7 +16,6 @@ func ytVideoToVideo(ytVideo *youtube.Video) (*model.Video, error) {
 		ViewCount:    ytVideo.Statistics.ViewCount,
 		ThumbnailURL: model.ThumbnailURL(ytVideo.Snippet.Thumbnails.Default.Url),
 	}
-
 	// Set status
 	switch ytVideo.Snippet.LiveBroadcastContent {
 	case "upcoming":
@@ -26,26 +25,36 @@ func ytVideoToVideo(ytVideo *youtube.Video) (*model.Video, error) {
 	case "none":
 	case "completed":
 		m.Status = model.StatusEnded
+	default:
+		m.Status = model.StatusEnded
+	}
+	if ytVideo.Snippet.PublishedAt != "" {
+		publishedAt, err := utime.Utc.ISOStringToTime(ytVideo.Snippet.PublishedAt)
+		if err != nil {
+			return nil, err
+		}
+		m.PublishedAt = &publishedAt
 	}
 
-	publishedAt, err := utime.Utc.ISOStringToTime(ytVideo.Snippet.PublishedAt)
-	if err != nil {
-		return nil, err
+	if ytVideo.LiveStreamingDetails.ScheduledStartTime != "" {
+		startAt, err := utime.Utc.ISOStringToTime(ytVideo.LiveStreamingDetails.ScheduledStartTime)
+		if err != nil {
+			return nil, err
+		}
+		m.StartedAt = &startAt
 	}
-	m.PublishedAt = publishedAt
-
-	startAt, err := utime.Utc.ISOStringToTime(ytVideo.LiveStreamingDetails.ScheduledStartTime)
-	if err != nil {
-		return nil, err
-	}
-	m.StartedAt = startAt
 
 	if ytVideo.LiveStreamingDetails.ActualEndTime != "" {
 		endAt, err := utime.Utc.ISOStringToTime(ytVideo.LiveStreamingDetails.ActualEndTime)
 		if err != nil {
 			return nil, err
 		}
-		m.EndedAt = endAt
+		m.EndedAt = &endAt
+		m.Status = model.StatusEnded
+	}
+
+	if ytVideo.Snippet.ChannelId != "" {
+		m.CreatorInfo.ChannelID = ytVideo.Snippet.ChannelId
 	}
 	return m, nil
 }
@@ -94,12 +103,17 @@ func ytSearchResultToVideo(ytSearchResult *youtube.SearchResult) (*model.Video, 
 	case "completed":
 		m.Status = model.StatusEnded
 	}
-
-	publishedAt, err := utime.Utc.ISOStringToTime(ytSearchResult.Snippet.PublishedAt)
-	if err != nil {
-		return nil, err
+	if ytSearchResult.Snippet.PublishedAt == "" {
+		publishedAt, err := utime.Utc.ISOStringToTime(ytSearchResult.Snippet.PublishedAt)
+		if err != nil {
+			return nil, err
+		}
+		m.PublishedAt = &publishedAt
 	}
-	m.PublishedAt = publishedAt
+
+	if ytSearchResult.Snippet.ChannelId != "" {
+		m.CreatorInfo.ChannelID = ytSearchResult.Snippet.ChannelId
+	}
 
 	return m, nil
 }

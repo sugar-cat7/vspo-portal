@@ -7,17 +7,17 @@ import (
 	"github.com/go-faster/jx"
 )
 
-// Encode encodes ChannelsPostBadRequest as json.
-func (s *ChannelsPostBadRequest) Encode(e *jx.Encoder) {
+// Encode encodes CronCreatorsPostBadRequest as json.
+func (s *CronCreatorsPostBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ChannelsPostBadRequest from json.
-func (s *ChannelsPostBadRequest) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostBadRequest from json.
+func (s *CronCreatorsPostBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostBadRequest to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostBadRequest to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -28,34 +28,34 @@ func (s *ChannelsPostBadRequest) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ChannelsPostBadRequest(unwrapped)
+	*s = CronCreatorsPostBadRequest(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsPostBadRequest) MarshalJSON() ([]byte, error) {
+func (s *CronCreatorsPostBadRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostBadRequest) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPostForbidden as json.
-func (s *ChannelsPostForbidden) Encode(e *jx.Encoder) {
+// Encode encodes CronCreatorsPostForbidden as json.
+func (s *CronCreatorsPostForbidden) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ChannelsPostForbidden from json.
-func (s *ChannelsPostForbidden) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostForbidden from json.
+func (s *CronCreatorsPostForbidden) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostForbidden to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostForbidden to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -66,34 +66,34 @@ func (s *ChannelsPostForbidden) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ChannelsPostForbidden(unwrapped)
+	*s = CronCreatorsPostForbidden(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsPostForbidden) MarshalJSON() ([]byte, error) {
+func (s *CronCreatorsPostForbidden) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostForbidden) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostForbidden) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPostInternalServerError as json.
-func (s *ChannelsPostInternalServerError) Encode(e *jx.Encoder) {
+// Encode encodes CronCreatorsPostInternalServerError as json.
+func (s *CronCreatorsPostInternalServerError) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ChannelsPostInternalServerError from json.
-func (s *ChannelsPostInternalServerError) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostInternalServerError from json.
+func (s *CronCreatorsPostInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostInternalServerError to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostInternalServerError to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -104,34 +104,34 @@ func (s *ChannelsPostInternalServerError) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ChannelsPostInternalServerError(unwrapped)
+	*s = CronCreatorsPostInternalServerError(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsPostInternalServerError) MarshalJSON() ([]byte, error) {
+func (s *CronCreatorsPostInternalServerError) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostInternalServerError) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPostNotFound as json.
-func (s *ChannelsPostNotFound) Encode(e *jx.Encoder) {
+// Encode encodes CronCreatorsPostNotFound as json.
+func (s *CronCreatorsPostNotFound) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ChannelsPostNotFound from json.
-func (s *ChannelsPostNotFound) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostNotFound from json.
+func (s *CronCreatorsPostNotFound) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostNotFound to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostNotFound to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -142,34 +142,34 @@ func (s *ChannelsPostNotFound) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ChannelsPostNotFound(unwrapped)
+	*s = CronCreatorsPostNotFound(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsPostNotFound) MarshalJSON() ([]byte, error) {
+func (s *CronCreatorsPostNotFound) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostNotFound) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostNotFound) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPostOK as json.
-func (s *ChannelsPostOK) Encode(e *jx.Encoder) {
+// Encode encodes CronCreatorsPostOK as json.
+func (s *CronCreatorsPostOK) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ChannelsPostOK from json.
-func (s *ChannelsPostOK) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostOK from json.
+func (s *CronCreatorsPostOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostOK to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostOK to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -180,32 +180,32 @@ func (s *ChannelsPostOK) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ChannelsPostOK(unwrapped)
+	*s = CronCreatorsPostOK(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsPostOK) MarshalJSON() ([]byte, error) {
+func (s *CronCreatorsPostOK) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostOK) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *ChannelsPostReq) Encode(e *jx.Encoder) {
+func (s *CronCreatorsPostReq) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ChannelsPostReq) encodeFields(e *jx.Encoder) {
+func (s *CronCreatorsPostReq) encodeFields(e *jx.Encoder) {
 	{
 		if s.PlatformType.Set {
 			e.FieldStart("platform_type")
@@ -219,23 +219,23 @@ func (s *ChannelsPostReq) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.ChannelType.Set {
-			e.FieldStart("channel_type")
-			s.ChannelType.Encode(e)
+		if s.CreatorType.Set {
+			e.FieldStart("creator_type")
+			s.CreatorType.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfChannelsPostReq = [3]string{
+var jsonFieldsNameOfCronCreatorsPostReq = [3]string{
 	0: "platform_type",
 	1: "period",
-	2: "channel_type",
+	2: "creator_type",
 }
 
-// Decode decodes ChannelsPostReq from json.
-func (s *ChannelsPostReq) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostReq from json.
+func (s *CronCreatorsPostReq) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostReq to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostReq to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -260,179 +260,179 @@ func (s *ChannelsPostReq) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"period\"")
 			}
-		case "channel_type":
+		case "creator_type":
 			if err := func() error {
-				s.ChannelType.Reset()
-				if err := s.ChannelType.Decode(d); err != nil {
+				s.CreatorType.Reset()
+				if err := s.CreatorType.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"channel_type\"")
+				return errors.Wrap(err, "decode field \"creator_type\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ChannelsPostReq")
+		return errors.Wrap(err, "decode CronCreatorsPostReq")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsPostReq) MarshalJSON() ([]byte, error) {
+func (s *CronCreatorsPostReq) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostReq) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostReq) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPostReqChannelType as json.
-func (s ChannelsPostReqChannelType) Encode(e *jx.Encoder) {
+// Encode encodes CronCreatorsPostReqCreatorType as json.
+func (s CronCreatorsPostReqCreatorType) Encode(e *jx.Encoder) {
 	e.Str(string(s))
 }
 
-// Decode decodes ChannelsPostReqChannelType from json.
-func (s *ChannelsPostReqChannelType) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostReqCreatorType from json.
+func (s *CronCreatorsPostReqCreatorType) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostReqChannelType to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostReqCreatorType to nil")
 	}
 	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
 	// Try to use constant string.
-	switch ChannelsPostReqChannelType(v) {
-	case ChannelsPostReqChannelTypeVspo:
-		*s = ChannelsPostReqChannelTypeVspo
-	case ChannelsPostReqChannelTypeGeneral:
-		*s = ChannelsPostReqChannelTypeGeneral
+	switch CronCreatorsPostReqCreatorType(v) {
+	case CronCreatorsPostReqCreatorTypeVspo:
+		*s = CronCreatorsPostReqCreatorTypeVspo
+	case CronCreatorsPostReqCreatorTypeGeneral:
+		*s = CronCreatorsPostReqCreatorTypeGeneral
 	default:
-		*s = ChannelsPostReqChannelType(v)
+		*s = CronCreatorsPostReqCreatorType(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ChannelsPostReqChannelType) MarshalJSON() ([]byte, error) {
+func (s CronCreatorsPostReqCreatorType) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostReqChannelType) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostReqCreatorType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPostReqPeriod as json.
-func (s ChannelsPostReqPeriod) Encode(e *jx.Encoder) {
+// Encode encodes CronCreatorsPostReqPeriod as json.
+func (s CronCreatorsPostReqPeriod) Encode(e *jx.Encoder) {
 	e.Str(string(s))
 }
 
-// Decode decodes ChannelsPostReqPeriod from json.
-func (s *ChannelsPostReqPeriod) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostReqPeriod from json.
+func (s *CronCreatorsPostReqPeriod) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostReqPeriod to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostReqPeriod to nil")
 	}
 	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
 	// Try to use constant string.
-	switch ChannelsPostReqPeriod(v) {
-	case ChannelsPostReqPeriodDay:
-		*s = ChannelsPostReqPeriodDay
-	case ChannelsPostReqPeriodWeek:
-		*s = ChannelsPostReqPeriodWeek
-	case ChannelsPostReqPeriodMonth:
-		*s = ChannelsPostReqPeriodMonth
-	case ChannelsPostReqPeriodYear:
-		*s = ChannelsPostReqPeriodYear
+	switch CronCreatorsPostReqPeriod(v) {
+	case CronCreatorsPostReqPeriodDay:
+		*s = CronCreatorsPostReqPeriodDay
+	case CronCreatorsPostReqPeriodWeek:
+		*s = CronCreatorsPostReqPeriodWeek
+	case CronCreatorsPostReqPeriodMonth:
+		*s = CronCreatorsPostReqPeriodMonth
+	case CronCreatorsPostReqPeriodYear:
+		*s = CronCreatorsPostReqPeriodYear
 	default:
-		*s = ChannelsPostReqPeriod(v)
+		*s = CronCreatorsPostReqPeriod(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ChannelsPostReqPeriod) MarshalJSON() ([]byte, error) {
+func (s CronCreatorsPostReqPeriod) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostReqPeriod) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostReqPeriod) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPostReqPlatformType as json.
-func (s ChannelsPostReqPlatformType) Encode(e *jx.Encoder) {
+// Encode encodes CronCreatorsPostReqPlatformType as json.
+func (s CronCreatorsPostReqPlatformType) Encode(e *jx.Encoder) {
 	e.Str(string(s))
 }
 
-// Decode decodes ChannelsPostReqPlatformType from json.
-func (s *ChannelsPostReqPlatformType) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostReqPlatformType from json.
+func (s *CronCreatorsPostReqPlatformType) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostReqPlatformType to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostReqPlatformType to nil")
 	}
 	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
 	// Try to use constant string.
-	switch ChannelsPostReqPlatformType(v) {
-	case ChannelsPostReqPlatformTypeYoutube:
-		*s = ChannelsPostReqPlatformTypeYoutube
-	case ChannelsPostReqPlatformTypeTwitch:
-		*s = ChannelsPostReqPlatformTypeTwitch
-	case ChannelsPostReqPlatformTypeTwitcasting:
-		*s = ChannelsPostReqPlatformTypeTwitcasting
-	case ChannelsPostReqPlatformTypeNiconico:
-		*s = ChannelsPostReqPlatformTypeNiconico
+	switch CronCreatorsPostReqPlatformType(v) {
+	case CronCreatorsPostReqPlatformTypeYoutube:
+		*s = CronCreatorsPostReqPlatformTypeYoutube
+	case CronCreatorsPostReqPlatformTypeTwitch:
+		*s = CronCreatorsPostReqPlatformTypeTwitch
+	case CronCreatorsPostReqPlatformTypeTwitcasting:
+		*s = CronCreatorsPostReqPlatformTypeTwitcasting
+	case CronCreatorsPostReqPlatformTypeNiconico:
+		*s = CronCreatorsPostReqPlatformTypeNiconico
 	default:
-		*s = ChannelsPostReqPlatformType(v)
+		*s = CronCreatorsPostReqPlatformType(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ChannelsPostReqPlatformType) MarshalJSON() ([]byte, error) {
+func (s CronCreatorsPostReqPlatformType) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostReqPlatformType) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostReqPlatformType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPostUnauthorized as json.
-func (s *ChannelsPostUnauthorized) Encode(e *jx.Encoder) {
+// Encode encodes CronCreatorsPostUnauthorized as json.
+func (s *CronCreatorsPostUnauthorized) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ChannelsPostUnauthorized from json.
-func (s *ChannelsPostUnauthorized) Decode(d *jx.Decoder) error {
+// Decode decodes CronCreatorsPostUnauthorized from json.
+func (s *CronCreatorsPostUnauthorized) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ChannelsPostUnauthorized to nil")
+		return errors.New("invalid: unable to decode CronCreatorsPostUnauthorized to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -443,19 +443,19 @@ func (s *ChannelsPostUnauthorized) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ChannelsPostUnauthorized(unwrapped)
+	*s = CronCreatorsPostUnauthorized(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ChannelsPostUnauthorized) MarshalJSON() ([]byte, error) {
+func (s *CronCreatorsPostUnauthorized) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ChannelsPostUnauthorized) UnmarshalJSON(data []byte) error {
+func (s *CronCreatorsPostUnauthorized) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -523,217 +523,17 @@ func (s *CronResponse) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes ChannelsPostReqChannelType as json.
-func (o OptChannelsPostReqChannelType) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes ChannelsPostReqChannelType from json.
-func (o *OptChannelsPostReqChannelType) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptChannelsPostReqChannelType to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptChannelsPostReqChannelType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptChannelsPostReqChannelType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes ChannelsPostReqPeriod as json.
-func (o OptChannelsPostReqPeriod) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes ChannelsPostReqPeriod from json.
-func (o *OptChannelsPostReqPeriod) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptChannelsPostReqPeriod to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptChannelsPostReqPeriod) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptChannelsPostReqPeriod) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes ChannelsPostReqPlatformType as json.
-func (o OptChannelsPostReqPlatformType) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes ChannelsPostReqPlatformType from json.
-func (o *OptChannelsPostReqPlatformType) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptChannelsPostReqPlatformType to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptChannelsPostReqPlatformType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptChannelsPostReqPlatformType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes string as json.
-func (o OptString) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes string from json.
-func (o *OptString) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptString to nil")
-	}
-	o.Set = true
-	v, err := d.Str()
-	if err != nil {
-		return err
-	}
-	o.Value = string(v)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptString) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptString) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes VideosPostReqPeriod as json.
-func (o OptVideosPostReqPeriod) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes VideosPostReqPeriod from json.
-func (o *OptVideosPostReqPeriod) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptVideosPostReqPeriod to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptVideosPostReqPeriod) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptVideosPostReqPeriod) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes VideosPostReqVideoType as json.
-func (o OptVideosPostReqVideoType) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes VideosPostReqVideoType from json.
-func (o *OptVideosPostReqVideoType) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptVideosPostReqVideoType to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptVideosPostReqVideoType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptVideosPostReqVideoType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes VideosPostBadRequest as json.
-func (s *VideosPostBadRequest) Encode(e *jx.Encoder) {
+// Encode encodes CronVideosPostBadRequest as json.
+func (s *CronVideosPostBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes VideosPostBadRequest from json.
-func (s *VideosPostBadRequest) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostBadRequest from json.
+func (s *CronVideosPostBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostBadRequest to nil")
+		return errors.New("invalid: unable to decode CronVideosPostBadRequest to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -744,34 +544,34 @@ func (s *VideosPostBadRequest) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = VideosPostBadRequest(unwrapped)
+	*s = CronVideosPostBadRequest(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *VideosPostBadRequest) MarshalJSON() ([]byte, error) {
+func (s *CronVideosPostBadRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostBadRequest) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostForbidden as json.
-func (s *VideosPostForbidden) Encode(e *jx.Encoder) {
+// Encode encodes CronVideosPostForbidden as json.
+func (s *CronVideosPostForbidden) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes VideosPostForbidden from json.
-func (s *VideosPostForbidden) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostForbidden from json.
+func (s *CronVideosPostForbidden) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostForbidden to nil")
+		return errors.New("invalid: unable to decode CronVideosPostForbidden to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -782,34 +582,34 @@ func (s *VideosPostForbidden) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = VideosPostForbidden(unwrapped)
+	*s = CronVideosPostForbidden(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *VideosPostForbidden) MarshalJSON() ([]byte, error) {
+func (s *CronVideosPostForbidden) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostForbidden) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostForbidden) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostInternalServerError as json.
-func (s *VideosPostInternalServerError) Encode(e *jx.Encoder) {
+// Encode encodes CronVideosPostInternalServerError as json.
+func (s *CronVideosPostInternalServerError) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes VideosPostInternalServerError from json.
-func (s *VideosPostInternalServerError) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostInternalServerError from json.
+func (s *CronVideosPostInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostInternalServerError to nil")
+		return errors.New("invalid: unable to decode CronVideosPostInternalServerError to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -820,34 +620,34 @@ func (s *VideosPostInternalServerError) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = VideosPostInternalServerError(unwrapped)
+	*s = CronVideosPostInternalServerError(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *VideosPostInternalServerError) MarshalJSON() ([]byte, error) {
+func (s *CronVideosPostInternalServerError) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostInternalServerError) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostNotFound as json.
-func (s *VideosPostNotFound) Encode(e *jx.Encoder) {
+// Encode encodes CronVideosPostNotFound as json.
+func (s *CronVideosPostNotFound) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes VideosPostNotFound from json.
-func (s *VideosPostNotFound) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostNotFound from json.
+func (s *CronVideosPostNotFound) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostNotFound to nil")
+		return errors.New("invalid: unable to decode CronVideosPostNotFound to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -858,34 +658,34 @@ func (s *VideosPostNotFound) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = VideosPostNotFound(unwrapped)
+	*s = CronVideosPostNotFound(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *VideosPostNotFound) MarshalJSON() ([]byte, error) {
+func (s *CronVideosPostNotFound) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostNotFound) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostNotFound) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostOK as json.
-func (s *VideosPostOK) Encode(e *jx.Encoder) {
+// Encode encodes CronVideosPostOK as json.
+func (s *CronVideosPostOK) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes VideosPostOK from json.
-func (s *VideosPostOK) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostOK from json.
+func (s *CronVideosPostOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostOK to nil")
+		return errors.New("invalid: unable to decode CronVideosPostOK to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -896,32 +696,32 @@ func (s *VideosPostOK) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = VideosPostOK(unwrapped)
+	*s = CronVideosPostOK(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *VideosPostOK) MarshalJSON() ([]byte, error) {
+func (s *CronVideosPostOK) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostOK) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *VideosPostReq) Encode(e *jx.Encoder) {
+func (s *CronVideosPostReq) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *VideosPostReq) encodeFields(e *jx.Encoder) {
+func (s *CronVideosPostReq) encodeFields(e *jx.Encoder) {
 	{
 		if s.PlatformType != nil {
 			e.FieldStart("platform_type")
@@ -946,25 +746,25 @@ func (s *VideosPostReq) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfVideosPostReq = [3]string{
+var jsonFieldsNameOfCronVideosPostReq = [3]string{
 	0: "platform_type",
 	1: "period",
 	2: "video_type",
 }
 
-// Decode decodes VideosPostReq from json.
-func (s *VideosPostReq) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostReq from json.
+func (s *CronVideosPostReq) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostReq to nil")
+		return errors.New("invalid: unable to decode CronVideosPostReq to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "platform_type":
 			if err := func() error {
-				s.PlatformType = make([]VideosPostReqPlatformTypeItem, 0)
+				s.PlatformType = make([]CronVideosPostReqPlatformTypeItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem VideosPostReqPlatformTypeItem
+					var elem CronVideosPostReqPlatformTypeItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
@@ -1002,164 +802,164 @@ func (s *VideosPostReq) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode VideosPostReq")
+		return errors.Wrap(err, "decode CronVideosPostReq")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *VideosPostReq) MarshalJSON() ([]byte, error) {
+func (s *CronVideosPostReq) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostReq) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostReq) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostReqPeriod as json.
-func (s VideosPostReqPeriod) Encode(e *jx.Encoder) {
+// Encode encodes CronVideosPostReqPeriod as json.
+func (s CronVideosPostReqPeriod) Encode(e *jx.Encoder) {
 	e.Str(string(s))
 }
 
-// Decode decodes VideosPostReqPeriod from json.
-func (s *VideosPostReqPeriod) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostReqPeriod from json.
+func (s *CronVideosPostReqPeriod) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostReqPeriod to nil")
+		return errors.New("invalid: unable to decode CronVideosPostReqPeriod to nil")
 	}
 	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
 	// Try to use constant string.
-	switch VideosPostReqPeriod(v) {
-	case VideosPostReqPeriodDay:
-		*s = VideosPostReqPeriodDay
-	case VideosPostReqPeriodMonth:
-		*s = VideosPostReqPeriodMonth
-	case VideosPostReqPeriodWeek:
-		*s = VideosPostReqPeriodWeek
+	switch CronVideosPostReqPeriod(v) {
+	case CronVideosPostReqPeriodDay:
+		*s = CronVideosPostReqPeriodDay
+	case CronVideosPostReqPeriodMonth:
+		*s = CronVideosPostReqPeriodMonth
+	case CronVideosPostReqPeriodWeek:
+		*s = CronVideosPostReqPeriodWeek
 	default:
-		*s = VideosPostReqPeriod(v)
+		*s = CronVideosPostReqPeriod(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s VideosPostReqPeriod) MarshalJSON() ([]byte, error) {
+func (s CronVideosPostReqPeriod) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostReqPeriod) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostReqPeriod) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostReqPlatformTypeItem as json.
-func (s VideosPostReqPlatformTypeItem) Encode(e *jx.Encoder) {
+// Encode encodes CronVideosPostReqPlatformTypeItem as json.
+func (s CronVideosPostReqPlatformTypeItem) Encode(e *jx.Encoder) {
 	e.Str(string(s))
 }
 
-// Decode decodes VideosPostReqPlatformTypeItem from json.
-func (s *VideosPostReqPlatformTypeItem) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostReqPlatformTypeItem from json.
+func (s *CronVideosPostReqPlatformTypeItem) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostReqPlatformTypeItem to nil")
+		return errors.New("invalid: unable to decode CronVideosPostReqPlatformTypeItem to nil")
 	}
 	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
 	// Try to use constant string.
-	switch VideosPostReqPlatformTypeItem(v) {
-	case VideosPostReqPlatformTypeItemYoutube:
-		*s = VideosPostReqPlatformTypeItemYoutube
-	case VideosPostReqPlatformTypeItemTwitch:
-		*s = VideosPostReqPlatformTypeItemTwitch
-	case VideosPostReqPlatformTypeItemTwitcasting:
-		*s = VideosPostReqPlatformTypeItemTwitcasting
-	case VideosPostReqPlatformTypeItemNiconico:
-		*s = VideosPostReqPlatformTypeItemNiconico
+	switch CronVideosPostReqPlatformTypeItem(v) {
+	case CronVideosPostReqPlatformTypeItemYoutube:
+		*s = CronVideosPostReqPlatformTypeItemYoutube
+	case CronVideosPostReqPlatformTypeItemTwitch:
+		*s = CronVideosPostReqPlatformTypeItemTwitch
+	case CronVideosPostReqPlatformTypeItemTwitcasting:
+		*s = CronVideosPostReqPlatformTypeItemTwitcasting
+	case CronVideosPostReqPlatformTypeItemNiconico:
+		*s = CronVideosPostReqPlatformTypeItemNiconico
 	default:
-		*s = VideosPostReqPlatformTypeItem(v)
+		*s = CronVideosPostReqPlatformTypeItem(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s VideosPostReqPlatformTypeItem) MarshalJSON() ([]byte, error) {
+func (s CronVideosPostReqPlatformTypeItem) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostReqPlatformTypeItem) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostReqPlatformTypeItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostReqVideoType as json.
-func (s VideosPostReqVideoType) Encode(e *jx.Encoder) {
+// Encode encodes CronVideosPostReqVideoType as json.
+func (s CronVideosPostReqVideoType) Encode(e *jx.Encoder) {
 	e.Str(string(s))
 }
 
-// Decode decodes VideosPostReqVideoType from json.
-func (s *VideosPostReqVideoType) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostReqVideoType from json.
+func (s *CronVideosPostReqVideoType) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostReqVideoType to nil")
+		return errors.New("invalid: unable to decode CronVideosPostReqVideoType to nil")
 	}
 	v, err := d.StrBytes()
 	if err != nil {
 		return err
 	}
 	// Try to use constant string.
-	switch VideosPostReqVideoType(v) {
-	case VideosPostReqVideoTypeVspoBroadcast:
-		*s = VideosPostReqVideoTypeVspoBroadcast
-	case VideosPostReqVideoTypeClip:
-		*s = VideosPostReqVideoTypeClip
-	case VideosPostReqVideoTypeFreechat:
-		*s = VideosPostReqVideoTypeFreechat
+	switch CronVideosPostReqVideoType(v) {
+	case CronVideosPostReqVideoTypeVspoBroadcast:
+		*s = CronVideosPostReqVideoTypeVspoBroadcast
+	case CronVideosPostReqVideoTypeClip:
+		*s = CronVideosPostReqVideoTypeClip
+	case CronVideosPostReqVideoTypeFreechat:
+		*s = CronVideosPostReqVideoTypeFreechat
 	default:
-		*s = VideosPostReqVideoType(v)
+		*s = CronVideosPostReqVideoType(v)
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s VideosPostReqVideoType) MarshalJSON() ([]byte, error) {
+func (s CronVideosPostReqVideoType) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostReqVideoType) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostReqVideoType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes VideosPostUnauthorized as json.
-func (s *VideosPostUnauthorized) Encode(e *jx.Encoder) {
+// Encode encodes CronVideosPostUnauthorized as json.
+func (s *CronVideosPostUnauthorized) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes VideosPostUnauthorized from json.
-func (s *VideosPostUnauthorized) Decode(d *jx.Decoder) error {
+// Decode decodes CronVideosPostUnauthorized from json.
+func (s *CronVideosPostUnauthorized) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode VideosPostUnauthorized to nil")
+		return errors.New("invalid: unable to decode CronVideosPostUnauthorized to nil")
 	}
 	var unwrapped CronResponse
 	if err := func() error {
@@ -1170,19 +970,219 @@ func (s *VideosPostUnauthorized) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = VideosPostUnauthorized(unwrapped)
+	*s = CronVideosPostUnauthorized(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *VideosPostUnauthorized) MarshalJSON() ([]byte, error) {
+func (s *CronVideosPostUnauthorized) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *VideosPostUnauthorized) UnmarshalJSON(data []byte) error {
+func (s *CronVideosPostUnauthorized) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CronCreatorsPostReqCreatorType as json.
+func (o OptCronCreatorsPostReqCreatorType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes CronCreatorsPostReqCreatorType from json.
+func (o *OptCronCreatorsPostReqCreatorType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptCronCreatorsPostReqCreatorType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptCronCreatorsPostReqCreatorType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptCronCreatorsPostReqCreatorType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CronCreatorsPostReqPeriod as json.
+func (o OptCronCreatorsPostReqPeriod) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes CronCreatorsPostReqPeriod from json.
+func (o *OptCronCreatorsPostReqPeriod) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptCronCreatorsPostReqPeriod to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptCronCreatorsPostReqPeriod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptCronCreatorsPostReqPeriod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CronCreatorsPostReqPlatformType as json.
+func (o OptCronCreatorsPostReqPlatformType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes CronCreatorsPostReqPlatformType from json.
+func (o *OptCronCreatorsPostReqPlatformType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptCronCreatorsPostReqPlatformType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptCronCreatorsPostReqPlatformType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptCronCreatorsPostReqPlatformType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CronVideosPostReqPeriod as json.
+func (o OptCronVideosPostReqPeriod) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes CronVideosPostReqPeriod from json.
+func (o *OptCronVideosPostReqPeriod) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptCronVideosPostReqPeriod to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptCronVideosPostReqPeriod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptCronVideosPostReqPeriod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CronVideosPostReqVideoType as json.
+func (o OptCronVideosPostReqVideoType) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes CronVideosPostReqVideoType from json.
+func (o *OptCronVideosPostReqVideoType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptCronVideosPostReqVideoType to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptCronVideosPostReqVideoType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptCronVideosPostReqVideoType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes string as json.
+func (o OptString) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes string from json.
+func (o *OptString) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptString to nil")
+	}
+	o.Set = true
+	v, err := d.Str()
+	if err != nil {
+		return err
+	}
+	o.Value = string(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptString) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptString) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

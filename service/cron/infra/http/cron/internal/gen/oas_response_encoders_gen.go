@@ -11,9 +11,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeCronCreatorsPostResponse(response CronCreatorsPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ChannelsPostOK:
+	case *CronCreatorsPostOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -26,7 +26,7 @@ func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ChannelsPostBadRequest:
+	case *CronCreatorsPostBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -39,7 +39,7 @@ func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ChannelsPostUnauthorized:
+	case *CronCreatorsPostUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
@@ -52,7 +52,7 @@ func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ChannelsPostForbidden:
+	case *CronCreatorsPostForbidden:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
@@ -65,7 +65,7 @@ func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ChannelsPostNotFound:
+	case *CronCreatorsPostNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
@@ -78,7 +78,7 @@ func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter,
 
 		return nil
 
-	case *ChannelsPostInternalServerError:
+	case *CronCreatorsPostInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -96,9 +96,9 @@ func encodeChannelsPostResponse(response ChannelsPostRes, w http.ResponseWriter,
 	}
 }
 
-func encodeVideosPostResponse(response VideosPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeCronVideosPostResponse(response CronVideosPostRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *VideosPostOK:
+	case *CronVideosPostOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -111,7 +111,7 @@ func encodeVideosPostResponse(response VideosPostRes, w http.ResponseWriter, spa
 
 		return nil
 
-	case *VideosPostBadRequest:
+	case *CronVideosPostBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -124,7 +124,7 @@ func encodeVideosPostResponse(response VideosPostRes, w http.ResponseWriter, spa
 
 		return nil
 
-	case *VideosPostUnauthorized:
+	case *CronVideosPostUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
@@ -137,7 +137,7 @@ func encodeVideosPostResponse(response VideosPostRes, w http.ResponseWriter, spa
 
 		return nil
 
-	case *VideosPostForbidden:
+	case *CronVideosPostForbidden:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
@@ -150,7 +150,7 @@ func encodeVideosPostResponse(response VideosPostRes, w http.ResponseWriter, spa
 
 		return nil
 
-	case *VideosPostNotFound:
+	case *CronVideosPostNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
@@ -163,7 +163,7 @@ func encodeVideosPostResponse(response VideosPostRes, w http.ResponseWriter, spa
 
 		return nil
 
-	case *VideosPostInternalServerError:
+	case *CronVideosPostInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))

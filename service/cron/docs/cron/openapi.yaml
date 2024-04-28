@@ -5,14 +5,14 @@ info:
   contact: {}
   version: "1.0"
 servers:
-- url: /cron
+- url: http://localhost:8080
 paths:
-  /channels:
+  /cron/creators:
     post:
       tags:
         - Channels
       summary: Upsert Channel(Youtube/Twitch/Twitcasting)
-      description: Creates channels by fetching from Youtube using provided Channel IDs.
+      description: Creates creators by fetching from Youtube using provided Channel IDs.
       requestBody:
         description: Array of Channel IDs
         content:
@@ -28,7 +28,7 @@ paths:
                   type: string
                   enum: [day, week, month, year]
                   description: Period for performing updates.
-                channel_type:
+                creator_type:
                   type: string
                   enum: [vspo, general]
                   description: Period for performing updates.
@@ -79,12 +79,12 @@ paths:
       security:
         - ApiKeyAuth: []
         - YoutubeApiKey: []
-  /videos:
+  /cron/videos:
     post:
       tags:
         - Videos
       summary: Upsert videos
-      description: Update videos related to a specific channel based on provided cronType
+      description: Update videos related to a specific creator based on provided cronType
       requestBody:
         description: Type of the cron
         required: true
@@ -168,15 +168,15 @@ components:
       type: object
       properties:
         message:
-         type: string
-         example: success
+          type: string
+          example: success
 security:
   - ApiKeyAuth: []
   - YoutubeApiKey: []
 
 tags:
   - name: Channels
-    description: Operations related to channels
+    description: Operations related to creators
   - name: Videos
     description: Operations related to videos
 

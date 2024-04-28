@@ -6,11 +6,12 @@ import (
 
 	api "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
 	dto "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/handler/video/internal"
+	"github.com/sugar-cat7/vspo-portal/service/cron/pkg/logger"
 	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/input"
 )
 
-// VideosPost implements the POST /channels/{channel_id}/videos endpoint.
-func (h *VH) VideosPost(ctx context.Context, req *api.VideosPostReq) (api.VideosPostRes, error) {
+// CronVideosPost implements the POST /channels/{channel_id}/videos endpoint.
+func (h *VH) CronVideosPost(ctx context.Context, req *api.CronVideosPostReq) (api.CronVideosPostRes, error) {
 	err := h.videoInteractor.BatchDeleteInsert(
 		ctx,
 		input.NewUpsertVideoInput(
@@ -21,9 +22,10 @@ func (h *VH) VideosPost(ctx context.Context, req *api.VideosPostReq) (api.Videos
 	)
 
 	if err != nil {
+		logger.New().Error(err.Error())
 		return nil, err
 	}
-	return &api.VideosPostOK{
+	return &api.CronVideosPostOK{
 		Message: api.OptString{
 			Value: fmt.Sprintf("Updated videos"),
 		},

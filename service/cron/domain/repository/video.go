@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"time"
 
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 )
@@ -17,7 +16,7 @@ type Video interface {
 		ctx context.Context,
 		query ListVideosQuery,
 	) (uint64, error)
-	DeleteInsertAll(
+	BatchDeleteInsert(
 		ctx context.Context,
 		m model.Videos,
 	) (model.Videos, error)
@@ -35,7 +34,5 @@ type ListVideosQuery struct {
 	PlatformTypes   []string
 	BroadcastStatus []string
 	VideoType       string
-	StartedAt       time.Time
-	EndedAt         time.Time
 	BaseListOptions
 }
