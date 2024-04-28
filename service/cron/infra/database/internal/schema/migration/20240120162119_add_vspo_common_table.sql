@@ -11,6 +11,7 @@ CREATE TABLE creator (
 -- Create a table to store channel information
 CREATE TABLE channel (
     id text PRIMARY KEY,                          -- Unique identifier for the channel
+    platform_id text NOT NULL unique,                    -- Unique identifier for the channel on the platform
     creator_id text NOT NULL,                     -- Identifier for the creator of the channel
     platform_type text NOT NULL,                  -- Name of the platform (e.g. YouTube, Twitch)
     title text NOT NULL,                          -- Title of the channel
@@ -22,7 +23,7 @@ CREATE TABLE channel (
     total_video_count integer NOT NULL,           -- Total number of videos uploaded to the channel
     thumbnail_url text NOT NULL,                  -- URL of the channel's thumbnail image
     is_deleted boolean NOT NULL,                  -- Flag indicating if the channel has been deleted
-    FOREIGN KEY (creator_id) REFERENCES Creator(id)
+    FOREIGN KEY (creator_id) REFERENCES creator(id)
 );
 
 CREATE TABLE video (
@@ -32,15 +33,15 @@ CREATE TABLE video (
     title text NOT NULL,                           -- Title of the video
     description text NOT NULL,                     -- Description of the video
     video_type text NOT NULL,                      -- Type of stream (e.g. vspo_broadcast, freechat, clip)
-    published_at timestamp with time zone NOT NULL,-- The date and time the video was published
-    started_at timestamp with time zone NOT NULL,    -- The date and time the video started
-    ended_at timestamp with time zone NOT NULL,      -- The date and time the video ended
+    published_at timestamp with time zone,  -- The date and time the video was published
+    started_at timestamp with time zone,    -- The date and time the video started
+    ended_at timestamp with time zone,      -- The date and time the video ended
     broadcast_status text NOT NULL,                -- Status of the video (e.g. live, upcoming)
     tags text NOT NULL,                            -- Tags associated with the video
     view_count integer NOT NULL,                   -- Number of views of the video
     thumbnail_url text NOT NULL,                   -- URL of the video's thumbnail image
     is_deleted boolean NOT NULL,                   -- Flag indicating if the video has been deleted
-    FOREIGN KEY (channel_id) REFERENCES Channel(id)
+    FOREIGN KEY (channel_id) REFERENCES channel(platform_id)
 );
 
 -- +goose StatementEnd

@@ -3,6 +3,7 @@ package dependency
 import (
 	"context"
 
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database/repository"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database/transaction"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/environment"
@@ -15,10 +16,16 @@ import (
 type Dependency struct {
 	CreatorInteractor usecase.CreatorInteractor
 	VideosInteractor  usecase.VideoInteractor
-	ChannelInteractor usecase.ChannelInteractor
 }
 
-func (d *Dependency) Inject(ctx context.Context, e *environment.Environment) *Dependency {
+func (d *Dependency) Inject(ctx context.Context, e *environment.Environment) {
+	dbClient := database.NewClientPool(ctx,
+		e.DatabaseEnvironment.DBHost,
+		e.DatabaseEnvironment.DBUser,
+		e.DatabaseEnvironment.DBPassword,
+		e.DatabaseEnvironment.DBDatabase,
+		e.DatabaseEnvironment.DBSSLMode,
+	)
 	creatorRepository := repository.NewCreator()
 	videosRepository := repository.NewVideo()
 	// channelRepository := repository.NewChannel()
@@ -28,7 +35,9 @@ func (d *Dependency) Inject(ctx context.Context, e *environment.Environment) *De
 	creatorInteractor := usecase.NewCreatorInteractor(
 		repository.NewCreator(),
 	)
-	tx := transaction.NewTransactable()
+	tx := transaction.NewTransactable(
+		dbClient,
+	)
 	videoInteractor := usecase.NewVideoInteractor(
 		tx,
 		creatorRepository,
@@ -42,10 +51,6 @@ func (d *Dependency) Inject(ctx context.Context, e *environment.Environment) *De
 	// 	// channelRepository,
 	// 	youtubeClient,
 	// )
-
-	return &Dependency{
-		CreatorInteractor: creatorInteractor,
-		VideosInteractor:  videoInteractor,
-		// ChannelInteractor: channelInteractor,
-	}
+	d.CreatorInteractor = creatorInteractor
+	d.VideosInteractor = videoInteractor
 }

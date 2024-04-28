@@ -3,12 +3,12 @@ package repository
 import (
 	"context"
 
+	"github.com/samber/lo"
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/repository"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database/internal/dto"
 	db_sqlc "github.com/sugar-cat7/vspo-portal/service/cron/infra/database/internal/gen"
-	utime "github.com/sugar-cat7/vspo-portal/service/cron/pkg/time"
 )
 
 type video struct{}
@@ -29,35 +29,29 @@ func (r *video) List(
 		return nil, err
 	}
 	res := model.Videos{}
-	if query.Page.Valid && query.Limit.Valid {
-		// If VideoIDs are specified, search by VideoIDs
-		if len(query.VideoIDs) > 0 {
-			cs, err := c.Queries.GetVideosByIDs(ctx, db_sqlc.GetVideosByIDsParams{
-				Ids:    query.VideoIDs,
-				Limit:  int32(query.Limit.Uint64),
-				Offset: int32(query.Page.Uint64) * int32(query.Limit.Uint64),
-			})
-			if err != nil {
-				return nil, err
-			}
-			res = dto.VideosByIDsRowsToModel(cs)
-			return res, nil
-		}
-		// If PlatformType is specified, search by PlatformType
-		cs, err := c.Queries.GetVideosByParams(ctx, db_sqlc.GetVideosByParamsParams{
-			PlatformTypes:   query.PlatformTypes,
-			VideoType:       query.VideoType,
-			BroadcastStatus: query.BroadcastStatus,
-			StartedAt:       utime.TimeToTimestamptz(query.StartedAt),
-			EndedAt:         utime.TimeToTimestamptz(query.EndedAt),
-			Limit:           int32(query.Limit.Uint64),
-			Offset:          int32(query.Page.Uint64) * int32(query.Limit.Uint64),
+	// If VideoIDs are specified, search by VideoIDs
+	if len(query.VideoIDs) > 0 {
+		cs, err := c.Queries.GetVideosByIDs(ctx, db_sqlc.GetVideosByIDsParams{
+			Ids:    query.VideoIDs,
+			Limit:  int32(query.Limit.Uint64),
+			Offset: int32(query.Page.Uint64) * int32(query.Limit.Uint64),
 		})
 		if err != nil {
 			return nil, err
 		}
-		res = dto.VideosByParamsRowsToModel(cs)
+		res = dto.VideosByIDsRowsToModel(cs)
+		return res, nil
 	}
+	// If PlatformType is specified, search by PlatformType
+	cs, err := c.Queries.GetVideosByParams(ctx, db_sqlc.GetVideosByParamsParams{
+		PlatformTypes:   query.PlatformTypes,
+		VideoType:       query.VideoType,
+		BroadcastStatus: query.BroadcastStatus,
+	})
+	if err != nil {
+		return nil, err
+	}
+	res = dto.VideosByParamsRowsToModel(cs)
 	return res, nil
 }
 
@@ -76,7 +70,7 @@ func (r *video) Count(
 	return uint64(cn), nil
 }
 
-func (r *video) DeleteInsertAll(
+func (r *video) BatchDeleteInsert(
 	ctx context.Context,
 	m model.Videos,
 ) (model.Videos, error) {
@@ -84,16 +78,15 @@ func (r *video) DeleteInsertAll(
 	if err != nil {
 		return nil, err
 	}
+
+	if c.Queries.DeleteVideosByIDs(ctx, lo.Map(m, func(v *model.Video, index int) string {
+		return v.ID
+	})) != nil {
+		return nil, err
+	}
+
 	br := c.Queries.CreateVideo(ctx, dto.VideoModelsToCreateVideoParams(m))
 	defer br.Close()
 
-	var i model.Videos
-	br.QueryRow(func(_ int, ch db_sqlc.Video, err error) {
-		if err != nil {
-			return
-		}
-		i = append(i, dto.VideoToModel(&ch))
-	})
-
-	return i, nil
+	return nil, nil
 }

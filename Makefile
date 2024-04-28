@@ -8,11 +8,11 @@ ogen:
 	go generate service/cron/tool/generate.go
 local:
 	@echo "Setting up local database..."
-	docker-compose -f ./service/cron/compose.local.yml up
+	docker-compose -f ./service/cron/local/compose.local.yml up
 	@echo "Setting up local database...done"
 local-build:
 	@echo "Setting up local database..."
-	docker-compose -f ./service/cron/compose.local.yml up --build
+	docker-compose -f ./service/cron/local/compose.local.yml up --build
 	@echo "Setting up local database...done"
 migrate:
 	@echo "Migrating database..."

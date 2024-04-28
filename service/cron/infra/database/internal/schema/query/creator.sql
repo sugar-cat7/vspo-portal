@@ -13,23 +13,10 @@ SELECT
 FROM
     creator cr
 JOIN
-    channel ch ON cr.id = ch.creatorId
+    channel ch ON cr.id = ch.creator_id
 WHERE
-    cr.member_type = ANY(@member_types::text[])
-LIMIT $1 OFFSET $2;
+    cr.member_type = ANY(@member_types::text[]);
 
-
--- name: GetCreatorsByIDs :many
-SELECT
-    sqlc.embed(cr),
-    sqlc.embed(ch)
-FROM
-    creator cr
-JOIN
-    channel ch ON cr.id = ch.creatorId
-WHERE
-    cr.id = ANY(@ids::text[])
-LIMIT $1 OFFSET $2;
 
 -- name: CountCreator :one
 SELECT COUNT(*)

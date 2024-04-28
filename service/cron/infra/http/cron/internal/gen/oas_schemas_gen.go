@@ -20,87 +20,87 @@ func (s *ApiKeyAuth) SetAPIKey(val string) {
 	s.APIKey = val
 }
 
-type ChannelsPostBadRequest CronResponse
+type CronCreatorsPostBadRequest CronResponse
 
-func (*ChannelsPostBadRequest) channelsPostRes() {}
+func (*CronCreatorsPostBadRequest) cronCreatorsPostRes() {}
 
-type ChannelsPostForbidden CronResponse
+type CronCreatorsPostForbidden CronResponse
 
-func (*ChannelsPostForbidden) channelsPostRes() {}
+func (*CronCreatorsPostForbidden) cronCreatorsPostRes() {}
 
-type ChannelsPostInternalServerError CronResponse
+type CronCreatorsPostInternalServerError CronResponse
 
-func (*ChannelsPostInternalServerError) channelsPostRes() {}
+func (*CronCreatorsPostInternalServerError) cronCreatorsPostRes() {}
 
-type ChannelsPostNotFound CronResponse
+type CronCreatorsPostNotFound CronResponse
 
-func (*ChannelsPostNotFound) channelsPostRes() {}
+func (*CronCreatorsPostNotFound) cronCreatorsPostRes() {}
 
-type ChannelsPostOK CronResponse
+type CronCreatorsPostOK CronResponse
 
-func (*ChannelsPostOK) channelsPostRes() {}
+func (*CronCreatorsPostOK) cronCreatorsPostRes() {}
 
-type ChannelsPostReq struct {
+type CronCreatorsPostReq struct {
 	// Video's platform type.
-	PlatformType OptChannelsPostReqPlatformType `json:"platform_type"`
+	PlatformType OptCronCreatorsPostReqPlatformType `json:"platform_type"`
 	// Period for performing updates.
-	Period OptChannelsPostReqPeriod `json:"period"`
+	Period OptCronCreatorsPostReqPeriod `json:"period"`
 	// Period for performing updates.
-	ChannelType OptChannelsPostReqChannelType `json:"channel_type"`
+	CreatorType OptCronCreatorsPostReqCreatorType `json:"creator_type"`
 }
 
 // GetPlatformType returns the value of PlatformType.
-func (s *ChannelsPostReq) GetPlatformType() OptChannelsPostReqPlatformType {
+func (s *CronCreatorsPostReq) GetPlatformType() OptCronCreatorsPostReqPlatformType {
 	return s.PlatformType
 }
 
 // GetPeriod returns the value of Period.
-func (s *ChannelsPostReq) GetPeriod() OptChannelsPostReqPeriod {
+func (s *CronCreatorsPostReq) GetPeriod() OptCronCreatorsPostReqPeriod {
 	return s.Period
 }
 
-// GetChannelType returns the value of ChannelType.
-func (s *ChannelsPostReq) GetChannelType() OptChannelsPostReqChannelType {
-	return s.ChannelType
+// GetCreatorType returns the value of CreatorType.
+func (s *CronCreatorsPostReq) GetCreatorType() OptCronCreatorsPostReqCreatorType {
+	return s.CreatorType
 }
 
 // SetPlatformType sets the value of PlatformType.
-func (s *ChannelsPostReq) SetPlatformType(val OptChannelsPostReqPlatformType) {
+func (s *CronCreatorsPostReq) SetPlatformType(val OptCronCreatorsPostReqPlatformType) {
 	s.PlatformType = val
 }
 
 // SetPeriod sets the value of Period.
-func (s *ChannelsPostReq) SetPeriod(val OptChannelsPostReqPeriod) {
+func (s *CronCreatorsPostReq) SetPeriod(val OptCronCreatorsPostReqPeriod) {
 	s.Period = val
 }
 
-// SetChannelType sets the value of ChannelType.
-func (s *ChannelsPostReq) SetChannelType(val OptChannelsPostReqChannelType) {
-	s.ChannelType = val
+// SetCreatorType sets the value of CreatorType.
+func (s *CronCreatorsPostReq) SetCreatorType(val OptCronCreatorsPostReqCreatorType) {
+	s.CreatorType = val
 }
 
 // Period for performing updates.
-type ChannelsPostReqChannelType string
+type CronCreatorsPostReqCreatorType string
 
 const (
-	ChannelsPostReqChannelTypeVspo    ChannelsPostReqChannelType = "vspo"
-	ChannelsPostReqChannelTypeGeneral ChannelsPostReqChannelType = "general"
+	CronCreatorsPostReqCreatorTypeVspo    CronCreatorsPostReqCreatorType = "vspo"
+	CronCreatorsPostReqCreatorTypeGeneral CronCreatorsPostReqCreatorType = "general"
 )
 
-// AllValues returns all ChannelsPostReqChannelType values.
-func (ChannelsPostReqChannelType) AllValues() []ChannelsPostReqChannelType {
-	return []ChannelsPostReqChannelType{
-		ChannelsPostReqChannelTypeVspo,
-		ChannelsPostReqChannelTypeGeneral,
+// AllValues returns all CronCreatorsPostReqCreatorType values.
+func (CronCreatorsPostReqCreatorType) AllValues() []CronCreatorsPostReqCreatorType {
+	return []CronCreatorsPostReqCreatorType{
+		CronCreatorsPostReqCreatorTypeVspo,
+		CronCreatorsPostReqCreatorTypeGeneral,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s ChannelsPostReqChannelType) MarshalText() ([]byte, error) {
+func (s CronCreatorsPostReqCreatorType) MarshalText() ([]byte, error) {
 	switch s {
-	case ChannelsPostReqChannelTypeVspo:
+	case CronCreatorsPostReqCreatorTypeVspo:
 		return []byte(s), nil
-	case ChannelsPostReqChannelTypeGeneral:
+	case CronCreatorsPostReqCreatorTypeGeneral:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -108,13 +108,13 @@ func (s ChannelsPostReqChannelType) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ChannelsPostReqChannelType) UnmarshalText(data []byte) error {
-	switch ChannelsPostReqChannelType(data) {
-	case ChannelsPostReqChannelTypeVspo:
-		*s = ChannelsPostReqChannelTypeVspo
+func (s *CronCreatorsPostReqCreatorType) UnmarshalText(data []byte) error {
+	switch CronCreatorsPostReqCreatorType(data) {
+	case CronCreatorsPostReqCreatorTypeVspo:
+		*s = CronCreatorsPostReqCreatorTypeVspo
 		return nil
-	case ChannelsPostReqChannelTypeGeneral:
-		*s = ChannelsPostReqChannelTypeGeneral
+	case CronCreatorsPostReqCreatorTypeGeneral:
+		*s = CronCreatorsPostReqCreatorTypeGeneral
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -122,35 +122,35 @@ func (s *ChannelsPostReqChannelType) UnmarshalText(data []byte) error {
 }
 
 // Period for performing updates.
-type ChannelsPostReqPeriod string
+type CronCreatorsPostReqPeriod string
 
 const (
-	ChannelsPostReqPeriodDay   ChannelsPostReqPeriod = "day"
-	ChannelsPostReqPeriodWeek  ChannelsPostReqPeriod = "week"
-	ChannelsPostReqPeriodMonth ChannelsPostReqPeriod = "month"
-	ChannelsPostReqPeriodYear  ChannelsPostReqPeriod = "year"
+	CronCreatorsPostReqPeriodDay   CronCreatorsPostReqPeriod = "day"
+	CronCreatorsPostReqPeriodWeek  CronCreatorsPostReqPeriod = "week"
+	CronCreatorsPostReqPeriodMonth CronCreatorsPostReqPeriod = "month"
+	CronCreatorsPostReqPeriodYear  CronCreatorsPostReqPeriod = "year"
 )
 
-// AllValues returns all ChannelsPostReqPeriod values.
-func (ChannelsPostReqPeriod) AllValues() []ChannelsPostReqPeriod {
-	return []ChannelsPostReqPeriod{
-		ChannelsPostReqPeriodDay,
-		ChannelsPostReqPeriodWeek,
-		ChannelsPostReqPeriodMonth,
-		ChannelsPostReqPeriodYear,
+// AllValues returns all CronCreatorsPostReqPeriod values.
+func (CronCreatorsPostReqPeriod) AllValues() []CronCreatorsPostReqPeriod {
+	return []CronCreatorsPostReqPeriod{
+		CronCreatorsPostReqPeriodDay,
+		CronCreatorsPostReqPeriodWeek,
+		CronCreatorsPostReqPeriodMonth,
+		CronCreatorsPostReqPeriodYear,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s ChannelsPostReqPeriod) MarshalText() ([]byte, error) {
+func (s CronCreatorsPostReqPeriod) MarshalText() ([]byte, error) {
 	switch s {
-	case ChannelsPostReqPeriodDay:
+	case CronCreatorsPostReqPeriodDay:
 		return []byte(s), nil
-	case ChannelsPostReqPeriodWeek:
+	case CronCreatorsPostReqPeriodWeek:
 		return []byte(s), nil
-	case ChannelsPostReqPeriodMonth:
+	case CronCreatorsPostReqPeriodMonth:
 		return []byte(s), nil
-	case ChannelsPostReqPeriodYear:
+	case CronCreatorsPostReqPeriodYear:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -158,19 +158,19 @@ func (s ChannelsPostReqPeriod) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ChannelsPostReqPeriod) UnmarshalText(data []byte) error {
-	switch ChannelsPostReqPeriod(data) {
-	case ChannelsPostReqPeriodDay:
-		*s = ChannelsPostReqPeriodDay
+func (s *CronCreatorsPostReqPeriod) UnmarshalText(data []byte) error {
+	switch CronCreatorsPostReqPeriod(data) {
+	case CronCreatorsPostReqPeriodDay:
+		*s = CronCreatorsPostReqPeriodDay
 		return nil
-	case ChannelsPostReqPeriodWeek:
-		*s = ChannelsPostReqPeriodWeek
+	case CronCreatorsPostReqPeriodWeek:
+		*s = CronCreatorsPostReqPeriodWeek
 		return nil
-	case ChannelsPostReqPeriodMonth:
-		*s = ChannelsPostReqPeriodMonth
+	case CronCreatorsPostReqPeriodMonth:
+		*s = CronCreatorsPostReqPeriodMonth
 		return nil
-	case ChannelsPostReqPeriodYear:
-		*s = ChannelsPostReqPeriodYear
+	case CronCreatorsPostReqPeriodYear:
+		*s = CronCreatorsPostReqPeriodYear
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -178,35 +178,35 @@ func (s *ChannelsPostReqPeriod) UnmarshalText(data []byte) error {
 }
 
 // Video's platform type.
-type ChannelsPostReqPlatformType string
+type CronCreatorsPostReqPlatformType string
 
 const (
-	ChannelsPostReqPlatformTypeYoutube     ChannelsPostReqPlatformType = "youtube"
-	ChannelsPostReqPlatformTypeTwitch      ChannelsPostReqPlatformType = "twitch"
-	ChannelsPostReqPlatformTypeTwitcasting ChannelsPostReqPlatformType = "twitcasting"
-	ChannelsPostReqPlatformTypeNiconico    ChannelsPostReqPlatformType = "niconico"
+	CronCreatorsPostReqPlatformTypeYoutube     CronCreatorsPostReqPlatformType = "youtube"
+	CronCreatorsPostReqPlatformTypeTwitch      CronCreatorsPostReqPlatformType = "twitch"
+	CronCreatorsPostReqPlatformTypeTwitcasting CronCreatorsPostReqPlatformType = "twitcasting"
+	CronCreatorsPostReqPlatformTypeNiconico    CronCreatorsPostReqPlatformType = "niconico"
 )
 
-// AllValues returns all ChannelsPostReqPlatformType values.
-func (ChannelsPostReqPlatformType) AllValues() []ChannelsPostReqPlatformType {
-	return []ChannelsPostReqPlatformType{
-		ChannelsPostReqPlatformTypeYoutube,
-		ChannelsPostReqPlatformTypeTwitch,
-		ChannelsPostReqPlatformTypeTwitcasting,
-		ChannelsPostReqPlatformTypeNiconico,
+// AllValues returns all CronCreatorsPostReqPlatformType values.
+func (CronCreatorsPostReqPlatformType) AllValues() []CronCreatorsPostReqPlatformType {
+	return []CronCreatorsPostReqPlatformType{
+		CronCreatorsPostReqPlatformTypeYoutube,
+		CronCreatorsPostReqPlatformTypeTwitch,
+		CronCreatorsPostReqPlatformTypeTwitcasting,
+		CronCreatorsPostReqPlatformTypeNiconico,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s ChannelsPostReqPlatformType) MarshalText() ([]byte, error) {
+func (s CronCreatorsPostReqPlatformType) MarshalText() ([]byte, error) {
 	switch s {
-	case ChannelsPostReqPlatformTypeYoutube:
+	case CronCreatorsPostReqPlatformTypeYoutube:
 		return []byte(s), nil
-	case ChannelsPostReqPlatformTypeTwitch:
+	case CronCreatorsPostReqPlatformTypeTwitch:
 		return []byte(s), nil
-	case ChannelsPostReqPlatformTypeTwitcasting:
+	case CronCreatorsPostReqPlatformTypeTwitcasting:
 		return []byte(s), nil
-	case ChannelsPostReqPlatformTypeNiconico:
+	case CronCreatorsPostReqPlatformTypeNiconico:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -214,28 +214,28 @@ func (s ChannelsPostReqPlatformType) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *ChannelsPostReqPlatformType) UnmarshalText(data []byte) error {
-	switch ChannelsPostReqPlatformType(data) {
-	case ChannelsPostReqPlatformTypeYoutube:
-		*s = ChannelsPostReqPlatformTypeYoutube
+func (s *CronCreatorsPostReqPlatformType) UnmarshalText(data []byte) error {
+	switch CronCreatorsPostReqPlatformType(data) {
+	case CronCreatorsPostReqPlatformTypeYoutube:
+		*s = CronCreatorsPostReqPlatformTypeYoutube
 		return nil
-	case ChannelsPostReqPlatformTypeTwitch:
-		*s = ChannelsPostReqPlatformTypeTwitch
+	case CronCreatorsPostReqPlatformTypeTwitch:
+		*s = CronCreatorsPostReqPlatformTypeTwitch
 		return nil
-	case ChannelsPostReqPlatformTypeTwitcasting:
-		*s = ChannelsPostReqPlatformTypeTwitcasting
+	case CronCreatorsPostReqPlatformTypeTwitcasting:
+		*s = CronCreatorsPostReqPlatformTypeTwitcasting
 		return nil
-	case ChannelsPostReqPlatformTypeNiconico:
-		*s = ChannelsPostReqPlatformTypeNiconico
+	case CronCreatorsPostReqPlatformTypeNiconico:
+		*s = CronCreatorsPostReqPlatformTypeNiconico
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
 
-type ChannelsPostUnauthorized CronResponse
+type CronCreatorsPostUnauthorized CronResponse
 
-func (*ChannelsPostUnauthorized) channelsPostRes() {}
+func (*CronCreatorsPostUnauthorized) cronCreatorsPostRes() {}
 
 // Ref: #/components/schemas/CronResponse
 type CronResponse struct {
@@ -252,38 +252,252 @@ func (s *CronResponse) SetMessage(val OptString) {
 	s.Message = val
 }
 
-// NewOptChannelsPostReqChannelType returns new OptChannelsPostReqChannelType with value set to v.
-func NewOptChannelsPostReqChannelType(v ChannelsPostReqChannelType) OptChannelsPostReqChannelType {
-	return OptChannelsPostReqChannelType{
+type CronVideosPostBadRequest CronResponse
+
+func (*CronVideosPostBadRequest) cronVideosPostRes() {}
+
+type CronVideosPostForbidden CronResponse
+
+func (*CronVideosPostForbidden) cronVideosPostRes() {}
+
+type CronVideosPostInternalServerError CronResponse
+
+func (*CronVideosPostInternalServerError) cronVideosPostRes() {}
+
+type CronVideosPostNotFound CronResponse
+
+func (*CronVideosPostNotFound) cronVideosPostRes() {}
+
+type CronVideosPostOK CronResponse
+
+func (*CronVideosPostOK) cronVideosPostRes() {}
+
+type CronVideosPostReq struct {
+	// Video's platform type.
+	PlatformType []CronVideosPostReqPlatformTypeItem `json:"platform_type"`
+	// Period for performing updates.
+	Period    OptCronVideosPostReqPeriod    `json:"period"`
+	VideoType OptCronVideosPostReqVideoType `json:"video_type"`
+}
+
+// GetPlatformType returns the value of PlatformType.
+func (s *CronVideosPostReq) GetPlatformType() []CronVideosPostReqPlatformTypeItem {
+	return s.PlatformType
+}
+
+// GetPeriod returns the value of Period.
+func (s *CronVideosPostReq) GetPeriod() OptCronVideosPostReqPeriod {
+	return s.Period
+}
+
+// GetVideoType returns the value of VideoType.
+func (s *CronVideosPostReq) GetVideoType() OptCronVideosPostReqVideoType {
+	return s.VideoType
+}
+
+// SetPlatformType sets the value of PlatformType.
+func (s *CronVideosPostReq) SetPlatformType(val []CronVideosPostReqPlatformTypeItem) {
+	s.PlatformType = val
+}
+
+// SetPeriod sets the value of Period.
+func (s *CronVideosPostReq) SetPeriod(val OptCronVideosPostReqPeriod) {
+	s.Period = val
+}
+
+// SetVideoType sets the value of VideoType.
+func (s *CronVideosPostReq) SetVideoType(val OptCronVideosPostReqVideoType) {
+	s.VideoType = val
+}
+
+// Period for performing updates.
+type CronVideosPostReqPeriod string
+
+const (
+	CronVideosPostReqPeriodDay   CronVideosPostReqPeriod = "day"
+	CronVideosPostReqPeriodMonth CronVideosPostReqPeriod = "month"
+	CronVideosPostReqPeriodWeek  CronVideosPostReqPeriod = "week"
+)
+
+// AllValues returns all CronVideosPostReqPeriod values.
+func (CronVideosPostReqPeriod) AllValues() []CronVideosPostReqPeriod {
+	return []CronVideosPostReqPeriod{
+		CronVideosPostReqPeriodDay,
+		CronVideosPostReqPeriodMonth,
+		CronVideosPostReqPeriodWeek,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s CronVideosPostReqPeriod) MarshalText() ([]byte, error) {
+	switch s {
+	case CronVideosPostReqPeriodDay:
+		return []byte(s), nil
+	case CronVideosPostReqPeriodMonth:
+		return []byte(s), nil
+	case CronVideosPostReqPeriodWeek:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *CronVideosPostReqPeriod) UnmarshalText(data []byte) error {
+	switch CronVideosPostReqPeriod(data) {
+	case CronVideosPostReqPeriodDay:
+		*s = CronVideosPostReqPeriodDay
+		return nil
+	case CronVideosPostReqPeriodMonth:
+		*s = CronVideosPostReqPeriodMonth
+		return nil
+	case CronVideosPostReqPeriodWeek:
+		*s = CronVideosPostReqPeriodWeek
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type CronVideosPostReqPlatformTypeItem string
+
+const (
+	CronVideosPostReqPlatformTypeItemYoutube     CronVideosPostReqPlatformTypeItem = "youtube"
+	CronVideosPostReqPlatformTypeItemTwitch      CronVideosPostReqPlatformTypeItem = "twitch"
+	CronVideosPostReqPlatformTypeItemTwitcasting CronVideosPostReqPlatformTypeItem = "twitcasting"
+	CronVideosPostReqPlatformTypeItemNiconico    CronVideosPostReqPlatformTypeItem = "niconico"
+)
+
+// AllValues returns all CronVideosPostReqPlatformTypeItem values.
+func (CronVideosPostReqPlatformTypeItem) AllValues() []CronVideosPostReqPlatformTypeItem {
+	return []CronVideosPostReqPlatformTypeItem{
+		CronVideosPostReqPlatformTypeItemYoutube,
+		CronVideosPostReqPlatformTypeItemTwitch,
+		CronVideosPostReqPlatformTypeItemTwitcasting,
+		CronVideosPostReqPlatformTypeItemNiconico,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s CronVideosPostReqPlatformTypeItem) MarshalText() ([]byte, error) {
+	switch s {
+	case CronVideosPostReqPlatformTypeItemYoutube:
+		return []byte(s), nil
+	case CronVideosPostReqPlatformTypeItemTwitch:
+		return []byte(s), nil
+	case CronVideosPostReqPlatformTypeItemTwitcasting:
+		return []byte(s), nil
+	case CronVideosPostReqPlatformTypeItemNiconico:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *CronVideosPostReqPlatformTypeItem) UnmarshalText(data []byte) error {
+	switch CronVideosPostReqPlatformTypeItem(data) {
+	case CronVideosPostReqPlatformTypeItemYoutube:
+		*s = CronVideosPostReqPlatformTypeItemYoutube
+		return nil
+	case CronVideosPostReqPlatformTypeItemTwitch:
+		*s = CronVideosPostReqPlatformTypeItemTwitch
+		return nil
+	case CronVideosPostReqPlatformTypeItemTwitcasting:
+		*s = CronVideosPostReqPlatformTypeItemTwitcasting
+		return nil
+	case CronVideosPostReqPlatformTypeItemNiconico:
+		*s = CronVideosPostReqPlatformTypeItemNiconico
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type CronVideosPostReqVideoType string
+
+const (
+	CronVideosPostReqVideoTypeVspoBroadcast CronVideosPostReqVideoType = "vspo_broadcast"
+	CronVideosPostReqVideoTypeClip          CronVideosPostReqVideoType = "clip"
+	CronVideosPostReqVideoTypeFreechat      CronVideosPostReqVideoType = "freechat"
+)
+
+// AllValues returns all CronVideosPostReqVideoType values.
+func (CronVideosPostReqVideoType) AllValues() []CronVideosPostReqVideoType {
+	return []CronVideosPostReqVideoType{
+		CronVideosPostReqVideoTypeVspoBroadcast,
+		CronVideosPostReqVideoTypeClip,
+		CronVideosPostReqVideoTypeFreechat,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s CronVideosPostReqVideoType) MarshalText() ([]byte, error) {
+	switch s {
+	case CronVideosPostReqVideoTypeVspoBroadcast:
+		return []byte(s), nil
+	case CronVideosPostReqVideoTypeClip:
+		return []byte(s), nil
+	case CronVideosPostReqVideoTypeFreechat:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *CronVideosPostReqVideoType) UnmarshalText(data []byte) error {
+	switch CronVideosPostReqVideoType(data) {
+	case CronVideosPostReqVideoTypeVspoBroadcast:
+		*s = CronVideosPostReqVideoTypeVspoBroadcast
+		return nil
+	case CronVideosPostReqVideoTypeClip:
+		*s = CronVideosPostReqVideoTypeClip
+		return nil
+	case CronVideosPostReqVideoTypeFreechat:
+		*s = CronVideosPostReqVideoTypeFreechat
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type CronVideosPostUnauthorized CronResponse
+
+func (*CronVideosPostUnauthorized) cronVideosPostRes() {}
+
+// NewOptCronCreatorsPostReqCreatorType returns new OptCronCreatorsPostReqCreatorType with value set to v.
+func NewOptCronCreatorsPostReqCreatorType(v CronCreatorsPostReqCreatorType) OptCronCreatorsPostReqCreatorType {
+	return OptCronCreatorsPostReqCreatorType{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptChannelsPostReqChannelType is optional ChannelsPostReqChannelType.
-type OptChannelsPostReqChannelType struct {
-	Value ChannelsPostReqChannelType
+// OptCronCreatorsPostReqCreatorType is optional CronCreatorsPostReqCreatorType.
+type OptCronCreatorsPostReqCreatorType struct {
+	Value CronCreatorsPostReqCreatorType
 	Set   bool
 }
 
-// IsSet returns true if OptChannelsPostReqChannelType was set.
-func (o OptChannelsPostReqChannelType) IsSet() bool { return o.Set }
+// IsSet returns true if OptCronCreatorsPostReqCreatorType was set.
+func (o OptCronCreatorsPostReqCreatorType) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptChannelsPostReqChannelType) Reset() {
-	var v ChannelsPostReqChannelType
+func (o *OptCronCreatorsPostReqCreatorType) Reset() {
+	var v CronCreatorsPostReqCreatorType
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptChannelsPostReqChannelType) SetTo(v ChannelsPostReqChannelType) {
+func (o *OptCronCreatorsPostReqCreatorType) SetTo(v CronCreatorsPostReqCreatorType) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptChannelsPostReqChannelType) Get() (v ChannelsPostReqChannelType, ok bool) {
+func (o OptCronCreatorsPostReqCreatorType) Get() (v CronCreatorsPostReqCreatorType, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -291,45 +505,45 @@ func (o OptChannelsPostReqChannelType) Get() (v ChannelsPostReqChannelType, ok b
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptChannelsPostReqChannelType) Or(d ChannelsPostReqChannelType) ChannelsPostReqChannelType {
+func (o OptCronCreatorsPostReqCreatorType) Or(d CronCreatorsPostReqCreatorType) CronCreatorsPostReqCreatorType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptChannelsPostReqPeriod returns new OptChannelsPostReqPeriod with value set to v.
-func NewOptChannelsPostReqPeriod(v ChannelsPostReqPeriod) OptChannelsPostReqPeriod {
-	return OptChannelsPostReqPeriod{
+// NewOptCronCreatorsPostReqPeriod returns new OptCronCreatorsPostReqPeriod with value set to v.
+func NewOptCronCreatorsPostReqPeriod(v CronCreatorsPostReqPeriod) OptCronCreatorsPostReqPeriod {
+	return OptCronCreatorsPostReqPeriod{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptChannelsPostReqPeriod is optional ChannelsPostReqPeriod.
-type OptChannelsPostReqPeriod struct {
-	Value ChannelsPostReqPeriod
+// OptCronCreatorsPostReqPeriod is optional CronCreatorsPostReqPeriod.
+type OptCronCreatorsPostReqPeriod struct {
+	Value CronCreatorsPostReqPeriod
 	Set   bool
 }
 
-// IsSet returns true if OptChannelsPostReqPeriod was set.
-func (o OptChannelsPostReqPeriod) IsSet() bool { return o.Set }
+// IsSet returns true if OptCronCreatorsPostReqPeriod was set.
+func (o OptCronCreatorsPostReqPeriod) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptChannelsPostReqPeriod) Reset() {
-	var v ChannelsPostReqPeriod
+func (o *OptCronCreatorsPostReqPeriod) Reset() {
+	var v CronCreatorsPostReqPeriod
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptChannelsPostReqPeriod) SetTo(v ChannelsPostReqPeriod) {
+func (o *OptCronCreatorsPostReqPeriod) SetTo(v CronCreatorsPostReqPeriod) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptChannelsPostReqPeriod) Get() (v ChannelsPostReqPeriod, ok bool) {
+func (o OptCronCreatorsPostReqPeriod) Get() (v CronCreatorsPostReqPeriod, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -337,45 +551,45 @@ func (o OptChannelsPostReqPeriod) Get() (v ChannelsPostReqPeriod, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptChannelsPostReqPeriod) Or(d ChannelsPostReqPeriod) ChannelsPostReqPeriod {
+func (o OptCronCreatorsPostReqPeriod) Or(d CronCreatorsPostReqPeriod) CronCreatorsPostReqPeriod {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptChannelsPostReqPlatformType returns new OptChannelsPostReqPlatformType with value set to v.
-func NewOptChannelsPostReqPlatformType(v ChannelsPostReqPlatformType) OptChannelsPostReqPlatformType {
-	return OptChannelsPostReqPlatformType{
+// NewOptCronCreatorsPostReqPlatformType returns new OptCronCreatorsPostReqPlatformType with value set to v.
+func NewOptCronCreatorsPostReqPlatformType(v CronCreatorsPostReqPlatformType) OptCronCreatorsPostReqPlatformType {
+	return OptCronCreatorsPostReqPlatformType{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptChannelsPostReqPlatformType is optional ChannelsPostReqPlatformType.
-type OptChannelsPostReqPlatformType struct {
-	Value ChannelsPostReqPlatformType
+// OptCronCreatorsPostReqPlatformType is optional CronCreatorsPostReqPlatformType.
+type OptCronCreatorsPostReqPlatformType struct {
+	Value CronCreatorsPostReqPlatformType
 	Set   bool
 }
 
-// IsSet returns true if OptChannelsPostReqPlatformType was set.
-func (o OptChannelsPostReqPlatformType) IsSet() bool { return o.Set }
+// IsSet returns true if OptCronCreatorsPostReqPlatformType was set.
+func (o OptCronCreatorsPostReqPlatformType) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptChannelsPostReqPlatformType) Reset() {
-	var v ChannelsPostReqPlatformType
+func (o *OptCronCreatorsPostReqPlatformType) Reset() {
+	var v CronCreatorsPostReqPlatformType
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptChannelsPostReqPlatformType) SetTo(v ChannelsPostReqPlatformType) {
+func (o *OptCronCreatorsPostReqPlatformType) SetTo(v CronCreatorsPostReqPlatformType) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptChannelsPostReqPlatformType) Get() (v ChannelsPostReqPlatformType, ok bool) {
+func (o OptCronCreatorsPostReqPlatformType) Get() (v CronCreatorsPostReqPlatformType, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -383,7 +597,99 @@ func (o OptChannelsPostReqPlatformType) Get() (v ChannelsPostReqPlatformType, ok
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptChannelsPostReqPlatformType) Or(d ChannelsPostReqPlatformType) ChannelsPostReqPlatformType {
+func (o OptCronCreatorsPostReqPlatformType) Or(d CronCreatorsPostReqPlatformType) CronCreatorsPostReqPlatformType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptCronVideosPostReqPeriod returns new OptCronVideosPostReqPeriod with value set to v.
+func NewOptCronVideosPostReqPeriod(v CronVideosPostReqPeriod) OptCronVideosPostReqPeriod {
+	return OptCronVideosPostReqPeriod{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCronVideosPostReqPeriod is optional CronVideosPostReqPeriod.
+type OptCronVideosPostReqPeriod struct {
+	Value CronVideosPostReqPeriod
+	Set   bool
+}
+
+// IsSet returns true if OptCronVideosPostReqPeriod was set.
+func (o OptCronVideosPostReqPeriod) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCronVideosPostReqPeriod) Reset() {
+	var v CronVideosPostReqPeriod
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCronVideosPostReqPeriod) SetTo(v CronVideosPostReqPeriod) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCronVideosPostReqPeriod) Get() (v CronVideosPostReqPeriod, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCronVideosPostReqPeriod) Or(d CronVideosPostReqPeriod) CronVideosPostReqPeriod {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptCronVideosPostReqVideoType returns new OptCronVideosPostReqVideoType with value set to v.
+func NewOptCronVideosPostReqVideoType(v CronVideosPostReqVideoType) OptCronVideosPostReqVideoType {
+	return OptCronVideosPostReqVideoType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCronVideosPostReqVideoType is optional CronVideosPostReqVideoType.
+type OptCronVideosPostReqVideoType struct {
+	Value CronVideosPostReqVideoType
+	Set   bool
+}
+
+// IsSet returns true if OptCronVideosPostReqVideoType was set.
+func (o OptCronVideosPostReqVideoType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCronVideosPostReqVideoType) Reset() {
+	var v CronVideosPostReqVideoType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCronVideosPostReqVideoType) SetTo(v CronVideosPostReqVideoType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCronVideosPostReqVideoType) Get() (v CronVideosPostReqVideoType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCronVideosPostReqVideoType) Or(d CronVideosPostReqVideoType) CronVideosPostReqVideoType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -435,312 +741,6 @@ func (o OptString) Or(d string) string {
 	}
 	return d
 }
-
-// NewOptVideosPostReqPeriod returns new OptVideosPostReqPeriod with value set to v.
-func NewOptVideosPostReqPeriod(v VideosPostReqPeriod) OptVideosPostReqPeriod {
-	return OptVideosPostReqPeriod{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptVideosPostReqPeriod is optional VideosPostReqPeriod.
-type OptVideosPostReqPeriod struct {
-	Value VideosPostReqPeriod
-	Set   bool
-}
-
-// IsSet returns true if OptVideosPostReqPeriod was set.
-func (o OptVideosPostReqPeriod) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptVideosPostReqPeriod) Reset() {
-	var v VideosPostReqPeriod
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptVideosPostReqPeriod) SetTo(v VideosPostReqPeriod) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptVideosPostReqPeriod) Get() (v VideosPostReqPeriod, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptVideosPostReqPeriod) Or(d VideosPostReqPeriod) VideosPostReqPeriod {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptVideosPostReqVideoType returns new OptVideosPostReqVideoType with value set to v.
-func NewOptVideosPostReqVideoType(v VideosPostReqVideoType) OptVideosPostReqVideoType {
-	return OptVideosPostReqVideoType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptVideosPostReqVideoType is optional VideosPostReqVideoType.
-type OptVideosPostReqVideoType struct {
-	Value VideosPostReqVideoType
-	Set   bool
-}
-
-// IsSet returns true if OptVideosPostReqVideoType was set.
-func (o OptVideosPostReqVideoType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptVideosPostReqVideoType) Reset() {
-	var v VideosPostReqVideoType
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptVideosPostReqVideoType) SetTo(v VideosPostReqVideoType) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptVideosPostReqVideoType) Get() (v VideosPostReqVideoType, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptVideosPostReqVideoType) Or(d VideosPostReqVideoType) VideosPostReqVideoType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-type VideosPostBadRequest CronResponse
-
-func (*VideosPostBadRequest) videosPostRes() {}
-
-type VideosPostForbidden CronResponse
-
-func (*VideosPostForbidden) videosPostRes() {}
-
-type VideosPostInternalServerError CronResponse
-
-func (*VideosPostInternalServerError) videosPostRes() {}
-
-type VideosPostNotFound CronResponse
-
-func (*VideosPostNotFound) videosPostRes() {}
-
-type VideosPostOK CronResponse
-
-func (*VideosPostOK) videosPostRes() {}
-
-type VideosPostReq struct {
-	// Video's platform type.
-	PlatformType []VideosPostReqPlatformTypeItem `json:"platform_type"`
-	// Period for performing updates.
-	Period    OptVideosPostReqPeriod    `json:"period"`
-	VideoType OptVideosPostReqVideoType `json:"video_type"`
-}
-
-// GetPlatformType returns the value of PlatformType.
-func (s *VideosPostReq) GetPlatformType() []VideosPostReqPlatformTypeItem {
-	return s.PlatformType
-}
-
-// GetPeriod returns the value of Period.
-func (s *VideosPostReq) GetPeriod() OptVideosPostReqPeriod {
-	return s.Period
-}
-
-// GetVideoType returns the value of VideoType.
-func (s *VideosPostReq) GetVideoType() OptVideosPostReqVideoType {
-	return s.VideoType
-}
-
-// SetPlatformType sets the value of PlatformType.
-func (s *VideosPostReq) SetPlatformType(val []VideosPostReqPlatformTypeItem) {
-	s.PlatformType = val
-}
-
-// SetPeriod sets the value of Period.
-func (s *VideosPostReq) SetPeriod(val OptVideosPostReqPeriod) {
-	s.Period = val
-}
-
-// SetVideoType sets the value of VideoType.
-func (s *VideosPostReq) SetVideoType(val OptVideosPostReqVideoType) {
-	s.VideoType = val
-}
-
-// Period for performing updates.
-type VideosPostReqPeriod string
-
-const (
-	VideosPostReqPeriodDay   VideosPostReqPeriod = "day"
-	VideosPostReqPeriodMonth VideosPostReqPeriod = "month"
-	VideosPostReqPeriodWeek  VideosPostReqPeriod = "week"
-)
-
-// AllValues returns all VideosPostReqPeriod values.
-func (VideosPostReqPeriod) AllValues() []VideosPostReqPeriod {
-	return []VideosPostReqPeriod{
-		VideosPostReqPeriodDay,
-		VideosPostReqPeriodMonth,
-		VideosPostReqPeriodWeek,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s VideosPostReqPeriod) MarshalText() ([]byte, error) {
-	switch s {
-	case VideosPostReqPeriodDay:
-		return []byte(s), nil
-	case VideosPostReqPeriodMonth:
-		return []byte(s), nil
-	case VideosPostReqPeriodWeek:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *VideosPostReqPeriod) UnmarshalText(data []byte) error {
-	switch VideosPostReqPeriod(data) {
-	case VideosPostReqPeriodDay:
-		*s = VideosPostReqPeriodDay
-		return nil
-	case VideosPostReqPeriodMonth:
-		*s = VideosPostReqPeriodMonth
-		return nil
-	case VideosPostReqPeriodWeek:
-		*s = VideosPostReqPeriodWeek
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-type VideosPostReqPlatformTypeItem string
-
-const (
-	VideosPostReqPlatformTypeItemYoutube     VideosPostReqPlatformTypeItem = "youtube"
-	VideosPostReqPlatformTypeItemTwitch      VideosPostReqPlatformTypeItem = "twitch"
-	VideosPostReqPlatformTypeItemTwitcasting VideosPostReqPlatformTypeItem = "twitcasting"
-	VideosPostReqPlatformTypeItemNiconico    VideosPostReqPlatformTypeItem = "niconico"
-)
-
-// AllValues returns all VideosPostReqPlatformTypeItem values.
-func (VideosPostReqPlatformTypeItem) AllValues() []VideosPostReqPlatformTypeItem {
-	return []VideosPostReqPlatformTypeItem{
-		VideosPostReqPlatformTypeItemYoutube,
-		VideosPostReqPlatformTypeItemTwitch,
-		VideosPostReqPlatformTypeItemTwitcasting,
-		VideosPostReqPlatformTypeItemNiconico,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s VideosPostReqPlatformTypeItem) MarshalText() ([]byte, error) {
-	switch s {
-	case VideosPostReqPlatformTypeItemYoutube:
-		return []byte(s), nil
-	case VideosPostReqPlatformTypeItemTwitch:
-		return []byte(s), nil
-	case VideosPostReqPlatformTypeItemTwitcasting:
-		return []byte(s), nil
-	case VideosPostReqPlatformTypeItemNiconico:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *VideosPostReqPlatformTypeItem) UnmarshalText(data []byte) error {
-	switch VideosPostReqPlatformTypeItem(data) {
-	case VideosPostReqPlatformTypeItemYoutube:
-		*s = VideosPostReqPlatformTypeItemYoutube
-		return nil
-	case VideosPostReqPlatformTypeItemTwitch:
-		*s = VideosPostReqPlatformTypeItemTwitch
-		return nil
-	case VideosPostReqPlatformTypeItemTwitcasting:
-		*s = VideosPostReqPlatformTypeItemTwitcasting
-		return nil
-	case VideosPostReqPlatformTypeItemNiconico:
-		*s = VideosPostReqPlatformTypeItemNiconico
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-type VideosPostReqVideoType string
-
-const (
-	VideosPostReqVideoTypeVspoBroadcast VideosPostReqVideoType = "vspo_broadcast"
-	VideosPostReqVideoTypeClip          VideosPostReqVideoType = "clip"
-	VideosPostReqVideoTypeFreechat      VideosPostReqVideoType = "freechat"
-)
-
-// AllValues returns all VideosPostReqVideoType values.
-func (VideosPostReqVideoType) AllValues() []VideosPostReqVideoType {
-	return []VideosPostReqVideoType{
-		VideosPostReqVideoTypeVspoBroadcast,
-		VideosPostReqVideoTypeClip,
-		VideosPostReqVideoTypeFreechat,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s VideosPostReqVideoType) MarshalText() ([]byte, error) {
-	switch s {
-	case VideosPostReqVideoTypeVspoBroadcast:
-		return []byte(s), nil
-	case VideosPostReqVideoTypeClip:
-		return []byte(s), nil
-	case VideosPostReqVideoTypeFreechat:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *VideosPostReqVideoType) UnmarshalText(data []byte) error {
-	switch VideosPostReqVideoType(data) {
-	case VideosPostReqVideoTypeVspoBroadcast:
-		*s = VideosPostReqVideoTypeVspoBroadcast
-		return nil
-	case VideosPostReqVideoTypeClip:
-		*s = VideosPostReqVideoTypeClip
-		return nil
-	case VideosPostReqVideoTypeFreechat:
-		*s = VideosPostReqVideoTypeFreechat
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
-}
-
-type VideosPostUnauthorized CronResponse
-
-func (*VideosPostUnauthorized) videosPostRes() {}
 
 type YoutubeApiKey struct {
 	APIKey string

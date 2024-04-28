@@ -12,20 +12,29 @@ type Video struct {
 	ID           string
 	Title        string
 	Description  string
-	PublishedAt  time.Time
-	StartedAt    time.Time
-	EndedAt      time.Time
+	PublishedAt  *time.Time
+	StartedAt    *time.Time
+	EndedAt      *time.Time
 	Platform     Platform
 	Status       Status
 	Tags         []string
 	ViewCount    uint64
 	ThumbnailURL ThumbnailURL
+	VideoType    VideoType
 	IsDeleted    bool
 	CreatorInfo  CreatorInfo
 }
 
 // Videos is a slice of pointers to Video.
 type Videos []*Video
+
+// SetVideoType sets the video type of all videos in the slice.
+func (vs Videos) SetVideoType(t VideoType) Videos {
+	for _, v := range vs {
+		v.VideoType = t
+	}
+	return vs
+}
 
 // CreatorInfo represents the information about the creator of a video.
 type CreatorInfo struct {

@@ -39,5 +39,5 @@ func TimestamptzToTime(t pgtype.Timestamptz) time.Time {
 
 // TimeToTimestamptz converts time.Time to pgtype.Timestamptz.
 func TimeToTimestamptz(t time.Time) pgtype.Timestamptz {
-	return pgtype.Timestamptz{Time: t}
+	return pgtype.Timestamptz{Time: t, Valid: true}
 }

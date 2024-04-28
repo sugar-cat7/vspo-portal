@@ -22,18 +22,18 @@ import (
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
-	// ChannelsPost invokes POST /channels operation.
+	// CronCreatorsPost invokes POST /cron/creators operation.
 	//
-	// Creates channels by fetching from Youtube using provided Channel IDs.
+	// Creates creators by fetching from Youtube using provided Channel IDs.
 	//
-	// POST /channels
-	ChannelsPost(ctx context.Context, request *ChannelsPostReq) (ChannelsPostRes, error)
-	// VideosPost invokes POST /videos operation.
+	// POST /cron/creators
+	CronCreatorsPost(ctx context.Context, request *CronCreatorsPostReq) (CronCreatorsPostRes, error)
+	// CronVideosPost invokes POST /cron/videos operation.
 	//
-	// Update videos related to a specific channel based on provided cronType.
+	// Update videos related to a specific creator based on provided cronType.
 	//
-	// POST /videos
-	VideosPost(ctx context.Context, request *VideosPostReq) (VideosPostRes, error)
+	// POST /cron/videos
+	CronVideosPost(ctx context.Context, request *CronVideosPostReq) (CronVideosPostRes, error)
 }
 
 // Client implements OAS client.
@@ -86,20 +86,20 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 	return u
 }
 
-// ChannelsPost invokes POST /channels operation.
+// CronCreatorsPost invokes POST /cron/creators operation.
 //
-// Creates channels by fetching from Youtube using provided Channel IDs.
+// Creates creators by fetching from Youtube using provided Channel IDs.
 //
-// POST /channels
-func (c *Client) ChannelsPost(ctx context.Context, request *ChannelsPostReq) (ChannelsPostRes, error) {
-	res, err := c.sendChannelsPost(ctx, request)
+// POST /cron/creators
+func (c *Client) CronCreatorsPost(ctx context.Context, request *CronCreatorsPostReq) (CronCreatorsPostRes, error) {
+	res, err := c.sendCronCreatorsPost(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq) (res ChannelsPostRes, err error) {
+func (c *Client) sendCronCreatorsPost(ctx context.Context, request *CronCreatorsPostReq) (res CronCreatorsPostRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/channels"),
+		semconv.HTTPRouteKey.String("/cron/creators"),
 	}
 
 	// Run stopwatch.
@@ -114,7 +114,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ChannelsPost",
+	ctx, span := c.cfg.Tracer.Start(ctx, "CronCreatorsPost",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -132,7 +132,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/channels"
+	pathParts[0] = "/cron/creators"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
@@ -140,7 +140,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeChannelsPostRequest(request, r); err != nil {
+	if err := encodeCronCreatorsPostRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -149,7 +149,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 		var satisfied bitset
 		{
 			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "ChannelsPost", r); {
+			switch err := c.securityApiKeyAuth(ctx, "CronCreatorsPost", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -160,7 +160,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 		}
 		{
 			stage = "Security:YoutubeApiKey"
-			switch err := c.securityYoutubeApiKey(ctx, "ChannelsPost", r); {
+			switch err := c.securityYoutubeApiKey(ctx, "CronCreatorsPost", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 1
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -197,7 +197,7 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeChannelsPostResponse(resp)
+	result, err := decodeCronCreatorsPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -205,20 +205,20 @@ func (c *Client) sendChannelsPost(ctx context.Context, request *ChannelsPostReq)
 	return result, nil
 }
 
-// VideosPost invokes POST /videos operation.
+// CronVideosPost invokes POST /cron/videos operation.
 //
-// Update videos related to a specific channel based on provided cronType.
+// Update videos related to a specific creator based on provided cronType.
 //
-// POST /videos
-func (c *Client) VideosPost(ctx context.Context, request *VideosPostReq) (VideosPostRes, error) {
-	res, err := c.sendVideosPost(ctx, request)
+// POST /cron/videos
+func (c *Client) CronVideosPost(ctx context.Context, request *CronVideosPostReq) (CronVideosPostRes, error) {
+	res, err := c.sendCronVideosPost(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendVideosPost(ctx context.Context, request *VideosPostReq) (res VideosPostRes, err error) {
+func (c *Client) sendCronVideosPost(ctx context.Context, request *CronVideosPostReq) (res CronVideosPostRes, err error) {
 	otelAttrs := []attribute.KeyValue{
 		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/videos"),
+		semconv.HTTPRouteKey.String("/cron/videos"),
 	}
 
 	// Run stopwatch.
@@ -233,7 +233,7 @@ func (c *Client) sendVideosPost(ctx context.Context, request *VideosPostReq) (re
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "VideosPost",
+	ctx, span := c.cfg.Tracer.Start(ctx, "CronVideosPost",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -251,7 +251,7 @@ func (c *Client) sendVideosPost(ctx context.Context, request *VideosPostReq) (re
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/videos"
+	pathParts[0] = "/cron/videos"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
@@ -259,7 +259,7 @@ func (c *Client) sendVideosPost(ctx context.Context, request *VideosPostReq) (re
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeVideosPostRequest(request, r); err != nil {
+	if err := encodeCronVideosPostRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -268,7 +268,7 @@ func (c *Client) sendVideosPost(ctx context.Context, request *VideosPostReq) (re
 		var satisfied bitset
 		{
 			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "VideosPost", r); {
+			switch err := c.securityApiKeyAuth(ctx, "CronVideosPost", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -279,7 +279,7 @@ func (c *Client) sendVideosPost(ctx context.Context, request *VideosPostReq) (re
 		}
 		{
 			stage = "Security:YoutubeApiKey"
-			switch err := c.securityYoutubeApiKey(ctx, "VideosPost", r); {
+			switch err := c.securityYoutubeApiKey(ctx, "CronVideosPost", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 1
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -316,7 +316,7 @@ func (c *Client) sendVideosPost(ctx context.Context, request *VideosPostReq) (re
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeVideosPostResponse(resp)
+	result, err := decodeCronVideosPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

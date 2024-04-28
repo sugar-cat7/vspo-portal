@@ -18,21 +18,22 @@ services:
   vspo-cron-go:
     container_name: vspo-cron-go
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile.cron
     volumes:
-      - .:/project/
+      - ../:/project/
     working_dir: /project
     ports:
       - 8080:8080
+    env_file:
+      - ../.env.local
   vspo-db-migration:
-    container_name: vspo--db-migration
+    container_name: vspo-db-migration
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfile.migration
     volumes:
-      - ./infra/database/internal/schema/migration:/migrations
-      - .:/project
+      - ./db/migrations:/migrations
     command: ["goose", "-dir", "/migrations", "postgres", "host=vspo-db user=user dbname=vspo password=password sslmode=disable", "up"]
     depends_on:
       vspo-db:

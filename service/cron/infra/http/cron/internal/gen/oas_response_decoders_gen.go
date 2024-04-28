@@ -14,7 +14,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ error) {
+func decodeCronCreatorsPostResponse(resp *http.Response) (res CronCreatorsPostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -30,7 +30,7 @@ func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsPostOK
+			var response CronCreatorsPostOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -65,7 +65,7 @@ func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsPostBadRequest
+			var response CronCreatorsPostBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -100,7 +100,7 @@ func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsPostUnauthorized
+			var response CronCreatorsPostUnauthorized
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -135,7 +135,7 @@ func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsPostForbidden
+			var response CronCreatorsPostForbidden
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -170,7 +170,7 @@ func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsPostNotFound
+			var response CronCreatorsPostNotFound
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -205,7 +205,7 @@ func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ChannelsPostInternalServerError
+			var response CronCreatorsPostInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -230,7 +230,7 @@ func decodeChannelsPostResponse(resp *http.Response) (res ChannelsPostRes, _ err
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeVideosPostResponse(resp *http.Response) (res VideosPostRes, _ error) {
+func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -246,7 +246,7 @@ func decodeVideosPostResponse(resp *http.Response) (res VideosPostRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response VideosPostOK
+			var response CronVideosPostOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -281,7 +281,7 @@ func decodeVideosPostResponse(resp *http.Response) (res VideosPostRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response VideosPostBadRequest
+			var response CronVideosPostBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -316,7 +316,7 @@ func decodeVideosPostResponse(resp *http.Response) (res VideosPostRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response VideosPostUnauthorized
+			var response CronVideosPostUnauthorized
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -351,7 +351,7 @@ func decodeVideosPostResponse(resp *http.Response) (res VideosPostRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response VideosPostForbidden
+			var response CronVideosPostForbidden
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -386,7 +386,7 @@ func decodeVideosPostResponse(resp *http.Response) (res VideosPostRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response VideosPostNotFound
+			var response CronVideosPostNotFound
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -421,7 +421,7 @@ func decodeVideosPostResponse(resp *http.Response) (res VideosPostRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response VideosPostInternalServerError
+			var response CronVideosPostInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

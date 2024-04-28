@@ -49,8 +49,7 @@ func (y *youtubeServiceImpl) GetVideos(ctx context.Context, param domain_youtube
 
 // Search returns a list of videos by their search query.
 func (y *youtubeServiceImpl) SearchVideos(ctx context.Context, param domain_youtube.SearchVideosParam) (model.Videos, error) {
-	call := y.service.Search.List([]string{"snippet", "liveStreamingDetails"}).Q(param.SearchQuery.String()).Type("video").MaxResults(50).EventType(param.EventType.String())
-
+	call := y.service.Search.List([]string{"snippet"}).Q(param.SearchQuery.String()).Type("video").MaxResults(50).EventType(param.EventType.String())
 	response, err := call.Do()
 	if err != nil {
 		return nil, fmt.Errorf("error making Search.List call: %v", err)

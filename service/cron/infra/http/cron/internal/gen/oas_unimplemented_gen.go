@@ -13,20 +13,20 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
-// ChannelsPost implements POST /channels operation.
+// CronCreatorsPost implements POST /cron/creators operation.
 //
-// Creates channels by fetching from Youtube using provided Channel IDs.
+// Creates creators by fetching from Youtube using provided Channel IDs.
 //
-// POST /channels
-func (UnimplementedHandler) ChannelsPost(ctx context.Context, req *ChannelsPostReq) (r ChannelsPostRes, _ error) {
+// POST /cron/creators
+func (UnimplementedHandler) CronCreatorsPost(ctx context.Context, req *CronCreatorsPostReq) (r CronCreatorsPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// VideosPost implements POST /videos operation.
+// CronVideosPost implements POST /cron/videos operation.
 //
-// Update videos related to a specific channel based on provided cronType.
+// Update videos related to a specific creator based on provided cronType.
 //
-// POST /videos
-func (UnimplementedHandler) VideosPost(ctx context.Context, req *VideosPostReq) (r VideosPostRes, _ error) {
+// POST /cron/videos
+func (UnimplementedHandler) CronVideosPost(ctx context.Context, req *CronVideosPostReq) (r CronVideosPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

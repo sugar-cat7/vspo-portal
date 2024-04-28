@@ -54,7 +54,6 @@ func (i *videoInteractor) BatchDeleteInsert(
 	// if err != nil {
 	// 	return nil, err
 	// }
-
 	platformTypes, err := model.NewPlatforms(param.PlatformTypes)
 	if err != nil {
 		return err
@@ -80,7 +79,7 @@ func (i *videoInteractor) BatchDeleteInsert(
 				videoType,
 			)
 			// DeleteInsert Videos All
-			_, err = i.videoRepository.DeleteInsertAll(
+			_, err = i.videoRepository.BatchDeleteInsert(
 				ctx,
 				uvs,
 			)
@@ -101,29 +100,78 @@ func (i *videoInteractor) ytVideos(
 	cs model.Creators,
 	vt model.VideoType,
 ) (model.Videos, error) {
-	// Retrieve new videos via youtube api
-	liveYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
-		SearchQuery: youtube.SearchQueryVspoJp,
-		EventType:   youtube.EventTypeLive,
-	})
+	var vs model.Videos
+	var freeChats model.Videos
+	switch vt {
+	case model.VideoTypeAll, model.VideoTypeVspoBroadcast:
+		// Retrieve new videos via youtube api
+		liveYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
+			SearchQuery: youtube.SearchQueryVspoJp,
+			EventType:   youtube.EventTypeLive,
+		})
+		if err != nil {
+			return nil, err
+		}
 
-	if err != nil {
-		return nil, err
+		upcomingYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
+			SearchQuery: youtube.SearchQueryVspoJp,
+			EventType:   youtube.EventTypeUpcoming,
+		})
+
+		if err != nil {
+			return nil, err
+		}
+		vs = append(liveYoutubeVideos, upcomingYoutubeVideos...)
+		err = i.transactable.RWTx(
+			ctx,
+			func(ctx context.Context) error {
+				existVideos, err := i.videoRepository.List(
+					ctx,
+					repository.ListVideosQuery{
+						PlatformTypes:   []string{model.PlatformYouTube.String()},
+						BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String()},
+						VideoType:       model.VideoTypeVspoBroadcast.String(),
+					},
+				)
+				if err != nil {
+					return err
+				}
+				vs = append(vs, existVideos...)
+
+				freeChats, err = i.videoRepository.List(
+					ctx,
+					repository.ListVideosQuery{
+						PlatformTypes:   []string{model.PlatformYouTube.String()},
+						BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String()},
+						VideoType:       model.VideoTypeFreechat.String(),
+					},
+				)
+				if err != nil {
+					return err
+				}
+				return nil
+			},
+		)
+		if err != nil {
+			return nil, err
+		}
+	case model.VideoTypeClip:
+		// TODO: Implement
 	}
 
-	upcomingYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
-		SearchQuery: youtube.SearchQueryVspoJp,
-		EventType:   youtube.EventTypeUpcoming,
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	vs := append(liveYoutubeVideos, upcomingYoutubeVideos...)
 	m := mapset.NewSet[string]()
-
+	// Non freechat videos
 	for _, v := range vs {
+		flag := false
+		for _, f := range freeChats {
+			if v.ID == f.ID {
+				flag = true
+				break
+			}
+		}
+		if flag {
+			continue
+		}
 		m.Add(v.ID)
 	}
 
@@ -140,6 +188,14 @@ func (i *videoInteractor) ytVideos(
 
 	if vt == model.VideoTypeVspoBroadcast || vt == model.VideoTypeFreechat {
 		ytVideos = ytVideos.FilterCreator(cs)
+	}
+
+	switch vt {
+	case model.VideoTypeAll, model.VideoTypeVspoBroadcast:
+		// All new videos are VspoBroadcast
+		ytVideos.SetVideoType(model.VideoTypeVspoBroadcast)
+	case model.VideoTypeClip:
+		ytVideos.SetVideoType(model.VideoTypeClip)
 	}
 	return ytVideos, nil
 }

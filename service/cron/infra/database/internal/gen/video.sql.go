@@ -7,8 +7,6 @@ package db_sqlc
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countVideo = `-- name: CountVideo :one
@@ -30,8 +28,8 @@ WHERE id = ANY($1::text[])
 RETURNING id, channel_id, platform_type, title, description, video_type, published_at, started_at, ended_at, broadcast_status, tags, view_count, thumbnail_url, is_deleted
 `
 
-func (q *Queries) DeleteVideosByIDs(ctx context.Context, dollar_1 []string) error {
-	_, err := q.db.Exec(ctx, deleteVideosByIDs, dollar_1)
+func (q *Queries) DeleteVideosByIDs(ctx context.Context, ids []string) error {
+	_, err := q.db.Exec(ctx, deleteVideosByIDs, ids)
 	return err
 }
 
@@ -96,20 +94,13 @@ SELECT
 FROM
     video v
 WHERE
-    platform_type = ANY($6::text[])
-    AND broadcast_status = ANY($7::text[])
+    platform_type = ANY($2::text[])
+    AND broadcast_status = ANY($3::text[])
     AND video_type = $1
-    AND started_at >= $2
-    AND ended_at <= $3
-LIMIT $4 OFFSET $5
 `
 
 type GetVideosByParamsParams struct {
 	VideoType       string
-	StartedAt       pgtype.Timestamptz
-	EndedAt         pgtype.Timestamptz
-	Limit           int32
-	Offset          int32
 	PlatformTypes   []string
 	BroadcastStatus []string
 }
@@ -119,15 +110,7 @@ type GetVideosByParamsRow struct {
 }
 
 func (q *Queries) GetVideosByParams(ctx context.Context, arg GetVideosByParamsParams) ([]GetVideosByParamsRow, error) {
-	rows, err := q.db.Query(ctx, getVideosByParams,
-		arg.VideoType,
-		arg.StartedAt,
-		arg.EndedAt,
-		arg.Limit,
-		arg.Offset,
-		arg.PlatformTypes,
-		arg.BroadcastStatus,
-	)
+	rows, err := q.db.Query(ctx, getVideosByParams, arg.VideoType, arg.PlatformTypes, arg.BroadcastStatus)
 	if err != nil {
 		return nil, err
 	}

@@ -7,7 +7,6 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/repository"
 	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/input"
 	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/output"
-	"github.com/volatiletech/null/v8"
 )
 
 type creatorInteractor struct {
@@ -27,12 +26,7 @@ func (i *creatorInteractor) List(
 	ctx context.Context,
 	param *input.ListCreators,
 ) (*output.ListCreators, error) {
-	query := repository.ListCreatorsQuery{
-		BaseListOptions: repository.BaseListOptions{
-			Page:  null.Uint64From(param.Page),
-			Limit: null.Uint64From(param.Limit),
-		},
-	}
+	query := repository.ListCreatorsQuery{}
 	creators, err := i.creatorRepository.List(
 		ctx,
 		query,
