@@ -5,7 +5,9 @@ on:
       - main
     paths:
       - 'deployment/blue/**'
+      - 'deployment/modules/**'
   workflow_dispatch:
+
 defaults:
   run:
     shell: bash
@@ -20,6 +22,14 @@ jobs:
     name: "CI"
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        directory:
+          - deployment/blue
+          - deployment/modules/artifact_registry
+          - deployment/modules/cloud_run
+          - deployment/modules/iam
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
@@ -29,16 +39,16 @@ jobs:
         with:
           terraform_version: 1.8.2
           terraform_wrapper: false
-          cli_config_credentials_token: "${{secrets.TF_CLOUD_CREDENTIALS_TOKEN}}"
+          cli_config_credentials_token: "${{ secrets.TF_CLOUD_CREDENTIALS_TOKEN }}"
 
       - name: "Terraform Init"
         id: init
-        working-directory: ./deployment/blue
+        working-directory: ${{ matrix.directory }}
         run: terraform init
 
       - name: "Run fmt"
         id: fmt
-        working-directory: ./deployment/blue
+        working-directory: ${{ matrix.directory }}
         run: terraform fmt -check -recursive
 
       - name: "Setup TFLint"
@@ -48,16 +58,17 @@ jobs:
 
       - name: "Run TFLint"
         id: tflint
-        working-directory: ./deployment/blue
+        working-directory: ${{ matrix.directory }}
         run: tflint -f compact
 
-      - name: Run Validate
+      - name: "Run Validate"
         id: validate
+        working-directory: ${{ matrix.directory }}
         run: terraform validate -no-color
 
       - name: "Terraform Plan"
         id: plan
-        working-directory: ./deployment/blue
+        working-directory: deployment/blue
         run: terraform plan
         continue-on-error: true
 
@@ -68,12 +79,12 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const output = `#### Check Terraform files (Blue)
+            const output = `#### Terraform Checks for Module: \`${{ matrix.directory }}\`
             #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
             #### Terraform Validation 🧪\`${{ steps.validate.outcome }}\`
             #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
             #### TFLint 👓\`${{ steps.tflint.outcome }}\`
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+            #### Terraform Plan (only for main deployment) 📖\`${{ steps.plan.outcome }}\` if ('${{ matrix.directory }}' == 'deployment/blue')
 
             </details>
 

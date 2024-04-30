@@ -32,3 +32,10 @@ ddl:
 	@echo "Creating new migration..."
 	docker run --rm -v ${PWD}/${DIR}:/migrations $(MIGRATION_IMAGE_NAME) goose -dir=/migrations create $(name) sql
 	@echo "Creating new migration done."
+
+tf:
+	@echo "Terraform init..."
+	cd ./deployment/blue
+	terraform fmt ./**/**
+	tflint -f compact
+	@echo "Terraform init...done"
