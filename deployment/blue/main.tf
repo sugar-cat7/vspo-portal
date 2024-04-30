@@ -21,9 +21,18 @@ provider "google" {
   region      = "asia-northeast1"
 }
 
-module "artifact_registry" {
-  source   = "../modules/artifact_registry"
-  location = "asia-northeast1"
+locals {
   env      = "blue"
+  location = "asia-northeast1"
 }
 
+module "artifact_registry" {
+  source   = "../modules/artifact_registry"
+  location = local.location
+  env      = local.env
+}
+
+module "iam" {
+  source = "../modules/iam"
+  env    = local.env
+}
