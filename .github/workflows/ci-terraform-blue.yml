@@ -46,11 +46,6 @@ jobs:
         working-directory: deployment/blue
         run: terraform init
 
-      - name: "Run fmt"
-        id: fmt
-        working-directory: ${{ matrix.directory }}
-        run: terraform fmt -check -recursive
-
       - name: "Setup TFLint"
         uses: terraform-linters/setup-tflint@v4
         with:
@@ -58,8 +53,13 @@ jobs:
 
       - name: "Run TFLint"
         id: tflint
-        working-directory: ${{ matrix.directory }}
+        working-directory: deployment/blue
         run: tflint -f compact
+
+      - name: "Run fmt"
+        id: fmt
+        working-directory: ${{ matrix.directory }}
+        run: terraform fmt -check -recursive
 
       - name: "Run Validate"
         id: validate
