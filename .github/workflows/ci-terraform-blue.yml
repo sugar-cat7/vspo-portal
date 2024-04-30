@@ -1,0 +1,126 @@
+name: "CI for PR (Terraform/Blue)"
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'deployment/blue/**'
+  workflow_dispatch:
+defaults:
+  run:
+    shell: bash
+permissions:
+  contents: read
+  id-token: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  ci:
+    name: "CI"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Diff files"
+        id: diff
+        working-directory: ./deployment/blue/scripts
+        shell: bash -x {0}
+        continue-on-error: true
+        run: |
+          echo 'DIFF_LOG<<EOF' >> $GITHUB_ENV
+          ./diff-terraform.sh >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+      - name: "Create comment for PR (diff Terraform files between Blue & Green)"
+        uses: actions/github-script@v7
+        env:
+          DIFF: "${{ env.DIFF_LOG }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Diff Terraform files between Blue & Green
+
+            <details><summary>Show Diff</summary>
+
+            \`\`\`\n
+            ${process.env.DIFF}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+      - name: "Setup Terraform"
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.8.2
+          terraform_wrapper: false
+
+      - name: "Terraform Init"
+        id: init
+        working-directory: ./deployment/blue
+        run: terraform init
+
+      - name: "Setup TFLint"
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.50.3
+
+      - name: "Run TFLint"
+        id: tflint
+        working-directory: ./deployment/blue
+        run: tflint -f compact
+
+      - name: "Terraform Validate"
+        id: validate
+        working-directory: ./deployment/blue
+        run: terraform validate -no-color -json  | jq -e '. | select(.warning_count == 0)'
+
+      - name: "Terraform Plan"
+        id: plan
+        working-directory: ./deployment/blue
+        run: terraform plan
+        continue-on-error: true
+
+      - name: "Create comment for PR (Terraform fmt/init/validate/plan)"
+        uses: actions/github-script@v7
+        env:
+          PLAN: "${{ steps.plan.outputs.stdout }}\n${{ steps.plan.outputs.stderr }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Check Terraform files (Blue)
+            #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### TFLint 👓\`${{ steps.tflint.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            </details>
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })

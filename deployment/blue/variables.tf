@@ -1,2 +1,6 @@
-variable "GOOGLE_CREDENTIALS" {}
-variable "GOOGLE_PROJECT_ID" {}
+variable "GOOGLE_CREDENTIALS" {
+    type = string
+}
+variable "GOOGLE_PROJECT_ID" {
+    type = string
+}
