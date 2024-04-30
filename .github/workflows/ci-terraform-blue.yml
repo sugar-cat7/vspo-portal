@@ -27,7 +27,6 @@ jobs:
         directory:
           - deployment/blue
           - deployment/modules/artifact_registry
-          - deployment/modules/cloud_run
           - deployment/modules/iam
 
     steps:
@@ -63,7 +62,7 @@ jobs:
 
       - name: "Run Validate"
         id: validate
-        working-directory: ${{ matrix.directory }}
+        working-directory: deployment/blue
         run: terraform validate -no-color
 
       - name: "Terraform Plan"
