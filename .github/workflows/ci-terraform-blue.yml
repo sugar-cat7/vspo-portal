@@ -43,7 +43,7 @@ jobs:
 
       - name: "Terraform Init"
         id: init
-        working-directory: ${{ matrix.directory }}
+        working-directory: deployment/blue
         run: terraform init
 
       - name: "Run fmt"
