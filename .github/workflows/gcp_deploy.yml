@@ -1,0 +1,46 @@
+name: Run creating docker image and deploy to cloud run
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGION: asia-northeast1
+  ARTIFACT_REPOSITORY: asia-northeast1-docker.pkg.dev
+  IMAGE_NAME: vspo-portal-cron
+  DOCKERFILE: docker/Dockerfile.cron
+
+jobs:
+  blue:
+    name: deploy to Cloud Run to develop environment
+    runs-on: ubuntu-latest
+
+    env:
+      SERVICE_NAME: blue-vspo-portal
+      REPOSITORY_NAME: blue-vspo-portal
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    steps:
+      - uses: actions/checkout@v4
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GITHUB_ACTIONS_SERVICE_ACCOUNT }}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+        with:
+          version: '>= 363.0.0'
+
+      - name: Authorize Docker
+        run: gcloud auth configure-docker $ARTIFACT_REPOSITORY --quiet
+
+      - name: Build and push Docker image to Artifact Registry
+        run: |
+          IMAGE_TAG=$(git rev-parse --short "$GITHUB_SHA")
+          docker build -t $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG -f $DOCKERFILE .
+          docker tag $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
+          docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG && docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
