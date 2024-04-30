@@ -33,6 +33,7 @@ module "artifact_registry" {
 }
 
 module "iam" {
-  source = "../modules/iam"
-  env    = local.env
+  source  = "../modules/iam"
+  env     = local.env
+  project = var.GOOGLE_PROJECT_ID
 }

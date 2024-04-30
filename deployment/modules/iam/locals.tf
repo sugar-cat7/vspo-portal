@@ -1,4 +1,5 @@
 locals {
+  project = var.project
   workload_identity_pool = {
     id          = "${var.env}-github"
     provider_id = "${var.env}-github"
