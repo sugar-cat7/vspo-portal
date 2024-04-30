@@ -42,18 +42,8 @@ jobs:
 
       - name: "Terraform Init"
         id: init
-        working-directory: deployment/blue
+        working-directory: ${{ matrix.directory }}
         run: terraform init
-
-      - name: "Setup TFLint"
-        uses: terraform-linters/setup-tflint@v4
-        with:
-          tflint_version: v0.50.3
-
-      - name: "Run TFLint"
-        id: tflint
-        working-directory: deployment/blue
-        run: tflint -f compact
 
       - name: "Run fmt"
         id: fmt
@@ -62,44 +52,24 @@ jobs:
 
       - name: "Run Validate"
         id: validate
-        working-directory: deployment/blue
+        working-directory: ${{ matrix.directory }}
         run: terraform validate -no-color
+
+      - name: "Setup TFLint"
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.50.3
+        if: ${{ matrix.directory == 'deployment/blue' }}
+
+      - name: "Run TFLint"
+        id: tflint
+        working-directory: ${{ matrix.directory }}
+        run: tflint -f compact
+        if: ${{ matrix.directory == 'deployment/blue' }}
 
       - name: "Terraform Plan"
         id: plan
         working-directory: deployment/blue
         run: terraform plan
         continue-on-error: true
-
-      - name: "Create comment for PR (Terraform fmt/init/validate/plan)"
-        uses: actions/github-script@v7
-        env:
-          PLAN: "${{ steps.plan.outputs.stdout }}\n${{ steps.plan.outputs.stderr }}"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const output = `#### Terraform Checks for Module: \`${{ matrix.directory }}\`
-            #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Validation 🧪\`${{ steps.validate.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### TFLint 👓\`${{ steps.tflint.outcome }}\`
-            #### Terraform Plan (only for main deployment) 📖\`${{ steps.plan.outcome }}\` if ('${{ matrix.directory }}' == 'deployment/blue')
-
-            </details>
-
-            <details><summary>Show Plan</summary>
-
-            \`\`\`\n
-            ${process.env.PLAN}
-            \`\`\`
-
-            </details>
-
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
+        if: ${{ matrix.directory == 'deployment/blue' }}
