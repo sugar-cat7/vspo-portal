@@ -11,7 +11,6 @@ resource "google_iam_workload_identity_pool_provider" "vspo_portal_workload_iden
   display_name                       = "GitHub"
   description                        = "GitHub Actions Workload Identity Pool Provider"
   attribute_mapping = {
-    "google.subject" = "assertion.sub"
     "google.subject" = "assertion.repository"
   }
   oidc {
@@ -29,7 +28,7 @@ resource "google_service_account_iam_binding" "vspo_portal_workload_identity_use
   service_account_id = google_service_account.vspo_portal_sa.name
   role               = "roles/iam.workloadIdentityUser"
   members = [
-    "principal://iam.googleapis.com/${google_iam_workload_identity_pool.vspo_portal_workload_identity_pool.name}/attribute.repository/${local.service_account.github.repository_name}"
+    "principal://iam.googleapis.com/${google_iam_workload_identity_pool.vspo_portal_workload_identity_pool.name}/subject/${local.service_account.github.repository_name}"
   ]
 }
 
