@@ -18,7 +18,7 @@ resource "google_project_iam_member" "cloud_run_invoker" {
 }
 
 resource "google_service_account" "cloud_scheduler" {
-  account_id   = "${var.env}-vspo-portal-cloud-scheduler-account"
+  account_id   = "${var.env}scheduler"
   display_name = "Cloud Scheduler Account"
 }
 
