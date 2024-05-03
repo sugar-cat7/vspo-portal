@@ -37,3 +37,10 @@ module "iam" {
   env     = local.env
   project = var.GOOGLE_PROJECT_ID
 }
+
+module "cloud_run" {
+  source   = "../modules/cloud_run"
+  location = local.location
+  env      = local.env
+  project  = var.GOOGLE_PROJECT_ID
+}
