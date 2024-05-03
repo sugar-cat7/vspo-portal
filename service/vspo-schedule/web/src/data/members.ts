@@ -222,6 +222,14 @@ export const members: Member[] = [
       "https://yt3.googleusercontent.com/uBemMrpiQtcdsbmAkxsCfyqr6lVkxa9FGwrs4URjOZgm97CbPDbilJBLcAy9SQYGfh8-__x7tw0=s176-c-k-c0x00ffffff-no-rj",
     keywords: [],
   },
+  {
+    id: 22,
+    name: "千燈ゆうひ",
+    channelId: "UCuDY3ibSP2MFRgf7eo3cojg",
+    iconUrl:
+      "https://yt3.googleusercontent.com/Q5r7YGQy17IXQTQOCo9fzUb3LBVh4m61y5EPs6lulBRB0kedZEDfcp-_idAbfSiZ1Hbhp5jW=s176-c-k-c0x00ffffff-no-rj",
+    keywords: [],
+  },
 ].map((member) => ({
   ...member,
   keywords: [...member.keywords, member.name],
