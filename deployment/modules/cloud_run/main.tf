@@ -4,7 +4,10 @@ resource "google_cloud_run_v2_job" "vspo_portal_cloud_run_v2_job" {
   template {
     template {
       containers {
-        image = "us-docker.pkg.dev/cloudrun/container/hello"
+        image = local.cloud_run_v2_job.container.image
+        ports {
+          container_port = 8080
+        }
       }
     }
   }
