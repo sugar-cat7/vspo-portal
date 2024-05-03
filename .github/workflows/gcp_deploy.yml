@@ -3,6 +3,7 @@ name: Run creating docker image and deploy to cloud run
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 env:
   REGION: asia-northeast1
