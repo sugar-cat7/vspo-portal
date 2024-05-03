@@ -9,3 +9,7 @@ variable "env" {
 variable "project" {
   type = string
 }
+
+variable "artifact_registry_repository_id" {
+  type = string
+}

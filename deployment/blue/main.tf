@@ -39,8 +39,9 @@ module "iam" {
 }
 
 module "cloud_run" {
-  source   = "../modules/cloud_run"
-  location = local.location
-  env      = local.env
-  project  = var.GOOGLE_PROJECT_ID
+  source                          = "../modules/cloud_run"
+  location                        = local.location
+  env                             = local.env
+  project                         = var.GOOGLE_PROJECT_ID
+  artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
 }
