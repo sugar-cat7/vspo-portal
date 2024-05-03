@@ -29,7 +29,7 @@ resource "google_cloud_scheduler_job" "scheduler" {
   time_zone   = "Asia/Tokyo"
 
   http_target {
-    uri         = "https://${google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.status.address.url}"
+    uri         = "https://${google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.name}.a.run.app/"
     http_method = "POST"
     oidc_token {
       service_account_email = google_service_account.cloud_scheduler.email
