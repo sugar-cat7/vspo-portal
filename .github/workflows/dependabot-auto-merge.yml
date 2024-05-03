@@ -2,7 +2,7 @@ name: Dependabot auto-merge
 on:
   pull_request:
     paths:
-      - 'service/cron/**'
+      - 'service/**'
 
 permissions:
   contents: write
@@ -14,10 +14,10 @@ jobs:
     if: github.actor == 'dependabot[bot]'
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Dependabot metadata
         id: metadata
-        uses: dependabot/fetch-metadata@v1
+        uses: dependabot/fetch-metadata@v2
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
       - name: Auto-merge
