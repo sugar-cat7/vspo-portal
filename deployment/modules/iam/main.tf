@@ -33,7 +33,7 @@ resource "google_project_iam_member" "vspo_portal_artifactregistry_writer" {
 resource "google_project_iam_member" "vspo_portal_run_admin" {
   project = local.project
   role    = "roles/run.admin"
-  member  = "serviceAccount:${google_service_account.my_service_account.email}"
+  member  = "serviceAccount:${google_service_account.vspo_portal_sa.email}"
 }
 
 resource "google_service_account_iam_binding" "vspo_portal_workload_identity_user" {
