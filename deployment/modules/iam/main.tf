@@ -24,6 +24,12 @@ resource "google_project_iam_member" "vspo_portal_workload_identity_user" {
   member  = "serviceAccount:${google_service_account.vspo_portal_sa.email}"
 }
 
+resource "google_project_iam_member" "service_account_user" {
+  project = local.project
+  role    = "roles/iam.serviceAccountUser"
+  member  = "serviceAccount:${google_service_account.vspo_portal_sa.email}"
+}
+
 resource "google_project_iam_member" "vspo_portal_artifactregistry_writer" {
   project = local.project
   role    = "roles/artifactregistry.writer"
