@@ -11,7 +11,8 @@ resource "google_iam_workload_identity_pool_provider" "vspo_portal_workload_iden
   display_name                       = "GitHub"
   description                        = "GitHub Actions Workload Identity Pool Provider"
   attribute_mapping = {
-    "google.subject" = "assertion.repository"
+    "google.subject"       = "assertion.sub"
+    "attribute.repository" = "assertion.repository"
   }
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
