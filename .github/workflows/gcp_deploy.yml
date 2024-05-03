@@ -1,8 +1,10 @@
-name: Run creating docker image and deploy to cloud run
+name: deploy to cloud run
 
 on:
   push:
     branches: [main]
+    paths:
+      - 'service/cron/**'
   workflow_dispatch:
 
 env:
@@ -15,7 +17,9 @@ jobs:
   blue:
     name: deploy to Cloud Run to develop environment
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./service/cron
     env:
       SERVICE_NAME: blue-vspo-portal
       REPOSITORY_NAME: blue-vspo-portal
@@ -45,3 +49,9 @@ jobs:
           docker build -t $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG -f $DOCKERFILE .
           docker tag $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
           docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG && docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
+
+      - name: Deploy to Cloud Run
+        run: |-
+          gcloud run services update $SERVICE_NAME \
+            --image=$ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest \
+            --region=$REGION
