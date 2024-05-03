@@ -6,7 +6,7 @@ locals {
   }
   service_account = {
     github = {
-      repository_name = "vspo-portal"
+      repository_name = "sugar-cat7/vspo-portal"
     }
   }
 }
