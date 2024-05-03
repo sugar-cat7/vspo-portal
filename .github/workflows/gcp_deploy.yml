@@ -11,7 +11,7 @@ env:
   REGION: asia-northeast1
   ARTIFACT_REPOSITORY: asia-northeast1-docker.pkg.dev
   IMAGE_NAME: vspo-portal-cron
-  DOCKERFILE: docker/Dockerfile.cron
+  DOCKERFILE: Dockerfile.cron
 
 jobs:
   blue:
