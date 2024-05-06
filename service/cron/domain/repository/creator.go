@@ -29,5 +29,6 @@ type GetCreatorQuery struct {
 
 // ListCreatorsQuery is ...
 type ListCreatorsQuery struct {
+	BaseListOptions
 	MemberTypes []string
 }

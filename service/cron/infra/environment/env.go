@@ -14,11 +14,11 @@ type ServerEnvironment struct {
 }
 
 type DatabaseEnvironment struct {
-	DBHost     string `env:"DB_HOST,required" envDefault:"localhost"`
+	DBHost     string `env:"DB_HOST,required" envDefault:"localhost:5432"`
 	DBUser     string `env:"DB_USER,required" envDefault:"user"`
 	DBPassword string `env:"DB_PASSWORD,required" envDefault:"password"`
 	DBDatabase string `env:"DB_DATABASE,required" envDefault:"vspo"`
-	DBSSLMode  string `env:"DB_SSL_MODE,required" envDefault:"verify-ca"`
+	DBSSLMode  string `env:"DB_SSL_MODE,required" envDefault:"disable"`
 }
 
 type YoutubeEnvironment struct {

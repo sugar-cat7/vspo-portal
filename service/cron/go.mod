@@ -8,11 +8,14 @@ require (
 	github.com/blendle/zapdriver v1.3.1
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/deckarep/golang-set/v2 v2.6.0
+	github.com/go-faker/faker/v4 v4.4.1
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/ogen-go/ogen v1.1.0
+	github.com/pressly/goose/v3 v3.20.0
 	github.com/samber/lo v1.39.0
+	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.30.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.30.0
 	github.com/volatiletech/null/v8 v8.1.2
@@ -37,6 +40,7 @@ require (
 	github.com/containerd/containerd v1.7.12 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/cpuguy83/dockercfg v0.3.1 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/distribution/reference v0.5.0 // indirect
 	github.com/dlclark/regexp2 v1.11.0 // indirect
 	github.com/docker/docker v25.0.5+incompatible // indirect
@@ -67,6 +71,7 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/moby/patternmatcher v0.6.0 // indirect
 	github.com/moby/sys/sequential v0.5.0 // indirect
 	github.com/moby/sys/user v0.1.0 // indirect
@@ -75,8 +80,10 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
+	github.com/sethvargo/go-retry v0.2.4 // indirect
 	github.com/shirou/gopsutil/v3 v3.23.12 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
@@ -95,11 +102,12 @@ require (
 	golang.org/x/oauth2 v0.19.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 	golang.org/x/tools v0.20.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240415180920-8c6c420018be // indirect
 	google.golang.org/grpc v1.63.2 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

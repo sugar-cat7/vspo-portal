@@ -2,11 +2,13 @@ package testhelpers
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/caarlos0/env/v10"
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/repository"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database"
+	repo "github.com/sugar-cat7/vspo-portal/service/cron/infra/database/repository"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/environment"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -20,18 +22,19 @@ type PostgresContainer struct {
 func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
 	pgContainer, err := postgres.RunContainer(ctx,
 		testcontainers.WithImage("postgres:latest"),
-		// postgres.WithInitScripts(filepath.Join("..", "testdata", "init-db.sql")),
 		postgres.WithDatabase("vspo"),
 		postgres.WithUsername("user"),
 		postgres.WithPassword("password"),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).WithStartupTimeout(5*time.Second)),
+		testcontainers.WithAfterReadyCommand(
+			testcontainers.NewRawCommand([]string{"echo", "Postgres is Vspo!"}),
+		),
 	)
 	if err != nil {
 		return nil, err
 	}
-
 	return &PostgresContainer{
 		PostgresContainer: pgContainer,
 	}, nil
@@ -39,26 +42,42 @@ func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
 
 type setupTx struct {
 	Transactable repository.Transactable
+	CreatorRepo  repository.Creator
+	VideoRepo    repository.Video
 }
 
-func SetupTx(ctx context.Context) setupTx {
+func SetupRepo(ctx context.Context) setupTx {
 	e := &environment.Environment{}
 	if err := env.Parse(e); err != nil {
 		panic(err)
 	}
+	c, err := SetupPostgresContainer(ctx)
+	if err != nil {
+		panic(err)
+	}
+	port, err := c.MappedPort(ctx, "5432")
+	if err != nil {
+		panic(err)
+	}
+	host, err := c.Host(ctx)
+	if err != nil {
+		panic(err)
+	}
 	dbClient := database.NewClientPool(ctx,
-		e.DatabaseEnvironment.DBHost,
+		fmt.Sprintf("%s:%s", host, port.Port()),
 		e.DatabaseEnvironment.DBUser,
 		e.DatabaseEnvironment.DBPassword,
 		e.DatabaseEnvironment.DBDatabase,
 		e.DatabaseEnvironment.DBSSLMode,
 	)
+
 	tx := NewTestTransactable(
 		dbClient,
 	)
-
 	return setupTx{
 		Transactable: tx,
+		CreatorRepo:  repo.NewCreator(),
+		VideoRepo:    repo.NewVideo(),
 	}
 }
 

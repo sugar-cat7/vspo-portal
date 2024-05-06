@@ -16,8 +16,7 @@ local-build:
 	@echo "Setting up local database...done"
 migrate:
 	@echo "Migrating database..."
-	@ docker run --rm -v ${PWD}/${DIR}:/migrations $(MIGRATION_IMAGE_NAME) goose -dir=/migrations postgres "${DBSTRING}" up
-	goose -dir=${DIR} ${DRIVER} "${DBSTRING}" up
+	go run cmd/migration/index.go
 	@echo "Migrating database...done"
 sqlc:
 	@echo "Pulling sqlc/sqlc Docker image..."

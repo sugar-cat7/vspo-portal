@@ -1,8 +1,8 @@
 version: "2"
 sql:
   - engine: "postgresql"
-    queries: "infra/database/internal/schema/query"
-    schema: "infra/database/internal/schema/migration"
+    queries: "infra/database/schema/query"
+    schema: "infra/database/schema/migration"
     gen:
       go:
         package: "db_sqlc"
