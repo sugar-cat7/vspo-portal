@@ -28,13 +28,11 @@ func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
 				WithOccurrence(2).WithStartupTimeout(5*time.Second)),
-		testcontainers.WithAfterReadyCommand(
-			testcontainers.NewRawCommand([]string{"echo", "Postgres is Vspo!"}),
-		),
 	)
 	if err != nil {
 		return nil, err
 	}
+
 	return &PostgresContainer{
 		PostgresContainer: pgContainer,
 	}, nil
@@ -63,6 +61,15 @@ func SetupRepo(ctx context.Context) setupTx {
 	if err != nil {
 		panic(err)
 	}
+
+	RunUp(
+		fmt.Sprintf("%s:%s", host, port.Port()),
+		e.DatabaseEnvironment.DBUser,
+		e.DatabaseEnvironment.DBPassword,
+		e.DatabaseEnvironment.DBDatabase,
+		e.DatabaseEnvironment.DBSSLMode,
+	)
+
 	dbClient := database.NewClientPool(ctx,
 		fmt.Sprintf("%s:%s", host, port.Port()),
 		e.DatabaseEnvironment.DBUser,
@@ -74,6 +81,7 @@ func SetupRepo(ctx context.Context) setupTx {
 	tx := NewTestTransactable(
 		dbClient,
 	)
+
 	return setupTx{
 		Transactable: tx,
 		CreatorRepo:  repo.NewCreator(),

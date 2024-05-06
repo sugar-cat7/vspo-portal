@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/repository"
@@ -32,7 +31,6 @@ func (r *creator) List(
 	// If MemberType is specified, search by MemberType
 	cs, err := client.Queries.GetCreatorsWithChannels(ctx, query.MemberTypes)
 	if err != nil {
-		fmt.Println("err:", err)
 		return nil, err
 	}
 	res = dto.CreatorsWithChannelsRowsToModel(cs)

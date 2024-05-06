@@ -39,22 +39,15 @@ SELECT
 FROM
     video v
 WHERE
-    id = ANY($3::text[])
-LIMIT $1 OFFSET $2
+    id = ANY($1::text[])
 `
-
-type GetVideosByIDsParams struct {
-	Limit  int32
-	Offset int32
-	Ids    []string
-}
 
 type GetVideosByIDsRow struct {
 	Video Video
 }
 
-func (q *Queries) GetVideosByIDs(ctx context.Context, arg GetVideosByIDsParams) ([]GetVideosByIDsRow, error) {
-	rows, err := q.db.Query(ctx, getVideosByIDs, arg.Limit, arg.Offset, arg.Ids)
+func (q *Queries) GetVideosByIDs(ctx context.Context, ids []string) ([]GetVideosByIDsRow, error) {
+	rows, err := q.db.Query(ctx, getVideosByIDs, ids)
 	if err != nil {
 		return nil, err
 	}

@@ -36,7 +36,6 @@ func RunUp(
 	if err := db.Ping(); err != nil {
 		panic(err)
 	}
-	fmt.Println("Migration goose.Up", connString)
 
 	if err := goose.Up(db, "migration"); err != nil {
 		panic(err)

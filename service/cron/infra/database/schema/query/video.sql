@@ -23,8 +23,7 @@ SELECT
 FROM
     video v
 WHERE
-    id = ANY(@ids::text[])
-LIMIT $1 OFFSET $2;
+    id = ANY(@ids::text[]);
 
 -- name: CountVideo :one
 SELECT COUNT(*)

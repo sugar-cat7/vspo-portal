@@ -12,7 +12,7 @@ import (
 
 // CronVideosPost implements the POST /channels/{channel_id}/videos endpoint.
 func (h *VH) CronVideosPost(ctx context.Context, req *api.CronVideosPostReq) (api.CronVideosPostRes, error) {
-	err := h.videoInteractor.BatchDeleteInsert(
+	v, err := h.videoInteractor.BatchDeleteInsert(
 		ctx,
 		input.NewUpsertVideoInput(
 			dto.ConvertPlatFormTypeOgenToReqSlice(req.PlatformType),
@@ -27,7 +27,7 @@ func (h *VH) CronVideosPost(ctx context.Context, req *api.CronVideosPostReq) (ap
 	}
 	return &api.CronVideosPostOK{
 		Message: api.OptString{
-			Value: fmt.Sprintf("Updated videos"),
+			Value: fmt.Sprintf("Updated videos: %v", v),
 		},
 	}, nil
 }

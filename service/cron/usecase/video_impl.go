@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/samber/lo"
@@ -12,6 +11,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/twitch"
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/youtube"
 	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/input"
+	"github.com/volatiletech/null/v8"
 )
 
 type videoInteractor struct {
@@ -45,11 +45,11 @@ func NewVideoInteractor(
 func (i *videoInteractor) BatchDeleteInsert(
 	ctx context.Context,
 	param *input.UpsertVideos,
-) error {
+) (model.Videos, error) {
 	// validate input
 	videoType, err := model.NewVideoType(param.VideoType)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	// startedAt, endedAt, err := model.NewPeriod(param.Period)
 	// if err != nil {
@@ -57,13 +57,12 @@ func (i *videoInteractor) BatchDeleteInsert(
 	// }
 	platformTypes, err := model.NewPlatforms(param.PlatformTypes)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	fmt.Println("BatchDeleteInsert", videoType, platformTypes)
+	var v model.Videos
 	err = i.transactable.RWTx(
 		ctx,
 		func(ctx context.Context) error {
-			fmt.Println("i.creatorRepository.List")
 			// Retrieve creators
 			cs, err := i.creatorRepository.List(
 				ctx,
@@ -71,12 +70,11 @@ func (i *videoInteractor) BatchDeleteInsert(
 					MemberTypes: model.VideoTypeToMemberTypes(videoType),
 				},
 			)
-			fmt.Println("cs", model.VideoTypeToMemberTypes(videoType), cs, err)
+
 			if err != nil {
 				return err
 			}
 
-			fmt.Println("cs", cs)
 			// Update videos by platform types
 			uvs, err := i.updateVideosByPlatformTypes(
 				ctx,
@@ -92,13 +90,29 @@ func (i *videoInteractor) BatchDeleteInsert(
 			if err != nil {
 				return err
 			}
+
+			v, err = i.videoRepository.List(
+				ctx,
+				repository.ListVideosQuery{
+					VideoIDs: lo.Map(uvs, func(v *model.Video, _ int) string {
+						return v.ID
+					}),
+					BaseListOptions: repository.BaseListOptions{
+						Limit: null.NewUint64(100, true), // null.Uint64型の値を正しく初期化
+					},
+				})
+
+			if err != nil {
+				return err
+			}
+
 			return nil
 		},
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	return v, nil
 }
 
 func (i *videoInteractor) ytVideos(
@@ -118,12 +132,10 @@ func (i *videoInteractor) ytVideos(
 		if err != nil {
 			return nil, err
 		}
-
 		upcomingYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
 			SearchQuery: youtube.SearchQueryVspoJp,
 			EventType:   youtube.EventTypeUpcoming,
 		})
-
 		if err != nil {
 			return nil, err
 		}
@@ -188,6 +200,7 @@ func (i *videoInteractor) ytVideos(
 			VideoIDs: m.ToSlice(),
 		},
 	)
+
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +226,6 @@ func (i *videoInteractor) twitchVideos(
 	twitchUserIDs := lo.Map(cs, func(c *model.Creator, _ int) string {
 		return c.Channel.Twitch.ID
 	})
-	fmt.Println("twitchUserIDs", twitchUserIDs)
 	newTwitchVideos, err := i.twitchClient.GetVideos(ctx, twitch.TwitchVideosParam{
 		UserIDs: twitchUserIDs,
 	})
@@ -251,14 +263,12 @@ func (i *videoInteractor) updateVideosByPlatformTypes(
 	for _, platformType := range pts.String() {
 		switch platformType {
 		case model.PlatformYouTube.String():
-			fmt.Println("youtube")
 			newYoutubeVideos, err := i.ytVideos(ctx, cs, vt)
 			if err != nil {
 				return nil, err
 			}
 			updatedVideos = append(updatedVideos, newYoutubeVideos...)
 		case model.PlatformTwitch.String():
-			fmt.Println("twitch")
 			newTwitchVideos, err := i.twitchVideos(ctx, cs)
 			if err != nil {
 				return nil, err
