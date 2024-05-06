@@ -3,13 +3,11 @@ package transaction
 import (
 	"context"
 	"fmt"
+	"log"
 
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/repository"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database"
 )
-
-// clientKey is a context key for storing the database client.
-type clientKey struct{}
 
 // FromContext extracts the database client from the context.
 func FromContext(ctx context.Context) (*database.Client, error) {
@@ -25,7 +23,11 @@ func runTx(ctx context.Context, client *database.Client, fn func(context.Context
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback(ctx)
+	defer func() {
+		if err := tx.Rollback(ctx); err != nil {
+			log.Printf("Failed to rollback transaction: %v", err)
+		}
+	}()
 
 	txCtx := context.WithValue(ctx, database.ClientKey{}, &database.Client{Queries: client.Queries.WithTx(tx)})
 	err = fn(txCtx)

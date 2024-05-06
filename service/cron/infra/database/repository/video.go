@@ -28,14 +28,14 @@ func (r *video) List(
 	if err != nil {
 		return nil, err
 	}
-	res := model.Videos{}
+
 	// If VideoIDs are specified, search by VideoIDs
 	if len(query.VideoIDs) > 0 {
 		cs, err := c.Queries.GetVideosByIDs(ctx, query.VideoIDs)
 		if err != nil {
 			return nil, err
 		}
-		res = dto.VideosByIDsRowsToModel(cs)
+		res := dto.VideosByIDsRowsToModel(cs)
 		return res, nil
 	}
 	// If PlatformType is specified, search by PlatformType
@@ -47,7 +47,7 @@ func (r *video) List(
 	if err != nil {
 		return nil, err
 	}
-	res = dto.VideosByParamsRowsToModel(cs)
+	res := dto.VideosByParamsRowsToModel(cs)
 	return res, nil
 }
 

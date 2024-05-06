@@ -27,13 +27,12 @@ func (r *creator) List(
 	if err != nil {
 		return nil, err
 	}
-	res := model.Creators{}
 	// If MemberType is specified, search by MemberType
 	cs, err := client.Queries.GetCreatorsWithChannels(ctx, query.MemberTypes)
 	if err != nil {
 		return nil, err
 	}
-	res = dto.CreatorsWithChannelsRowsToModel(cs)
+	res := dto.CreatorsWithChannelsRowsToModel(cs)
 	return res, nil
 }
 

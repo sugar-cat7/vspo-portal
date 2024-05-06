@@ -82,6 +82,10 @@ func (i *videoInteractor) BatchDeleteInsert(
 				platformTypes,
 				videoType,
 			)
+			if err != nil {
+				return err
+			}
+
 			// DeleteInsert Videos All
 			_, err = i.videoRepository.BatchDeleteInsert(
 				ctx,

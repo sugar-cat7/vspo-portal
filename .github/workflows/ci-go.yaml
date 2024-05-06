@@ -1,0 +1,38 @@
+name: Cron CI Go Check
+
+on:
+    pull_request:
+      branches:
+        - main
+      paths:
+        - 'service/cron/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go 1.22
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+          cache: false
+
+      - name: mod download
+        run: go mod download
+
+      - name: build
+        run: go build ./cmd/index.go
+
+      - name: test
+        run: go test -v ./... -cover
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v5
+        with:
+          version: v1.58.0

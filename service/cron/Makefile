@@ -35,3 +35,7 @@ gen.mock:
 	@echo "Generating mocks..."
 	go generate ./...
 	@echo "Generating mocks...done"
+lint:
+	@echo "Linting..."
+	docker run -t --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.58.0 golangci-lint run -v
+	@echo "Linting...done"
