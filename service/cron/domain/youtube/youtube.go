@@ -6,6 +6,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 )
 
+//go:generate go run go.uber.org/mock/mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_youtube
 type YoutubeClient interface {
 	GetVideos(ctx context.Context, param VideosParam) (model.Videos, error)
 	SearchVideos(ctx context.Context, param SearchVideosParam) (model.Videos, error)

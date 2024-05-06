@@ -6,7 +6,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 )
 
-//go:generate mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_repository
+//go:generate go run go.uber.org/mock/mockgen -source=$GOFILE -destination=mock/$GOFILE -package=mock_repository
 type Video interface {
 	List(
 		ctx context.Context,

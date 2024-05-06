@@ -50,8 +50,8 @@ jobs:
           docker tag $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
           docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG && docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
 
-      - name: Deploy to Cloud Run
-        run: |-
-          gcloud run services update $SERVICE_NAME \
-            --image=$ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest \
-            --region=$REGION
+      # - name: Deploy to Cloud Run
+      #   run: |-
+      #     gcloud run services update $SERVICE_NAME \
+      #       --image=$ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest \
+      #       --region=$REGION

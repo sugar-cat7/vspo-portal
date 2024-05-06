@@ -51,7 +51,9 @@ func (s *twitchServiceImpl) getAuthToken(ctx context.Context) (string, error) {
 	body, _ := io.ReadAll(resp.Body)
 
 	var result map[string]interface{}
-	json.Unmarshal(body, &result)
+	if err := json.Unmarshal(body, &result); err != nil {
+		return "", err
+	}
 
 	token := result["access_token"].(string)
 

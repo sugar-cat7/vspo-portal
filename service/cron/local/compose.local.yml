@@ -33,8 +33,8 @@ services:
       context: ..
       dockerfile: Dockerfile.migration
     volumes:
-      - ./db/migrations:/migrations
-    command: ["goose", "-dir", "/migrations", "postgres", "host=vspo-db user=user dbname=vspo password=password sslmode=disable", "up"]
+      - ../test/testhelpers/migration:/migration
+    command: ["goose", "-dir", "/migration", "postgres", "host=vspo-db user=user dbname=vspo password=password sslmode=disable", "up"]
     depends_on:
       vspo-db:
         condition: service_healthy
