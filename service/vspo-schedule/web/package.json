@@ -35,7 +35,7 @@
     "next-sitemap": "^4.2.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-tweet": "^3.2.0",
+    "react-tweet": "^3.2.1",
     "sass": "^1.71.1",
     "sharp": "^0.33.3",
     "swr": "^2.2.5",
