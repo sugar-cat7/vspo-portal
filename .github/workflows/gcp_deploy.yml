@@ -21,7 +21,7 @@ jobs:
       run:
         working-directory: ./service/cron
     env:
-      SERVICE_NAME: blue-vspo-portal
+      JOB_NAME: blue-vspo-portal
       REPOSITORY_NAME: blue-vspo-portal
 
     permissions:
@@ -52,6 +52,4 @@ jobs:
 
       # - name: Deploy to Cloud Run
       #   run: |-
-      #     gcloud run services update $SERVICE_NAME \
-      #       --image=$ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest \
-      #       --region=$REGION
+      #     gcloud run jobs update $JOB_NAME

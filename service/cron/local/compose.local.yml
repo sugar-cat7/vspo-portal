@@ -19,7 +19,7 @@ services:
     container_name: vspo-cron-go
     build:
       context: ..
-      dockerfile: Dockerfile.cron
+      dockerfile: Dockerfile.local
     volumes:
       - ../:/project/
     working_dir: /project
