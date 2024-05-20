@@ -1,21 +1,23 @@
-# Dockerfile-go
-FROM golang:1.22.1-bullseye
+FROM golang:1.22.3-bullseye AS builder
 
-# Install air for live-reloading during development
-RUN go install github.com/cosmtrek/air@latest
+ENV CGO_ENABLED=0 \
+    GOOS=linux \
+    GOARCH=amd64
 
-# Set the working directory
+
 WORKDIR /project
-COPY . /project
 
-# Install dependencies
-RUN go mod tidy
+COPY go.mod go.sum ./
+RUN go mod download
 
-# Build the application
-RUN go build -o ./tmp/main ./cmd/index.go
+COPY . .
 
-# Expose the port the app runs on
+RUN go build -o /main -ldflags="-s -w" ./cmd/index.go
+
+FROM alpine:3.19.1
+
+COPY --from=builder /main /main
+
 EXPOSE 8080
 
-# Command to run the application using air for live reloading
-CMD ["air"]
+CMD ["/main"]
