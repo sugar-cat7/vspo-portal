@@ -742,17 +742,17 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
-type PingGetOK struct {
+type PostOK struct {
 	Message OptString `json:"message"`
 }
 
 // GetMessage returns the value of Message.
-func (s *PingGetOK) GetMessage() OptString {
+func (s *PostOK) GetMessage() OptString {
 	return s.Message
 }
 
 // SetMessage sets the value of Message.
-func (s *PingGetOK) SetMessage(val OptString) {
+func (s *PostOK) SetMessage(val OptString) {
 	s.Message = val
 }
 

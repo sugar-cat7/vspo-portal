@@ -34,12 +34,12 @@ type Invoker interface {
 	//
 	// POST /cron/videos
 	CronVideosPost(ctx context.Context, request *CronVideosPostReq) (CronVideosPostRes, error)
-	// PingGet invokes GET /ping operation.
+	// Post invokes POST / operation.
 	//
 	// Returns a 200 status code if successful, or an error.
 	//
-	// GET /ping
-	PingGet(ctx context.Context) (*PingGetOK, error)
+	// POST /
+	Post(ctx context.Context) (*PostOK, error)
 }
 
 // Client implements OAS client.
@@ -330,20 +330,20 @@ func (c *Client) sendCronVideosPost(ctx context.Context, request *CronVideosPost
 	return result, nil
 }
 
-// PingGet invokes GET /ping operation.
+// Post invokes POST / operation.
 //
 // Returns a 200 status code if successful, or an error.
 //
-// GET /ping
-func (c *Client) PingGet(ctx context.Context) (*PingGetOK, error) {
-	res, err := c.sendPingGet(ctx)
+// POST /
+func (c *Client) Post(ctx context.Context) (*PostOK, error) {
+	res, err := c.sendPost(ctx)
 	return res, err
 }
 
-func (c *Client) sendPingGet(ctx context.Context) (res *PingGetOK, err error) {
+func (c *Client) sendPost(ctx context.Context) (res *PostOK, err error) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/ping"),
+		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/"),
 	}
 
 	// Run stopwatch.
@@ -358,7 +358,7 @@ func (c *Client) sendPingGet(ctx context.Context) (res *PingGetOK, err error) {
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "PingGet",
+	ctx, span := c.cfg.Tracer.Start(ctx, "Post",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -376,11 +376,11 @@ func (c *Client) sendPingGet(ctx context.Context) (res *PingGetOK, err error) {
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/ping"
+	pathParts[0] = "/"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "GET", u)
+	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -390,7 +390,7 @@ func (c *Client) sendPingGet(ctx context.Context) (res *PingGetOK, err error) {
 		var satisfied bitset
 		{
 			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "PingGet", r); {
+			switch err := c.securityApiKeyAuth(ctx, "Post", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -426,7 +426,7 @@ func (c *Client) sendPingGet(ctx context.Context) (res *PingGetOK, err error) {
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodePingGetResponse(resp)
+	result, err := decodePostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

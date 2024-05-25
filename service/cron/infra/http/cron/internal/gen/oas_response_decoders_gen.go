@@ -446,7 +446,7 @@ func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodePingGetResponse(resp *http.Response) (res *PingGetOK, _ error) {
+func decodePostResponse(resp *http.Response) (res *PostOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -462,7 +462,7 @@ func decodePingGetResponse(resp *http.Response) (res *PingGetOK, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response PingGetOK
+			var response PostOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

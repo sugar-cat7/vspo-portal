@@ -365,19 +365,19 @@ func (s *Server) handleCronVideosPostRequest(args [0]string, argsEscaped bool, w
 	}
 }
 
-// handlePingGetRequest handles GET /ping operation.
+// handlePostRequest handles POST / operation.
 //
 // Returns a 200 status code if successful, or an error.
 //
-// GET /ping
-func (s *Server) handlePingGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// POST /
+func (s *Server) handlePostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/ping"),
+		semconv.HTTPMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "PingGet",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "Post",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -408,7 +408,7 @@ func (s *Server) handlePingGetRequest(args [0]string, argsEscaped bool, w http.R
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "PingGet",
+			Name: "Post",
 			ID:   "",
 		}
 	)
@@ -416,7 +416,7 @@ func (s *Server) handlePingGetRequest(args [0]string, argsEscaped bool, w http.R
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "PingGet", r)
+			sctx, ok, err := s.securityApiKeyAuth(ctx, "Post", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -457,11 +457,11 @@ func (s *Server) handlePingGetRequest(args [0]string, argsEscaped bool, w http.R
 		}
 	}
 
-	var response *PingGetOK
+	var response *PostOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "PingGet",
+			OperationName:    "Post",
 			OperationSummary: "Ping endpoint",
 			OperationID:      "",
 			Body:             nil,
@@ -472,7 +472,7 @@ func (s *Server) handlePingGetRequest(args [0]string, argsEscaped bool, w http.R
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *PingGetOK
+			Response = *PostOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -483,12 +483,12 @@ func (s *Server) handlePingGetRequest(args [0]string, argsEscaped bool, w http.R
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PingGet(ctx)
+				response, err = s.h.Post(ctx)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PingGet(ctx)
+		response, err = s.h.Post(ctx)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -496,7 +496,7 @@ func (s *Server) handlePingGetRequest(args [0]string, argsEscaped bool, w http.R
 		return
 	}
 
-	if err := encodePingGetResponse(response, w, span); err != nil {
+	if err := encodePostResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

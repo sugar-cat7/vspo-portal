@@ -152,8 +152,8 @@ paths:
       security:
         - ApiKeyAuth: []
         - YoutubeApiKey: []
-  /ping:
-    get:
+  /:
+    post:
       summary: Ping endpoint
       description: Returns a 200 status code if successful, or an error.
       responses:

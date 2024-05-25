@@ -20,12 +20,12 @@ type Handler interface {
 	//
 	// POST /cron/videos
 	CronVideosPost(ctx context.Context, req *CronVideosPostReq) (CronVideosPostRes, error)
-	// PingGet implements GET /ping operation.
+	// Post implements POST / operation.
 	//
 	// Returns a 200 status code if successful, or an error.
 	//
-	// GET /ping
-	PingGet(ctx context.Context) (*PingGetOK, error)
+	// POST /
+	Post(ctx context.Context) (*PostOK, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

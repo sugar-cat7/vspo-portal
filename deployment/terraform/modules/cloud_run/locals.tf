@@ -1,7 +1,7 @@
 locals {
   project = var.project
   env     = var.env
-  cloud_run_v2_job = {
+  cloud_run_v2_service = {
     name     = "${var.env}-vspo-portal"
     location = var.location
     container = {
