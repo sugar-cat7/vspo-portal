@@ -44,14 +44,16 @@ module "cloud_run" {
   env                             = local.env
   project                         = var.GOOGLE_PROJECT_ID
   artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
+  cloud_scheduler_sa_email        = module.iam.cloud_scheduler_sa_email
 }
 
 module "cloud_scheduler_job" {
-  source                = "../modules/cloud_scheduler_job"
-  location              = local.location
-  env                   = local.env
-  project               = var.GOOGLE_PROJECT_ID
-  cloud_run_service_url = module.cloud_run.cloud_run_service_url
+  source                   = "../modules/cloud_scheduler_job"
+  location                 = local.location
+  env                      = local.env
+  project                  = var.GOOGLE_PROJECT_ID
+  cloud_run_service_url    = module.cloud_run.cloud_run_service_url
+  cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
   schedules = [
     {
       name     = "vspo-portal"
