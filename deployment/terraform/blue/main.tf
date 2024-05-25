@@ -52,4 +52,14 @@ module "cloud_scheduler_job" {
   env                   = local.env
   project               = var.GOOGLE_PROJECT_ID
   cloud_run_service_url = module.cloud_run.cloud_run_service_url
+  schedules = [
+    {
+      name     = "vspo-portal"
+      schedule = "*/30 * * * *",
+      headers = {
+        "x-api-key" = "dummy-key"
+      }
+      body = base64encode(jsonencode({}))
+    }
+  ]
 }
