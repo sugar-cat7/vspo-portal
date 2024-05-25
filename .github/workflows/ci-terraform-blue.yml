@@ -26,8 +26,7 @@ jobs:
       matrix:
         directory:
           - deployment/blue
-          - deployment/modules/artifact_registry
-          - deployment/modules/iam
+          - deployment/modules/**
 
     steps:
       - name: "Checkout"
