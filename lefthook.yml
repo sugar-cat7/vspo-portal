@@ -9,5 +9,7 @@ pre-commit:
       stage_fixed: true
     autoformat-tf:
       root: "deployment/terraform/**"
-      run: terraform fmt ./**/**
+      glob: "deployment/terraform/**/*"
+      run: terraform fmt ./deployment/terraform/**/**
+      stage_fixed: true
 

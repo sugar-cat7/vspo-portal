@@ -12,7 +12,7 @@ resource "google_project_iam_member" "cloud_run_invoker" {
 }
 
 resource "google_cloud_scheduler_job" "scheduler" {
-  for_each = { for idx, val in local.schedules : idx => val }
+  for_each = { for idx, val in local.schedules : val.name => val }
 
   name        = each.value.name
   description = "Trigger Cloud Run"
@@ -20,7 +20,7 @@ resource "google_cloud_scheduler_job" "scheduler" {
   time_zone   = "Asia/Tokyo"
 
   http_target {
-    uri         = "https://${google_cloud_run_v2_service.vspo_portal_cloud_run_v2_service.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${local.project}/jobs/${google_cloud_run_v2_service.vspo_portal_cloud_run_v2_service.name}:run"
+    uri         = local.target_url
     http_method = "POST"
     headers     = each.value.headers
     body        = jsonencode(each.value.body)
@@ -29,4 +29,3 @@ resource "google_cloud_scheduler_job" "scheduler" {
     }
   }
 }
-
