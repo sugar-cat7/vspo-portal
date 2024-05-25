@@ -12,7 +12,7 @@ resource "google_project_iam_member" "cloud_run_invoker" {
 }
 
 resource "google_cloud_scheduler_job" "scheduler" {
-  for_each = { for idx, val in local.schedules : idx => val }
+  for_each = { for idx, val in local.schedules : tostring(idx) => val }
 
   name        = each.value.name
   description = "Trigger Cloud Run"
@@ -29,4 +29,3 @@ resource "google_cloud_scheduler_job" "scheduler" {
     }
   }
 }
-
