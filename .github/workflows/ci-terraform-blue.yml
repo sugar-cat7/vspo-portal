@@ -4,8 +4,7 @@ on:
     branches:
       - main
     paths:
-      - 'deployment/blue/**'
-      - 'deployment/modules/**'
+      - 'deployment/terraform/**'
   workflow_dispatch:
 
 defaults:
@@ -22,13 +21,18 @@ jobs:
     name: "CI"
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        directory:
+          - deployment/terraform/blue
+          - deployment/terraform/modules/iam
+          - deployment/terraform/modules/artifact_registry
+          - deployment/terraform/modules/cloud_run
+          - deployment/terraform/modules/cloud_scheduler_job
+
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
-
-      - name: "Find Directories"
-        id: find_dirs
-        run: echo "::set-output name=dirs::$(find deployment/blue deployment/modules -type d -not -path '*/\.*')"
 
       - name: "Setup Terraform"
         uses: hashicorp/setup-terraform@v3
@@ -39,48 +43,34 @@ jobs:
 
       - name: "Terraform Init"
         id: init
-        run: |
-          for dir in ${{ steps.find_dirs.outputs.dirs }}; do
-            echo "Initializing $dir"
-            (cd $dir && terraform init)
-          done
+        working-directory: ${{ matrix.directory }}
+        run: terraform init
 
       - name: "Run fmt"
         id: fmt
-        run: |
-          for dir in ${{ steps.find_dirs.outputs.dirs }}; do
-            echo "Running terraform fmt in $dir"
-            (cd $dir && terraform fmt -check -recursive)
-          done
+        working-directory: ${{ matrix.directory }}
+        run: terraform fmt -check -recursive
 
       - name: "Run Validate"
         id: validate
-        run: |
-          for dir in ${{ steps.find_dirs.outputs.dirs }}; do
-            echo "Validating $dir"
-            (cd $dir && terraform validate -no-color)
-          done
+        working-directory: ${{ matrix.directory }}
+        run: terraform validate -no-color
 
       - name: "Setup TFLint"
         uses: terraform-linters/setup-tflint@v4
         with:
           tflint_version: v0.50.3
+        if: ${{ matrix.directory == 'deployment/terraform/blue' }}
 
       - name: "Run TFLint"
         id: tflint
-        run: |
-          for dir in ${{ steps.find_dirs.outputs.dirs }}; do
-            if [[ $dir == *"deployment/blue"* ]]; then
-              echo "Running tflint in $dir"
-              (cd $dir && tflint -f compact)
-            fi
-          done
+        working-directory: ${{ matrix.directory }}
+        run: tflint -f compact
+        if: ${{ matrix.directory == 'deployment/terraform/blue' }}
 
       - name: "Terraform Plan"
         id: plan
-        run: |
-          if [[ "deployment/blue" == *"deployment/blue"* ]]; then
-            echo "Planning deployment/blue"
-            (cd deployment/blue && terraform plan)
-          fi
+        working-directory: deployment/terraform/blue
+        run: terraform plan
         continue-on-error: true
+        if: ${{ matrix.directory == 'deployment/terraform/blue' }}
