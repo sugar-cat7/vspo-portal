@@ -49,7 +49,7 @@ module "cloud_run" {
 module "cloud_scheduler_job" {
   source   = "../modules/cloud_scheduler_job"
   location = local.location
-  env      = local.env
+  env       = local.env
   project   = var.GOOGLE_PROJECT_ID
   cloud_run_service_url = module.cloud_run.cloud_run_service_url
 }
