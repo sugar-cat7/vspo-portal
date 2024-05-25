@@ -25,15 +25,33 @@ resource "google_service_account" "cloud_scheduler" {
   display_name = "Cloud Scheduler Account"
 }
 
+# resource "google_cloud_scheduler_job" "scheduler" {
+#   name        = "${local.env}-vspo-portal-cloud-run-job"
+#   description = "Trigger Cloud Run job every hour"
+#   schedule    = "*/5 * * * *"
+#   time_zone   = "Asia/Tokyo"
+
+#   http_target {
+#     uri         = "https://${google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${local.project}/jobs/${google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.name}:run"
+#     http_method = "POST"
+#     oidc_token {
+#       service_account_email = google_service_account.cloud_scheduler.email
+#     }
+#   }
+# }
+
 resource "google_cloud_scheduler_job" "scheduler" {
-  name        = "${local.env}-vspo-portal-cloud-run-job"
-  description = "Trigger Cloud Run job every hour"
+  name        = "${local.env}-vspo-portal-cloud-run-test-job"
+  description = "Test Job"
   schedule    = "*/5 * * * *"
   time_zone   = "Asia/Tokyo"
 
   http_target {
-    uri         = "https://${google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${local.project}/jobs/${google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.name}:run"
-    http_method = "POST"
+    uri         = "https://${google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.location}-run.googleapis.com/apis/run.googleapis.com/v1/namespaces/${local.project}/jobs/${google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.name}:run/ping"
+    http_method = "GET"
+    headers = {
+      "x-api-key" = "dummy-key"
+    }
     oidc_token {
       service_account_email = google_service_account.cloud_scheduler.email
     }

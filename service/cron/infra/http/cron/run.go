@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/caarlos0/env/v10"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/dependency"
@@ -21,11 +20,9 @@ func Run(w http.ResponseWriter, r *http.Request) {
 	if err := env.Parse(e); err != nil {
 		panic(err)
 	}
-
 	logger := logger.New()
 
 	ctx := context.Background()
-
 	d := &dependency.Dependency{}
 	d.Inject(ctx, e)
 	logger.Info(fmt.Sprintf("%s %s", r.Method, r.URL.Path))
@@ -40,11 +37,6 @@ func Run(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		panic(err)
-	}
-	pathSegments := strings.Split(r.URL.Path, "/")
-	if len(pathSegments) <= 1 || pathSegments[1] != "cron" {
-		http.NotFound(w, r)
-		return
 	}
 	cs.ServeHTTP(w, r)
 

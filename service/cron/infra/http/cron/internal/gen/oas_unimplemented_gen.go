@@ -30,3 +30,12 @@ func (UnimplementedHandler) CronCreatorsPost(ctx context.Context, req *CronCreat
 func (UnimplementedHandler) CronVideosPost(ctx context.Context, req *CronVideosPostReq) (r CronVideosPostRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
+
+// PingGet implements GET /ping operation.
+//
+// Returns a 200 status code if successful, or an error.
+//
+// GET /ping
+func (UnimplementedHandler) PingGet(ctx context.Context) (r *PingGetOK, _ error) {
+	return r, ht.ErrNotImplemented
+}
