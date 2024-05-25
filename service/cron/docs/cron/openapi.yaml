@@ -152,7 +152,23 @@ paths:
       security:
         - ApiKeyAuth: []
         - YoutubeApiKey: []
-
+  /ping:
+    get:
+      summary: Ping endpoint
+      description: Returns a 200 status code if successful, or an error.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Pong
+      security:
+        - ApiKeyAuth: []
 components:
   securitySchemes:
     ApiKeyAuth:

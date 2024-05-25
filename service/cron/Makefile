@@ -8,7 +8,7 @@ DBSTRING ?= host=vspo-db user=user password=password dbname=vspo sslmode=disable
 ogen:
 	@echo "Generating swagger files..."
 	rm -rf ./infra/http/cron/internal/gen
-	go generate service/cron/tool/generate.go
+	go generate ./tool/generate.go
 
 local:
 	@echo "Setting up local database..."
