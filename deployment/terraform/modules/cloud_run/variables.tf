@@ -13,3 +13,7 @@ variable "project" {
 variable "artifact_registry_repository_id" {
   type = string
 }
+
+variable "cloud_scheduler_sa_email" {
+  type = string
+}
