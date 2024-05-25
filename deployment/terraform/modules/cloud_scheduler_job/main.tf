@@ -23,7 +23,7 @@ resource "google_cloud_scheduler_job" "scheduler" {
     uri         = local.target_url
     http_method = "POST"
     headers     = each.value.headers
-    body        = jsonencode(each.value.body)
+    body        = each.value.body
     oidc_token {
       service_account_email = google_service_account.cloud_scheduler.email
     }

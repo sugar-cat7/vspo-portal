@@ -9,7 +9,7 @@ locals {
       headers = {
         "x-api-key" = "dummy-key"
       },
-      body = {}
+      body = base64encode(jsonencode({}))
     },
   ])
 }
