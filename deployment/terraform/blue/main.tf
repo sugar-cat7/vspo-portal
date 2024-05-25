@@ -52,7 +52,7 @@ module "cloud_scheduler_job" {
   env                   = local.env
   project               = var.GOOGLE_PROJECT_ID
   cloud_run_service_url = module.cloud_run.cloud_run_service_url
-  schedules = toset([
+  schedules = [
     {
       name     = "vspo-portal"
       schedule = "*/30 * * * *",
@@ -61,5 +61,5 @@ module "cloud_scheduler_job" {
       }
       body = base64encode(jsonencode({}))
     }
-  ])
+  ]
 }

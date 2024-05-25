@@ -15,10 +15,10 @@ variable "cloud_run_service_url" {
 }
 
 variable "schedules" {
-  type = set(list(object({
+  type = list(object({
     name     = string
     schedule = string
     headers  = map(string)
     body     = string
-  })))
+  }))
 }
