@@ -45,3 +45,10 @@ module "cloud_run" {
   project                         = var.GOOGLE_PROJECT_ID
   artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
 }
+
+module "cloud_scheduler_job" {
+  source   = "../modules/cloud_scheduler_job"
+  location = local.location
+  env      = local.env
+  project  = var.GOOGLE_PROJECT_ID
+}

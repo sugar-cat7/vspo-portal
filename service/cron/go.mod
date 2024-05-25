@@ -5,7 +5,6 @@ go 1.22
 require (
 	github.com/Adeithe/go-twitch v0.2.3
 	github.com/Code-Hex/synchro v0.5.2
-	github.com/blendle/zapdriver v1.3.1
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/deckarep/golang-set/v2 v2.6.0
 	github.com/go-faker/faker/v4 v4.4.1
@@ -95,8 +94,8 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.51.0 // indirect
+	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20240506185415-9bf2ced13842 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/oauth2 v0.20.0 // indirect

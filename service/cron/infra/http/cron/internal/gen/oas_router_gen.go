@@ -57,7 +57,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if len(elem) == 0 {
-				break
+				switch r.Method {
+				case "POST":
+					s.handlePostRequest([0]string{}, elemIsEscaped, w, r)
+				default:
+					s.notAllowed(w, r, "POST")
+				}
+
+				return
 			}
 			switch elem[0] {
 			case 'c': // Prefix: "cron/"
@@ -114,27 +121,6 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
-				}
-
-				elem = origElem
-			case 'p': // Prefix: "ping"
-				origElem := elem
-				if l := len("ping"); len(elem) >= l && elem[0:l] == "ping" {
-					elem = elem[l:]
-				} else {
-					break
-				}
-
-				if len(elem) == 0 {
-					// Leaf node.
-					switch r.Method {
-					case "GET":
-						s.handlePingGetRequest([0]string{}, elemIsEscaped, w, r)
-					default:
-						s.notAllowed(w, r, "GET")
-					}
-
-					return
 				}
 
 				elem = origElem
@@ -230,7 +216,18 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			}
 
 			if len(elem) == 0 {
-				break
+				switch method {
+				case "POST":
+					r.name = "Post"
+					r.summary = "Ping endpoint"
+					r.operationID = ""
+					r.pathPattern = "/"
+					r.args = args
+					r.count = 0
+					return r, true
+				default:
+					return
+				}
 			}
 			switch elem[0] {
 			case 'c': // Prefix: "cron/"
@@ -295,31 +292,6 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
-				}
-
-				elem = origElem
-			case 'p': // Prefix: "ping"
-				origElem := elem
-				if l := len("ping"); len(elem) >= l && elem[0:l] == "ping" {
-					elem = elem[l:]
-				} else {
-					break
-				}
-
-				if len(elem) == 0 {
-					switch method {
-					case "GET":
-						// Leaf: PingGet
-						r.name = "PingGet"
-						r.summary = "Ping endpoint"
-						r.operationID = ""
-						r.pathPattern = "/ping"
-						r.args = args
-						r.count = 0
-						return r, true
-					default:
-						return
-					}
 				}
 
 				elem = origElem

@@ -1188,14 +1188,14 @@ func (s *OptString) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *PingGetOK) Encode(e *jx.Encoder) {
+func (s *PostOK) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *PingGetOK) encodeFields(e *jx.Encoder) {
+func (s *PostOK) encodeFields(e *jx.Encoder) {
 	{
 		if s.Message.Set {
 			e.FieldStart("message")
@@ -1204,14 +1204,14 @@ func (s *PingGetOK) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPingGetOK = [1]string{
+var jsonFieldsNameOfPostOK = [1]string{
 	0: "message",
 }
 
-// Decode decodes PingGetOK from json.
-func (s *PingGetOK) Decode(d *jx.Decoder) error {
+// Decode decodes PostOK from json.
+func (s *PostOK) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode PingGetOK to nil")
+		return errors.New("invalid: unable to decode PostOK to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -1231,21 +1231,21 @@ func (s *PingGetOK) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode PingGetOK")
+		return errors.Wrap(err, "decode PostOK")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *PingGetOK) MarshalJSON() ([]byte, error) {
+func (s *PostOK) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *PingGetOK) UnmarshalJSON(data []byte) error {
+func (s *PostOK) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
