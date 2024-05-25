@@ -52,4 +52,4 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |-
-          gcloud run jobs update $JOB_NAME
+          gcloud run jobs update $JOB_NAME --region $REGION
