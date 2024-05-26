@@ -61,7 +61,16 @@ module "cloud_scheduler_job" {
       headers = {
         "x-api-key" = "dummy-key"
       }
-      body = base64encode(jsonencode({}))
+      body = base64encode(jsonencode({
+        "overrides" : {
+          "containerOverrides" : [
+            {
+              "name" : "blue-vspo-portal",
+              "args" : ["/main", "ping"]
+            }
+          ]
+        }
+      }))
     }
   ]
 }

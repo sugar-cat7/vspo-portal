@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   vspo-db:
     container_name: vspo-db
@@ -15,18 +13,6 @@ services:
       interval: 2s
       timeout: 1s
       retries: 5
-  vspo-cron-go:
-    container_name: vspo-cron-go
-    build:
-      context: ..
-      dockerfile: Dockerfile.local
-    volumes:
-      - ../:/project/
-    working_dir: /project
-    ports:
-      - 8080:8080
-    env_file:
-      - ../.env.local
   vspo-db-migration:
     container_name: vspo-db-migration
     build:
@@ -38,3 +24,16 @@ services:
     depends_on:
       vspo-db:
         condition: service_healthy
+  vspo-cron-go:
+    container_name: vspo-cron-go
+    build:
+      context: ..
+      dockerfile: Dockerfile.local
+    volumes:
+      - ../:/project/
+    working_dir: /project
+    command: ["./tmp/main", "ping"]
+    ports:
+      - 8080:8080
+    env_file:
+      - ../.env.local
