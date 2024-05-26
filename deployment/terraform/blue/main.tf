@@ -59,7 +59,7 @@ module "cloud_scheduler_job" {
       name     = "vspo-portal"
       schedule = "*/30 * * * *",
       headers = {
-        "x-api-key" = "dummy-key"
+        "Content-Type" = "application/json"
       }
       body = base64encode(jsonencode({
         "overrides" : {
