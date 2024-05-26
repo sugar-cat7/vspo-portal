@@ -61,7 +61,7 @@ module "cloud_scheduler_job" {
       headers = {
         "Content-Type" = "application/json"
       }
-      body = base64encode("{\"overrides\":{\"containerOverride\":[{\"name\":\"vspo-portal\",\"args\":[\"/main\",\"ping\"]}]}}")
+      body = base64encode("{\"overrides\":{\"containerOverrides\":[{\"name\":\"blue-vspo-portal\",\"args\":[\"/main\",\"ping\"]}]}}")
     }
   ]
 }
