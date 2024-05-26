@@ -12,6 +12,7 @@ resource "google_cloud_scheduler_job" "scheduler" {
     headers     = each.value.headers
     body        = each.value.body
     oauth_token {
+      scope                 = "https://www.googleapis.com/auth/cloud-platform"
       service_account_email = var.cloud_scheduler_sa_email
     }
   }
