@@ -68,3 +68,9 @@ resource "google_project_iam_member" "cloud_run_invoker" {
   role    = "roles/run.invoker"
   member  = "serviceAccount:${google_service_account.cloud_scheduler.email}"
 }
+
+resource "google_project_iam_member" "cloud_run_service_agent" {
+  project = local.project
+  role    = "roles/run.serviceAgent"
+  member  = "serviceAccount:${google_service_account.cloud_scheduler.email}"
+}
