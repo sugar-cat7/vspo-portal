@@ -11,7 +11,7 @@ resource "google_cloud_scheduler_job" "scheduler" {
     http_method = "POST"
     headers     = each.value.headers
     body        = each.value.body
-    oidc_token {
+    oauth_token {
       service_account_email = var.cloud_scheduler_sa_email
     }
   }
