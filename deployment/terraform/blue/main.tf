@@ -32,36 +32,36 @@ module "artifact_registry" {
   env      = local.env
 }
 
-# module "iam" {
-#   source  = "../modules/iam"
-#   env     = local.env
-#   project = var.GOOGLE_PROJECT_ID
-# }
+module "iam" {
+  source  = "../modules/iam"
+  env     = local.env
+  project = var.GOOGLE_PROJECT_ID
+}
 
-# module "cloud_run" {
-#   source                          = "../modules/cloud_run"
-#   location                        = local.location
-#   env                             = local.env
-#   project                         = var.GOOGLE_PROJECT_ID
-#   artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
-#   cloud_scheduler_sa_email        = module.iam.cloud_scheduler_sa_email
-# }
+module "cloud_run" {
+  source                          = "../modules/cloud_run"
+  location                        = local.location
+  env                             = local.env
+  project                         = var.GOOGLE_PROJECT_ID
+  artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
+  cloud_scheduler_sa_email        = module.iam.cloud_scheduler_sa_email
+}
 
-# module "cloud_scheduler_job" {
-#   source                   = "../modules/cloud_scheduler_job"
-#   location                 = local.location
-#   env                      = local.env
-#   project                  = var.GOOGLE_PROJECT_ID
-#   cloud_run_service_url    = module.cloud_run.cloud_run_service_url
-#   cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
-#   schedules = [
-#     {
-#       name     = "vspo-portal"
-#       schedule = "*/30 * * * *",
-#       headers = {
-#         "x-api-key" = "dummy-key"
-#       }
-#       body = base64encode(jsonencode({}))
-#     }
-#   ]
-# }
+module "cloud_scheduler_job" {
+  source                   = "../modules/cloud_scheduler_job"
+  location                 = local.location
+  env                      = local.env
+  project                  = var.GOOGLE_PROJECT_ID
+  cloud_run_service_url    = module.cloud_run.cloud_run_service_url
+  cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
+  schedules = [
+    {
+      name     = "vspo-portal"
+      schedule = "*/30 * * * *",
+      headers = {
+        "x-api-key" = "dummy-key"
+      }
+      body = base64encode(jsonencode({}))
+    }
+  ]
+}
