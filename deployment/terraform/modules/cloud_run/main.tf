@@ -3,6 +3,7 @@ resource "google_cloud_run_v2_job" "vspo_portal_cloud_run_v2_job" {
   location = local.cloud_run_v2_job.location
   template {
     template {
+      service_account = var.cloud_scheduler_sa_email
       containers {
         image = local.cloud_run_v2_job.container.image
         ports {
@@ -11,11 +12,4 @@ resource "google_cloud_run_v2_job" "vspo_portal_cloud_run_v2_job" {
       }
     }
   }
-}
-
-resource "google_cloud_run_service_iam_member" "default" {
-  location = google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.location
-  service  = google_cloud_run_v2_job.vspo_portal_cloud_run_v2_job.name
-  role     = "roles/run.invoker"
-  member   = "serviceAccount:${var.cloud_scheduler_sa_email}"
 }
