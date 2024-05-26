@@ -1,18 +1,16 @@
 package main
 
 import (
-	"log"
-	"net/http"
+	"fmt"
+	"os"
 
-	http_handler "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/cmd"
 )
 
 func main() {
-	http.HandleFunc("/", http_handler.Run)
-	port := "8080"
-	log.Printf("Starting server on port %s...\n", port)
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		log.Fatalf("Error occurred while starting the server: %v", err)
+	c := cmd.NewCmdRoot()
+	if err := c.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }

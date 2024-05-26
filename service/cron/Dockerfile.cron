@@ -14,10 +14,9 @@ COPY . .
 
 RUN go build -o /main -ldflags="-s -w" ./cmd/index.go
 
-FROM alpine:3.19.1
+# FROM alpine:3.19.1
 
-COPY --from=builder /main /main
+# COPY --from=builder /main /main
 
-EXPOSE 8080
+# ENTRYPOINT ["/main"]
 
-CMD ["/main"]

@@ -15,7 +15,7 @@ RUN go mod tidy
 RUN go build -o ./tmp/main ./cmd/index.go
 
 # Expose the port the app runs on
-EXPOSE 8080
+# EXPOSE 8080
 
 # Command to run the application using air for live reloading
-CMD ["air"]
+# CMD ["air"]
