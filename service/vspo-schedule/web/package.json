@@ -46,6 +46,6 @@
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@typescript-eslint/parser": "^7.12.0",
     "knip": "^5.17.4",
-    "lefthook": "^1.6.15"
+    "lefthook": "^1.6.16"
   }
 }
