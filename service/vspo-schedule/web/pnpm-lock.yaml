@@ -21,8 +21,8 @@ dependencies:
     specifier: ^0.2.2
     version: 0.2.2(@fortawesome/fontawesome-svg-core@6.5.2)(react@18.3.1)
   '@mui/icons-material':
-    specifier: ^5.15.19
-    version: 5.15.19(@mui/material@5.15.20)(@types/react@18.3.3)(react@18.3.1)
+    specifier: ^5.15.20
+    version: 5.15.20(@mui/material@5.15.20)(@types/react@18.3.3)(react@18.3.1)
   '@mui/lab':
     specifier: 5.0.0-alpha.170
     version: 5.0.0-alpha.170(@emotion/react@11.11.4)(@emotion/styled@11.11.5)(@mui/material@5.15.20)(@types/react@18.3.3)(react-dom@18.3.1)(react@18.3.1)
@@ -2023,8 +2023,8 @@ packages:
     resolution: {integrity: sha512-DoL2ppgldL16utL8nNyj/P12f8mCNdx/Hb/AJnX9rLY4b52hCMIx1kH83pbXQ6uMy6n54M3StmEbvSGoj2OFuA==}
     dev: false
 
-  /@mui/icons-material@5.15.19(@mui/material@5.15.20)(@types/react@18.3.3)(react@18.3.1):
-    resolution: {integrity: sha512-RsEiRxA5azN9b8gI7JRqekkgvxQUlitoBOtZglflb8cUDyP12/cP4gRwhb44Ea1/zwwGGjAj66ZJpGHhKfibNA==}
+  /@mui/icons-material@5.15.20(@mui/material@5.15.20)(@types/react@18.3.3)(react@18.3.1):
+    resolution: {integrity: sha512-oGcKmCuHaYbAAoLN67WKSXtHmEgyWcJToT1uRtmPyxMj9N5uqwc/mRtEnst4Wj/eGr+zYH2FiZQ79v9k7kSk1Q==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
       '@mui/material': ^5.0.0
