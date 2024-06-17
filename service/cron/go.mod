@@ -14,7 +14,7 @@ require (
 	github.com/ogen-go/ogen v1.2.1
 	github.com/pressly/goose/v3 v3.20.0
 	github.com/samber/lo v1.39.0
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/testcontainers/testcontainers-go v0.31.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.31.0
