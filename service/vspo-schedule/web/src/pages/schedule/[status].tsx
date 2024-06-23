@@ -142,6 +142,9 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   if (!params) {
     return {
       notFound: true,
+      meta: {
+        livestreamDescription: "",
+      },
     };
   }
 
