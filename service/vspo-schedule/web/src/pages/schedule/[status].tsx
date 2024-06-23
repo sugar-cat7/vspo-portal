@@ -311,7 +311,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
 HomePage.getLayout = (page, pageProps) => {
   let title = "";
   let headTitle = "";
-  let additionalDescription = pageProps.meta.livestreamDescription;
+  const additionalDescription = pageProps.meta.livestreamDescription;
   switch (pageProps.liveStatus) {
     case "all":
       title = "配信スケジュール";
