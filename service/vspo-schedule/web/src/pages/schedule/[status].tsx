@@ -142,15 +142,22 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   if (!params) {
     return {
       notFound: true,
-      meta: {
-        livestreamDescription: "",
+      props: {
+        livestreamsByDate: {},
+        eventsByDate: {},
+        lastUpdateDate: "",
+        liveStatus: "",
+        dateTabsInfo: undefined,
+        meta: {
+          livestreamDescription: "",
+        },
       },
+      revalidate: 30,
     };
   }
 
   const pastLivestreams = await fetchLivestreams({ limit: 300 });
   const events = await fetchEvents();
-
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
     (livestream) => !freechatVideoIds.includes(livestream.id),
   );
@@ -158,7 +165,6 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
   const isDateStatus = isValidDate(params.status);
   const todayDate = new Date();
-
   const todayDateString = formatWithTimeZone(todayDate, "ja", "yyyy-MM-dd");
 
   let filteredLivestreams = uniqueLivestreams.filter((livestream) => {
@@ -206,13 +212,14 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       return scheduledStartTimeString === yesterdayDateString;
     });
   }
-  // Sort livestreams by scheduled start time in ascending order
+
   filteredLivestreams.sort((a, b) => {
     return (
       new Date(a.scheduledStartTime).getTime() -
       new Date(b.scheduledStartTime).getTime()
     );
   });
+
   const livestreamsByDate = groupBy(filteredLivestreams, (livestream) => {
     try {
       return formatWithTimeZone(
@@ -256,9 +263,9 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         eventsByDate,
         lastUpdateDate,
         liveStatus: params.status,
-      },
-      meta: {
-        livestreamDescription: livestreamDescription,
+        meta: {
+          livestreamDescription: livestreamDescription,
+        },
       },
       revalidate: revalidateWindow,
     };
@@ -282,6 +289,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     todayIndex = tabDates.indexOf(params.status);
   }
   todayIndex = todayIndex >= 0 ? todayIndex : tabDates.length - 1;
+
   return {
     props: {
       livestreamsByDate,
