@@ -35,6 +35,9 @@ type LivestreamsProps = {
     tabDates: string[];
     todayIndex: number;
   };
+  meta: {
+    livestreamDescription: string;
+  };
 };
 
 const TabBox = styled(Box)(({ theme }) => ({
@@ -144,7 +147,6 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
 
   const pastLivestreams = await fetchLivestreams({ limit: 300 });
   const events = await fetchEvents();
-
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
     (livestream) => !freechatVideoIds.includes(livestream.id),
   );
@@ -152,7 +154,6 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
   const isDateStatus = isValidDate(params.status);
   const todayDate = new Date();
-
   const todayDateString = formatWithTimeZone(todayDate, "ja", "yyyy-MM-dd");
 
   let filteredLivestreams = uniqueLivestreams.filter((livestream) => {
@@ -200,13 +201,14 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       return scheduledStartTimeString === yesterdayDateString;
     });
   }
-  // Sort livestreams by scheduled start time in ascending order
+
   filteredLivestreams.sort((a, b) => {
     return (
       new Date(a.scheduledStartTime).getTime() -
       new Date(b.scheduledStartTime).getTime()
     );
   });
+
   const livestreamsByDate = groupBy(filteredLivestreams, (livestream) => {
     try {
       return formatWithTimeZone(
@@ -236,6 +238,13 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   );
   const revalidateWindow = 30;
 
+  const livestreamDescription =
+    filteredLivestreams
+      .slice(-50)
+      .reverse()
+      .map((livestream) => livestream.title)
+      .join(", ") ?? "";
+
   if (["archive", "live", "upcoming"].includes(params.status)) {
     return {
       props: {
@@ -243,6 +252,9 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         eventsByDate,
         lastUpdateDate,
         liveStatus: params.status,
+        meta: {
+          livestreamDescription: livestreamDescription,
+        },
       },
       revalidate: revalidateWindow,
     };
@@ -265,6 +277,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   if (isDateStatus) {
     todayIndex = tabDates.indexOf(params.status);
   }
+  todayIndex = todayIndex >= 0 ? todayIndex : tabDates.length - 1;
 
   return {
     props: {
@@ -273,8 +286,11 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       lastUpdateDate,
       liveStatus: params.status,
       dateTabsInfo: {
-        todayIndex: todayIndex >= 0 ? todayIndex : tabDates.length - 1,
+        todayIndex: todayIndex,
         tabDates: tabDates,
+      },
+      meta: {
+        livestreamDescription: livestreamDescription,
       },
     },
     revalidate: revalidateWindow,
@@ -284,6 +300,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
 HomePage.getLayout = (page, pageProps) => {
   let title = "";
   let headTitle = "";
+  const additionalDescription = pageProps.meta?.livestreamDescription || "";
   switch (pageProps.liveStatus) {
     case "all":
       title = "配信スケジュール";
@@ -305,7 +322,7 @@ HomePage.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
       title={`ぶいすぽっ!${title}`}
-      description={`ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス/ニコニコ)を確認できます。`}
+      description={`ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス/ニコニコ)を確認できます。\n${additionalDescription}`}
       lastUpdateDate={pageProps.lastUpdateDate}
       footerMessage="※メン限の配信は掲載しておりません。"
       headTitle={headTitle}
