@@ -239,6 +239,13 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   );
   const revalidateWindow = 30;
 
+  const livestreamDescription =
+    filteredLivestreams
+      .slice(-50)
+      .reverse()
+      .map((livestream) => livestream.title)
+      .join(", ") ?? "";
+
   if (["archive", "live", "upcoming"].includes(params.status)) {
     return {
       props: {
@@ -246,6 +253,9 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         eventsByDate,
         lastUpdateDate,
         liveStatus: params.status,
+      },
+      meta: {
+        livestreamDescription: livestreamDescription,
       },
       revalidate: revalidateWindow,
     };
@@ -269,7 +279,6 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     todayIndex = tabDates.indexOf(params.status);
   }
   todayIndex = todayIndex >= 0 ? todayIndex : tabDates.length - 1;
-  const livestreamDescription = livestreamsByDate[tabDates[todayIndex]];
   return {
     props: {
       livestreamsByDate,
@@ -277,7 +286,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       lastUpdateDate,
       liveStatus: params.status,
       dateTabsInfo: {
-        todayIndex: todayIndex >= 0 ? todayIndex : tabDates.length - 1,
+        todayIndex: todayIndex,
         tabDates: tabDates,
       },
       meta: {
