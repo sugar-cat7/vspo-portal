@@ -35,6 +35,9 @@ type LivestreamsProps = {
     tabDates: string[];
     todayIndex: number;
   };
+  meta: {
+    livestreamDescription: string;
+  };
 };
 
 const TabBox = styled(Box)(({ theme }) => ({
@@ -265,7 +268,8 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   if (isDateStatus) {
     todayIndex = tabDates.indexOf(params.status);
   }
-
+  todayIndex = todayIndex >= 0 ? todayIndex : tabDates.length - 1;
+  const livestreamDescription = livestreamsByDate[tabDates[todayIndex]];
   return {
     props: {
       livestreamsByDate,
@@ -276,6 +280,9 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         todayIndex: todayIndex >= 0 ? todayIndex : tabDates.length - 1,
         tabDates: tabDates,
       },
+      meta: {
+        livestreamDescription: livestreamDescription,
+      },
     },
     revalidate: revalidateWindow,
   };
@@ -284,6 +291,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
 HomePage.getLayout = (page, pageProps) => {
   let title = "";
   let headTitle = "";
+  let additionalDescription = pageProps.meta.livestreamDescription;
   switch (pageProps.liveStatus) {
     case "all":
       title = "配信スケジュール";
@@ -305,7 +313,7 @@ HomePage.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
       title={`ぶいすぽっ!${title}`}
-      description={`ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス/ニコニコ)を確認できます。`}
+      description={`ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス/ニコニコ)を確認できます。\n${additionalDescription}`}
       lastUpdateDate={pageProps.lastUpdateDate}
       footerMessage="※メン限の配信は掲載しておりません。"
       headTitle={headTitle}
