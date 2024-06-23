@@ -142,17 +142,6 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   if (!params) {
     return {
       notFound: true,
-      props: {
-        livestreamsByDate: {},
-        eventsByDate: {},
-        lastUpdateDate: "",
-        liveStatus: "",
-        dateTabsInfo: undefined,
-        meta: {
-          livestreamDescription: "",
-        },
-      },
-      revalidate: 30,
     };
   }
 
