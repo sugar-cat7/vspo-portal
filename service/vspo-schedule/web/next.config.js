@@ -23,6 +23,8 @@ const withPWA = require("next-pwa")({
   ],
 });
 
+const { i18n } = require('./i18next.config');
+
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -48,6 +50,7 @@ const nextConfig = {
       })),
     ],
   },
+  i18n,
   async redirects() {
     return [
       {
