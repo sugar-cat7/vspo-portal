@@ -1,0 +1,32 @@
+{
+  "name": "chat-api",
+  "version": "q.0.0",
+  "main": "cmd/server/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "dependencies": {
+    "@hono/swagger-ui": "^0.2.2",
+    "@hono/zod-openapi": "^0.14.1",
+    "@microlabs/otel-cf-workers": "^1.0.0-rc.40",
+    "@opentelemetry/api": "1.6.0",
+    "@tsndr/cloudflare-worker-jwt": "2.5.3",
+    "hono": "^4.4.2",
+    "miniflare": "3.20240524.1",
+    "pg": "^8.11.5",
+    "tslog": "^4.9.2",
+    "uuid": "^9.0.1",
+    "valibot": "^0.30.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240529.0",
+    "@types/pg": "^8.11.6",
+    "@types/uuid": "^9.0.8",
+    "better-sqlite3": "^11.0.0",
+    "bun-types": "^1.1.12",
+    "drizzle-kit": "^0.22.1",
+    "typescript": "^5.4.5",
+    "wrangler": "^3.58.0"
+  }
+}
