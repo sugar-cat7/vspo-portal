@@ -1,6 +1,6 @@
+import { Env } from "@/pkg/env";
 import { newApp } from "@/pkg/hono/app";
 import { init } from "@/pkg/middleware";
-import { createHandler } from "@/pkg/otel";
 
 const app = newApp();
 app.notFound((c) => {
@@ -14,4 +14,15 @@ app.get('*', (c) => {
 })
 
 
-export default createHandler(app);
+export default {
+    fetch: async (req: Request, env: Env, executionCtx: ExecutionContext) => {
+        return await app.fetch(req, env, executionCtx);
+    },
+    queue: async (
+        batch: MessageBatch,
+        env: Env,
+        _executionContext: ExecutionContext,
+    ) => {
+        new Error('Not implemented');
+    },
+} satisfies ExportedHandler<Env>;
