@@ -46,8 +46,10 @@ export const fetchEvents = async (): Promise<VspoEvent[]> => {
 
 export const fetchLivestreams = async ({
   limit = 300,
+  lang = "ja",
 }: {
   limit?: number;
+  lang?: string;
 }): Promise<Livestream[]> => {
   try {
     if (ENVIRONMENT === "production") {
@@ -59,6 +61,7 @@ export const fetchLivestreams = async ({
           },
           params: {
             limit: limit,
+            lang: lang,
           },
         },
       );

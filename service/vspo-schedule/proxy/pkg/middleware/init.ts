@@ -23,10 +23,11 @@ export function init(): MiddlewareHandler<HonoEnv> {
         });
         c.set("services", {
             logger: logger,
-            tracer: trace.getTracer('OTelCFWorkers:Fetcher')
+            tracer: trace.getTracer('OTelCFWorkers:Fetcher'),
+            kv: envResult.data.APP_KV,
         });
         c.set("requestUrl", envResult.data.API_BASE_URL + c.req.path);
-
+        c.set("translateUrl", envResult.data.TRANSLATE_URL);
         logger.info("[Request started]");
         await next();
     };

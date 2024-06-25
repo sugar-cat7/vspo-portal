@@ -138,6 +138,7 @@ export const getStaticPaths: GetStaticPaths<Params> = () => {
 
 export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   params,
+  locale,
 }) => {
   if (!params) {
     return {
@@ -145,7 +146,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     };
   }
 
-  const pastLivestreams = await fetchLivestreams({ limit: 300 });
+  const pastLivestreams = await fetchLivestreams({ limit: 300, lang: locale });
   const events = await fetchEvents();
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
     (livestream) => !freechatVideoIds.includes(livestream.id),

@@ -13,6 +13,8 @@ export const zEnv = z.object({
     BASELIME_API_KEY: z.string(),
     SERVICE_NAME: z.string(),
     API_BASE_URL: z.string(),
+    APP_KV: z.custom<KVNamespace>(),
+    TRANSLATE_URL: z.string(),
 });
 
 export type Env = z.infer<typeof zEnv>;
