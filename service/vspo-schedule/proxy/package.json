@@ -7,6 +7,7 @@
     "deploy": "wrangler deploy"
   },
   "dependencies": {
+    "@google-cloud/translate": "^8.3.0",
     "@hono/swagger-ui": "^0.2.2",
     "@hono/zod-openapi": "^0.14.1",
     "@microlabs/otel-cf-workers": "^1.0.0-rc.40",

@@ -8,3 +8,7 @@ logpush = true
 [vars]
 SERVICE_NAME = "vspo-schedule-proxy"
 BASELIME_API_KEY = "xxx"
+
+kv_namespaces = [
+    { binding = "APP_KV", id = "4a001d176484425ba3e3c1226d80ee91" },
+]

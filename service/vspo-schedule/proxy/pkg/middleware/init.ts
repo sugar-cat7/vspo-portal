@@ -5,6 +5,7 @@ import { env } from 'hono/adapter'
 import { type Env, zEnv } from '@/pkg/env'
 import { AppLogger } from "@/pkg/logging";
 import { trace } from '@opentelemetry/api';
+import { TranslationServiceClient } from '@google-cloud/translate';
 
 export function init(): MiddlewareHandler<HonoEnv> {
     return async (c, next) => {
@@ -23,9 +24,12 @@ export function init(): MiddlewareHandler<HonoEnv> {
         });
         c.set("services", {
             logger: logger,
-            tracer: trace.getTracer('OTelCFWorkers:Fetcher')
+            tracer: trace.getTracer('OTelCFWorkers:Fetcher'),
+            kv: envResult.data.APP_KV,
+            translator: new TranslationServiceClient()
         });
         c.set("requestUrl", envResult.data.API_BASE_URL + c.req.path);
+        c.set("gcpProjectPath", envResult.data.GCP_PROJECT_PATH);
 
         logger.info("[Request started]");
         await next();
