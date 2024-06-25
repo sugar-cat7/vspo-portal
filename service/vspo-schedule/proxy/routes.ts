@@ -6,7 +6,6 @@ export const registerProxyRoutes = (app: App) => {
         // Get language from query parameter, default to 'ja' (Japanese)
         const lang = c.req.query('lang') || 'ja';
         const { kv } = c.get('services');
-        console.log("kv", kv)
         // Send request to Backend API
         const response = await fetch(c.get('requestUrl'), { headers: c.req.raw.headers });
 
@@ -14,12 +13,11 @@ export const registerProxyRoutes = (app: App) => {
         const data = await response.json();
         // Parse specific fields of the response using Zod schema
         const parsedData = VideoSchema.array().parse(data);
-        // console.log("parsedData", parsedData)
+
         // Process each item
         const translatedDataPromises = parsedData.map(async item => {
-            const kvKey = `key_${item.id}_${lang}`;
+            const kvKey = `${item.id}_${lang}`;
             let kvData: string | null = await kv.get(kvKey);
-
             if (!kvData) {
                 // Translate title and description
                 const translatedTitle = await translateText(c, item.title, lang);
@@ -49,7 +47,7 @@ export const registerProxyRoutes = (app: App) => {
         const translatedData = await Promise.all(translatedDataPromises);
 
         // Return the translated data
-        return c.json("translatedData");
+        return c.json(translatedData);
     });
 }
 
@@ -72,8 +70,8 @@ const translateText = async (c: AppContext, text: string, targetLang: string): P
     });
 
     // Parse the response and extract the translated text
-    const responseData: { translations: Array<{ detectedSourceLanguage: string, model: string, translatedText: string }> } = await response.json()
-    const translatedText = responseData?.translations?.at(0)?.translatedText || text;
+    const responseData: { data: { translations: Array<{ detectedSourceLanguage: string, model: string, translatedText: string }> } } = await response.json()
+    const translatedText = responseData?.data.translations?.at(0)?.translatedText || text;
 
     return translatedText;
 };
