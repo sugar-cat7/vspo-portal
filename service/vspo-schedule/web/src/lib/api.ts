@@ -54,13 +54,14 @@ export const fetchLivestreams = async ({
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<Livestream[]>(
-        `${API_ROOT}/api/livestreams/recent?lang=${lang}`,
+        `${API_ROOT}/api/livestreams/recent`,
         {
           headers: {
             "x-api-key": process.env.API_KEY,
           },
           params: {
             limit: limit,
+            lang: lang,
           },
         },
       );

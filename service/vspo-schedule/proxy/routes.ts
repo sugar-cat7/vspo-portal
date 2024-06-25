@@ -9,6 +9,9 @@ export const registerProxyRoutes = (app: App) => {
         // Send request to Backend API
         const response = await fetch(c.get('requestUrl'), { headers: c.req.raw.headers });
 
+        if (lang === 'ja') {
+            return response
+        }
         // Parse response to JSON
         const data = await response.json();
         // Parse specific fields of the response using Zod schema
