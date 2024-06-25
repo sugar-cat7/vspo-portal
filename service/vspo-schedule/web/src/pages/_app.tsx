@@ -9,6 +9,7 @@ import { ThemeModeProvider } from "@/context/Theme";
 import { GoogleAnalytics } from "@/components/Elements";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { VideoModalContextProvider } from "@/context/VideoModalContext";
+import { appWithTranslation } from "next-i18next";
 
 config.autoAddCss = false;
 
@@ -20,7 +21,7 @@ export type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-export default function App({ Component, pageProps }: AppPropsWithLayout) {
+function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
@@ -36,3 +37,5 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
     </>
   );
 }
+
+export default appWithTranslation(App);
