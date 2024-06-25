@@ -22,3 +22,9 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: ${{ github.event.inputs.service }}
+          secrets: |
+            TRANSLATE_URL
+            API_BASE_URL
+        env:
+          TRANSLATE_URL: ${{ secrets.TRANSLATE_URL }}
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}

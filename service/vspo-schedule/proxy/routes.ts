@@ -6,16 +6,15 @@ export const registerProxyRoutes = (app: App) => {
         // Get language from query parameter, default to 'ja' (Japanese)
         const lang = c.req.query('lang') || 'ja';
         const { kv } = c.get('services');
-
+        console.log("kv", kv)
         // Send request to Backend API
-        const response = await fetch(c.get('requestUrl'));
+        const response = await fetch(c.get('requestUrl'), { headers: c.req.raw.headers });
 
         // Parse response to JSON
         const data = await response.json();
-
         // Parse specific fields of the response using Zod schema
         const parsedData = VideoSchema.array().parse(data);
-
+        // console.log("parsedData", parsedData)
         // Process each item
         const translatedDataPromises = parsedData.map(async item => {
             const kvKey = `key_${item.id}_${lang}`;
@@ -50,22 +49,31 @@ export const registerProxyRoutes = (app: App) => {
         const translatedData = await Promise.all(translatedDataPromises);
 
         // Return the translated data
-        return c.json(translatedData);
+        return c.json("translatedData");
     });
 }
 
 // Function to translate text
-const translateText = async (c: AppContext, text: string, lang: string): Promise<string> => {
-    const { translator } = c.get('services');
-    const request = {
-        parent: c.get('gcpProjectPath'),
-        contents: [text],
-        mimeType: 'text/plain',
-        sourceLanguageCode: 'ja',
-        targetLanguageCode: lang,
+const translateText = async (c: AppContext, text: string, targetLang: string): Promise<string> => {
+    const requestBody = {
+        q: text,
+        source: 'ja',
+        target: targetLang,
+        format: 'text'
     };
 
-    const [response] = await translator.translateText(request);
+    // Perform the fetch request to the Translation API
+    const response = await fetch(c.get('translateUrl'), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+    });
 
-    return response.translations?.at(0)?.translatedText || '';
-}
+    // Parse the response and extract the translated text
+    const responseData: { translations: Array<{ detectedSourceLanguage: string, model: string, translatedText: string }> } = await response.json()
+    const translatedText = responseData?.translations?.at(0)?.translatedText || text;
+
+    return translatedText;
+};

@@ -14,7 +14,7 @@ export const zEnv = z.object({
     SERVICE_NAME: z.string(),
     API_BASE_URL: z.string(),
     APP_KV: z.custom<KVNamespace>(),
-    GCP_PROJECT_PATH: z.string(),
+    TRANSLATE_URL: z.string(),
 });
 
 export type Env = z.infer<typeof zEnv>;
