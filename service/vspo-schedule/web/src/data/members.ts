@@ -230,6 +230,30 @@ export const members: Member[] = [
       "https://yt3.googleusercontent.com/Q5r7YGQy17IXQTQOCo9fzUb3LBVh4m61y5EPs6lulBRB0kedZEDfcp-_idAbfSiZ1Hbhp5jW=s176-c-k-c0x00ffffff-no-rj",
     keywords: [],
   },
+  {
+    id: 23,
+    name: "Remia Aotsuki",
+    channelId: "UCCra1t-eIlO3ULyXQQMD9Xw",
+    iconUrl:
+      "https://yt3.ggpht.com/_ZXWSEkZc-HWDhMzW_uOCGqJPbnMKNzAUOx_28omus1sUw4YOb3qixY7fRzT7o5P_ONFzAfYqsU=s88-c-k-c0x00ffffff-no-rj",
+    keywords: [],
+  },
+  {
+    id: 24,
+    name: "Jira Jisaki",
+    channelId: "UCeCWj-SiJG9SWN6wGORiLmw",
+    iconUrl:
+      "https://yt3.ggpht.com/-vNvJ64yYeDrjAKWz0z0atBNWSW_1p3lCRZjQpfzaKp3JvQY46focTOTXN3-uXAK65hcy31oOQ=s88-c-k-c0x00ffffff-no-rj",
+    keywords: [],
+  },
+  {
+    id: 25,
+    name: "Arya Kuroha",
+    channelId: "UCLlJpxXt6L5d-XQ0cDdIyDQ",
+    iconUrl:
+      "https://yt3.ggpht.com/5mAqbF3j7cJ4DoAgcglo5lrnJaNR3uzyjAUf4UKi-ud3PA8gtdWL-rMAp45U4qNd-gV7mgww0co=s88-c-k-c0x00ffffff-no-rj",
+    keywords: [],
+  },
 ].map((member) => ({
   ...member,
   keywords: [...member.keywords, member.name],
