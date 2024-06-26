@@ -1,5 +1,43 @@
 {
   "spodule": "Spodule",
+  "vspo": "VSPO!",
   "noLivestreams": "No matching livestreams. ※You cannot search for livestreams older than one week.",
-  "livestreamsOfDate": "Livestreams of {date}"
+  "search": "Search",
+  "back": "Back",
+  "footer": {
+    "lastUpdated": "Page last updated: {{date}}",
+    "pages": {
+      "home": "Home",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    }
+  },
+  "bottomNav": {
+    "pages": {
+      "list": "Streams",
+      "clip": "Clips",
+      "twitch-clip": "Twitch Clips",
+      "event": "Events"
+    }
+  },
+  "drawer": {
+    "pages": {
+      "live": "Live Streams",
+      "upcoming": "Upcoming Streams",
+      "archive": "Archived Streams",
+      "freechat": "Freechats",
+      "clip": "Clips",
+      "twitch-clip": "Twitch Clips",
+      "about": "About Spodule",
+      "site-news": "Site News",
+      "qa": "Contact Us",
+      "discord": "Discord Bot"
+    },
+    "settings": "Settings",
+    "site-theme": "Theme"
+  },
+  "alert": {
+    "title": "Notice",
+    "message": "Spodule Discord bot is now available!\nAdd it to your server from the site sidebar."
+  }
 }

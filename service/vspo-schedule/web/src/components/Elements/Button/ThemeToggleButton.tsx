@@ -72,7 +72,7 @@ export const ThemeToggleButton: React.FC = () => {
   ) => {
     setMode(checked ? "dark" : "light");
   };
-  const label = `背景のテーマ: ${mode ?? "light"}`;
+  const label = `Theme: ${mode ?? "light"}`;
   return (
     <FormGroup>
       <FormControlLabel

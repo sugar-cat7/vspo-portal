@@ -1,5 +1,43 @@
 {
   "spodule": "すぽじゅーる",
+  "vspo": "ぶいすぽっ！",
   "noLivestreams": "対象の配信はありません。※現在1週間以上前の配信は検索できません。",
-  "livestreamsOfDate": "{date}の配信一覧"
+  "search": "検索",
+  "back": "戻る",
+  "footer": {
+    "lastUpdated": "最終更新日時: {{date}}",
+    "pages": {
+      "home": "ホーム",
+      "terms": "利用規約",
+      "privacy": "プライバシーポリシー"
+    }
+  },
+  "bottomNav": {
+    "pages": {
+      "list": "配信一覧",
+      "clip": "切り抜き",
+      "twitch-clip": "クリップ",
+      "event": "イベント"
+    }
+  },
+  "drawer": {
+    "pages": {
+      "live": "配信中",
+      "upcoming": "配信予定",
+      "archive": "アーカイブ",
+      "freechat": "フリーチャット",
+      "clip": "切り抜き一覧",
+      "twitch-clip": "クリップ一覧",
+      "about": "すぽじゅーるについて",
+      "site-news": "お知らせ",
+      "qa": "お問い合わせ",
+      "discord": "Discord Bot"
+    },
+    "settings": "設定",
+    "site-theme": "背景のテーマ"
+  },
+  "alert": {
+    "title": "お知らせ",
+    "message": "配信情報を通知するDiscord Botを公開しました！\nサイドバーから追加できます。"
+  }
 }

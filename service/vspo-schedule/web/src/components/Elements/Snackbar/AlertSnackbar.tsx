@@ -1,20 +1,12 @@
 import { Alert, IconButton, Snackbar } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import CloseIcon from "@mui/icons-material/Close";
-
-const latestNewsMessage = (
-  <>
-    [お知らせ]
-    <br />
-    配信情報を通知するDiscord Botを公開しました！
-    <br />
-    サイドバーから追加できます。
-  </>
-);
+import { useTranslation } from "next-i18next";
 
 const StyledAlert = styled(Alert)({
   backgroundColor: "#e5f6fd",
   color: "#014361",
+  whiteSpace: "pre-line",
 });
 
 type AlertSnackbarProps = {
@@ -26,6 +18,8 @@ export const AlertSnackbar: React.FC<AlertSnackbarProps> = ({
   open,
   onClose,
 }) => {
+  const { t } = useTranslation("common");
+
   return (
     <Snackbar
       open={open}
@@ -48,7 +42,9 @@ export const AlertSnackbar: React.FC<AlertSnackbarProps> = ({
           </IconButton>
         }
       >
-        {latestNewsMessage}
+        {`[${t("alert.title")}]`}
+        <br />
+        {t("alert.message")}
       </StyledAlert>
     </Snackbar>
   );

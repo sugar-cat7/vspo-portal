@@ -22,11 +22,18 @@ import { VspoEvent } from "@/types/events";
 import { ContentLayout } from "@/components/Layout";
 import { useMediaQuery } from "@mui/material";
 import { members } from "@/data/members";
-import { formatWithTimeZone, groupEventsByYearMonth } from "@/lib/utils";
+import {
+  formatDate,
+  formatWithTimeZone,
+  groupEventsByYearMonth,
+} from "@/lib/utils";
 import React, { useEffect } from "react";
 import { fetchEvents } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
+import { DEFAULT_LOCALE } from "@/lib/Const";
 
 type Params = {
   yearMonth: string;
@@ -73,43 +80,56 @@ const YearMonthSelector: React.FC<{
   beforeYearMonth?: string;
   currentYearMonth?: string;
   nextYearMonth?: string;
-}> = ({ beforeYearMonth, currentYearMonth, nextYearMonth }) => (
-  <>
-    <AdjacentYearMonthButton
-      disabled={!beforeYearMonth}
-      yearMonth={beforeYearMonth}
-    >
-      前の月へ
-    </AdjacentYearMonthButton>
-    <Typography
-      variant="h6"
-      component="div"
-      style={{ width: "160px", textAlign: "center" }}
-    >
-      {currentYearMonth && currentYearMonth.replace("-", "年") + "月"}
-    </Typography>
-    <AdjacentYearMonthButton
-      disabled={!nextYearMonth}
-      yearMonth={nextYearMonth}
-    >
-      次の月へ
-    </AdjacentYearMonthButton>
-  </>
-);
+}> = ({ beforeYearMonth, currentYearMonth, nextYearMonth }) => {
+  const { t } = useTranslation("events");
 
-export const getStaticPaths: GetStaticPaths<Params> = async () => {
+  return (
+    <>
+      <AdjacentYearMonthButton
+        disabled={!beforeYearMonth}
+        yearMonth={beforeYearMonth}
+      >
+        {t("prevMonth")}
+      </AdjacentYearMonthButton>
+      <Typography
+        variant="h6"
+        component="div"
+        style={{ width: "160px", textAlign: "center" }}
+      >
+        {currentYearMonth &&
+          t("currMonth", { val: new Date(currentYearMonth) })}
+      </Typography>
+      <AdjacentYearMonthButton
+        disabled={!nextYearMonth}
+        yearMonth={nextYearMonth}
+      >
+        {t("nextMonth")}
+      </AdjacentYearMonthButton>
+    </>
+  );
+};
+
+export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
   const fetchedEvents = await fetchEvents();
   const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
+  const yearMonths = Object.keys(eventsByMonth);
 
-  const paths = Object.keys(eventsByMonth).map((yearMonth) => ({
-    params: { yearMonth },
-  }));
+  const paths =
+    locales === undefined
+      ? yearMonths.map((yearMonth) => ({ params: { yearMonth } }))
+      : yearMonths.flatMap((yearMonth) => {
+          return locales.map((locale) => ({
+            params: { yearMonth },
+            locale,
+          }));
+        });
 
   return { paths, fallback: true };
 };
 
 export const getStaticProps: GetStaticProps<Props, Params> = async ({
   params,
+  locale = DEFAULT_LOCALE,
 }) => {
   if (!params) {
     return {
@@ -145,8 +165,9 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
   const latestYearMonth = Object.keys(eventsByMonth).sort().pop();
   return {
     props: {
+      ...(await serverSideTranslations(locale, ["common", "events"])),
       events: sortedData,
-      lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
+      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
       beforeYearMonth: beforeYearMonth,
       nextYearMonth: nextYearMonth,
       currentYearMonth: yearMonth,
@@ -164,6 +185,8 @@ const IndexPage: NextPageWithLayout<Props> = ({
 }) => {
   const router = useRouter();
   const todayEventRef = React.useRef<HTMLDivElement>(null);
+  const { t } = useTranslation("common");
+  const locale = router.locale ?? DEFAULT_LOCALE;
 
   const matches = useMediaQuery("(max-width:600px)");
   const [searchText, setSearchText] = React.useState("");
@@ -225,7 +248,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
         <TextField
           fullWidth
           variant="outlined"
-          label="検索"
+          label={t("search")}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           sx={{ marginBottom: "20px" }}
@@ -253,7 +276,10 @@ const IndexPage: NextPageWithLayout<Props> = ({
                       width: "100px",
                     }}
                   >
-                    {formatWithTimeZone(new Date(date), "ja", "MM/dd (E)")}
+                    {formatDate(date, "MM/dd (E)", {
+                      localeCode: locale,
+                      timeZone: "JST",
+                    })}
                   </Typography>
                 </TimelineOppositeContent>
                 <TimelineSeparator>
@@ -264,6 +290,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: matches ? "40px" : "20px", px: 2 }}>
                   {eventsOnDate.map((event, eventIndex) => {
+                    // TODO: Consider whether an event should hold time zone info
                     const eventDate = event.startedAt.split("T")[0]; // Get the date part of the ISO string
                     const today = formatWithTimeZone(
                       new Date(),
@@ -371,18 +398,27 @@ const IndexPage: NextPageWithLayout<Props> = ({
     </>
   );
 };
-IndexPage.getLayout = (page, pageProps) => {
+
+const IndexPageLayout: React.FC<{
+  pageProps: Props;
+  children: React.ReactNode;
+}> = ({ pageProps, children }) => {
+  const { t } = useTranslation("events");
   return (
     <ContentLayout
-      title="ぶいすぽっ!イベント一覧"
-      description="ぶいすぽっ!が関係するイベントをまとめています。"
+      title={t("title")}
+      description={t("description")}
       lastUpdateDate={pageProps.lastUpdateDate}
       path={`/events/${pageProps.currentYearMonth}`}
       maxPageWidth="md"
     >
-      {page}
+      {children}
     </ContentLayout>
   );
 };
+
+IndexPage.getLayout = (page, pageProps) => (
+  <IndexPageLayout pageProps={pageProps}>{page}</IndexPageLayout>
+);
 
 export default IndexPage;

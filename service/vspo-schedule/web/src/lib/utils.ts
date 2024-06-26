@@ -10,10 +10,10 @@ import {
   Video,
 } from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
-import { format, utcToZonedTime } from "date-fns-tz";
+import { format, formatInTimeZone, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
 import { Locale } from "date-fns";
-import { TEMP_TIMESTAMP } from "./Const";
+import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "./Const";
 import { platforms } from "@/constants/platforms";
 
 /**
@@ -349,8 +349,8 @@ export const getOneWeekRange = () => {
 };
 
 const locales: Record<string, Locale> = {
-  enUS,
-  ja,
+  en: enUS,
+  ja: ja,
 };
 const localeTimeZoneMap: Record<string, string> = {
   ja: "Asia/Tokyo",
@@ -372,6 +372,23 @@ export const formatWithTimeZone = (
   const timeZone = localeTimeZoneMap[localeCode];
   const zonedDate = utcToZonedTime(date, timeZone);
   return format(zonedDate, dateFormat, { locale: locales[localeCode] });
+};
+
+/**
+ * Format a date with the given format, locale, and time zone.
+ * @param date - The Date object, date string, or timestamp to format.
+ * @param dateFormat - The date format pattern to use for formatting.
+ * @param localeCode - The code identifying the locale to use for formatting.
+ * @param timeZone - The time zone to use for formatting.
+ * @returns A formatted date string.
+ */
+export const formatDate = (
+  date: Date | number | string,
+  dateFormat: string,
+  { localeCode = DEFAULT_LOCALE, timeZone = "UTC" } = {},
+): string => {
+  const locale = locales[localeCode] ?? enUS;
+  return formatInTimeZone(new Date(date), timeZone, dateFormat, { locale });
 };
 
 /**
