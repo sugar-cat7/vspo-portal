@@ -1,9 +1,10 @@
 name: Deploy Worker Preview
 on:
-  push:
+  pull_request:
     branches: [main]
     paths:
       - 'service/vspo-schedule/**'
+      - '.github/workflows/deploy-workers-preview.yaml'
   workflow_dispatch:
     inputs:
       service:
