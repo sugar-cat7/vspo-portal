@@ -1,4 +1,4 @@
-import { EventSchema } from "@/schema";
+import { EventsSchema } from "@/schema";
 import { convertToUTC } from "../dayjs";
 import { AppContext } from "../hono";
 import { translateText } from "../translator";
@@ -6,7 +6,7 @@ import { translateText } from "../translator";
 export const eventProcessor = async (c: AppContext, data: any) => {
     const { kv } = c.get('services');
     const lang = c.req.query('lang') || 'ja';
-    const parsedData = EventSchema.array().parse(data);
+    const parsedData = EventsSchema.parse(data);
     parsedData.forEach(item => {
         item.startedAt = convertToUTC(item.startedAt);
     })
