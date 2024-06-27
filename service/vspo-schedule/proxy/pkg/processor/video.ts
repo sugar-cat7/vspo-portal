@@ -10,7 +10,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     // Livestream, freechat, clip.....
     // Parse specific fields of the response using Zod schema
     let parsedData: z.infer<typeof VideoSchema>[] = [];
-    if (c.req.path.includes('clips')) {
+    if (c.req.path.includes('clips/youtube')) {
         parsedData = VideoSchema.array().parse(data.pastClips);
     } else {
         parsedData = VideoSchema.array().parse(data);
