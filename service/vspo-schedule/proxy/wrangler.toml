@@ -11,6 +11,3 @@ kv_namespaces = [
 
 [vars]
 SERVICE_NAME = "vspo-schedule-proxy"
-BASELIME_API_KEY = "xxx"
-TRANSLATE_URL = "xxx"
-API_BASE_URL = "xxx"
