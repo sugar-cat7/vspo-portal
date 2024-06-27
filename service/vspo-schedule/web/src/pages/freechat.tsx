@@ -1,6 +1,6 @@
 import { LivestreamCard } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
-import { formatWithTimeZone } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { GetStaticProps } from "next";
 import React from "react";
 import { NextPageWithLayout } from "./_app";
@@ -8,6 +8,9 @@ import { Livestream } from "@/types/streaming";
 import { Grid } from "@mui/material";
 import { members } from "@/data/members";
 import { fetchFreechats } from "@/lib/api";
+import { DEFAULT_LOCALE } from "@/lib/Const";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 
 type FreechatsProps = {
   freechats: Livestream[];
@@ -26,7 +29,9 @@ const FreechatPage: NextPageWithLayout<FreechatsProps> = ({ freechats }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps<FreechatsProps> = async () => {
+export const getStaticProps: GetStaticProps<FreechatsProps> = async ({
+  locale = DEFAULT_LOCALE,
+}) => {
   const freechats = await fetchFreechats();
 
   // Create a mapping of channelId to id for members
@@ -42,25 +47,34 @@ export const getStaticProps: GetStaticProps<FreechatsProps> = async () => {
   });
   return {
     props: {
+      ...(await serverSideTranslations(locale, ["common", "freechat"])),
       freechats: freechats,
-      lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
+      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
     },
   };
 };
 
-FreechatPage.getLayout = (page, pageProps) => {
+const FreechatLayout: React.FC<{
+  pageProps: FreechatsProps;
+  children: React.ReactNode;
+}> = ({ pageProps, children }) => {
+  const { t } = useTranslation("freechat");
   return (
     <ContentLayout
-      title="ぶいすぽっ!フリーチャット"
-      description="ぶいすぽっ!メンバーのフリーチャットを確認できます。"
+      title={t("title")}
+      description={t("description")}
       lastUpdateDate={pageProps.lastUpdateDate}
       path="/freechat"
       maxPageWidth="lg"
       padTop
     >
-      {page}
+      {children}
     </ContentLayout>
   );
 };
+
+FreechatPage.getLayout = (page, pageProps) => (
+  <FreechatLayout pageProps={pageProps}>{page}</FreechatLayout>
+);
 
 export default FreechatPage;

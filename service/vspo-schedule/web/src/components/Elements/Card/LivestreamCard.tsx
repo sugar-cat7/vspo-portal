@@ -13,6 +13,7 @@ import { getLiveStatus, formatWithTimeZone } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
 import Image from "next/image";
 import { useVideoModalContext } from "@/hooks";
+import { useTranslation } from "next-i18next";
 
 type StyledCardProps = {
   liveStatus: LiveStatus | "freechat";
@@ -21,6 +22,8 @@ type StyledCardProps = {
 const LiveLabel = styled("div")<{ isUpcoming?: boolean }>(
   ({ theme, isUpcoming }) => ({
     width: "78px",
+    minWidth: "fit-content",
+    padding: "0 12px",
     color: "rgb(255, 255, 255)",
     fontSize: "15px",
     fontWeight: "700",
@@ -36,6 +39,7 @@ const LiveLabel = styled("div")<{ isUpcoming?: boolean }>(
     [theme.breakpoints.down("md")]: {
       // CSS for tablet devices
       width: "60px",
+      padding: "0 10px",
       fontSize: "12px",
       lineHeight: "18px",
       top: "-10px",
@@ -44,6 +48,7 @@ const LiveLabel = styled("div")<{ isUpcoming?: boolean }>(
     [theme.breakpoints.down("sm")]: {
       // CSS for mobile devices
       width: "50px",
+      padding: "0 8px",
       fontSize: "10px",
       lineHeight: "14px",
       top: "-8px",
@@ -134,6 +139,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
   livestream,
 }) => {
   const { pushVideo } = useVideoModalContext();
+  const { t } = useTranslation("streams");
   const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
     livestream;
   const livestreamStatus = useMemo(
@@ -142,9 +148,9 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
   );
   return (
     <CardBox>
-      {livestreamStatus === "live" && <LiveLabel>Live</LiveLabel>}
+      {livestreamStatus === "live" && <LiveLabel>{t("status.live")}</LiveLabel>}
       {livestreamStatus === "upcoming" && (
-        <LiveLabel isUpcoming>配信予定</LiveLabel>
+        <LiveLabel isUpcoming>{t("status.upcoming")}</LiveLabel>
       )}
       <StyledCard liveStatus={livestreamStatus}>
         <CardActionArea onClick={() => pushVideo(livestream)}>
