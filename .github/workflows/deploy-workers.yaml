@@ -22,6 +22,8 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: ${{ github.event.inputs.service }}
+          environment: production
+          command: deploy --env production
           secrets: |
             TRANSLATE_URL
             API_BASE_URL
