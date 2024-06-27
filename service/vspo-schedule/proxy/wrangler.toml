@@ -5,11 +5,12 @@ main = "cmd/server/index.ts"
 # tail_consumers = [{ service = "vspo-schedule-proxy-tail" }]
 logpush = true
 
+[env.production]
 kv_namespaces = [
-    { binding = "APP_KV", id = "5e5d47010ba44070ae8dbb819ed26a68" },
+    { binding = "APP_KV", id = "03a6063eb8ff4686be651ed6176ab252" },
 ]
 
-[vars]
+[env.production.vars]
 SERVICE_NAME = "vspo-schedule-proxy"
 
 [env.preview]
