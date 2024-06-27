@@ -11,8 +11,9 @@ export const registerOldAPIProxyRoutes = (app: App) => {
 
         // Event...
         if (c.req.path.includes('events')) {
-            const translatedData = await eventProcessor(c, data);
-            return c.json(translatedData);
+            return response
+            // const translatedData = await eventProcessor(c, data);
+            // return c.json(translatedData);
         }
 
         // Livestream, freechat, clip.....
