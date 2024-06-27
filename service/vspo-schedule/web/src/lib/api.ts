@@ -99,7 +99,7 @@ export const fetchFreechats = async (): Promise<Livestream[]> => {
 export const fetchClips = async (): Promise<Clip[]> => {
   try {
     if (ENVIRONMENT === "production") {
-      const response = await axios.get<{ pastClips: Clip[] }>(
+      const response = await axios.get<Clip[]>(
         `${API_ROOT}/api/clips/youtube`,
         {
           headers: {
@@ -107,7 +107,7 @@ export const fetchClips = async (): Promise<Clip[]> => {
           },
         },
       );
-      return convertThumbnailQualityInObjects(response.data.pastClips);
+      return convertThumbnailQualityInObjects(response.data);
     } else {
       return mockClips;
     }
