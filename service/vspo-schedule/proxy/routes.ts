@@ -9,6 +9,14 @@ export const registerProxyRoutes = (app: App) => {
         const { kv } = c.get('services');
         // Send request to Backend API
         const response = await fetch(c.get('requestUrl'), { headers: c.req.raw.headers });
+        // FIXME: path
+        if (c.req.path.includes('events')) {
+            return response;
+        }
+
+        if (c.req.path.includes('clips')) {
+            return response;
+        }
 
         // Parse response to JSON
         const data = await response.json();
