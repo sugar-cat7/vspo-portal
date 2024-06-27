@@ -22,11 +22,6 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: ${{ github.event.inputs.service }}
-          environment: production
-          command: deploy --env production
-          postCommands: |
-            echo "*** post commands ***"
-            wrangler kv:namespace create APP_KV
           secrets: |
             TRANSLATE_URL
             API_BASE_URL
