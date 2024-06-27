@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test'
-import { convertToUTC, convertToUTCDate, getCurrentUTCDate } from '@/pkg'
+import { convertToUTC, convertToUTCDate, getCurrentUTCDate } from '@/pkg/dayjs'
 
 const testCases = [
   {
