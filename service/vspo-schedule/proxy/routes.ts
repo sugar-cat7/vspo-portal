@@ -7,7 +7,7 @@ export const registerOldAPIProxyRoutes = (app: App) => {
         const response = await fetch(c.get('requestUrl'), { headers: c.req.raw.headers });
 
         // Event...
-        if (c.req.path.includes('events')) {
+        if (c.req.path.includes('events') || c.req.path.includes('clips')) {
             return response
             // const translatedData = await eventProcessor(c, data);
             // return c.json(translatedData);
