@@ -1,3 +1,4 @@
+import { convertToUTC } from './pkg/dayjs';
 import { App, AppContext } from './pkg/hono';
 import { VideoSchema } from './schema';
 
@@ -9,14 +10,25 @@ export const registerProxyRoutes = (app: App) => {
         // Send request to Backend API
         const response = await fetch(c.get('requestUrl'), { headers: c.req.raw.headers });
 
-        if (lang === 'ja') {
-            return response
-        }
         // Parse response to JSON
         const data = await response.json();
         // Parse specific fields of the response using Zod schema
         const parsedData = VideoSchema.array().parse(data);
 
+        // Date Format To UTC: scheduledStartTime, actualEndTime, createdAt
+        parsedData.forEach(item => {
+            item.scheduledStartTime = convertToUTC(item.scheduledStartTime);
+            if (item.actualEndTime) {
+                item.actualEndTime = convertToUTC(item.actualEndTime);
+            }
+            if (item.createdAt) {
+                item.createdAt = convertToUTC(item.createdAt);
+            }
+        });
+
+        if (lang === 'ja') {
+            return c.json(parsedData);
+        }
         // Process each item
         const translatedDataPromises = parsedData.map(async item => {
             const kvKey = `${item.id}_${lang}`;
