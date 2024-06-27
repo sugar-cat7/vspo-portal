@@ -22,6 +22,10 @@ type Props = {
   event: VspoEvent;
   lastUpdateDate: string;
   id: string;
+  meta: {
+    title: string;
+    description: string;
+  };
 };
 
 export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
@@ -65,6 +69,10 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
       event: event,
       id: params.id,
       lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
+      meta: {
+        title: event.title,
+        description: event.contentSummary,
+      },
     },
   };
 };
@@ -174,34 +182,15 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
   );
 };
 
-const EventPageLayout: React.FC<{
-  pageProps: Props;
-  children: React.ReactNode;
-}> = ({ pageProps, children }) => {
-  const { t } = useTranslation("events");
-
-  /* eslint-disable @typescript-eslint/no-unnecessary-condition --
-   * pageProps is empty in fallback render
-   */
-  const eventTitle = pageProps.event?.title ?? t("eventNotFoundTitle");
-  const eventDescription =
-    pageProps.event?.contentSummary ?? t("eventNotFoundDescription");
-  /* eslint-enable @typescript-eslint/no-unnecessary-condition */
-
-  return (
-    <ContentLayout
-      title={eventTitle}
-      description={eventDescription}
-      path={`/events/details/${pageProps.id}`}
-      maxPageWidth="md"
-    >
-      {children}
-    </ContentLayout>
-  );
-};
-
 EventPage.getLayout = (page, pageProps) => (
-  <EventPageLayout pageProps={pageProps}>{page}</EventPageLayout>
+  <ContentLayout
+    title={pageProps.meta?.title}
+    description={pageProps.meta?.description}
+    path={`/events/details/${pageProps.id}`}
+    maxPageWidth="md"
+  >
+    {page}
+  </ContentLayout>
 );
 
 export default EventPage;

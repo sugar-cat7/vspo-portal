@@ -15,6 +15,8 @@ import { enUS, ja } from "date-fns/locale";
 import { Locale } from "date-fns";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "./Const";
 import { platforms } from "@/constants/platforms";
+import { SSRConfig } from "next-i18next";
+import { createInstance as createI18nInstance } from "i18next";
 
 /**
  * Group an array of items by a specified key.
@@ -670,4 +672,28 @@ export const isValidDate = (dateString: string) => {
   const dNum = d.getTime();
   if (!dNum && dNum !== 0) return false; // NaN value, Invalid date
   return d.toISOString().slice(0, 10) === dateString;
+};
+
+/**
+ * Gets an initialized i18n instance created from the config object given by
+ * `serverSideTranslations`.
+ * Enables translations to be used in `getStaticProps`.
+ * @param translations - The object obtained from `serverSideTranslations`.
+ * @returns An initialized i18n instance.
+ */
+export const getInitializedI18nInstance = (
+  translations: SSRConfig,
+  defaultNamespace?: string,
+) => {
+  const { _nextI18Next: nextI18Next } = translations;
+  const i18n = createI18nInstance({
+    ...nextI18Next?.userConfig,
+    lng: nextI18Next?.initialLocale,
+    ns: nextI18Next?.ns,
+    defaultNS: defaultNamespace ?? false,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    resources: nextI18Next?.initialI18nStore,
+  });
+  i18n.init();
+  return i18n;
 };

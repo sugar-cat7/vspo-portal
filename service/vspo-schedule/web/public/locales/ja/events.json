@@ -3,7 +3,5 @@
   "description": "$t(common:vspo)が関係するイベントをまとめています。",
   "prevMonth": "前の月へ",
   "nextMonth": "次の月へ",
-  "currMonth": "{{val, datetime(year: numeric; month: long; timeZone: UTC)}}",
-  "eventNotFoundTitle": "Event Not Found",
-  "eventNotFoundDescription": "お探しのイベントは見つかりませんでした。"
+  "currMonth": "{{val, datetime(year: numeric; month: long; timeZone: UTC)}}"
 }

@@ -25,6 +25,7 @@ import { members } from "@/data/members";
 import {
   formatDate,
   formatWithTimeZone,
+  getInitializedI18nInstance,
   groupEventsByYearMonth,
 } from "@/lib/utils";
 import React, { useEffect } from "react";
@@ -46,6 +47,10 @@ type Props = {
   beforeYearMonth?: string;
   currentYearMonth?: string;
   latestYearMonth?: string;
+  meta: {
+    title: string;
+    description: string;
+  };
 };
 
 type EventsByDate = {
@@ -163,15 +168,26 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
   );
 
   const latestYearMonth = Object.keys(eventsByMonth).sort().pop();
+
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "events",
+  ]);
+  const { t } = getInitializedI18nInstance(translations);
+
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "events"])),
+      ...translations,
       events: sortedData,
       lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
       beforeYearMonth: beforeYearMonth,
       nextYearMonth: nextYearMonth,
       currentYearMonth: yearMonth,
       latestYearMonth: latestYearMonth,
+      meta: {
+        title: t("title", { ns: "events" }),
+        description: t("description", { ns: "events" }),
+      },
     },
   };
 };
@@ -399,26 +415,16 @@ const IndexPage: NextPageWithLayout<Props> = ({
   );
 };
 
-const IndexPageLayout: React.FC<{
-  pageProps: Props;
-  children: React.ReactNode;
-}> = ({ pageProps, children }) => {
-  const { t } = useTranslation("events");
-  return (
-    <ContentLayout
-      title={t("title")}
-      description={t("description")}
-      lastUpdateDate={pageProps.lastUpdateDate}
-      path={`/events/${pageProps.currentYearMonth}`}
-      maxPageWidth="md"
-    >
-      {children}
-    </ContentLayout>
-  );
-};
-
 IndexPage.getLayout = (page, pageProps) => (
-  <IndexPageLayout pageProps={pageProps}>{page}</IndexPageLayout>
+  <ContentLayout
+    title={pageProps.meta?.title}
+    description={pageProps.meta?.description}
+    lastUpdateDate={pageProps.lastUpdateDate}
+    path={`/events/${pageProps.currentYearMonth}`}
+    maxPageWidth="md"
+  >
+    {page}
+  </ContentLayout>
 );
 
 export default IndexPage;

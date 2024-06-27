@@ -1,9 +1,7 @@
 {
   "title": "$t(common:vspo) Events",
-  "description": "View recent $t(common:vspo)-related events.",
+  "description": "View recent and upcoming events related to $t(common:vspo).",
   "prevMonth": "Prev Month",
   "nextMonth": "Next Month",
-  "currMonth": "{{val, datetime(year: numeric; month: long; timeZone: UTC)}}",
-  "eventNotFoundTitle": "Event Not Found",
-  "eventNotFoundDescription": "This event could not be found."
+  "currMonth": "{{val, datetime(year: numeric; month: long; timeZone: UTC)}}"
 }

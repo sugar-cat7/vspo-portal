@@ -11,6 +11,7 @@ import {
   isValidDate,
   removeDuplicateTitles,
   formatDate,
+  getInitializedI18nInstance,
 } from "@/lib/utils";
 import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
@@ -39,8 +40,11 @@ type LivestreamsProps = {
     tabDates: string[];
     todayIndex: number;
   };
+  footerMessage: string;
   meta: {
-    livestreamDescription: string;
+    title: string;
+    headTitle: string;
+    description: string;
   };
 };
 
@@ -255,23 +259,56 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   const lastUpdateDate = formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'");
   const revalidateWindow = 30;
 
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "streams",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "streams");
+
+  const footerMessage = t("membersOnlyStreamsHidden");
+
   const livestreamDescription =
     filteredLivestreams
       .slice(-50)
       .reverse()
       .map((livestream) => livestream.title)
       .join(", ") ?? "";
+  const description = `${t("description")}\n${livestreamDescription}`;
+
+  let title = "";
+  let headTitle = "";
+  switch (params.status) {
+    case "all":
+      title = t("titles.streamSchedule");
+      break;
+    case "live":
+      title = t("titles.live");
+      break;
+    case "upcoming":
+      title = t("titles.upcoming");
+      break;
+    case "archive":
+      title = t("titles.archive");
+      break;
+    default:
+      title = t("titles.streamSchedule");
+      headTitle = t("titles.dateStatus", { date: params.status });
+      break;
+  }
 
   if (["archive", "live", "upcoming"].includes(params.status)) {
     return {
       props: {
-        ...(await serverSideTranslations(locale, ["common", "streams"])),
+        ...translations,
         livestreamsByDate,
         eventsByDate,
         lastUpdateDate,
         liveStatus: params.status,
+        footerMessage,
         meta: {
-          livestreamDescription: livestreamDescription,
+          title,
+          headTitle,
+          description,
         },
       },
       revalidate: revalidateWindow,
@@ -299,7 +336,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
 
   return {
     props: {
-      ...(await serverSideTranslations(locale, ["common", "streams"])),
+      ...translations,
       livestreamsByDate,
       eventsByDate,
       lastUpdateDate,
@@ -308,58 +345,29 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         todayIndex: todayIndex,
         tabDates: tabDates,
       },
+      footerMessage,
       meta: {
-        livestreamDescription: livestreamDescription,
+        title,
+        headTitle,
+        description,
       },
     },
     revalidate: revalidateWindow,
   };
 };
 
-const HomePageLayout: React.FC<{
-  pageProps: LivestreamsProps;
-  children: React.ReactNode;
-}> = ({ pageProps, children }) => {
-  const { t } = useTranslation("streams");
-
-  let title = "";
-  let headTitle = "";
-  const additionalDescription = pageProps.meta?.livestreamDescription || "";
-  switch (pageProps.liveStatus) {
-    case "all":
-      title = t("titles.streamSchedule");
-      break;
-    case "live":
-      title = t("titles.live");
-      break;
-    case "upcoming":
-      title = t("titles.upcoming");
-      break;
-    case "archive":
-      title = t("titles.archive");
-      break;
-    default:
-      title = t("titles.streamSchedule");
-      headTitle = t("titles.dateStatus", { date: pageProps.liveStatus });
-      break;
-  }
-  return (
-    <ContentLayout
-      title={title}
-      description={`${t("description")}\n${additionalDescription}`}
-      lastUpdateDate={pageProps.lastUpdateDate}
-      footerMessage={t("membersOnlyStreamsHidden")}
-      headTitle={headTitle}
-      path={`/schedule/${pageProps.liveStatus}`}
-      canonicalPath={`/schedule/all`}
-    >
-      {children}
-    </ContentLayout>
-  );
-};
-
 HomePage.getLayout = (page, pageProps) => (
-  <HomePageLayout pageProps={pageProps}>{page}</HomePageLayout>
+  <ContentLayout
+    title={pageProps.meta?.title}
+    description={pageProps.meta?.description}
+    lastUpdateDate={pageProps.lastUpdateDate}
+    footerMessage={pageProps.footerMessage}
+    headTitle={pageProps.meta?.headTitle}
+    path={`/schedule/${pageProps.liveStatus}`}
+    canonicalPath={`/schedule/all`}
+  >
+    {page}
+  </ContentLayout>
 );
 
 export default HomePage;
