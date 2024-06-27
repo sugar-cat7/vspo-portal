@@ -1,7 +1,7 @@
 import { Env } from "@/pkg/env";
 import { newApp } from "@/pkg/hono/app";
 import { init } from "@/pkg/middleware";
-import { registerProxyRoutes } from "@/routes";
+import { registerOldAPIProxyRoutes } from "@/routes";
 
 const app = newApp();
 app.notFound((c) => {
@@ -9,7 +9,7 @@ app.notFound((c) => {
 })
 app.use("*", init())
 
-registerProxyRoutes(app)
+registerOldAPIProxyRoutes(app)
 
 
 export default {

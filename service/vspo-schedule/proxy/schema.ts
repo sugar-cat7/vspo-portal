@@ -1,17 +1,17 @@
 import { z } from "@hono/zod-openapi";
 
 
-const LivestreamSchema = z.object({
+export const VideoSchema = z.object({
     id: z.string(),
     title: z.string(),
     description: z.string(),
-    channelId: z.string(),
-    channelTitle: z.string(),
-    thumbnailUrl: z.string(),
-    scheduledStartTime: z.string(),
+    channelId: z.string().optional(),
+    channelTitle: z.string().optional(),
+    thumbnailUrl: z.string().optional(),
+    scheduledStartTime: z.string().optional(),
     actualEndTime: z.string().optional(),
-    iconUrl: z.string(),
-    platform: z.enum(["youtube", "twitch", "twitcasting", "nicovideo"]),
+    iconUrl: z.string().optional(),
+    platform: z.enum(["youtube", "twitch", "twitcasting", "nicovideo"]).optional(),
     link: z.string().optional(),
     viewCount: z.number().optional(),
     likeCount: z.number().optional(),
@@ -23,24 +23,12 @@ const LivestreamSchema = z.object({
     tempUrl: z.string().optional(),
 });
 
-const ClipSchema = z.object({
-    id: z.string(),
+export const EventSchema = z.object({
     title: z.string(),
-    description: z.string(),
-    channelId: z.string(),
-    channelTitle: z.string(),
-    thumbnailUrl: z.string(),
-    platform: z.enum(["youtube", "twitch", "twitcasting", "nicovideo"]),
-    viewCount: z.number().optional(),
-    likeCount: z.number().optional(),
-    commentCount: z.number().optional(),
-    createdAt: z.string().optional(),
-    link: z.string().optional(),
-    iconUrl: z.string(),
-    scheduledStartTime: z.string().optional(),
-    isTemp: z.boolean().optional(),
-    tempUrl: z.string().optional(),
-});
-
-
-export const VideoSchema = z.union([LivestreamSchema, ClipSchema]);
+    contentSummary: z.string(),
+    webPageLinks: z.array(z.string()),
+    tweetLinks: z.array(z.string()),
+    startedAt: z.string(),
+    isNotLink: z.boolean(),
+    newsId: z.string(),
+})
