@@ -12,7 +12,11 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     let parsedData: z.infer<typeof VideoSchema>[] = [];
     if (c.req.path.includes('clips/youtube')) {
         parsedData = VideoSchema.array().parse(data.pastClips);
-    } else {
+    }
+    else if (c.req.path.includes('clips/twitch')) {
+        return data;
+    }
+    else {
         parsedData = VideoSchema.array().parse(data);
     }
 
