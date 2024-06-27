@@ -11,3 +11,11 @@ kv_namespaces = [
 
 [vars]
 SERVICE_NAME = "vspo-schedule-proxy"
+
+[env.preview]
+kv_namespaces = [
+    { binding = "APP_KV", id = "5e5d47010ba44070ae8dbb819ed26a68" },
+]
+
+[env.preview.vars]
+SERVICE_NAME = "vspo-schedule-proxy-preview"
