@@ -20,7 +20,7 @@ export const translateText = async (c: AppContext, text: string, targetLang: str
 
     // Parse the response and extract the translated text
     const responseData: { data: { translations: Array<{ detectedSourceLanguage: string, model: string, translatedText: string }> } } = await response.json()
-    const translatedText = responseData?.data.translations?.at(0)?.translatedText || text;
+    const translatedText = responseData?.data?.translations?.at(0)?.translatedText || text;
 
     return translatedText;
 };
