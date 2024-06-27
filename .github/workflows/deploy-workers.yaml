@@ -24,6 +24,9 @@ jobs:
           workingDirectory: ${{ github.event.inputs.service }}
           environment: production
           command: deploy --env production
+          postCommands: |
+            echo "*** post commands ***"
+            wrangler kv:namespace create APP_KV
           secrets: |
             TRANSLATE_URL
             API_BASE_URL
