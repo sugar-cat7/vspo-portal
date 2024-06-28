@@ -8,7 +8,11 @@ export const eventProcessor = async (c: AppContext, data: any) => {
 
     let parsedData;
     try {
-        parsedData = data
+        if (typeof data === 'string') {
+            parsedData = JSON.parse(data);
+        } else {
+            parsedData = data;
+        }
     } catch (error) {
         console.error('Failed to parse data:', error);
         throw new Error('Invalid event data');
