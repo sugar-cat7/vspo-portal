@@ -19,6 +19,10 @@ export const eventProcessor = async (c: AppContext, data: any) => {
         item.startedAt = convertToUTC(item.startedAt);
     });
 
+    if (lang === 'ja') {
+        return parsedData
+    }
+
     const translatedDataPromises = parsedData.map(async (item: any) => {
         const kvKey = `${item.newsId}_${lang}`;
         let kvData: string | null = await kv?.get(kvKey)
