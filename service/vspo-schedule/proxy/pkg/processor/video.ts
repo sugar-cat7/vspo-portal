@@ -1,4 +1,4 @@
-import { VideoSchema } from "@/schema";
+import { VideoSchema, VideosSchema } from "@/schema";
 import { convertToUTC } from "../dayjs";
 import { AppContext } from "../hono";
 import { translateText } from "../translator";
@@ -11,13 +11,13 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     // Parse specific fields of the response using Zod schema
     let parsedData: z.infer<typeof VideoSchema>[] = [];
     if (c.req.path.includes('clips/youtube')) {
-        parsedData = VideoSchema.array().parse(data.pastClips);
+        parsedData = VideosSchema.parse(data.pastClips);
     }
     else if (c.req.path.includes('clips/twitch')) {
-        return data;
+        parsedData = VideosSchema.parse(data);
     }
     else {
-        parsedData = VideoSchema.array().parse(data);
+        parsedData = VideosSchema.parse(data);
     }
 
     // Date Format To UTC: scheduledStartTime, actualEndTime, createdAt

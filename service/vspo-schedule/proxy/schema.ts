@@ -23,6 +23,8 @@ export const VideoSchema = z.object({
     tempUrl: z.any(),
 });
 
+export const VideosSchema = z.array(z.any());
+
 export const EventSchema = z.object({
     title: z.string(),
     contentSummary: z.string(),
@@ -33,4 +35,4 @@ export const EventSchema = z.object({
     newsId: z.any(),
 });
 
-export const EventsSchema = z.array(EventSchema);
+export const EventsSchema = z.array(z.any());
