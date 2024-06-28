@@ -3,6 +3,7 @@
   "vspo": "ぶいすぽっ！",
   "noLivestreams": "対象の配信はありません。※現在1週間以上前の配信は検索できません。",
   "search": "検索",
+  "cancel": "キャンセル",
   "back": "戻る",
   "footer": {
     "lastUpdated": "最終更新日時: {{date}}",

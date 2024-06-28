@@ -1,17 +1,28 @@
 import React, { useEffect } from "react";
 import { GetStaticProps } from "next";
 import { Clip } from "@/types/streaming";
-import { filterByTimeframe, formatWithTimeZone } from "@/lib/utils";
+import {
+  filterByTimeframe,
+  formatDate,
+  getInitializedI18nInstance,
+} from "@/lib/utils";
 import { Box } from "@mui/system";
 import { NextPageWithLayout } from "./_app";
 import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
 import { fetchClips } from "@/lib/api";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { DEFAULT_LOCALE } from "@/lib/Const";
+import { useTranslation } from "next-i18next";
 
 type ClipsProps = {
   clips: Clip[];
   lastUpdateDate: string;
+  meta: {
+    title: string;
+    description: string;
+  };
 };
 
 const ClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
@@ -27,6 +38,8 @@ const ClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
     setIsProcessing(false);
   }, [clips]);
 
+  const { t } = useTranslation("clips");
+
   if (!clips) {
     return <></>;
   }
@@ -37,7 +50,7 @@ const ClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
         <Loading />
       ) : filteredClips.length === 0 ? (
         <Box mt={2} sx={{ padding: "0 50px 50px" }}>
-          対象の切り抜きはありません。
+          {t("noClips")}
         </Box>
       ) : (
         <ClipTabs clips={filteredClips} />
@@ -51,13 +64,26 @@ const ClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
+export const getStaticProps: GetStaticProps<ClipsProps> = async ({
+  locale = DEFAULT_LOCALE,
+}) => {
   const pastClips = await fetchClips();
+
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "clips",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "clips");
 
   return {
     props: {
+      ...translations,
       clips: pastClips,
-      lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
+      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
+      meta: {
+        title: t("youtubeClips.title"),
+        description: t("youtubeClips.description"),
+      },
     },
     revalidate: 1800,
   };
@@ -66,8 +92,8 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
 ClipPage.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
-      title="ぶいすぽっ!切り抜き一覧"
-      description="ぶいすぽっ!メンバーの切り抜き動画をまとめています。"
+      title={pageProps.meta.title}
+      description={pageProps.meta.description}
       lastUpdateDate={pageProps.lastUpdateDate}
       path="/clips"
     >

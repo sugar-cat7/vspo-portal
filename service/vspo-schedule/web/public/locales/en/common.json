@@ -3,6 +3,7 @@
   "vspo": "VSPO!",
   "noLivestreams": "No matching livestreams. ※You cannot search for livestreams older than one week.",
   "search": "Search",
+  "cancel": "Cancel",
   "back": "Back",
   "footer": {
     "lastUpdated": "Page last updated: {{date}}",

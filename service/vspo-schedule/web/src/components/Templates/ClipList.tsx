@@ -9,7 +9,6 @@ import {
   Pagination,
   Avatar,
   Chip,
-  PaletteColor,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Clip } from "@/types/streaming";
@@ -17,6 +16,7 @@ import { getVideoIconUrl, isTrending } from "@/lib/utils";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import Image from "next/image";
 import { useVideoModalContext } from "@/hooks";
+import { useTranslation } from "next-i18next";
 
 type Props = {
   clips: Clip[];
@@ -36,27 +36,15 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
   },
 }));
 
-const formatViewCount = (viewCount: number) => {
-  return Math.floor(viewCount / 100_000) * 10;
-};
-
-const getClipLabel = (clip: Clip) => {
-  if (isTrending(clip)) {
-    return { label: "急上昇", color: "error" };
-  }
-  // if (isPopular(clip)) {
-  //   return { label: "人気", color: "warning" };
-  // }
-  // if (isNew(clip)) {
-  //   return { label: "新着", color: "success" };
-  // }
-  return null;
+const roundViewCount = (viewCount: number) => {
+  return Math.trunc(viewCount / 100_000) * 100_000;
 };
 
 export const ClipList: React.FC<Props> = ({ clips }) => {
   const { pushVideo } = useVideoModalContext();
   const [page, setPage] = useState(1);
   const clipsPerPage = 24;
+  const { t } = useTranslation("clips");
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -72,14 +60,14 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
       <Grid container spacing={3}>
         {paginatedClips.map((clip) => {
           const iconUrl = getVideoIconUrl(clip);
-          const clipLabel = getClipLabel(clip);
+          const isClipTrending = isTrending(clip);
 
           return (
             <Grid item xs={12} sm={6} md={4} key={clip.id}>
               <Box sx={{ position: "relative" }}>
-                {clipLabel && (
+                {isClipTrending && (
                   <Chip
-                    label={clipLabel.label}
+                    label={t("clipLabels.trending")}
                     sx={{
                       position: "absolute",
                       transform: "translateY(-12px)",
@@ -87,12 +75,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
                       top: "0px",
                       right: "8px",
                       height: "24px",
-                      backgroundColor: (theme) =>
-                        (
-                          theme.vars.palette[
-                            clipLabel.color as keyof typeof theme.vars.palette
-                          ] as PaletteColor
-                        ).main,
+                      backgroundColor: (theme) => theme.vars.palette.error.main,
                       color: "white",
                     }}
                   />
@@ -104,7 +87,7 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
                     flexDirection: "column",
                     width: "100%",
                     position: "relative",
-                    ...(clipLabel ? { border: "3px solid red" } : {}),
+                    ...(isClipTrending ? { border: "3px solid red" } : {}),
                   }}
                 >
                   <CardActionArea onClick={() => pushVideo(clip)}>
@@ -172,9 +155,11 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
                                 sx={{ color: "white !important" }}
                               />
                             }
-                            label={`${formatViewCount(
-                              Number(clip.viewCount),
-                            )}万以上`}
+                            label={t("viewCountLabel", {
+                              views: roundViewCount(Number(clip.viewCount)),
+                              notation: "compact",
+                              compactDisplay: "short",
+                            })}
                             sx={{
                               height: "24px",
                               width: "90px",

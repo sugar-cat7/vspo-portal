@@ -1,17 +1,28 @@
 import React, { useEffect } from "react";
 import { GetStaticProps } from "next";
 import { Clip } from "@/types/streaming";
-import { filterByTimeframe, formatWithTimeZone } from "@/lib/utils";
+import {
+  filterByTimeframe,
+  formatDate,
+  getInitializedI18nInstance,
+} from "@/lib/utils";
 import { Box } from "@mui/system";
 import { NextPageWithLayout } from "./_app";
 import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
 import { fetchTwitchClips } from "@/lib/api";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { DEFAULT_LOCALE } from "@/lib/Const";
 
 type ClipsProps = {
   clips: Clip[];
   lastUpdateDate: string;
+  meta: {
+    title: string;
+    description: string;
+  };
 };
 
 const TwitchClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
@@ -31,6 +42,8 @@ const TwitchClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
     setIsProcessing(false);
   }, [clips]);
 
+  const { t } = useTranslation("clips");
+
   if (!clips) {
     return <></>;
   }
@@ -41,7 +54,7 @@ const TwitchClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
         <Loading />
       ) : filteredClips.length === 0 ? (
         <Box mt={2} sx={{ padding: "0 50px 50px" }}>
-          対象のクリップはありません。
+          {t("noClips")}
         </Box>
       ) : (
         <ClipTabs clips={filteredClips} />
@@ -55,13 +68,26 @@ const TwitchClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
+export const getStaticProps: GetStaticProps<ClipsProps> = async ({
+  locale = DEFAULT_LOCALE,
+}) => {
   const clips = await fetchTwitchClips();
+
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "clips",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "clips");
 
   return {
     props: {
+      ...translations,
       clips,
-      lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
+      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
+      meta: {
+        title: t("twitchClips.title"),
+        description: t("twitchClips.description"),
+      },
     },
     revalidate: 1800,
   };
@@ -70,8 +96,8 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
 TwitchClipPage.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
-      title="ぶいすぽっ!クリップ一覧"
-      description="ぶいすぽっ!メンバーのTwitchクリップをまとめています。"
+      title={pageProps.meta.title}
+      description={pageProps.meta.description}
       lastUpdateDate={pageProps.lastUpdateDate}
       path="/twitch-clips"
     >
