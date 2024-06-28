@@ -2,13 +2,23 @@ import { VideoSchema } from "@/schema";
 import { convertToUTC } from "../dayjs";
 import { AppContext } from "../hono";
 import { translateText } from "../translator";
+import { z } from "@hono/zod-openapi";
 
 export const videoProcessor = async (c: AppContext, data: any) => {
     const { kv } = c.get('services');
     const lang = c.req.query('lang') || 'ja';
     // Livestream, freechat, clip.....
     // Parse specific fields of the response using Zod schema
-    const parsedData = VideoSchema.array().parse(data);
+    let parsedData: z.infer<typeof VideoSchema>[] = [];
+    if (c.req.path.includes('clips/youtube')) {
+        parsedData = VideoSchema.array().parse(data.pastClips);
+    }
+    else if (c.req.path.includes('clips/twitch')) {
+        return data;
+    }
+    else {
+        parsedData = VideoSchema.array().parse(data);
+    }
 
     // Date Format To UTC: scheduledStartTime, actualEndTime, createdAt
     parsedData.forEach(item => {
@@ -29,7 +39,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     // Process each item
     const translatedDataPromises = parsedData.map(async item => {
         const kvKey = `${item.id}_${lang}`;
-        let kvData: string | null = await kv.get(kvKey);
+        let kvData: string | null = await kv?.get(kvKey)
         if (!kvData) {
             // Translate title and description
             const translatedTitle = await translateText(c, item.title, lang);
@@ -45,14 +55,19 @@ export const videoProcessor = async (c: AppContext, data: any) => {
             await kv.put(kvKey, JSON.stringify(kvObject));
             kvData = JSON.stringify(kvObject);
         }
+        if (kvData) {
+            // Convert data retrieved from KV store to object
+            const parsedKvData = JSON.parse(kvData);
 
-        // Convert data retrieved from KV store to object
-        const parsedKvData = JSON.parse(kvData);
-
+            // Construct return data by merging original and translated data
+            return {
+                ...item,
+                ...parsedKvData
+            };
+        }
         // Construct return data by merging original and translated data
         return {
             ...item,
-            ...parsedKvData
         };
     });
 
