@@ -31,7 +31,7 @@ export const eventProcessor = async (c: AppContext, data: any) => {
                 contentSummary: translatedContentSummary,
             };
 
-            await kv.put(kvKey, JSON.stringify(kvObject));
+            await kv?.put(kvKey, JSON.stringify(kvObject));
             kvData = JSON.stringify(kvObject);
         }
 

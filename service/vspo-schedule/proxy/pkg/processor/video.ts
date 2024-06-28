@@ -52,7 +52,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
             };
 
             // Save data to KV store
-            await kv.put(kvKey, JSON.stringify(kvObject));
+            await kv?.put(kvKey, JSON.stringify(kvObject));
             kvData = JSON.stringify(kvObject);
         }
         if (kvData) {
