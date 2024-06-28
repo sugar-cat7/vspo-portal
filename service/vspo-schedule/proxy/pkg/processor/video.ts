@@ -11,15 +11,13 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     // Parse specific fields of the response using Zod schema
     let parsedData: z.infer<typeof VideoSchema>[] = [];
     if (c.req.path.includes('clips/youtube')) {
-        parsedData = JSON.parse(data);
-        // parsedData = VideoSchema.array().parse(data.pastClips);
+        parsedData = VideoSchema.array().parse(data.pastClips);
     }
     else if (c.req.path.includes('clips/twitch')) {
         return data;
     }
     else {
-        parsedData = JSON.parse(data);
-        // parsedData = VideoSchema.array().parse(data);
+        parsedData = VideoSchema.array().parse(data);
     }
 
     // Date Format To UTC: scheduledStartTime, actualEndTime, createdAt
@@ -41,7 +39,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     // Process each item
     const translatedDataPromises = parsedData.map(async item => {
         const kvKey = `${item.id}_${lang}`;
-        let kvData: string | null = await kv.get(kvKey);
+        let kvData: string | null = await kv?.get(kvKey) ?? "{}"
         if (!kvData) {
             // Translate title and description
             const translatedTitle = await translateText(c, item.title, lang);
