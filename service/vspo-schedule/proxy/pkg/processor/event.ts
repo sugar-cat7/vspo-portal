@@ -18,17 +18,22 @@ export const eventProcessor = async (c: AppContext, data: any) => {
         throw new Error('Invalid event data');
     }
 
-    parsedData?.forEach((item: any) => {
+    if (!Array.isArray(parsedData)) {
+        console.error('Parsed data is not an array:', parsedData);
+        return data
+    }
+
+    parsedData.forEach((item: any) => {
         item.startedAt = convertToUTC(item.startedAt);
     });
 
     if (lang === 'ja') {
-        return parsedData
+        return parsedData;
     }
 
-    const translatedDataPromises = parsedData?.map(async (item: any) => {
+    const translatedDataPromises = parsedData.map(async (item: any) => {
         const kvKey = `${item.newsId}_${lang}`;
-        let kvData: string | null = await kv?.get(kvKey)
+        let kvData: string | null = await kv?.get(kvKey);
         if (!kvData) {
             const translatedTitle = await translateText(c, item.title, lang);
             const translatedContentSummary = await translateText(c, item.contentSummary, lang);
