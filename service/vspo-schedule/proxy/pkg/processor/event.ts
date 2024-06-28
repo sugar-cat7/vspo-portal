@@ -21,7 +21,7 @@ export const eventProcessor = async (c: AppContext, data: any) => {
 
     const translatedDataPromises = parsedData.map(async (item: any) => {
         const kvKey = `${item.newsId}_${lang}`;
-        let kvData: string | null = await kv?.get(kvKey) ?? "{}"
+        let kvData: string | null = await kv?.get(kvKey)
         if (!kvData) {
             const translatedTitle = await translateText(c, item.title, lang);
             const translatedContentSummary = await translateText(c, item.contentSummary, lang);
@@ -34,10 +34,19 @@ export const eventProcessor = async (c: AppContext, data: any) => {
             await kv.put(kvKey, JSON.stringify(kvObject));
             kvData = JSON.stringify(kvObject);
         }
-        const parsedKvData = JSON.parse(kvData);
+
+        if (kvData) {
+            // Convert data retrieved from KV store to object
+            const parsedKvData = JSON.parse(kvData);
+
+            // Construct return data by merging original and translated data
+            return {
+                ...item,
+                ...parsedKvData
+            };
+        }
         return {
             ...item,
-            ...parsedKvData
         };
     });
 

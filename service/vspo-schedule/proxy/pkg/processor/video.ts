@@ -39,7 +39,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     // Process each item
     const translatedDataPromises = parsedData.map(async item => {
         const kvKey = `${item.id}_${lang}`;
-        let kvData: string | null = await kv?.get(kvKey) ?? "{}"
+        let kvData: string | null = await kv?.get(kvKey)
         if (!kvData) {
             // Translate title and description
             const translatedTitle = await translateText(c, item.title, lang);
@@ -55,14 +55,19 @@ export const videoProcessor = async (c: AppContext, data: any) => {
             await kv.put(kvKey, JSON.stringify(kvObject));
             kvData = JSON.stringify(kvObject);
         }
+        if (kvData) {
+            // Convert data retrieved from KV store to object
+            const parsedKvData = JSON.parse(kvData);
 
-        // Convert data retrieved from KV store to object
-        const parsedKvData = JSON.parse(kvData);
-
+            // Construct return data by merging original and translated data
+            return {
+                ...item,
+                ...parsedKvData
+            };
+        }
         // Construct return data by merging original and translated data
         return {
             ...item,
-            ...parsedKvData
         };
     });
 
