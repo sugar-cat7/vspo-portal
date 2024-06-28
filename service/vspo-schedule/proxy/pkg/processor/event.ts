@@ -1,4 +1,3 @@
-import { EventsSchema } from "@/schema";
 import { convertToUTC } from "../dayjs";
 import { AppContext } from "../hono";
 import { translateText } from "../translator";
@@ -9,13 +8,13 @@ export const eventProcessor = async (c: AppContext, data: any) => {
 
     let parsedData;
     try {
-        parsedData = EventsSchema.parse(data);
+        parsedData = data
     } catch (error) {
         console.error('Failed to parse data:', error);
         throw new Error('Invalid event data');
     }
 
-    parsedData.forEach((item: any) => {
+    parsedData?.forEach((item: any) => {
         item.startedAt = convertToUTC(item.startedAt);
     });
 
@@ -23,7 +22,7 @@ export const eventProcessor = async (c: AppContext, data: any) => {
         return parsedData
     }
 
-    const translatedDataPromises = parsedData.map(async (item: any) => {
+    const translatedDataPromises = parsedData?.map(async (item: any) => {
         const kvKey = `${item.newsId}_${lang}`;
         let kvData: string | null = await kv?.get(kvKey)
         if (!kvData) {

@@ -21,7 +21,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     }
 
     // Date Format To UTC: scheduledStartTime, actualEndTime, createdAt
-    parsedData.forEach(item => {
+    parsedData?.forEach(item => {
         if (item.scheduledStartTime) {
             item.scheduledStartTime = convertToUTC(item.scheduledStartTime);
         }
@@ -37,7 +37,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
         return parsedData
     }
     // Process each item
-    const translatedDataPromises = parsedData.map(async item => {
+    const translatedDataPromises = parsedData?.map(async item => {
         const kvKey = `${item.id}_${lang}`;
         let kvData: string | null = await kv?.get(kvKey)
         if (!kvData) {
