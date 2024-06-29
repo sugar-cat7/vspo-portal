@@ -17,6 +17,7 @@ export type HonoEnv = {
         requestId: string;
         requestUrl: string;
         translateUrl: string;
+        apiKey: string;
         services: ServiceContext;
     };
 };

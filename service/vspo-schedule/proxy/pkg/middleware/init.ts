@@ -8,6 +8,10 @@ import { trace } from '@opentelemetry/api';
 
 export function init(): MiddlewareHandler<HonoEnv> {
     return async (c, next) => {
+        const apiKey = c.req.header('x-api-key')
+        if (!apiKey) {
+            return c.json({ error: 'Unauthorized' }, 401);
+        }
         const honoEnv = env<Env, AppContext>(c)
         const envResult = zEnv.safeParse(honoEnv)
         if (!envResult.success) {
@@ -28,6 +32,7 @@ export function init(): MiddlewareHandler<HonoEnv> {
         });
         c.set("requestUrl", envResult.data.API_BASE_URL + c.req.path);
         c.set("translateUrl", envResult.data.TRANSLATE_URL);
+        c.set("apiKey", apiKey);
         logger.info("[Request started]");
         await next();
     };

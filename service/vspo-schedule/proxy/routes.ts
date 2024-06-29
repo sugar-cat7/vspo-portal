@@ -6,7 +6,7 @@ export const registerOldAPIProxyRoutes = (app: App) => {
         // Send request to Backend API
         const channelId = c.req.query('channelId')
         const requestUrl = channelId ? c.get('requestUrl') + `?channelId=${channelId}` : c.get('requestUrl');
-        const response = await fetch(requestUrl, { ...c.req.raw });
+        const response = await fetch(requestUrl, { ...c.req.raw, headers: { "x-api-key": c.get('apiKey') } });
         const data = await response.json();
         // Event...
         if (c.req.path.includes('events')) {
