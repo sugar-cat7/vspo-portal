@@ -23,14 +23,20 @@ type Props = {
 };
 
 export const getStaticPaths: GetStaticPaths<Params> = async () => {
-  // Fetch events from API
-  const fetchedEvents = await fetchEvents();
-  const paths = fetchedEvents.map((event) => ({
-    params: { id: event.newsId },
-  }));
+  try {
+    const fetchedEvents = await fetchEvents();
+    const paths = fetchedEvents.map((event) => ({
+      params: { id: event.newsId.toString() },
+    }));
 
-  // Fallback to true to handle non-existent paths
-  return { paths, fallback: true };
+    return { paths, fallback: true };
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return {
+      paths: [],
+      fallback: true,
+    };
+  }
 };
 
 export const getStaticProps: GetStaticProps<Props, Params> = async ({
@@ -43,6 +49,11 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
   }
 
   const fetchedEvents = await fetchEvents();
+  if (!Array.isArray(fetchedEvents)) {
+    return {
+      notFound: true,
+    };
+  }
   const event = fetchedEvents.find((event) => event.newsId === params.id);
   if (!event) {
     return {
