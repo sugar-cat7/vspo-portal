@@ -236,6 +236,15 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         convertToUTCDate(b.scheduledStartTime).getTime()
       );
     });
+    filteredLivestreams.forEach((livestream) => {
+      livestream.formattedDateString = formatDate(
+        convertToUTCDate(livestream.scheduledStartTime),
+        "MM/dd(E)",
+        {
+          localeCode: locale,
+        },
+      );
+    });
     const livestreamsByDate = groupBy(filteredLivestreams, (livestream) => {
       try {
         return formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {

@@ -120,13 +120,8 @@ export const LivestreamCards: React.FC<Props> = ({
           events = eventsByDate[date];
         }
 
-        const formattedDate = formatDate(
-          livestreamsByDate[date].at(0)?.scheduledStartTime || date,
-          "MM/dd (E)",
-          {
-            localeCode: locale,
-          },
-        );
+        const formattedDate =
+          livestreamsByDate[date].at(0)?.formattedDateString;
 
         return (
           <Box
