@@ -350,18 +350,21 @@ const IndexPage: NextPageWithLayout<Props> = ({
                                   marginTop: "10px",
                                 }}
                               >
-                                {members.map(
-                                  (member, index) =>
-                                    event.contentSummary.includes(
-                                      member.name.replace(" ", ""),
-                                    ) && (
+                                {members.map((member, index) => {
+                                  const isMatch = member.keywords.some(
+                                    (keyword) =>
+                                      event.contentSummary.includes(keyword),
+                                  );
+                                  return (
+                                    isMatch && (
                                       <StyledAvatar
                                         key={index}
                                         alt={member.name}
                                         src={member.iconUrl}
                                       />
-                                    ),
-                                )}
+                                    )
+                                  );
+                                })}
                               </Box>
                             </CardContent>
                           </Card>
@@ -392,18 +395,21 @@ const IndexPage: NextPageWithLayout<Props> = ({
                                     marginTop: "10px",
                                   }}
                                 >
-                                  {members.map(
-                                    (member, index) =>
-                                      event.contentSummary.includes(
-                                        member.name.replace(" ", ""),
-                                      ) && (
+                                  {members.map((member, index) => {
+                                    const isMatch = member.keywords.some(
+                                      (keyword) =>
+                                        event.contentSummary.includes(keyword),
+                                    );
+                                    return (
+                                      isMatch && (
                                         <StyledAvatar
                                           key={index}
                                           alt={member.name}
                                           src={member.iconUrl}
                                         />
-                                      ),
-                                  )}
+                                      )
+                                    );
+                                  })}
                                 </Box>
                               </CardContent>
                             </Card>

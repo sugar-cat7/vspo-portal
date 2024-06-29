@@ -134,18 +134,20 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
               { localeCode: locale },
             )}
           </Typography>
-          {members.map(
-            (member, index) =>
-              event.contentSummary.includes(
-                (member.name || "").replace(" ", ""),
-              ) && (
+          {members.map((member, index) => {
+            const isMatch = member.keywords.some((keyword) =>
+              event.contentSummary.includes(keyword),
+            );
+            return (
+              isMatch && (
                 <StyledAvatar
                   key={index}
                   alt={member.name}
                   src={member.iconUrl}
                 />
-              ),
-          )}
+              )
+            );
+          })}
         </Box>
         <Box sx={{ marginBottom: "20px" }}>
           {event.contentSummary.split("\n").map((line, index) => {
