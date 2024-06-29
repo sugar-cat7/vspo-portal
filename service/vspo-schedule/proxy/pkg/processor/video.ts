@@ -14,10 +14,17 @@ export const videoProcessor = async (c: AppContext, data: any) => {
         parsedData = VideosSchema.parse(data.pastClips);
     }
     else if (c.req.path.includes('clips/twitch')) {
+        if (data.error) {
+            return parsedData
+        }
         parsedData = VideosSchema.parse(data);
     }
     else {
         parsedData = VideosSchema.parse(data);
+    }
+    if (!Array.isArray(parsedData)) {
+        console.error('Parsed data is not an array:', parsedData);
+        return data
     }
 
     // Date Format To UTC: scheduledStartTime, actualEndTime, createdAt
