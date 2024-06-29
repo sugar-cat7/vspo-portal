@@ -195,12 +195,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       if (isAll) {
         return scheduledStartTimeString === todayDateString;
       } else if (isDateStatus) {
-        const targetDate = convertToUTCDate(params.status);
-        targetDate.setHours(0, 0, 0, 0);
-        return (
-          scheduledStartTimeString ===
-          formatDate(targetDate, "yyyy-MM-dd", { localeCode: locale })
-        );
+        return scheduledStartTimeString === params.status;
       } else {
         const scheduledStartTime = convertToUTCDate(
           livestream.scheduledStartTime,
@@ -414,7 +409,7 @@ HomePage.getLayout = (page, pageProps) => (
     footerMessage={pageProps.footerMessage}
     headTitle={pageProps.meta?.headTitle}
     path={`/schedule/${pageProps.liveStatus}`}
-    canonicalPath={`/schedule/all`}
+    // canonicalPath={`/schedule/all`}
   >
     {page}
   </ContentLayout>

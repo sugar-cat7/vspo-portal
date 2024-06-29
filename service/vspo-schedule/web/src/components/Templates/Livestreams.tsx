@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Livestream } from "@/types/streaming";
-import { formatDate, groupLivestreamsByTimeRange } from "@/lib/utils";
+import { groupLivestreamsByTimeRange } from "@/lib/utils";
 import { LivestreamCard } from "../Elements";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
