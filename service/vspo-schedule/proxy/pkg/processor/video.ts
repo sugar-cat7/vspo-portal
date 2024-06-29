@@ -1,32 +1,17 @@
-import { VideoSchema, VideosSchema } from "@/schema";
+import { VideosSchema } from "@/schema";
 import { convertToUTC } from "../dayjs";
 import { AppContext } from "../hono";
 import { translateText } from "../translator";
-import { z } from "@hono/zod-openapi";
 
 export const videoProcessor = async (c: AppContext, data: any) => {
     const { kv } = c.get('services');
     const lang = c.req.query('lang') || 'ja';
     // Livestream, freechat, clip.....
     // Parse specific fields of the response using Zod schema
-    let parsedData: z.infer<typeof VideoSchema>[] = [];
-    if (c.req.path.includes('clips/youtube')) {
-        if (!data) {
-            return []
-        }
-        parsedData = VideosSchema.parse(data.pastClips);
+    if (!Array.isArray(data)) {
+        return []
     }
-    else {
-        if (!Array.isArray(data)) {
-            return []
-        }
-        parsedData = VideosSchema.parse(data);
-        parsedData = VideosSchema.parse(data);
-    }
-    if (!Array.isArray(parsedData)) {
-        console.error('Parsed data is not an array:', parsedData);
-        return data
-    }
+    const parsedData = VideosSchema.parse(data);
     // Date Format To UTC: scheduledStartTime, actualEndTime, createdAt
     parsedData?.forEach(item => {
         if (item.scheduledStartTime) {
