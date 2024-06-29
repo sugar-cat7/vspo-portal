@@ -25,7 +25,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
         }
     });
 
-    if (lang === 'ja') {
+    if (lang === 'ja' || c.req.path === '/api/clips/youtube') {
         return parsedData
     }
     // Process each item
