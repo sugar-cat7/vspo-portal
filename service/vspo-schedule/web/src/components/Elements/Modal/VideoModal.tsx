@@ -33,6 +33,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { ChatEmbed } from "../ChatEmbed";
 import { useVideoModalContext } from "@/hooks";
+import { useTranslation } from "next-i18next";
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   backgroundColor: "#7266cf",
@@ -153,6 +154,7 @@ const a11yProps = (index: number) => {
 
 const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
   const [value, setValue] = React.useState(0);
+  const { t } = useTranslation("common");
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -180,9 +182,14 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
           variant="scrollable"
           scrollButtons="auto"
         >
-          <Tab label="概要" {...a11yProps(0)} />
-          <Tab label="関連動画" {...a11yProps(1)} />
-          {showChatTab && <Tab label="ライブチャット" {...a11yProps(2)} />}
+          <Tab label={t("videoModal.tabLabels.overview")} {...a11yProps(0)} />
+          <Tab
+            label={t("videoModal.tabLabels.relatedVideos")}
+            {...a11yProps(1)}
+          />
+          {showChatTab && (
+            <Tab label={t("videoModal.tabLabels.chat")} {...a11yProps(2)} />
+          )}
         </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -200,9 +207,11 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
             </TypographySmallOnMobile>
             {isLivestream(video) && (
               <>
-                {getLiveStatus(video) === "live" && <LiveLabel>Live</LiveLabel>}
+                {getLiveStatus(video) === "live" && (
+                  <LiveLabel>{t("liveStatus.live")}</LiveLabel>
+                )}
                 {getLiveStatus(video) === "upcoming" && (
-                  <LiveLabel isUpcoming>配信予定</LiveLabel>
+                  <LiveLabel isUpcoming>{t("liveStatus.upcoming")}</LiveLabel>
                 )}
               </>
             )}
@@ -235,7 +244,7 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
                     textDecoration: "none", // 下線を削除する
                   }}
                 >
-                  視聴
+                  {t("videoModal.watch")}
                 </Button>
               )}
               <Button
@@ -260,7 +269,7 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
                   }
                 }}
               >
-                共有
+                {t("videoModal.share")}
               </Button>
             </Box>
           </Box>
@@ -298,6 +307,7 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
 export const VideoModal: React.FC = () => {
   const router = useRouter();
   const { activeVideo, popVideo, clearVideos } = useVideoModalContext();
+  const { t } = useTranslation("common");
 
   return (
     <Dialog open={activeVideo !== undefined} fullScreen>
@@ -323,7 +333,7 @@ export const VideoModal: React.FC = () => {
             <TypographySmallOnMobile
               sx={{ fontWeight: "bold", paddingTop: "3px" }}
             >
-              すぽじゅーる
+              {t("spodule")}
             </TypographySmallOnMobile>
           </Box>
           {/* </NextLink> */}
@@ -375,7 +385,7 @@ export const VideoModal: React.FC = () => {
           onClick={popVideo}
           color="inherit"
         >
-          戻る
+          {t("back")}
         </Button>
         <Typography
           variant="body1"

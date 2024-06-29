@@ -1,10 +1,13 @@
 {
   "spodule": "Spodule",
   "vspo": "VSPO!",
-  "noLivestreams": "No matching livestreams. ※You cannot search for livestreams older than one week.",
   "search": "Search",
   "cancel": "Cancel",
   "back": "Back",
+  "liveStatus": {
+    "live": "Live",
+    "upcoming": "Upcoming"
+  },
   "footer": {
     "lastUpdated": "Page last updated: {{date}}",
     "pages": {
@@ -40,5 +43,18 @@
   "alert": {
     "title": "Notice",
     "message": "Spodule Discord bot is now available!\nAdd it to your server from the site sidebar."
+  },
+  "videoModal": {
+    "tabLabels": {
+      "overview": "Overview",
+      "relatedVideos": "Related videos",
+      "chat": "Live chat"
+    },
+    "watch": "Watch",
+    "share": "Share"
+  },
+  "relatedVideos": {
+    "dataLoadError": "Error loading data.",
+    "loadMore": "More videos"
   }
 }

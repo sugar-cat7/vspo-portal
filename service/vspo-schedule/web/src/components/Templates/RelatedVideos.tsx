@@ -1,7 +1,7 @@
 import { memberNames } from "@/data/members";
-import { TEMP_TIMESTAMP } from "@/lib/Const";
+import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
 import { RelatedProps, fetcher } from "@/lib/api";
-import { formatWithTimeZone } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { Clip, Livestream, Video } from "@/types/streaming";
 import {
   Card,
@@ -17,6 +17,8 @@ import React, { useMemo } from "react";
 import useSWRInfinite from "swr/infinite";
 import { Loading } from "../Elements";
 import { useVideoModalContext } from "@/hooks";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 const StyledCard = styled(Card)({
   marginTop: "8px",
@@ -127,6 +129,9 @@ const RelatedVideoCard: React.FC<RelatedVideoCardProps> = ({
   video,
   onClick,
 }) => {
+  const router = useRouter();
+  const locale = router.locale ?? DEFAULT_LOCALE;
+
   return (
     <StyledCard>
       <CardActionArea onClick={onClick}>
@@ -147,12 +152,12 @@ const RelatedVideoCard: React.FC<RelatedVideoCardProps> = ({
               {video.channelTitle}
             </StyledChannelTitle>
             <Typography variant="body2" color="text.secondary">
-              {formatWithTimeZone(
+              {formatDate(
                 new Date(
                   video.scheduledStartTime || video.createdAt || TEMP_TIMESTAMP,
                 ),
-                "ja",
                 "MM/dd (E)",
+                { localeCode: locale, timeZone: "JST" },
               )}
             </Typography>
           </StyledCardContent>
@@ -167,6 +172,7 @@ export const RelatedVideos: React.FC<{
   videoId: string;
 }> = ({ channelId, videoId }) => {
   const { pushVideo } = useVideoModalContext();
+  const { t } = useTranslation("common");
   const { data, error, size, setSize, isValidating } = useSWRInfinite<
     Videos,
     Error
@@ -219,7 +225,7 @@ export const RelatedVideos: React.FC<{
         disabled={isValidating}
         sx={{ width: "100%", display: "flex", justifyContent: "center" }}
       >
-        もっと見る
+        {t("relatedVideos.loadMore")}
       </Button>
     </Box>
   );

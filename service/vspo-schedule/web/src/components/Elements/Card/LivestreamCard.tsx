@@ -139,7 +139,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
   livestream,
 }) => {
   const { pushVideo } = useVideoModalContext();
-  const { t } = useTranslation("streams");
+  const { t } = useTranslation("common");
   const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
     livestream;
   const livestreamStatus = useMemo(
@@ -148,9 +148,11 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
   );
   return (
     <CardBox>
-      {livestreamStatus === "live" && <LiveLabel>{t("status.live")}</LiveLabel>}
+      {livestreamStatus === "live" && (
+        <LiveLabel>{t("liveStatus.live")}</LiveLabel>
+      )}
       {livestreamStatus === "upcoming" && (
-        <LiveLabel isUpcoming>{t("status.upcoming")}</LiveLabel>
+        <LiveLabel isUpcoming>{t("liveStatus.upcoming")}</LiveLabel>
       )}
       <StyledCard liveStatus={livestreamStatus}>
         <CardActionArea onClick={() => pushVideo(livestream)}>

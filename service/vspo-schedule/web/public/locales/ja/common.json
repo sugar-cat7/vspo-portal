@@ -1,10 +1,13 @@
 {
   "spodule": "すぽじゅーる",
   "vspo": "ぶいすぽっ！",
-  "noLivestreams": "対象の配信はありません。※現在1週間以上前の配信は検索できません。",
   "search": "検索",
   "cancel": "キャンセル",
   "back": "戻る",
+  "liveStatus": {
+    "live": "Live",
+    "upcoming": "配信予定"
+  },
   "footer": {
     "lastUpdated": "最終更新日時: {{date}}",
     "pages": {
@@ -40,5 +43,18 @@
   "alert": {
     "title": "お知らせ",
     "message": "配信情報を通知するDiscord Botを公開しました！\nサイドバーから追加できます。"
+  },
+  "videoModal": {
+    "tabLabels": {
+      "overview": "概要",
+      "relatedVideos": "関連動画",
+      "chat": "ライブチャット"
+    },
+    "watch": "視聴",
+    "share": "共有"
+  },
+  "relatedVideos": {
+    "dataLoadError": "データの取得に失敗しました。",
+    "loadMore": "もっと見る"
   }
 }
