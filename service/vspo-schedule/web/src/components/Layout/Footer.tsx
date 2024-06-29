@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
+import { getCurrentUTCDate } from "@/lib/dayjs";
 
 type Props = {
   lastUpdateDate?: string;
@@ -27,7 +28,7 @@ export const Footer: React.FC<Props> = ({ lastUpdateDate, description }) => {
         <Link href={"/privacy-policy"}>{t("footer.pages.privacy")}</Link>
       </Typography>
       <Typography variant="body2" color="text.secondary" mt={1}>
-        &copy; {t("spodule")} {new Date().getFullYear()}
+        &copy; {t("spodule")} {getCurrentUTCDate().getFullYear()}
       </Typography>
     </Box>
   );

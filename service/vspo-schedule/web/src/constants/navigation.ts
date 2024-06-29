@@ -1,4 +1,5 @@
 import { DISCORD_LINK, QA_LINK } from "@/lib/Const";
+import { getCurrentUTCDate } from "@/lib/dayjs";
 import { formatWithTimeZone } from "@/lib/utils";
 
 const internalRoutes = {
@@ -10,7 +11,7 @@ const internalRoutes = {
   clip: "/clips",
   "twitch-clip": "/twitch-clips",
   get event() {
-    return `/events/${formatWithTimeZone(new Date(), "ja", "yyyy-MM")}`;
+    return `/events/${formatWithTimeZone(getCurrentUTCDate(), "ja", "yyyy-MM")}`;
   },
   about: "/about",
   "site-news": "/site-news",

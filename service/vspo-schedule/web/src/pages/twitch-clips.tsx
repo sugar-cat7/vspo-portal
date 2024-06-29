@@ -15,6 +15,7 @@ import { fetchTwitchClips } from "@/lib/api";
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { DEFAULT_LOCALE } from "@/lib/Const";
+import { getCurrentUTCDate } from "@/lib/dayjs";
 
 type ClipsProps = {
   clips: Clip[];
@@ -83,7 +84,9 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async ({
     props: {
       ...translations,
       clips,
-      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
+      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
+        localeCode: locale,
+      }),
       meta: {
         title: t("twitchClips.title"),
         description: t("twitchClips.description"),

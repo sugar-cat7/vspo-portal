@@ -12,13 +12,14 @@ import {
 import { Timeframe } from "@/types/timeframe";
 import { format, formatInTimeZone, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
-import { Locale } from "date-fns";
+import { Locale, getHours } from "date-fns";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "./Const";
 import { platforms } from "@/constants/platforms";
 import { SSRConfig } from "next-i18next";
 import { createInstance as createI18nInstance } from "i18next";
 import { SiteNewsTag } from "@/types/site-news";
 import { ParsedUrlQuery } from "querystring";
+import { convertToUTCDate, getCurrentUTCDate } from "./dayjs";
 
 /**
  * Group an array of items by a specified key.
@@ -273,12 +274,12 @@ const filterClips = (clips: Clip[], searchMemberIds: number[]): Clip[] => {
  */
 const titleFilter = (livestreams: Livestream[]): Livestream[] => {
   return livestreams.filter((stream, index, self) => {
-    const currentTime = new Date(stream.scheduledStartTime);
+    const currentTime = convertToUTCDate(stream.scheduledStartTime);
     const currentTitle = stream.title;
 
     return !self.some((otherStream, otherIndex) => {
       if (stream.channelId === otherStream.channelId && index !== otherIndex) {
-        const otherTime = new Date(otherStream.scheduledStartTime);
+        const otherTime = convertToUTCDate(otherStream.scheduledStartTime);
         const timeDifference = Math.abs(
           currentTime.getTime() - otherTime.getTime(),
         );
@@ -338,13 +339,13 @@ const removeDuplicateTwitchId = (livestreams: Livestream[]): Livestream[] => {
  * @returns - An object with `oneWeekAgo` and `oneWeekLater` properties representing the dates.
  */
 export const getOneWeekRange = () => {
-  const now = new Date();
+  const now = getCurrentUTCDate();
   now.setHours(0, 0, 0, 0); // Set time to 00:00:00
 
   const oneWeekInMilliseconds = 7 * 24 * 60 * 60 * 1000;
 
-  const oneWeekAgo = new Date(now.getTime() - oneWeekInMilliseconds);
-  const oneWeekLater = new Date(now.getTime() + oneWeekInMilliseconds);
+  const oneWeekAgo = convertToUTCDate(now.getTime() - oneWeekInMilliseconds);
+  const oneWeekLater = convertToUTCDate(now.getTime() + oneWeekInMilliseconds);
 
   return {
     oneWeekAgo,
@@ -352,16 +353,18 @@ export const getOneWeekRange = () => {
   };
 };
 
-const locales: Record<string, Locale> = {
+export const locales: Record<string, Locale> = {
   en: enUS,
   ja: ja,
 };
+
 const localeTimeZoneMap: Record<string, string> = {
   ja: "Asia/Tokyo",
-  enUS: "America/New_York",
+  en: "America/Los_Angeles",
 };
 
 /**
+ * @deprecated Use `formatDate` instead.
  * Format a date with the given locale and format, converted to the specified timezone.
  * @param date - A Date object or date string to format.
  * @param localeCode - The locale code to use for formatting.
@@ -373,7 +376,7 @@ export const formatWithTimeZone = (
   localeCode: string,
   dateFormat: string,
 ): string => {
-  const timeZone = localeTimeZoneMap[localeCode];
+  const timeZone = localeTimeZoneMap[localeCode] || "UTC";
   const zonedDate = utcToZonedTime(date, timeZone);
   return format(zonedDate, dateFormat, { locale: locales[localeCode] });
 };
@@ -389,12 +392,20 @@ export const formatWithTimeZone = (
 export const formatDate = (
   date: Date | number | string,
   dateFormat: string,
-  { localeCode = DEFAULT_LOCALE, timeZone = "UTC" } = {},
+  {
+    localeCode = DEFAULT_LOCALE,
+    timeZone,
+  }: { localeCode?: string; timeZone?: string } = {},
 ): string => {
   const locale = locales[localeCode] ?? enUS;
-  return formatInTimeZone(new Date(date), timeZone, dateFormat, { locale });
+  const effectiveTimeZone = timeZone || localeTimeZoneMap[localeCode] || "UTC";
+  return formatInTimeZone(
+    convertToUTCDate(date),
+    effectiveTimeZone,
+    dateFormat,
+    { locale },
+  );
 };
-
 /**
  * Determines if a livestream is live, upcoming, archived, or is a freechat.
  * @param {Livestream} livestream - The livestream to check the live status of.
@@ -408,8 +419,10 @@ export const getLiveStatus = (
     return "freechat";
   }
 
-  const scheduledStartTime: Date = new Date(livestream.scheduledStartTime);
-  const currentTime: Date = new Date();
+  const scheduledStartTime: Date = convertToUTCDate(
+    livestream.scheduledStartTime,
+  );
+  const currentTime: Date = getCurrentUTCDate();
 
   // 時間差をミリ秒で計算
   const timeDifference: number = Math.abs(
@@ -422,7 +435,7 @@ export const getLiveStatus = (
   // 時間差が12時間以内であるかどうかを判断
   const isWithinTwelveHours: boolean =
     timeDifference <= twelveHoursInMilliseconds;
-  if (new Date(livestream.scheduledStartTime) > new Date()) {
+  if (convertToUTCDate(livestream.scheduledStartTime) > getCurrentUTCDate()) {
     return "upcoming";
   } else if (
     livestream.actualEndTime &&
@@ -445,15 +458,22 @@ const timeRanges = [
 /**
  * Groups livestreams into time ranges of 6 hours, starting at 0:00.
  * @param {Livestream[]} livestreams - The array of livestreams to group.
+ * @param {string} localeCode - The locale code to use for formatting.
  * @returns {Array<{label: string, livestreams: Livestream[]}>} - An array of objects containing a label and an array of livestreams.
  */
-export const groupLivestreamsByTimeRange = (livestreams: Livestream[]) => {
+export const groupLivestreamsByTimeRange = (
+  livestreams: Livestream[],
+  localeCode: string,
+) => {
   return timeRanges.map((timeRange) => {
     return {
       label: timeRange.label,
       livestreams: livestreams.filter((livestream) => {
-        const scheduledStartTime = new Date(livestream.scheduledStartTime);
-        const hours = scheduledStartTime.getHours();
+        const zonedStartTime = utcToZonedTime(
+          livestream.scheduledStartTime,
+          localeTimeZoneMap[localeCode],
+        );
+        const hours = getHours(zonedStartTime);
         return hours >= timeRange.start && hours < timeRange.end;
       }),
     };
@@ -502,9 +522,9 @@ export const filterByTimeframe = (
 ): Clip[] => {
   if (!timeframe) return clips;
 
-  const now = new Date();
+  const now = getCurrentUTCDate();
   return clips.filter((clip) => {
-    const clipCreatedAt = new Date(clip.createdAt || TEMP_TIMESTAMP);
+    const clipCreatedAt = convertToUTCDate(clip.createdAt || TEMP_TIMESTAMP);
     const daysDifference = Math.floor(
       (now.getTime() - clipCreatedAt.getTime()) / (1000 * 60 * 60 * 24),
     );
@@ -583,11 +603,11 @@ const YOUTUBE_TRENDING_THRESHOLDS = 30_000;
 export const isTrending = (clip: Clip) => {
   if (!clip.createdAt) return false;
 
-  const createdAt = new Date(clip.createdAt);
+  const createdAt = convertToUTCDate(clip.createdAt);
   const viewCount = Number(clip.viewCount);
 
   const isOlderThan = (days: number) => {
-    const date = new Date();
+    const date = getCurrentUTCDate();
     date.setDate(date.getDate() - days);
     return createdAt > date;
   };
@@ -616,7 +636,7 @@ export const groupEventsByYearMonth = (events: VspoEvent[]) => {
   const eventsByMonth: { [key: string]: VspoEvent[] } = {};
 
   for (const event of events) {
-    const eventDate = new Date(event.startedAt);
+    const eventDate = convertToUTCDate(event.startedAt);
     const year = eventDate.getFullYear();
     const month = eventDate.getMonth() + 1;
 
@@ -663,7 +683,7 @@ export const convertThumbnailQualityInObjects = <T extends HasThumbnailUrl>(
 export const isValidDate = (dateString: string) => {
   const regEx = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateString.match(regEx)) return false; // Invalid format
-  const d = new Date(dateString);
+  const d = convertToUTCDate(dateString);
   const dNum = d.getTime();
   if (!dNum && dNum !== 0) return false; // NaN value, Invalid date
   return d.toISOString().slice(0, 10) === dateString;

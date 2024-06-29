@@ -10,6 +10,7 @@ import { members } from "@/data/members";
 import { fetchFreechats } from "@/lib/api";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { getCurrentUTCDate } from "@/lib/dayjs";
 
 type FreechatsProps = {
   freechats: Livestream[];
@@ -59,7 +60,9 @@ export const getStaticProps: GetStaticProps<FreechatsProps> = async ({
     props: {
       ...translations,
       freechats: freechats,
-      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
+      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
+        localeCode: locale,
+      }),
       meta: {
         title: t("title"),
         description: t("description"),
