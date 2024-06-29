@@ -6,7 +6,7 @@ export const eventProcessor = async (c: AppContext, data: any) => {
     const { kv } = c.get('services');
     const lang = c.req.query('lang') || 'ja';
     if (!Array.isArray(data)) {
-        return data
+        return []
     }
     const parsedData = data;
     parsedData.forEach((item: any) => {
