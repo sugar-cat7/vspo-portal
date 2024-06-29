@@ -5,20 +5,10 @@ import { translateText } from "../translator";
 export const eventProcessor = async (c: AppContext, data: any) => {
     const { kv } = c.get('services');
     const lang = c.req.query('lang') || 'ja';
-
-    let parsedData;
-    try {
-        parsedData = data;
-    } catch (error) {
-        console.error('Failed to parse data:', error);
-        throw new Error('Invalid event data');
-    }
-
-    if (!Array.isArray(parsedData)) {
-        console.error('Parsed data is not an array:', parsedData);
+    if (!Array.isArray(data)) {
         return data
     }
-
+    const parsedData = data;
     parsedData.forEach((item: any) => {
         item.startedAt = convertToUTC(item.startedAt);
     });
