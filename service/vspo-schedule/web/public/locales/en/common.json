@@ -56,5 +56,11 @@
   "relatedVideos": {
     "dataLoadError": "Error loading data.",
     "loadMore": "More videos"
+  },
+  "breadcrumbs": {
+    "pages": {
+      "home": "Home",
+      "site-news": "Site News"
+    }
   }
 }

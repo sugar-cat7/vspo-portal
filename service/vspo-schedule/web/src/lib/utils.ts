@@ -17,6 +17,7 @@ import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "./Const";
 import { platforms } from "@/constants/platforms";
 import { SSRConfig } from "next-i18next";
 import { createInstance as createI18nInstance } from "i18next";
+import { SiteNewsTag } from "@/types/site-news";
 
 /**
  * Group an array of items by a specified key.
@@ -599,25 +600,15 @@ export const isTrending = (clip: Clip) => {
   });
 };
 
-export const getColor = (tag: string) => {
+export const getSiteNewsTagColor = (tag: SiteNewsTag) => {
   switch (tag) {
-    case "新機能追加":
+    case "feat":
       return "primary";
-    case "バグ修正":
+    case "fix":
       return "secondary";
-
     default:
       return "default";
   }
-};
-
-export const pathNames: { [key: string]: string } = {
-  "site-news": "お知らせ",
-  contact: "お問い合わせ",
-  about: "このサイトについて",
-  terms: "利用規約",
-  privacy: "プライバシーポリシー",
-  signup: "新規登録",
 };
 
 export const groupEventsByYearMonth = (events: VspoEvent[]) => {

@@ -5,7 +5,15 @@ import { NextPageWithLayout } from "../_app";
 import { Typography, Chip, Box, Toolbar } from "@mui/material";
 import { Breadcrumb, TweetEmbed } from "@/components/Elements";
 import { siteNewsItems } from "@/data/content/site-news";
-import { getColor } from "@/lib/utils";
+import {
+  formatDate,
+  getInitializedI18nInstance,
+  getSiteNewsTagColor,
+} from "@/lib/utils";
+import { DEFAULT_LOCALE } from "@/lib/Const";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
 type Params = {
   id: string;
@@ -13,9 +21,20 @@ type Params = {
 
 type Props = {
   siteNewsItem: SiteNewsItem;
+  meta: {
+    title: string;
+  };
 };
 
 const SiteNewsItemPage: NextPageWithLayout<Props> = ({ siteNewsItem }) => {
+  const router = useRouter();
+  const locale = router.locale ?? DEFAULT_LOCALE;
+  const { t } = useTranslation("site-news");
+
+  const formattedDate = formatDate(siteNewsItem.updated, "PPP", {
+    localeCode: locale,
+  });
+
   return (
     <>
       <Toolbar disableGutters variant="dense" sx={{ alignItems: "end" }}>
@@ -32,16 +51,16 @@ const SiteNewsItemPage: NextPageWithLayout<Props> = ({ siteNewsItem }) => {
           {siteNewsItem.title}
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
-          更新日: {siteNewsItem.updated}
+          {t("updateDate")}: {formattedDate}
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
-          Tags:
+          {t("tags")}:
           {siteNewsItem.tags.map((tag) => (
             <Chip
               key={tag}
-              label={tag}
+              label={t(`tagLabels.${tag}`)}
               variant="outlined"
-              color={getColor(tag)}
+              color={getSiteNewsTagColor(tag)}
               sx={{ m: 0.5 }}
             />
           ))}
@@ -60,7 +79,7 @@ const SiteNewsItemPage: NextPageWithLayout<Props> = ({ siteNewsItem }) => {
 SiteNewsItemPage.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
-      title="すぽじゅーるからのお知らせ"
+      title={pageProps.meta.title}
       description={pageProps.siteNewsItem.content}
       path={`/site-news/${pageProps.siteNewsItem.id}`}
       maxPageWidth="md"
@@ -70,7 +89,10 @@ SiteNewsItemPage.getLayout = (page, pageProps) => {
   );
 };
 
-export const getStaticProps: GetStaticProps<Props, Params> = ({ params }) => {
+export const getStaticProps: GetStaticProps<Props, Params> = async ({
+  params,
+  locale = DEFAULT_LOCALE,
+}) => {
   if (!params) {
     return {
       notFound: true,
@@ -87,17 +109,33 @@ export const getStaticProps: GetStaticProps<Props, Params> = ({ params }) => {
     };
   }
 
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "site-news",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "site-news");
+
   return {
     props: {
+      ...translations,
       siteNewsItem,
+      meta: {
+        title: t("title"),
+      },
     },
   };
 };
 
-export const getStaticPaths: GetStaticPaths<Params> = () => {
-  const paths = siteNewsItems.map((siteNewsItem) => ({
-    params: { id: siteNewsItem.id.toString() },
-  }));
+export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
+  const paths =
+    locales === undefined
+      ? siteNewsItems.map((item) => ({ params: { id: item.id.toString() } }))
+      : siteNewsItems.flatMap((item) => {
+          return locales.map((locale) => ({
+            params: { id: item.id.toString() },
+            locale,
+          }));
+        });
   return { paths, fallback: false };
 };
 

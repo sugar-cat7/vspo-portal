@@ -56,5 +56,11 @@
   "relatedVideos": {
     "dataLoadError": "データの取得に失敗しました。",
     "loadMore": "もっと見る"
+  },
+  "breadcrumbs": {
+    "pages": {
+      "home": "ホーム",
+      "site-news": "お知らせ"
+    }
   }
 }
