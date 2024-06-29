@@ -7,6 +7,7 @@ import { Breadcrumb, TweetEmbed } from "@/components/Elements";
 import { siteNewsItems } from "@/data/content/site-news";
 import {
   formatDate,
+  generateStaticPathsForLocales,
   getInitializedI18nInstance,
   getSiteNewsTagColor,
 } from "@/lib/utils";
@@ -127,15 +128,12 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
 };
 
 export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
-  const paths =
-    locales === undefined
-      ? siteNewsItems.map((item) => ({ params: { id: item.id.toString() } }))
-      : siteNewsItems.flatMap((item) => {
-          return locales.map((locale) => ({
-            params: { id: item.id.toString() },
-            locale,
-          }));
-        });
+  const paths = generateStaticPathsForLocales(
+    siteNewsItems.map((item) => ({
+      params: { id: item.id.toString() },
+    })),
+    locales,
+  );
   return { paths, fallback: false };
 };
 

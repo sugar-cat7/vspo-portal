@@ -12,6 +12,7 @@ import {
   removeDuplicateTitles,
   formatDate,
   getInitializedI18nInstance,
+  generateStaticPathsForLocales,
 } from "@/lib/utils";
 import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
@@ -147,16 +148,10 @@ export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
     datePaths.push({ params: { status: formattedDate } });
   }
 
-  let paths = [...statusPaths, ...datePaths];
-  paths =
-    locales === undefined
-      ? paths
-      : paths.flatMap((path) => {
-          return locales.map((locale) => ({
-            ...path,
-            locale,
-          }));
-        });
+  const paths = generateStaticPathsForLocales(
+    [...statusPaths, ...datePaths],
+    locales,
+  );
   return { paths, fallback: true };
 };
 

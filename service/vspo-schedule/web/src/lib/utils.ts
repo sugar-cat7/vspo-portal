@@ -18,6 +18,7 @@ import { platforms } from "@/constants/platforms";
 import { SSRConfig } from "next-i18next";
 import { createInstance as createI18nInstance } from "i18next";
 import { SiteNewsTag } from "@/types/site-news";
+import { ParsedUrlQuery } from "querystring";
 
 /**
  * Group an array of items by a specified key.
@@ -663,6 +664,30 @@ export const isValidDate = (dateString: string) => {
   const dNum = d.getTime();
   if (!dNum && dNum !== 0) return false; // NaN value, Invalid date
   return d.toISOString().slice(0, 10) === dateString;
+};
+
+/**
+ * Generates a path for each of the given paths in each of the given locales.
+ * Use for generating paths for each locale in `getStaticPaths`.
+ * @param paths - The paths to generated for each locale.
+ * @param locales - The locales in which this page should be generated.
+ * @returns The given paths in each of the given locales.
+ */
+export const generateStaticPathsForLocales = <
+  Params extends ParsedUrlQuery = ParsedUrlQuery,
+>(
+  paths: { params: Params }[],
+  locales: string[] | undefined,
+) => {
+  if (locales === undefined || locales.length === 0) {
+    return paths;
+  }
+  return paths.flatMap((path) => {
+    return locales.map((locale) => ({
+      ...path,
+      locale,
+    }));
+  });
 };
 
 /**

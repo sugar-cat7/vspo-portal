@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { NextPageWithLayout } from "../../_app";
 import { VspoEvent } from "@/types/events";
 import { TweetEmbed } from "@/components/Elements";
-import { formatDate } from "@/lib/utils";
+import { formatDate, generateStaticPathsForLocales } from "@/lib/utils";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ContentLayout } from "@/components/Layout";
 import { members } from "@/data/members";
@@ -31,15 +31,10 @@ type Props = {
 export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
   // Fetch events from API
   const fetchedEvents = await fetchEvents();
-  const paths =
-    locales === undefined
-      ? fetchedEvents.map((event) => ({ params: { id: event.newsId } }))
-      : fetchedEvents.flatMap((event) => {
-          return locales.map((locale) => ({
-            params: { id: event.newsId },
-            locale,
-          }));
-        });
+  const paths = generateStaticPathsForLocales(
+    fetchedEvents.map((event) => ({ params: { id: event.newsId } })),
+    locales,
+  );
 
   // Fallback to true to handle non-existent paths
   return { paths, fallback: true };

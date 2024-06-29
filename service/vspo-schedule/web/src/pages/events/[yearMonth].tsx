@@ -25,6 +25,7 @@ import { members } from "@/data/members";
 import {
   formatDate,
   formatWithTimeZone,
+  generateStaticPathsForLocales,
   getInitializedI18nInstance,
   groupEventsByYearMonth,
 } from "@/lib/utils";
@@ -119,15 +120,10 @@ export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
   const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
   const yearMonths = Object.keys(eventsByMonth);
 
-  const paths =
-    locales === undefined
-      ? yearMonths.map((yearMonth) => ({ params: { yearMonth } }))
-      : yearMonths.flatMap((yearMonth) => {
-          return locales.map((locale) => ({
-            params: { yearMonth },
-            locale,
-          }));
-        });
+  const paths = generateStaticPathsForLocales(
+    yearMonths.map((yearMonth) => ({ params: { yearMonth } })),
+    locales,
+  );
 
   return { paths, fallback: true };
 };
