@@ -24,6 +24,7 @@ export type Livestream = {
   twitchPastVideoId?: string;
   isTemp?: boolean;
   tempUrl?: string;
+  formattedDateString?: string;
 };
 
 export type Clip = {

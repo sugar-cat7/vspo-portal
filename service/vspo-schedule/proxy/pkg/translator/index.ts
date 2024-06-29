@@ -1,9 +1,10 @@
+import { replaceKeywordsWithEnName } from "@/data/vspoinfo";
 import { AppContext } from "../hono";
 
 // Function to translate text
 export const translateText = async (c: AppContext, text: string, targetLang: string): Promise<string> => {
     const requestBody = {
-        q: text,
+        q: replaceKeywordsWithEnName(text),
         source: 'ja',
         target: targetLang,
         format: 'text'

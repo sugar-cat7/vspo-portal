@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Livestream } from "@/types/streaming";
-import { formatDate, groupLivestreamsByTimeRange } from "@/lib/utils";
+import { groupLivestreamsByTimeRange } from "@/lib/utils";
 import { LivestreamCard } from "../Elements";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
@@ -111,15 +111,17 @@ export const LivestreamCards: React.FC<Props> = ({
   return (
     <>
       {Object.entries(livestreamsByDate).map(([date, livestreams]) => {
-        const livestreamsByTimeRange = groupLivestreamsByTimeRange(livestreams);
+        const livestreamsByTimeRange = groupLivestreamsByTimeRange(
+          livestreams,
+          locale,
+        );
         let events: VspoEvent[] = [];
         if (date in eventsByDate) {
           events = eventsByDate[date];
         }
-        const formattedDate = formatDate(date, "MM/dd (E)", {
-          localeCode: locale,
-          timeZone: "JST",
-        });
+
+        const formattedDate =
+          livestreamsByDate[date].at(0)?.formattedDateString;
 
         return (
           <Box

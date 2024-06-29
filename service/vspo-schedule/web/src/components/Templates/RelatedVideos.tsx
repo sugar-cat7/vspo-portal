@@ -153,11 +153,9 @@ const RelatedVideoCard: React.FC<RelatedVideoCardProps> = ({
             </StyledChannelTitle>
             <Typography variant="body2" color="text.secondary">
               {formatDate(
-                new Date(
-                  video.scheduledStartTime || video.createdAt || TEMP_TIMESTAMP,
-                ),
+                video.scheduledStartTime || video.createdAt || TEMP_TIMESTAMP,
                 "MM/dd (E)",
-                { localeCode: locale, timeZone: "JST" },
+                { localeCode: locale },
               )}
             </Typography>
           </StyledCardContent>
