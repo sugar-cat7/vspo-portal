@@ -2,9 +2,39 @@ import React from "react";
 import styles from "@/styles/Terms.module.scss";
 import { NextPageWithLayout } from "./_app";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
-import { QA_LINK } from "@/lib/Const";
+import { DEFAULT_LOCALE, QA_LINK } from "@/lib/Const";
+import { GetStaticProps } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { getInitializedI18nInstance } from "@/lib/utils";
 
-const PrivacyPolicy: NextPageWithLayout = () => {
+type Props = {
+  meta: {
+    title: string;
+    description: string;
+  };
+};
+
+export const getStaticProps: GetStaticProps<Props> = async ({
+  locale = DEFAULT_LOCALE,
+}) => {
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "privacy",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "privacy");
+
+  return {
+    props: {
+      ...translations,
+      meta: {
+        title: t("title"),
+        description: t("description"),
+      },
+    },
+  };
+};
+
+const PrivacyPolicy: NextPageWithLayout<Props> = () => {
   return (
     <div className={styles.container}>
       <h1>プライバシーポリシー</h1>
@@ -97,11 +127,11 @@ const PrivacyPolicy: NextPageWithLayout = () => {
   );
 };
 
-PrivacyPolicy.getLayout = (page) => {
+PrivacyPolicy.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
-      title="プライバシーポリシー"
-      description="本サイトを使用する上でのプライバシーポリシーです。"
+      title={pageProps.meta.title}
+      description={pageProps.meta.description}
       path="/privacy-policy"
       maxPageWidth="lg"
       padTop
