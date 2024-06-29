@@ -12,6 +12,7 @@
     "@microlabs/otel-cf-workers": "^1.0.0-rc.40",
     "@opentelemetry/api": "1.6.0",
     "@tsndr/cloudflare-worker-jwt": "2.5.3",
+    "dayjs": "^1.11.11",
     "hono": "^4.4.2",
     "miniflare": "3.20240524.1",
     "pg": "^8.11.5",

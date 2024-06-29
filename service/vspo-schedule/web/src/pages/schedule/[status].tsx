@@ -132,6 +132,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   );
 };
 
+// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
 export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
   const statusPaths = ["all", "live", "upcoming", "archive"].map((status) => ({
     params: { status },
@@ -166,7 +167,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   }
 
   const pastLivestreams = await fetchLivestreams({ limit: 300, lang: locale });
-  const events = await fetchEvents();
+  const events = await fetchEvents({ lang: locale });
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
     (livestream) => !freechatVideoIds.includes(livestream.id),
   );

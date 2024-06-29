@@ -1,46 +1,38 @@
 import { z } from "@hono/zod-openapi";
 
 
-const LivestreamSchema = z.object({
+export const VideoSchema = z.object({
     id: z.string(),
     title: z.string(),
     description: z.string(),
-    channelId: z.string(),
-    channelTitle: z.string(),
-    thumbnailUrl: z.string(),
-    scheduledStartTime: z.string(),
-    actualEndTime: z.string().optional(),
-    iconUrl: z.string(),
-    platform: z.enum(["youtube", "twitch", "twitcasting", "nicovideo"]),
-    link: z.string().optional(),
-    viewCount: z.number().optional(),
-    likeCount: z.number().optional(),
-    commentCount: z.number().optional(),
-    twitchName: z.string().optional(),
-    createdAt: z.string().optional(),
-    twitchPastVideoId: z.string().optional(),
-    isTemp: z.boolean().optional(),
-    tempUrl: z.string().optional(),
+    channelId: z.any(),
+    channelTitle: z.any(),
+    thumbnailUrl: z.any(),
+    scheduledStartTime: z.any(),
+    actualEndTime: z.any(),
+    iconUrl: z.any(),
+    platform: z.any(),
+    link: z.any(),
+    viewCount: z.any(),
+    likeCount: z.any(),
+    commentCount: z.any(),
+    twitchName: z.any(),
+    createdAt: z.any(),
+    twitchPastVideoId: z.any(),
+    isTemp: z.any(),
+    tempUrl: z.any(),
 });
 
-const ClipSchema = z.object({
-    id: z.string(),
+export const VideosSchema = z.array(z.any());
+
+export const EventSchema = z.object({
     title: z.string(),
-    description: z.string(),
-    channelId: z.string(),
-    channelTitle: z.string(),
-    thumbnailUrl: z.string(),
-    platform: z.enum(["youtube", "twitch", "twitcasting", "nicovideo"]),
-    viewCount: z.number().optional(),
-    likeCount: z.number().optional(),
-    commentCount: z.number().optional(),
-    createdAt: z.string().optional(),
-    link: z.string().optional(),
-    iconUrl: z.string(),
-    scheduledStartTime: z.string().optional(),
-    isTemp: z.boolean().optional(),
-    tempUrl: z.string().optional(),
+    contentSummary: z.string(),
+    webPageLinks: z.any(),
+    tweetLinks: z.any(),
+    startedAt: z.any(),
+    isNotLink: z.any(),
+    newsId: z.any(),
 });
 
-
-export const VideoSchema = z.union([LivestreamSchema, ClipSchema]);
+export const EventsSchema = z.array(z.any());

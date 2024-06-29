@@ -115,17 +115,26 @@ const YearMonthSelector: React.FC<{
   );
 };
 
+// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
 export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
-  const fetchedEvents = await fetchEvents();
-  const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
-  const yearMonths = Object.keys(eventsByMonth);
+  try {
+    const fetchedEvents = await fetchEvents({ lang: "ja" });
+    const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
+    const yearMonths = Object.keys(eventsByMonth);
 
-  const paths = generateStaticPathsForLocales(
-    yearMonths.map((yearMonth) => ({ params: { yearMonth } })),
-    locales,
-  );
+    const paths = generateStaticPathsForLocales(
+      yearMonths.map((yearMonth) => ({ params: { yearMonth } })),
+      locales,
+    );
 
-  return { paths, fallback: true };
+    return { paths, fallback: true };
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return {
+      paths: [],
+      fallback: true,
+    };
+  }
 };
 
 export const getStaticProps: GetStaticProps<Props, Params> = async ({
@@ -138,7 +147,7 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     };
   }
 
-  const fetchedEvents = await fetchEvents();
+  const fetchedEvents = await fetchEvents({ lang: locale });
   const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
 
   const yearMonth = params.yearMonth;

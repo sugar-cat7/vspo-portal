@@ -67,7 +67,7 @@ const ClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
 export const getStaticProps: GetStaticProps<ClipsProps> = async ({
   locale = DEFAULT_LOCALE,
 }) => {
-  const pastClips = await fetchClips();
+  const pastClips = await fetchClips({ lang: locale });
 
   const translations = await serverSideTranslations(locale, [
     "common",

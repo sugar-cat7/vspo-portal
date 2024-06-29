@@ -35,7 +35,7 @@ const FreechatPage: NextPageWithLayout<FreechatsProps> = ({ freechats }) => {
 export const getStaticProps: GetStaticProps<FreechatsProps> = async ({
   locale = DEFAULT_LOCALE,
 }) => {
-  const freechats = await fetchFreechats();
+  const freechats = await fetchFreechats({ lang: locale });
 
   // Create a mapping of channelId to id for members
   const memberIdMap = new Map(

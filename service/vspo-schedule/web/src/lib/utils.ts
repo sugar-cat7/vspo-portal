@@ -646,6 +646,9 @@ type HasThumbnailUrl = { thumbnailUrl: string };
 export const convertThumbnailQualityInObjects = <T extends HasThumbnailUrl>(
   objects: T[],
 ): T[] => {
+  if (!Array.isArray(objects)) {
+    return objects;
+  }
   return objects.map((object) => ({
     ...object,
     thumbnailUrl: object.thumbnailUrl

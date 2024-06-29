@@ -71,7 +71,7 @@ const TwitchClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
 export const getStaticProps: GetStaticProps<ClipsProps> = async ({
   locale = DEFAULT_LOCALE,
 }) => {
-  const clips = await fetchTwitchClips();
+  const clips = await fetchTwitchClips({ lang: locale });
 
   const translations = await serverSideTranslations(locale, [
     "common",

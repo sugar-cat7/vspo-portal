@@ -127,6 +127,8 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
   };
 };
 
+// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
   const paths = generateStaticPathsForLocales(
     siteNewsItems.map((item) => ({
