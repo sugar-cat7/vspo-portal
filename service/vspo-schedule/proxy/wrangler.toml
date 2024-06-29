@@ -7,7 +7,7 @@ logpush = true
 
 [env.production]
 kv_namespaces = [
-    { binding = "APP_KV", id = "03a6063eb8ff4686be651ed6176ab252" },
+    { binding = "APP_KV", id = "694426cd86e04d52b0de796be4931929" },
 ]
 
 [env.production.vars]
