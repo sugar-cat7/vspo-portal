@@ -10,6 +10,9 @@ import {
   getLiveStatus,
   isValidDate,
   removeDuplicateTitles,
+  formatDate,
+  getInitializedI18nInstance,
+  generateStaticPathsForLocales,
 } from "@/lib/utils";
 import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
@@ -21,6 +24,9 @@ import { VspoEvent } from "@/types/events";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Loading } from "@/components/Elements";
+import { useTranslation } from "next-i18next";
+import { DEFAULT_LOCALE } from "@/lib/Const";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type Params = {
   status: string;
@@ -35,8 +41,11 @@ type LivestreamsProps = {
     tabDates: string[];
     todayIndex: number;
   };
+  footerMessage: string;
   meta: {
-    livestreamDescription: string;
+    title: string;
+    headTitle: string;
+    description: string;
   };
 };
 
@@ -62,6 +71,9 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   dateTabsInfo,
 }) => {
   const router = useRouter();
+  const { t } = useTranslation("streams");
+  const locale = router.locale ?? DEFAULT_LOCALE;
+
   if (router.isFallback) {
     return <Loading />;
   }
@@ -80,7 +92,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
       {/* Date */}
       <TabBox>
         <Tabs
-          aria-label="配信日スケジュール"
+          aria-label={t("streamSchedule")}
           textColor="primary"
           indicatorColor="primary"
           scrollButtons="auto"
@@ -88,8 +100,10 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
           variant="scrollable"
         >
           {tabDates.map((date, i) => {
-            const d = new Date(date);
-            const label = formatWithTimeZone(d, "ja", "MM/dd (E)");
+            const label = formatDate(date, "MM/dd (E)", {
+              localeCode: locale,
+              timeZone: "JST",
+            });
             return (
               <Tab
                 role="tab"
@@ -119,7 +133,6 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
 };
 
 // https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
   const statusPaths = ["all", "live", "upcoming", "archive"].map((status) => ({
     params: { status },
@@ -135,12 +148,17 @@ export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
     const formattedDate = formatWithTimeZone(newDate, "ja", "yyyy-MM-dd");
     datePaths.push({ params: { status: formattedDate } });
   }
-  return { paths: [...statusPaths, ...datePaths], fallback: true };
+
+  const paths = generateStaticPathsForLocales(
+    [...statusPaths, ...datePaths],
+    locales,
+  );
+  return { paths, fallback: true };
 };
 
 export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   params,
-  locale,
+  locale = DEFAULT_LOCALE,
 }) => {
   if (!params) {
     return {
@@ -234,12 +252,16 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     }
   });
 
-  const lastUpdateDate = formatWithTimeZone(
-    new Date(),
-    "ja",
-    "yyyy/MM/dd HH:mm",
-  );
+  const lastUpdateDate = formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'");
   const revalidateWindow = 30;
+
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "streams",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "streams");
+
+  const footerMessage = t("membersOnlyStreamsHidden");
 
   const livestreamDescription =
     filteredLivestreams
@@ -247,16 +269,42 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       .reverse()
       .map((livestream) => livestream.title)
       .join(", ") ?? "";
+  const description = `${t("description")}\n${livestreamDescription}`;
+
+  let title = "";
+  let headTitle = "";
+  switch (params.status) {
+    case "all":
+      title = t("titles.streamSchedule");
+      break;
+    case "live":
+      title = t("titles.live");
+      break;
+    case "upcoming":
+      title = t("titles.upcoming");
+      break;
+    case "archive":
+      title = t("titles.archive");
+      break;
+    default:
+      title = t("titles.streamSchedule");
+      headTitle = t("titles.dateStatus", { date: params.status });
+      break;
+  }
 
   if (["archive", "live", "upcoming"].includes(params.status)) {
     return {
       props: {
+        ...translations,
         livestreamsByDate,
         eventsByDate,
         lastUpdateDate,
         liveStatus: params.status,
+        footerMessage,
         meta: {
-          livestreamDescription: livestreamDescription,
+          title,
+          headTitle,
+          description,
         },
       },
       revalidate: revalidateWindow,
@@ -284,6 +332,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
 
   return {
     props: {
+      ...translations,
       livestreamsByDate,
       eventsByDate,
       lastUpdateDate,
@@ -292,49 +341,29 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         todayIndex: todayIndex,
         tabDates: tabDates,
       },
+      footerMessage,
       meta: {
-        livestreamDescription: livestreamDescription,
+        title,
+        headTitle,
+        description,
       },
     },
     revalidate: revalidateWindow,
   };
 };
 
-HomePage.getLayout = (page, pageProps) => {
-  let title = "";
-  let headTitle = "";
-  const additionalDescription = pageProps.meta?.livestreamDescription || "";
-  switch (pageProps.liveStatus) {
-    case "all":
-      title = "配信スケジュール";
-      break;
-    case "live":
-      title = "配信中";
-      break;
-    case "upcoming":
-      title = "配信予定";
-      break;
-    case "archive":
-      title = "アーカイブ";
-      break;
-    default:
-      title = "配信スケジュール";
-      headTitle = `配信スケジュール/${pageProps.liveStatus}`;
-      break;
-  }
-  return (
-    <ContentLayout
-      title={`ぶいすぽっ!${title}`}
-      description={`ぶいすぽっ!メンバーの配信スケジュール(Youtube/Twitch/ツイキャス/ニコニコ)を確認できます。\n${additionalDescription}`}
-      lastUpdateDate={pageProps.lastUpdateDate}
-      footerMessage="※メン限の配信は掲載しておりません。"
-      headTitle={headTitle}
-      path={`/schedule/${pageProps.liveStatus}`}
-      canonicalPath={`/schedule/all`}
-    >
-      {page}
-    </ContentLayout>
-  );
-};
+HomePage.getLayout = (page, pageProps) => (
+  <ContentLayout
+    title={pageProps.meta?.title}
+    description={pageProps.meta?.description}
+    lastUpdateDate={pageProps.lastUpdateDate}
+    footerMessage={pageProps.footerMessage}
+    headTitle={pageProps.meta?.headTitle}
+    path={`/schedule/${pageProps.liveStatus}`}
+    canonicalPath={`/schedule/all`}
+  >
+    {page}
+  </ContentLayout>
+);
 
 export default HomePage;

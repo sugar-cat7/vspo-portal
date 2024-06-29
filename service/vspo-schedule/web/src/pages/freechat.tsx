@@ -1,6 +1,6 @@
 import { LivestreamCard } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
-import { formatWithTimeZone } from "@/lib/utils";
+import { formatDate, getInitializedI18nInstance } from "@/lib/utils";
 import { GetStaticProps } from "next";
 import React from "react";
 import { NextPageWithLayout } from "./_app";
@@ -8,10 +8,16 @@ import { Livestream } from "@/types/streaming";
 import { Grid } from "@mui/material";
 import { members } from "@/data/members";
 import { fetchFreechats } from "@/lib/api";
+import { DEFAULT_LOCALE } from "@/lib/Const";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
 type FreechatsProps = {
   freechats: Livestream[];
   lastUpdateDate: string;
+  meta: {
+    title: string;
+    description: string;
+  };
 };
 
 const FreechatPage: NextPageWithLayout<FreechatsProps> = ({ freechats }) => {
@@ -27,7 +33,7 @@ const FreechatPage: NextPageWithLayout<FreechatsProps> = ({ freechats }) => {
 };
 
 export const getStaticProps: GetStaticProps<FreechatsProps> = async ({
-  locale,
+  locale = DEFAULT_LOCALE,
 }) => {
   const freechats = await fetchFreechats({ lang: locale });
 
@@ -42,27 +48,37 @@ export const getStaticProps: GetStaticProps<FreechatsProps> = async ({
     const bMemberId = memberIdMap.get(b.channelId) || 0;
     return aMemberId - bMemberId;
   });
+
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "freechat",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "freechat");
+
   return {
     props: {
+      ...translations,
       freechats: freechats,
-      lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
+      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
+      meta: {
+        title: t("title"),
+        description: t("description"),
+      },
     },
   };
 };
 
-FreechatPage.getLayout = (page, pageProps) => {
-  return (
-    <ContentLayout
-      title="ぶいすぽっ!フリーチャット"
-      description="ぶいすぽっ!メンバーのフリーチャットを確認できます。"
-      lastUpdateDate={pageProps.lastUpdateDate}
-      path="/freechat"
-      maxPageWidth="lg"
-      padTop
-    >
-      {page}
-    </ContentLayout>
-  );
-};
+FreechatPage.getLayout = (page, pageProps) => (
+  <ContentLayout
+    title={pageProps.meta.title}
+    description={pageProps.meta.description}
+    lastUpdateDate={pageProps.lastUpdateDate}
+    path="/freechat"
+    maxPageWidth="lg"
+    padTop
+  >
+    {page}
+  </ContentLayout>
+);
 
 export default FreechatPage;

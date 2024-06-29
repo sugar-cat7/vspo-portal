@@ -1,0 +1,36 @@
+{
+  "noClips": "No matching clips.",
+  "clipLabels": {
+    "new": "New",
+    "popular": "Popular",
+    "recommended": "Recommended",
+    "trending": "Trending"
+  },
+  "youtubeClips": {
+    "title": "$t(common:vspo) Clips",
+    "description": "View YouTube clips (kirinuki) of $t(common:vspo) members."
+  },
+  "twitchClips": {
+    "title":"$t(common:vspo) Twitch Clips",
+    "description": "View Twitch clips of $t(common:vspo) members."
+  },
+  "viewCountLabel": "{{views, number}}+ views",
+  "searchDialog": {
+    "title": "Clip search",
+    "alertMessage": "Only clips less than 1 month old are searchable.",
+    "timeframe": "Time frame",
+    "timeframes": {
+      "1day": "Today",
+      "1week": "This week",
+      "1month": "This month"
+    },
+    "members": "Member(s)",
+    "keyword": "Keyword",
+    "keywords": [
+      "Apex",
+      "Valorant"
+    ],
+    "cancel": "$t(common:cancel)",
+    "search": "$t(common:search)"
+  }
+}

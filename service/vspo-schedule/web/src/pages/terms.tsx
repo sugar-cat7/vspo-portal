@@ -2,8 +2,39 @@ import React from "react";
 import styles from "@/styles/Terms.module.scss";
 import { NextPageWithLayout } from "./_app";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
+import { GetStaticProps } from "next";
+import { DEFAULT_LOCALE } from "@/lib/Const";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { getInitializedI18nInstance } from "@/lib/utils";
 
-const Terms: NextPageWithLayout = () => {
+type Props = {
+  meta: {
+    title: string;
+    description: string;
+  };
+};
+
+export const getStaticProps: GetStaticProps<Props> = async ({
+  locale = DEFAULT_LOCALE,
+}) => {
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "terms",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "terms");
+
+  return {
+    props: {
+      ...translations,
+      meta: {
+        title: t("title"),
+        description: t("description"),
+      },
+    },
+  };
+};
+
+const Terms: NextPageWithLayout<Props> = () => {
   return (
     <div className={styles.container}>
       <h1>利用規約</h1>
@@ -175,11 +206,11 @@ const Terms: NextPageWithLayout = () => {
   );
 };
 
-Terms.getLayout = (page) => {
+Terms.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
-      title="利用規約"
-      description="本サイトを使用する上での利用規約です。"
+      title={pageProps.meta.title}
+      description={pageProps.meta.description}
       path="/terms"
       maxPageWidth="lg"
       padTop

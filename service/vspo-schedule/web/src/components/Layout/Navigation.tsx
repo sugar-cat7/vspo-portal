@@ -8,13 +8,14 @@ import {
   getNavigationRouteInfo,
   NavigationRouteId,
 } from "@/constants/navigation";
+import { useTranslation } from "next-i18next";
 
-const bottomNavigationContents = [
-  { id: "list", name: "配信一覧" },
-  { id: "clip", name: "切り抜き" },
-  { id: "twitch-clip", name: "クリップ" },
-  { id: "event", name: "イベント" },
-] as const satisfies { id: NavigationRouteId; name: string }[];
+const bottomNavigationRoutes = [
+  "list",
+  "clip",
+  "twitch-clip",
+  "event",
+] satisfies NavigationRouteId[];
 
 const getActiveNavOption = (activePath: string) => {
   const pathParts = activePath.split("/");
@@ -22,7 +23,7 @@ const getActiveNavOption = (activePath: string) => {
     return undefined;
   }
   const basePath = pathParts.slice(0, 2).join("/");
-  return bottomNavigationContents.find(({ id }) => {
+  return bottomNavigationRoutes.find((id) => {
     const link = getNavigationRouteInfo(id).link;
     return link.startsWith(basePath);
   });
@@ -37,10 +38,11 @@ const BottomNavigationOffset = () => (
 export const CustomBottomNavigation: React.FC = () => {
   const [value, setValue] = useState("");
   const router = useRouter();
+  const { t } = useTranslation("common");
 
   useEffect(() => {
     const activeNavOption = getActiveNavOption(router.asPath);
-    setValue(activeNavOption?.id || "");
+    setValue(activeNavOption ?? "");
   }, [router.asPath]);
 
   return (
@@ -52,12 +54,12 @@ export const CustomBottomNavigation: React.FC = () => {
           showLabels
           sx={{ height: bottomNavigationHeight }}
         >
-          {bottomNavigationContents.map(({ id, name }) => (
+          {bottomNavigationRoutes.map((id) => (
             <BottomNavigationAction
               component={Link}
               href={getNavigationRouteInfo(id).link}
               key={id}
-              label={name}
+              label={t(`bottomNav.pages.${id}`)}
               value={id}
               icon={<DrawerIcon id={id} />}
             />

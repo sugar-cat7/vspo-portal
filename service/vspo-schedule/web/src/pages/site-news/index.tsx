@@ -14,10 +14,50 @@ import {
   Toolbar,
 } from "@mui/material";
 import Link from "next/link";
-import { getColor } from "@/lib/utils";
+import {
+  formatDate,
+  getInitializedI18nInstance,
+  getSiteNewsTagColor,
+} from "@/lib/utils";
 import { Breadcrumb } from "@/components/Elements";
+import { GetStaticProps } from "next";
+import { DEFAULT_LOCALE } from "@/lib/Const";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 
-const SiteNewsPage: NextPageWithLayout = () => {
+type Props = {
+  meta: {
+    title: string;
+    description: string;
+  };
+};
+
+export const getStaticProps: GetStaticProps<Props> = async ({
+  locale = DEFAULT_LOCALE,
+}) => {
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "site-news",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "site-news");
+
+  return {
+    props: {
+      ...translations,
+      meta: {
+        title: t("title"),
+        description: t("description"),
+      },
+    },
+  };
+};
+
+const SiteNewsPage: NextPageWithLayout<Props> = () => {
+  const router = useRouter();
+  const locale = router.locale ?? DEFAULT_LOCALE;
+  const { t } = useTranslation("site-news");
+
   return (
     <>
       <Toolbar disableGutters variant="dense" sx={{ alignItems: "end" }}>
@@ -44,7 +84,7 @@ const SiteNewsPage: NextPageWithLayout = () => {
                   padding: "24px",
                 }}
               >
-                内容
+                {t("tableHeaders.summary")}
               </TableCell>
               <TableCell
                 sx={{
@@ -54,7 +94,7 @@ const SiteNewsPage: NextPageWithLayout = () => {
                   padding: "24px 4px",
                 }}
               >
-                更新日
+                {t("tableHeaders.updateDate")}
               </TableCell>
               <TableCell
                 sx={{
@@ -64,7 +104,7 @@ const SiteNewsPage: NextPageWithLayout = () => {
                   padding: "24px",
                 }}
               >
-                Tags
+                {t("tableHeaders.tags")}
               </TableCell>
             </TableRow>
           </TableHead>
@@ -81,15 +121,17 @@ const SiteNewsPage: NextPageWithLayout = () => {
                 <TableCell
                   sx={{ fontSize: "16px", padding: "24px 4px", minWidth: 120 }}
                 >
-                  {siteNewsItem.updated}
+                  {formatDate(siteNewsItem.updated, "PPP", {
+                    localeCode: locale,
+                  })}
                 </TableCell>
                 <TableCell sx={{ fontSize: "16px", padding: "24px" }}>
                   {siteNewsItem.tags.map((tag) => (
                     <Chip
                       key={tag}
-                      label={tag}
+                      label={t(`tagLabels.${tag}`)}
                       variant="outlined"
-                      color={getColor(tag)}
+                      color={getSiteNewsTagColor(tag)}
                       sx={{ m: 0.5 }}
                     />
                   ))}
@@ -103,11 +145,11 @@ const SiteNewsPage: NextPageWithLayout = () => {
   );
 };
 
-SiteNewsPage.getLayout = (page) => {
+SiteNewsPage.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
-      title="すぽじゅーるからのお知らせ"
-      description="バグ改善や新機能追加に関してのお知らせを表示します。"
+      title={pageProps.meta.title}
+      description={pageProps.meta.description}
       path="/site-news"
       maxPageWidth="md"
     >

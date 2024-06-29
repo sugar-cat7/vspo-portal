@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
 import Link from "next/link";
 import { CustomDrawer } from "../Elements";
+import { useTranslation } from "next-i18next";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: "#7266cf",
@@ -62,6 +63,7 @@ type Props = {
 };
 export const Header: React.FC<Props> = ({ title }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { t } = useTranslation("common");
 
   const toggleDrawerOpen = () => {
     setDrawerOpen(!drawerOpen);
@@ -101,7 +103,7 @@ export const Header: React.FC<Props> = ({ title }) => {
                 height={40}
               />
               <Box>
-                <StyledTypography variant="h6">すぽじゅーる</StyledTypography>
+                <StyledTypography variant="h6">{t("spodule")}</StyledTypography>
                 <StyledSubtitle>{title}</StyledSubtitle>
               </Box>
             </Link>

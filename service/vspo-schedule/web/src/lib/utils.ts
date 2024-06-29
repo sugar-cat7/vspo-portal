@@ -10,11 +10,15 @@ import {
   Video,
 } from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
-import { format, utcToZonedTime } from "date-fns-tz";
+import { format, formatInTimeZone, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
 import { Locale } from "date-fns";
-import { TEMP_TIMESTAMP } from "./Const";
+import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "./Const";
 import { platforms } from "@/constants/platforms";
+import { SSRConfig } from "next-i18next";
+import { createInstance as createI18nInstance } from "i18next";
+import { SiteNewsTag } from "@/types/site-news";
+import { ParsedUrlQuery } from "querystring";
 
 /**
  * Group an array of items by a specified key.
@@ -349,8 +353,8 @@ export const getOneWeekRange = () => {
 };
 
 const locales: Record<string, Locale> = {
-  enUS,
-  ja,
+  en: enUS,
+  ja: ja,
 };
 const localeTimeZoneMap: Record<string, string> = {
   ja: "Asia/Tokyo",
@@ -372,6 +376,23 @@ export const formatWithTimeZone = (
   const timeZone = localeTimeZoneMap[localeCode];
   const zonedDate = utcToZonedTime(date, timeZone);
   return format(zonedDate, dateFormat, { locale: locales[localeCode] });
+};
+
+/**
+ * Format a date with the given format, locale, and time zone.
+ * @param date - The Date object, date string, or timestamp to format.
+ * @param dateFormat - The date format pattern to use for formatting.
+ * @param localeCode - The code identifying the locale to use for formatting.
+ * @param timeZone - The time zone to use for formatting.
+ * @returns A formatted date string.
+ */
+export const formatDate = (
+  date: Date | number | string,
+  dateFormat: string,
+  { localeCode = DEFAULT_LOCALE, timeZone = "UTC" } = {},
+): string => {
+  const locale = locales[localeCode] ?? enUS;
+  return formatInTimeZone(new Date(date), timeZone, dateFormat, { locale });
 };
 
 /**
@@ -580,25 +601,15 @@ export const isTrending = (clip: Clip) => {
   });
 };
 
-export const getColor = (tag: string) => {
+export const getSiteNewsTagColor = (tag: SiteNewsTag) => {
   switch (tag) {
-    case "新機能追加":
+    case "feat":
       return "primary";
-    case "バグ修正":
+    case "fix":
       return "secondary";
-
     default:
       return "default";
   }
-};
-
-export const pathNames: { [key: string]: string } = {
-  "site-news": "お知らせ",
-  contact: "お問い合わせ",
-  about: "このサイトについて",
-  terms: "利用規約",
-  privacy: "プライバシーポリシー",
-  signup: "新規登録",
 };
 
 export const groupEventsByYearMonth = (events: VspoEvent[]) => {
@@ -656,4 +667,52 @@ export const isValidDate = (dateString: string) => {
   const dNum = d.getTime();
   if (!dNum && dNum !== 0) return false; // NaN value, Invalid date
   return d.toISOString().slice(0, 10) === dateString;
+};
+
+/**
+ * Generates a path for each of the given paths in each of the given locales.
+ * Use for generating paths for each locale in `getStaticPaths`.
+ * @param paths - The paths to generated for each locale.
+ * @param locales - The locales in which this page should be generated.
+ * @returns The given paths in each of the given locales.
+ */
+export const generateStaticPathsForLocales = <
+  Params extends ParsedUrlQuery = ParsedUrlQuery,
+>(
+  paths: { params: Params }[],
+  locales: string[] | undefined,
+) => {
+  if (locales === undefined || locales.length === 0) {
+    return paths;
+  }
+  return paths.flatMap((path) => {
+    return locales.map((locale) => ({
+      ...path,
+      locale,
+    }));
+  });
+};
+
+/**
+ * Gets an initialized i18n instance created from the config object given by
+ * `serverSideTranslations`.
+ * Enables translations to be used in `getStaticProps`.
+ * @param translations - The object obtained from `serverSideTranslations`.
+ * @returns An initialized i18n instance.
+ */
+export const getInitializedI18nInstance = (
+  translations: SSRConfig,
+  defaultNamespace?: string,
+) => {
+  const { _nextI18Next: nextI18Next } = translations;
+  const i18n = createI18nInstance({
+    ...nextI18Next?.userConfig,
+    lng: nextI18Next?.initialLocale,
+    ns: nextI18Next?.ns,
+    defaultNS: defaultNamespace ?? false,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    resources: nextI18Next?.initialI18nStore,
+  });
+  i18n.init();
+  return i18n;
 };

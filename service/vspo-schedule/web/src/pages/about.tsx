@@ -15,6 +15,17 @@ import { aboutSections } from "@/data/content/about-sections";
 import Link from "next/link";
 import Image from "next/image";
 import { ReactNode } from "react";
+import { GetStaticProps } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { DEFAULT_LOCALE } from "@/lib/Const";
+import { getInitializedI18nInstance } from "@/lib/utils";
+
+type Props = {
+  meta: {
+    title: string;
+    description: string;
+  };
+};
 
 const parseMarkdown = (text: string): JSX.Element[] => {
   const linkPattern = /\[(.+?)\]\((https?:\/\/.+?)\)/g;
@@ -73,7 +84,27 @@ const parseMarkdown = (text: string): JSX.Element[] => {
   });
 };
 
-const AboutPage: NextPageWithLayout = () => {
+export const getStaticProps: GetStaticProps<Props> = async ({
+  locale = DEFAULT_LOCALE,
+}) => {
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "about",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "about");
+
+  return {
+    props: {
+      ...translations,
+      meta: {
+        title: t("title"),
+        description: t("description"),
+      },
+    },
+  };
+};
+
+const AboutPage: NextPageWithLayout<Props> = () => {
   return (
     <Stack direction="column" spacing={2}>
       {aboutSections.map((section, index) => (
@@ -88,11 +119,11 @@ const AboutPage: NextPageWithLayout = () => {
   );
 };
 
-AboutPage.getLayout = (page) => {
+AboutPage.getLayout = (page, pageProps) => {
   return (
     <ContentLayout
-      title="すぽじゅーるについて"
-      description="すぽじゅーるについて概要をまとめています。"
+      title={pageProps.meta.title}
+      description={pageProps.meta.description}
       path="/about"
       maxPageWidth="md"
       padTop

@@ -1,5 +1,66 @@
 {
   "spodule": "Spodule",
-  "noLivestreams": "No matching livestreams. ※You cannot search for livestreams older than one week.",
-  "livestreamsOfDate": "Livestreams of {date}"
+  "vspo": "VSPO!",
+  "search": "Search",
+  "cancel": "Cancel",
+  "back": "Back",
+  "liveStatus": {
+    "live": "Live",
+    "upcoming": "Upcoming"
+  },
+  "footer": {
+    "lastUpdated": "Page last updated: {{date}}",
+    "pages": {
+      "home": "Home",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    }
+  },
+  "bottomNav": {
+    "pages": {
+      "list": "Streams",
+      "clip": "Clips",
+      "twitch-clip": "Twitch Clips",
+      "event": "Events"
+    }
+  },
+  "drawer": {
+    "pages": {
+      "live": "Live Streams",
+      "upcoming": "Upcoming Streams",
+      "archive": "Archived Streams",
+      "freechat": "Freechats",
+      "clip": "Clips",
+      "twitch-clip": "Twitch Clips",
+      "about": "About Spodule",
+      "site-news": "Site News",
+      "qa": "Contact Us",
+      "discord": "Discord Bot"
+    },
+    "settings": "Settings",
+    "site-theme": "Theme"
+  },
+  "alert": {
+    "title": "Notice",
+    "message": "The Spodule Discord bot is now available!\nAdd it to your server from the site sidebar."
+  },
+  "videoModal": {
+    "tabLabels": {
+      "overview": "Overview",
+      "relatedVideos": "Related videos",
+      "chat": "Live chat"
+    },
+    "watch": "Watch",
+    "share": "Share"
+  },
+  "relatedVideos": {
+    "dataLoadError": "Error loading data.",
+    "loadMore": "More videos"
+  },
+  "breadcrumbs": {
+    "pages": {
+      "home": "Home",
+      "site-news": "Site News"
+    }
+  }
 }

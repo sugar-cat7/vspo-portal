@@ -1,0 +1,39 @@
+{
+  "noClips": "対象の切り抜きはありません。",
+  "clipLabels": {
+    "new": "新着",
+    "popular": "人気",
+    "recommended": "おすすめ",
+    "trending": "急上昇"
+  },
+  "youtubeClips": {
+    "title": "$t(common:vspo)切り抜き一覧",
+    "description": "$t(common:vspo)メンバーの切り抜き動画をまとめています。"
+  },
+  "twitchClips": {
+    "title": "$t(common:vspo)クリップ一覧",
+    "description": "$t(common:vspo)メンバーのTwitchクリップをまとめています。"
+  },
+  "viewCountLabel": "{{views, number}}以上",
+  "searchDialog": {
+    "title": "詳細検索",
+    "alertMessage": "現在1ヶ月以上前の切り抜きは検索できません。",
+    "timeframe": "期間",
+    "timeframes": {
+      "1day": "1日",
+      "1week": "1週間",
+      "1month": "1ヶ月"
+    },
+    "members": "配信者",
+    "keyword": "キーワード",
+    "keywords": [
+      "おれあぽ",
+      "ニチアサ",
+      "Apex",
+      "Valorant",
+      "雑談"
+    ],
+    "cancel": "$t(common:cancel)",
+    "search": "$t(common:search)"
+  }
+}

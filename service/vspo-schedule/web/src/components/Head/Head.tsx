@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { useTranslation } from "next-i18next";
 
 type CustomHeadProps = {
   title?: string;
@@ -13,9 +14,11 @@ export const CustomHead = ({
   path = "",
   canonicalPath = "",
 }: CustomHeadProps = {}) => {
+  const { t } = useTranslation("common");
+
   const pageTitle = title
-    ? `すぽじゅーる | ${title}`
-    : "すぽじゅーる - ぶいすぽ";
+    ? `${t("spodule")} | ${title}`
+    : `${t("spodule")} - ${t("vspo")}`;
 
   return (
     <Head>

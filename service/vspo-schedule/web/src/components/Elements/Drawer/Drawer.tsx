@@ -27,24 +27,24 @@ import {
 } from "@/constants/navigation";
 import { DrawerIcon } from "../Icon";
 import { ThemeToggleButton } from "../Button";
+import { useTranslation } from "next-i18next";
 
 const drawerNavigationSections: NavSectionProps[] = [
   {
     heading: "Main Section",
     links: [
-      { id: "live", label: "配信中" },
-      { id: "upcoming", label: "配信予定" },
-      { id: "archive", label: "アーカイブ" },
-      { id: "freechat", label: "フリーチャット" },
+      { id: "live" },
+      { id: "upcoming" },
+      { id: "archive" },
+      { id: "freechat" },
     ],
   },
   {
     heading: "Clips Section",
     links: [
-      { id: "clip", label: "切り抜き一覧", isBeta: true },
+      { id: "clip", isBeta: true },
       {
         id: "twitch-clip",
-        label: "クリップ一覧",
         isBeta: true,
         supplementaryIcon: <FontAwesomeIcon icon={faTwitch} />,
       },
@@ -53,10 +53,10 @@ const drawerNavigationSections: NavSectionProps[] = [
   {
     heading: "Help Section",
     links: [
-      { id: "about", label: "すぽじゅーるについて" },
-      { id: "site-news", label: "お知らせ" },
-      { id: "qa", label: "お問い合わせ" },
-      { id: "discord", label: "Discord Bot" },
+      { id: "about" },
+      { id: "site-news" },
+      { id: "qa" },
+      { id: "discord" },
     ],
   },
 ];
@@ -107,7 +107,6 @@ const StyledButton = styled(Button)({
 
 type NavLinkProps = {
   id: NavigationRouteId;
-  label: string;
   isBeta?: boolean;
   supplementaryIcon?: React.ReactNode;
 };
@@ -123,16 +122,14 @@ const NavSectionHeading: React.FC<{ text: string }> = ({ text }) => (
   </Typography>
 );
 
-const NavLink: React.FC<NavLinkProps> = ({
-  id,
-  label,
-  isBeta,
-  supplementaryIcon,
-}) => {
+const NavLink: React.FC<NavLinkProps> = ({ id, isBeta, supplementaryIcon }) => {
+  const { t } = useTranslation("common");
+
   const { link, isExternalLink } = getNavigationRouteInfo(id);
   const buttonProps = isExternalLink
     ? { component: "a", target: "_blank", rel: "noopener noreferrer" }
     : { component: Link };
+  const label = t(`drawer.pages.${id}`);
 
   return (
     <ListItemButton
@@ -208,6 +205,7 @@ export const CustomDrawer: React.FC<DrawerProps> = ({
   onOpen,
   onClose,
 }) => {
+  const { t } = useTranslation("common");
   const [settingsAnchorEl, setSettingsAnchorEl] = useState<null | HTMLElement>(
     null,
   );
@@ -254,7 +252,7 @@ export const CustomDrawer: React.FC<DrawerProps> = ({
           color="inherit"
           startIcon={<SettingsIcon />}
         >
-          設定
+          {t("settings")}
         </StyledButton>
         <Menu
           id="settings-menu"

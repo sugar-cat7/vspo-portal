@@ -14,7 +14,10 @@ class MyDocument extends Document {
             />
           )}
           <meta charSet="utf-8" />
-          <meta name="keywords" content="ぶいすぽ 配信スケジュール" />
+          <meta
+            name="keywords"
+            content="ぶいすぽっ！, ぶいすぽ, 配信スケジュール, VSPO!, Vspo, streaming schedule"
+          />
           <meta property="og:type" content="website" />
           <meta
             property="og:image"

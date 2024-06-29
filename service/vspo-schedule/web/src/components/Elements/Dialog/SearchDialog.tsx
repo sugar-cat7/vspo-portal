@@ -20,21 +20,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import { applyFilters } from "@/lib/utils";
 import { Clip } from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
-import { timeframes } from "@/constants/timeframes";
+import { useTranslation } from "next-i18next";
 
 type Props = {
   clips: Clip[];
   setFilteredClips: React.Dispatch<React.SetStateAction<Clip[]>>;
   setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>;
 };
-
-const sampleSearchKeywords = [
-  "おれあぽ",
-  "ニチアサ",
-  "Apex",
-  "Valorant",
-  "雑談",
-];
 
 const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
@@ -67,6 +59,7 @@ export const SearchDialog: React.FC<Props> = ({
   const [searchClipTimeframe, setSearchClipTimeframe] =
     React.useState<Timeframe | null>(null);
   const [searchKeyword, setSearchKeyword] = React.useState<string>("");
+  const { t } = useTranslation("clips");
 
   const selectableMembers =
     clips.at(0)?.platform === "twitch"
@@ -97,26 +90,30 @@ export const SearchDialog: React.FC<Props> = ({
     setSearchMemberIds(memberIds);
   };
 
+  const timeframes: Timeframe[] = ["1day", "1week", "1month"];
+  const sampleKeywords: string[] = t("searchDialog.keywords", {
+    returnObjects: true,
+  });
   return (
     <>
       <Dialog open={isDialogOpen} onClose={dialogClose} maxWidth="md" fullWidth>
-        <DialogTitle>詳細検索</DialogTitle>
+        <DialogTitle>{t("searchDialog.title")}</DialogTitle>
         <DialogContent>
           <StyledAlert severity="info" sx={{ marginBottom: 2 }}>
-            現在1ヶ月以上前の切り抜きは検索できません。
+            {t("searchDialog.alertMessage")}
           </StyledAlert>
           <TextField
             select
-            label="期間"
+            label={t("searchDialog.timeframe")}
             value={searchClipTimeframe || "1week"}
             onChange={(e) =>
               setSearchClipTimeframe(e.target.value as Timeframe)
             }
-            sx={{ margin: "1rem 0", width: "100px" }}
+            sx={{ margin: "1rem 0", width: "140px" }}
           >
             {timeframes.map((timeframe) => (
-              <MenuItem key={timeframe.value} value={timeframe.value}>
-                {timeframe.label}
+              <MenuItem key={timeframe} value={timeframe}>
+                {t(`searchDialog.timeframes.${timeframe}`)}
               </MenuItem>
             ))}
           </TextField>
@@ -143,19 +140,27 @@ export const SearchDialog: React.FC<Props> = ({
                 </Box>
               )}
               renderInput={(params) => (
-                <TextField {...params} label="配信者" variant="outlined" />
+                <TextField
+                  {...params}
+                  label={t("searchDialog.members")}
+                  variant="outlined"
+                />
               )}
             />
             <Autocomplete
               freeSolo
               id="keyword-autocomplete"
-              options={sampleSearchKeywords}
+              options={sampleKeywords}
               inputValue={searchKeyword}
               onInputChange={(event, newInputValue) => {
                 setSearchKeyword(newInputValue);
               }}
               renderInput={(params) => (
-                <TextField {...params} label="キーワード" variant="outlined" />
+                <TextField
+                  {...params}
+                  label={t("searchDialog.keyword")}
+                  variant="outlined"
+                />
               )}
               sx={{ margin: "1rem 0" }}
             />
@@ -163,10 +168,10 @@ export const SearchDialog: React.FC<Props> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={dialogClose} color="primary">
-            キャンセル
+            {t("searchDialog.cancel")}
           </Button>
           <Button onClick={handleSearch} color="primary">
-            検索
+            {t("searchDialog.search")}
           </Button>
         </DialogActions>
       </Dialog>

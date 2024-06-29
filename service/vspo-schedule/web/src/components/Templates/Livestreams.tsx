@@ -10,12 +10,15 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Livestream } from "@/types/streaming";
-import { formatWithTimeZone, groupLivestreamsByTimeRange } from "@/lib/utils";
+import { formatDate, groupLivestreamsByTimeRange } from "@/lib/utils";
 import { LivestreamCard } from "../Elements";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
 import { members } from "@/data/members";
 import Link from "next/link";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import { DEFAULT_LOCALE } from "@/lib/Const";
 
 type Props = {
   livestreamsByDate: Record<string, Livestream[]>;
@@ -42,6 +45,7 @@ const DateTypography = styled(Typography)(({ theme }) => ({
   fontWeight: "bold",
   padding: "0.75rem",
   borderRadius: "4px",
+  whiteSpace: "pre-line",
 
   [theme.getColorSchemeSelector("dark")]: {
     backgroundColor: "#353535",
@@ -87,6 +91,9 @@ export const LivestreamCards: React.FC<Props> = ({
   livestreamsByDate,
   eventsByDate,
 }) => {
+  const router = useRouter();
+  const { t } = useTranslation(["streams"]);
+  const locale = router.locale ?? DEFAULT_LOCALE;
   const [expanded, setExpanded] = React.useState<boolean>(true);
   if (Object.keys(livestreamsByDate).length === 0) {
     return (
@@ -96,8 +103,7 @@ export const LivestreamCards: React.FC<Props> = ({
         }}
       >
         <DateTypography variant="h5" mb={3}>
-          配信情報はありません。 <br />
-          アーカイブ・切り抜きをご覧ください。
+          {t("noLiveStreams")}
         </DateTypography>
       </Box>
     );
@@ -110,6 +116,10 @@ export const LivestreamCards: React.FC<Props> = ({
         if (date in eventsByDate) {
           events = eventsByDate[date];
         }
+        const formattedDate = formatDate(date, "MM/dd (E)", {
+          localeCode: locale,
+          timeZone: "JST",
+        });
 
         return (
           <Box
@@ -137,7 +147,7 @@ export const LivestreamCards: React.FC<Props> = ({
                       fontWeight: "bold",
                     }}
                   >
-                    イベント一覧
+                    {t("events")}
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails sx={{ backgroundColor: "transparent" }}>
@@ -196,8 +206,7 @@ export const LivestreamCards: React.FC<Props> = ({
               </StyledAccordion>
             )}
             <DateTypography variant="h5" mb={3}>
-              {formatWithTimeZone(new Date(date), "ja", "MM/dd (E)")}
-              の配信一覧
+              {t("streamsOnDate", { date: formattedDate })}
             </DateTypography>
             {livestreamsByTimeRange.map(
               ({ label, livestreams }) =>
@@ -212,9 +221,7 @@ export const LivestreamCards: React.FC<Props> = ({
                       alignItems: "center",
                     }}
                   >
-                    {livestreams.length > 0 && (
-                      <TimeRangeLabel variant="h6">{label}</TimeRangeLabel>
-                    )}
+                    <TimeRangeLabel variant="h6">{label}</TimeRangeLabel>
                     <Grid container spacing={2}>
                       {livestreams.map((livestream) => (
                         <Grid

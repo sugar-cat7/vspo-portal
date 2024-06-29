@@ -3,6 +3,8 @@ export type SiteNewsItem = {
   title: string;
   content: string;
   updated: string;
-  tags: string[];
+  tags: SiteNewsTag[];
   tweetLink?: string;
 };
+
+export type SiteNewsTag = "feat" | "fix";

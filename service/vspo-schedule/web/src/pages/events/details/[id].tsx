@@ -5,12 +5,14 @@ import { useRouter } from "next/router";
 import { NextPageWithLayout } from "../../_app";
 import { VspoEvent } from "@/types/events";
 import { TweetEmbed } from "@/components/Elements";
-import { formatWithTimeZone } from "@/lib/utils";
+import { formatDate, generateStaticPathsForLocales } from "@/lib/utils";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ContentLayout } from "@/components/Layout";
 import { members } from "@/data/members";
 import { fetchEvents } from "@/lib/api";
-import { TEMP_TIMESTAMP } from "@/lib/Const";
+import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useTranslation } from "next-i18next";
 
 type Params = {
   id: string;
@@ -20,17 +22,21 @@ type Props = {
   event: VspoEvent;
   lastUpdateDate: string;
   id: string;
+  meta: {
+    title: string;
+    description: string;
+  };
 };
 
 // https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
   try {
     // FIXME: lang should be passed from the context
     const fetchedEvents = await fetchEvents({ lang: "ja" });
-    const paths = fetchedEvents.map((event) => ({
-      params: { id: event.newsId.toString() },
-    }));
+    const paths = generateStaticPathsForLocales(
+      fetchedEvents.map((event) => ({ params: { id: event.newsId } })),
+      locales,
+    );
 
     return { paths, fallback: true };
   } catch (error) {
@@ -44,7 +50,7 @@ export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
 
 export const getStaticProps: GetStaticProps<Props, Params> = async ({
   params,
-  locale,
+  locale = DEFAULT_LOCALE,
 }) => {
   if (!params) {
     return {
@@ -67,9 +73,14 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
 
   return {
     props: {
+      ...(await serverSideTranslations(locale, ["common", "events"])),
       event: event,
       id: params.id,
-      lastUpdateDate: formatWithTimeZone(new Date(), "ja", "yyyy/MM/dd HH:mm"),
+      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
+      meta: {
+        title: event.title,
+        description: event.contentSummary,
+      },
     },
   };
 };
@@ -85,6 +96,9 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
 
 const EventPage: NextPageWithLayout<Props> = ({ event }) => {
   const router = useRouter();
+  const { t } = useTranslation(["common"]);
+  const locale = router.locale ?? DEFAULT_LOCALE;
+
   if (!event) {
     return null;
   }
@@ -92,7 +106,7 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
     <>
       <Toolbar disableGutters>
         <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()}>
-          戻る
+          {t("back", { ns: "common" })}
         </Button>
       </Toolbar>
 
@@ -109,10 +123,10 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
           }}
         >
           <Typography color="textSecondary">
-            {formatWithTimeZone(
+            {formatDate(
               new Date(event.startedAt.split("T")[0] || TEMP_TIMESTAMP),
-              "ja",
               "MM/dd (E)",
+              { localeCode: locale, timeZone: "JST" },
             )}
           </Typography>
           {members.map(
@@ -176,25 +190,15 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
   );
 };
 
-/* eslint-disable @typescript-eslint/no-unnecessary-condition --
- * pageProps is empty in fallback render
- */
-EventPage.getLayout = (page, pageProps) => {
-  const eventTitle = pageProps.event?.title ?? "Event Not Found";
-  const eventContentSummary =
-    pageProps.event?.contentSummary ?? "This event could not be found.";
-
-  return (
-    <ContentLayout
-      title={eventTitle}
-      description={eventContentSummary}
-      path={`/events/details/${pageProps.id}`}
-      maxPageWidth="md"
-    >
-      {page}
-    </ContentLayout>
-  );
-};
-/* eslint-enable @typescript-eslint/no-unnecessary-condition */
+EventPage.getLayout = (page, pageProps) => (
+  <ContentLayout
+    title={pageProps.meta?.title}
+    description={pageProps.meta?.description}
+    path={`/events/details/${pageProps.id}`}
+    maxPageWidth="md"
+  >
+    {page}
+  </ContentLayout>
+);
 
 export default EventPage;

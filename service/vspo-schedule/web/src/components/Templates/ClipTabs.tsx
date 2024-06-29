@@ -4,6 +4,7 @@ import { Clip } from "@/types/streaming";
 import { ClipList } from "./ClipList";
 import { isTrending, shuffleClips, sortClipsByPopularity } from "@/lib/utils";
 import { styled } from "@mui/material/styles";
+import { useTranslation } from "next-i18next";
 
 type Props = {
   clips: Clip[];
@@ -26,6 +27,7 @@ export const ClipTabs: React.FC<Props> = ({ clips }) => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+  const { t } = useTranslation("clips");
 
   useEffect(() => {
     if (value === 1) {
@@ -45,10 +47,10 @@ export const ClipTabs: React.FC<Props> = ({ clips }) => {
   return (
     <>
       <StyledTabs value={value} onChange={handleChange} centered>
-        <Tab label="新着👀" />
-        <Tab label="人気✨" />
-        <Tab label="おすすめ💡" />
-        <Tab label="急上昇🔥" />
+        <Tab label={`${t("clipLabels.new")} 👀`} />
+        <Tab label={`${t("clipLabels.popular")} ✨`} />
+        <Tab label={`${t("clipLabels.recommended")} 💡`} />
+        <Tab label={`${t("clipLabels.trending")} 🔥`} />
       </StyledTabs>
       <ClipList clips={sortedClips} />
     </>
