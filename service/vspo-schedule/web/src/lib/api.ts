@@ -24,17 +24,7 @@ export const fetchEvents = async (): Promise<VspoEvent[]> => {
           },
         },
       );
-      const events = response.data.map((event) => {
-        // startedAtを 'T' で分割し、日付部分だけを取得
-        const datePart = event.startedAt.split("T")[0];
-
-        // datePartと "T00:00:00Z" を結合して新しい日付を作成
-        event.startedAt = `${datePart}T00:00:00Z`;
-
-        return event;
-      });
-
-      return events;
+      return response.data;
     } else {
       return mockEvents;
     }
