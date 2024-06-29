@@ -50,6 +50,8 @@ const LiveLabel = styled("div")<{
   isUpcoming?: boolean;
 }>(({ isUpcoming }) => ({
   width: "78px",
+  minWidth: "fit-content",
+  padding: "0 12px",
   color: "rgb(255, 255, 255)",
   fontSize: "15px",
   fontWeight: "700",
