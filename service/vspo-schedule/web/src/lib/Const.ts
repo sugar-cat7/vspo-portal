@@ -1,6 +1,6 @@
 export const TEMP_TIMESTAMP = "1998-01-01T12:00:00Z";
 
-export const DEFAULT_LOCALE = "en";
+export const DEFAULT_LOCALE = "ja";
 
 export const QA_LINK = process.env.NEXT_PUBLIC_FORM;
 
