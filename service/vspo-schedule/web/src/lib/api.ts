@@ -36,7 +36,7 @@ export const fetchEvents = async ({
       return mockEvents;
     }
   } catch (error) {
-    console.error("Failed to fetch events:", error);
+    console.warn("Failed to fetch events:", error);
     throw error;
   }
 };
@@ -67,7 +67,7 @@ export const fetchLivestreams = async ({
       return convertThumbnailQualityInObjects(mockLivestreams);
     }
   } catch (error) {
-    console.error("Failed to fetch livestreams:", error);
+    console.warn("Failed to fetch livestreams:", error);
     throw error;
   }
 };
@@ -95,7 +95,7 @@ export const fetchFreechats = async ({
       return convertThumbnailQualityInObjects(mockFreechats);
     }
   } catch (error) {
-    console.error("Failed to fetch freechats:", error);
+    console.warn("Failed to fetch freechats:", error);
     throw error;
   }
 };
@@ -123,7 +123,7 @@ export const fetchClips = async ({
       return mockClips;
     }
   } catch (error) {
-    console.error("Failed to fetch YouTube clips:", error);
+    console.warn("Failed to fetch YouTube clips:", error);
     throw error;
   }
 };
@@ -154,7 +154,7 @@ export const fetchTwitchClips = async ({
       return mockTwitchClips;
     }
   } catch (error) {
-    console.error("Failed to fetch Twitch clips:", error);
+    console.warn("Failed to fetch Twitch clips:", error);
     throw error;
   }
 };
@@ -178,7 +178,7 @@ const fetchMemberTwitchClips = async ({
     });
     return response.data;
   } catch (error) {
-    console.error(
+    console.warn(
       `Failed to fetch Twitch clips for channel ID ${channelId}:`,
       error,
     );
