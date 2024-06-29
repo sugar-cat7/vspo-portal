@@ -16,7 +16,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { Video } from "@/types/streaming";
 import {
-  formatWithTimeZone,
+  formatDate,
   getLiveStatus,
   getVideoEmbedUrl,
   getVideoIconUrl,
@@ -157,14 +157,16 @@ const a11yProps = (index: number) => {
 const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
   const [value, setValue] = React.useState(0);
   const { t } = useTranslation("common");
+  const router = useRouter();
+  const { locale } = router;
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
-  const formattedStartTime = formatWithTimeZone(
+  const formattedStartTime = formatDate(
     video.scheduledStartTime || video.createdAt || "",
-    "ja",
     "MM/dd HH:mm~",
+    { localeCode: locale },
   );
   const showChatTab =
     isLivestream(video) &&

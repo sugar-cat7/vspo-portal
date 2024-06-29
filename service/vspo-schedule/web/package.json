@@ -28,6 +28,7 @@
     "axios": "^1.7.2",
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.1",
+    "dayjs": "^1.11.11",
     "eslint": "8.57.0",
     "eslint-config-next": "^14.2.4",
     "i18next": "^23.11.5",

@@ -13,6 +13,7 @@ import { fetchEvents } from "@/lib/api";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
+import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
 
 type Params = {
   id: string;
@@ -34,7 +35,9 @@ export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
     // FIXME: lang should be passed from the context
     const fetchedEvents = await fetchEvents({ lang: "ja" });
     const paths = generateStaticPathsForLocales(
-      fetchedEvents.map((event) => ({ params: { id: event.newsId } })),
+      fetchedEvents
+        .filter((f) => !f.isNotLink)
+        .map((event) => ({ params: { id: event.newsId } })),
       locales,
     );
 
@@ -76,10 +79,12 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
       ...(await serverSideTranslations(locale, ["common", "events"])),
       event: event,
       id: params.id,
-      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
+      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
+        localeCode: locale,
+      }),
       meta: {
         title: event.title,
-        description: event.contentSummary,
+        description: event?.contentSummary || event.title,
       },
     },
   };
@@ -124,9 +129,9 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
         >
           <Typography color="textSecondary">
             {formatDate(
-              new Date(event.startedAt.split("T")[0] || TEMP_TIMESTAMP),
+              convertToUTCDate(event.startedAt.split("T")[0] || TEMP_TIMESTAMP),
               "MM/dd (E)",
-              { localeCode: locale, timeZone: "JST" },
+              { localeCode: locale },
             )}
           </Typography>
           {members.map(

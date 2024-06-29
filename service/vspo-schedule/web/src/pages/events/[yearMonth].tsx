@@ -24,7 +24,6 @@ import { useMediaQuery } from "@mui/material";
 import { members } from "@/data/members";
 import {
   formatDate,
-  formatWithTimeZone,
   generateStaticPathsForLocales,
   getInitializedI18nInstance,
   groupEventsByYearMonth,
@@ -36,6 +35,7 @@ import { useRouter } from "next/router";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import { DEFAULT_LOCALE } from "@/lib/Const";
+import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
 
 type Params = {
   yearMonth: string;
@@ -103,7 +103,7 @@ const YearMonthSelector: React.FC<{
         style={{ width: "160px", textAlign: "center" }}
       >
         {currentYearMonth &&
-          t("currMonth", { val: new Date(currentYearMonth) })}
+          t("currMonth", { val: convertToUTCDate(currentYearMonth) })}
       </Typography>
       <AdjacentYearMonthButton
         disabled={!nextYearMonth}
@@ -169,7 +169,9 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
       : "";
 
   const sortedData = events.sort(
-    (a, b) => new Date(b.startedAt).getTime() - new Date(a.startedAt).getTime(),
+    (a, b) =>
+      convertToUTCDate(b.startedAt).getTime() -
+      convertToUTCDate(a.startedAt).getTime(),
   );
 
   const latestYearMonth = Object.keys(eventsByMonth).sort().pop();
@@ -184,7 +186,9 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     props: {
       ...translations,
       events: sortedData,
-      lastUpdateDate: formatDate(new Date(), "yyyy/MM/dd HH:mm '(UTC)'"),
+      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
+        localeCode: locale,
+      }),
       beforeYearMonth: beforeYearMonth,
       nextYearMonth: nextYearMonth,
       currentYearMonth: yearMonth,
@@ -276,9 +280,9 @@ const IndexPage: NextPageWithLayout<Props> = ({
         />
         <Timeline position="right" sx={{ padding: "0px" }}>
           {Object.entries(eventsByDate).map(([date, eventsOnDate], index) => {
-            const currentDate = new Date();
+            const currentDate = getCurrentUTCDate();
             currentDate.setHours(0, 0, 0, 0);
-            const isFutureEvent = new Date(date) > currentDate;
+            const isFutureEvent = convertToUTCDate(date) > currentDate;
 
             return (
               <TimelineItem key={index}>
@@ -299,7 +303,6 @@ const IndexPage: NextPageWithLayout<Props> = ({
                   >
                     {formatDate(date, "MM/dd (E)", {
                       localeCode: locale,
-                      timeZone: "JST",
                     })}
                   </Typography>
                 </TimelineOppositeContent>
@@ -313,12 +316,11 @@ const IndexPage: NextPageWithLayout<Props> = ({
                   {eventsOnDate.map((event, eventIndex) => {
                     // TODO: Consider whether an event should hold time zone info
                     const eventDate = event.startedAt.split("T")[0]; // Get the date part of the ISO string
-                    const today = formatWithTimeZone(
-                      new Date(),
-                      "ja",
+                    const today = formatDate(
+                      getCurrentUTCDate(),
                       "yyyy-MM-dd",
+                      { localeCode: locale },
                     );
-
                     const isEventToday = eventDate === today;
                     return (
                       <React.Fragment key={eventIndex}>

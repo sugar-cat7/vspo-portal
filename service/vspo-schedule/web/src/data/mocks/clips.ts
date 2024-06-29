@@ -1,13 +1,14 @@
+import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
 import { Clip } from "@/types/streaming";
 
-const today = new Date();
-const tomorrow = new Date(today);
+const today = getCurrentUTCDate();
+const tomorrow = convertToUTCDate(today);
 tomorrow.setDate(tomorrow.getDate() + 1);
-const dayAfterTomorrow = new Date(today);
+const dayAfterTomorrow = convertToUTCDate(today);
 dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2);
-const yesterday = new Date(today);
+const yesterday = convertToUTCDate(today);
 yesterday.setDate(yesterday.getDate() - 1);
-const dayBeforeYesterday = new Date(today);
+const dayBeforeYesterday = convertToUTCDate(today);
 dayBeforeYesterday.setDate(dayBeforeYesterday.getDate() - 2);
 
 export const mockClips: Clip[] = [

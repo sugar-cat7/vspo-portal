@@ -111,15 +111,22 @@ export const LivestreamCards: React.FC<Props> = ({
   return (
     <>
       {Object.entries(livestreamsByDate).map(([date, livestreams]) => {
-        const livestreamsByTimeRange = groupLivestreamsByTimeRange(livestreams);
+        const livestreamsByTimeRange = groupLivestreamsByTimeRange(
+          livestreams,
+          locale,
+        );
         let events: VspoEvent[] = [];
         if (date in eventsByDate) {
           events = eventsByDate[date];
         }
-        const formattedDate = formatDate(date, "MM/dd (E)", {
-          localeCode: locale,
-          timeZone: "JST",
-        });
+
+        const formattedDate = formatDate(
+          livestreamsByDate[date].at(0)?.scheduledStartTime || date,
+          "MM/dd (E)",
+          {
+            localeCode: locale,
+          },
+        );
 
         return (
           <Box
