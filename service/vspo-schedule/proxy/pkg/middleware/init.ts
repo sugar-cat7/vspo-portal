@@ -30,10 +30,12 @@ export function init(): MiddlewareHandler<HonoEnv> {
             tracer: trace.getTracer('OTelCFWorkers:Fetcher'),
             kv: envResult.data.APP_KV,
         });
-        c.set("requestUrl", envResult.data.API_BASE_URL + c.req.path);
+        const url = new URL(c.req.url);
+        const requestUrl = `${envResult.data.API_BASE_URL}${url.pathname}${url.search}`;
+        c.set("requestUrl", requestUrl);
         c.set("translateUrl", envResult.data.TRANSLATE_URL);
         c.set("apiKey", apiKey);
-        logger.info("[Request started]");
+        logger.info(`[Request started]: ${requestUrl}`);
         await next();
     };
 }
