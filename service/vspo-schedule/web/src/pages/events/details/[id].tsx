@@ -22,9 +22,12 @@ type Props = {
   id: string;
 };
 
-export const getStaticPaths: GetStaticPaths<Params> = async () => {
+// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
   try {
-    const fetchedEvents = await fetchEvents();
+    // FIXME: lang should be passed from the context
+    const fetchedEvents = await fetchEvents({ lang: "ja" });
     const paths = fetchedEvents.map((event) => ({
       params: { id: event.newsId.toString() },
     }));
@@ -41,6 +44,7 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
 
 export const getStaticProps: GetStaticProps<Props, Params> = async ({
   params,
+  locale,
 }) => {
   if (!params) {
     return {
@@ -48,7 +52,7 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     };
   }
 
-  const fetchedEvents = await fetchEvents();
+  const fetchedEvents = await fetchEvents({ lang: locale });
   if (!Array.isArray(fetchedEvents)) {
     return {
       notFound: true,

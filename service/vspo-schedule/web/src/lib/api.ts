@@ -13,7 +13,11 @@ import {
 import { API_ROOT, ENVIRONMENT } from "./Const";
 import { members } from "@/data/members";
 
-export const fetchEvents = async (): Promise<VspoEvent[]> => {
+export const fetchEvents = async ({
+  lang = "ja",
+}: {
+  lang?: string;
+}): Promise<VspoEvent[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<VspoEvent[]>(
@@ -21,6 +25,9 @@ export const fetchEvents = async (): Promise<VspoEvent[]> => {
         {
           headers: {
             "x-api-key": process.env.API_KEY,
+          },
+          params: {
+            lang: lang,
           },
         },
       );
@@ -65,7 +72,11 @@ export const fetchLivestreams = async ({
   }
 };
 
-export const fetchFreechats = async (): Promise<Livestream[]> => {
+export const fetchFreechats = async ({
+  lang = "ja",
+}: {
+  lang?: string;
+}): Promise<Livestream[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<Livestream[]>(
@@ -73,6 +84,9 @@ export const fetchFreechats = async (): Promise<Livestream[]> => {
         {
           headers: {
             "x-api-key": process.env.API_KEY,
+          },
+          params: {
+            lang: lang,
           },
         },
       );
@@ -86,7 +100,11 @@ export const fetchFreechats = async (): Promise<Livestream[]> => {
   }
 };
 
-export const fetchClips = async (): Promise<Clip[]> => {
+export const fetchClips = async ({
+  lang = "ja",
+}: {
+  lang?: string;
+}): Promise<Clip[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<Clip[]>(
@@ -94,6 +112,9 @@ export const fetchClips = async (): Promise<Clip[]> => {
         {
           headers: {
             "x-api-key": process.env.API_KEY,
+          },
+          params: {
+            lang: lang,
           },
         },
       );
@@ -107,12 +128,19 @@ export const fetchClips = async (): Promise<Clip[]> => {
   }
 };
 
-export const fetchTwitchClips = async (): Promise<Clip[]> => {
+export const fetchTwitchClips = async ({
+  lang = "ja",
+}: {
+  lang?: string;
+}): Promise<Clip[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const memberClipsPromises = members.map((member) => {
         return member.twitchChannelId
-          ? fetchMemberTwitchClips(member.twitchChannelId)
+          ? fetchMemberTwitchClips({
+              channelId: member.twitchChannelId,
+              lang: lang,
+            })
           : Promise.resolve([]);
       });
       const settledResults = await Promise.allSettled(memberClipsPromises);
@@ -131,11 +159,18 @@ export const fetchTwitchClips = async (): Promise<Clip[]> => {
   }
 };
 
-const fetchMemberTwitchClips = async (channelId: string): Promise<Clip[]> => {
+const fetchMemberTwitchClips = async ({
+  channelId,
+  lang = "ja",
+}: {
+  channelId: string;
+  lang?: string;
+}): Promise<Clip[]> => {
   try {
     const response = await axios.get<Clip[]>(`${API_ROOT}/api/clips/twitch`, {
       params: {
-        channelId,
+        channelId: channelId,
+        lang: lang,
       },
       headers: {
         "x-api-key": process.env.API_KEY,
@@ -159,13 +194,14 @@ export type RelatedProps = {
 export const fetchRelatedVideos = async (
   page = 1,
   limit = 10,
+  lang = "ja",
 ): Promise<RelatedProps> => {
   const pastLivestreams = await fetchLivestreams({ limit: 50 });
   const liveStreams = pastLivestreams.filter(
     (livestream) => getLiveStatus(livestream) === "live",
   );
 
-  const pastClips = await fetchClips();
+  const pastClips = await fetchClips({ lang });
   const shuffledClips = shuffleClips(pastClips);
   return {
     liveStreams: liveStreams.slice((page - 1) * limit, page * limit),

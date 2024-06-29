@@ -97,9 +97,11 @@ const YearMonthSelector: React.FC<{
   </>
 );
 
-export const getStaticPaths: GetStaticPaths<Params> = async () => {
+// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
   try {
-    const fetchedEvents = await fetchEvents();
+    const fetchedEvents = await fetchEvents({ lang: "ja" });
     const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
 
     const paths = Object.keys(eventsByMonth).map((yearMonth) => ({
@@ -118,6 +120,7 @@ export const getStaticPaths: GetStaticPaths<Params> = async () => {
 
 export const getStaticProps: GetStaticProps<Props, Params> = async ({
   params,
+  locale,
 }) => {
   if (!params) {
     return {
@@ -125,7 +128,7 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     };
   }
 
-  const fetchedEvents = await fetchEvents();
+  const fetchedEvents = await fetchEvents({ lang: locale });
   const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
 
   const yearMonth = params.yearMonth;

@@ -51,8 +51,10 @@ const ClipPage: NextPageWithLayout<ClipsProps> = ({ clips }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps<ClipsProps> = async () => {
-  const pastClips = await fetchClips();
+export const getStaticProps: GetStaticProps<ClipsProps> = async ({
+  locale,
+}) => {
+  const pastClips = await fetchClips({ lang: locale });
 
   return {
     props: {
