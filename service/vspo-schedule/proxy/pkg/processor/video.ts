@@ -1,4 +1,4 @@
-import { VideoSchema } from "@/schema";
+import { VideoSchema, VideosSchema } from "@/schema";
 import { convertToUTC } from "../dayjs";
 import { AppContext } from "../hono";
 import { translateText } from "../translator";
@@ -11,17 +11,24 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     // Parse specific fields of the response using Zod schema
     let parsedData: z.infer<typeof VideoSchema>[] = [];
     if (c.req.path.includes('clips/youtube')) {
-        parsedData = VideoSchema.array().parse(data.pastClips);
-    }
-    else if (c.req.path.includes('clips/twitch')) {
-        return data;
+        if (!data) {
+            return []
+        }
+        parsedData = VideosSchema.parse(data.pastClips);
     }
     else {
-        parsedData = VideoSchema.array().parse(data);
+        if (!Array.isArray(data)) {
+            return []
+        }
+        parsedData = VideosSchema.parse(data);
+        parsedData = VideosSchema.parse(data);
     }
-
+    if (!Array.isArray(parsedData)) {
+        console.error('Parsed data is not an array:', parsedData);
+        return data
+    }
     // Date Format To UTC: scheduledStartTime, actualEndTime, createdAt
-    parsedData.forEach(item => {
+    parsedData?.forEach(item => {
         if (item.scheduledStartTime) {
             item.scheduledStartTime = convertToUTC(item.scheduledStartTime);
         }
@@ -37,7 +44,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
         return parsedData
     }
     // Process each item
-    const translatedDataPromises = parsedData.map(async item => {
+    const translatedDataPromises = parsedData?.map(async item => {
         const kvKey = `${item.id}_${lang}`;
         let kvData: string | null = await kv?.get(kvKey)
         if (!kvData) {
@@ -52,7 +59,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
             };
 
             // Save data to KV store
-            await kv.put(kvKey, JSON.stringify(kvObject));
+            await kv?.put(kvKey, JSON.stringify(kvObject));
             kvData = JSON.stringify(kvObject);
         }
         if (kvData) {

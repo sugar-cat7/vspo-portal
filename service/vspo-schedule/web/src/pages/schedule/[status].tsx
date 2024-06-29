@@ -118,7 +118,9 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   );
 };
 
-export const getStaticPaths: GetStaticPaths<Params> = () => {
+// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
   const statusPaths = ["all", "live", "upcoming", "archive"].map((status) => ({
     params: { status },
   }));
@@ -147,7 +149,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   }
 
   const pastLivestreams = await fetchLivestreams({ limit: 300, lang: locale });
-  const events = await fetchEvents();
+  const events = await fetchEvents({ lang: locale });
   const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
     (livestream) => !freechatVideoIds.includes(livestream.id),
   );

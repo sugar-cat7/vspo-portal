@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Specify the directories to monitor
-CHECK_DIRECTORIES=("service/vspo-schedule/web/" "service/vspo-schedule/proxy/")
+CHECK_DIRECTORIES=("service/vspo-schedule/web/")
 
 # Check changes since the last commit
 for file in $(git diff --name-only HEAD^ HEAD); do

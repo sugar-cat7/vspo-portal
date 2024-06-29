@@ -22,19 +22,29 @@ type Props = {
   id: string;
 };
 
-export const getStaticPaths: GetStaticPaths<Params> = async () => {
-  // Fetch events from API
-  const fetchedEvents = await fetchEvents();
-  const paths = fetchedEvents.map((event) => ({
-    params: { id: event.newsId },
-  }));
+// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const getStaticPaths: GetStaticPaths<Params> = async ({ locales }) => {
+  try {
+    // FIXME: lang should be passed from the context
+    const fetchedEvents = await fetchEvents({ lang: "ja" });
+    const paths = fetchedEvents.map((event) => ({
+      params: { id: event.newsId.toString() },
+    }));
 
-  // Fallback to true to handle non-existent paths
-  return { paths, fallback: true };
+    return { paths, fallback: true };
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return {
+      paths: [],
+      fallback: true,
+    };
+  }
 };
 
 export const getStaticProps: GetStaticProps<Props, Params> = async ({
   params,
+  locale,
 }) => {
   if (!params) {
     return {
@@ -42,7 +52,12 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     };
   }
 
-  const fetchedEvents = await fetchEvents();
+  const fetchedEvents = await fetchEvents({ lang: locale });
+  if (!Array.isArray(fetchedEvents)) {
+    return {
+      notFound: true,
+    };
+  }
   const event = fetchedEvents.find((event) => event.newsId === params.id);
   if (!event) {
     return {

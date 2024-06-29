@@ -13,7 +13,11 @@ import {
 import { API_ROOT, ENVIRONMENT } from "./Const";
 import { members } from "@/data/members";
 
-export const fetchEvents = async (): Promise<VspoEvent[]> => {
+export const fetchEvents = async ({
+  lang = "ja",
+}: {
+  lang?: string;
+}): Promise<VspoEvent[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<VspoEvent[]>(
@@ -22,24 +26,17 @@ export const fetchEvents = async (): Promise<VspoEvent[]> => {
           headers: {
             "x-api-key": process.env.API_KEY,
           },
+          params: {
+            lang: lang,
+          },
         },
       );
-      const events = response.data.map((event) => {
-        // startedAtを 'T' で分割し、日付部分だけを取得
-        const datePart = event.startedAt.split("T")[0];
-
-        // datePartと "T00:00:00Z" を結合して新しい日付を作成
-        event.startedAt = `${datePart}T00:00:00Z`;
-
-        return event;
-      });
-
-      return events;
+      return response.data;
     } else {
       return mockEvents;
     }
   } catch (error) {
-    console.error("Failed to fetch events:", error);
+    console.warn("Failed to fetch events:", error);
     throw error;
   }
 };
@@ -70,12 +67,16 @@ export const fetchLivestreams = async ({
       return convertThumbnailQualityInObjects(mockLivestreams);
     }
   } catch (error) {
-    console.error("Failed to fetch livestreams:", error);
+    console.warn("Failed to fetch livestreams:", error);
     throw error;
   }
 };
 
-export const fetchFreechats = async (): Promise<Livestream[]> => {
+export const fetchFreechats = async ({
+  lang = "ja",
+}: {
+  lang?: string;
+}): Promise<Livestream[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<Livestream[]>(
@@ -84,6 +85,9 @@ export const fetchFreechats = async (): Promise<Livestream[]> => {
           headers: {
             "x-api-key": process.env.API_KEY,
           },
+          params: {
+            lang: lang,
+          },
         },
       );
       return convertThumbnailQualityInObjects(response.data);
@@ -91,12 +95,16 @@ export const fetchFreechats = async (): Promise<Livestream[]> => {
       return convertThumbnailQualityInObjects(mockFreechats);
     }
   } catch (error) {
-    console.error("Failed to fetch freechats:", error);
+    console.warn("Failed to fetch freechats:", error);
     throw error;
   }
 };
 
-export const fetchClips = async (): Promise<Clip[]> => {
+export const fetchClips = async ({
+  lang = "ja",
+}: {
+  lang?: string;
+}): Promise<Clip[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const response = await axios.get<Clip[]>(
@@ -105,6 +113,9 @@ export const fetchClips = async (): Promise<Clip[]> => {
           headers: {
             "x-api-key": process.env.API_KEY,
           },
+          params: {
+            lang: lang,
+          },
         },
       );
       return convertThumbnailQualityInObjects(response.data);
@@ -112,17 +123,24 @@ export const fetchClips = async (): Promise<Clip[]> => {
       return mockClips;
     }
   } catch (error) {
-    console.error("Failed to fetch YouTube clips:", error);
+    console.warn("Failed to fetch YouTube clips:", error);
     throw error;
   }
 };
 
-export const fetchTwitchClips = async (): Promise<Clip[]> => {
+export const fetchTwitchClips = async ({
+  lang = "ja",
+}: {
+  lang?: string;
+}): Promise<Clip[]> => {
   try {
     if (ENVIRONMENT === "production") {
       const memberClipsPromises = members.map((member) => {
         return member.twitchChannelId
-          ? fetchMemberTwitchClips(member.twitchChannelId)
+          ? fetchMemberTwitchClips({
+              channelId: member.twitchChannelId,
+              lang: lang,
+            })
           : Promise.resolve([]);
       });
       const settledResults = await Promise.allSettled(memberClipsPromises);
@@ -136,16 +154,23 @@ export const fetchTwitchClips = async (): Promise<Clip[]> => {
       return mockTwitchClips;
     }
   } catch (error) {
-    console.error("Failed to fetch Twitch clips:", error);
+    console.warn("Failed to fetch Twitch clips:", error);
     throw error;
   }
 };
 
-const fetchMemberTwitchClips = async (channelId: string): Promise<Clip[]> => {
+const fetchMemberTwitchClips = async ({
+  channelId,
+  lang = "ja",
+}: {
+  channelId: string;
+  lang?: string;
+}): Promise<Clip[]> => {
   try {
     const response = await axios.get<Clip[]>(`${API_ROOT}/api/clips/twitch`, {
       params: {
-        channelId,
+        channelId: channelId,
+        lang: lang,
       },
       headers: {
         "x-api-key": process.env.API_KEY,
@@ -153,7 +178,7 @@ const fetchMemberTwitchClips = async (channelId: string): Promise<Clip[]> => {
     });
     return response.data;
   } catch (error) {
-    console.error(
+    console.warn(
       `Failed to fetch Twitch clips for channel ID ${channelId}:`,
       error,
     );
@@ -169,13 +194,14 @@ export type RelatedProps = {
 export const fetchRelatedVideos = async (
   page = 1,
   limit = 10,
+  lang = "ja",
 ): Promise<RelatedProps> => {
   const pastLivestreams = await fetchLivestreams({ limit: 50 });
   const liveStreams = pastLivestreams.filter(
     (livestream) => getLiveStatus(livestream) === "live",
   );
 
-  const pastClips = await fetchClips();
+  const pastClips = await fetchClips({ lang });
   const shuffledClips = shuffleClips(pastClips);
   return {
     liveStreams: liveStreams.slice((page - 1) * limit, page * limit),
