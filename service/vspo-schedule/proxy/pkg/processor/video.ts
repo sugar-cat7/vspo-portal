@@ -11,7 +11,7 @@ export const videoProcessor = async (c: AppContext, data: any) => {
     // Parse specific fields of the response using Zod schema
     let parsedData: z.infer<typeof VideoSchema>[] = [];
     if (c.req.path.includes('clips/youtube')) {
-        if (data) {
+        if (!data) {
             return []
         }
         parsedData = VideosSchema.parse(data.pastClips);
