@@ -11,7 +11,7 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     const relatedVideos = await fetchRelatedVideos(page, limit);
 
     // Cache-Controlヘッダーを設定
-    res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate");
+    res.setHeader("Cache-Control", "s-maxage=10800, stale-while-revalidate");
 
     res.status(200).json(relatedVideos);
   });
