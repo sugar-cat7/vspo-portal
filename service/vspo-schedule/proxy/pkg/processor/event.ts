@@ -22,11 +22,11 @@ export const eventProcessor = async (c: AppContext, data: any) => {
         let kvData: string | null = await kv?.get(kvKey);
         if (!kvData) {
             const translatedTitle = await translateText(c, item.title, lang);
-            const translatedContentSummary = await translateText(c, item.contentSummary, lang);
+            // const translatedContentSummary = await translateText(c, item.contentSummary, lang);
 
             const kvObject = {
                 title: translatedTitle,
-                contentSummary: translatedContentSummary,
+                // contentSummary: translatedContentSummary,
             };
 
             await kv?.put(kvKey, JSON.stringify(kvObject));

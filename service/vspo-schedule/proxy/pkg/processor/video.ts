@@ -35,12 +35,12 @@ export const videoProcessor = async (c: AppContext, data: any) => {
         if (!kvData) {
             // Translate title and description
             const translatedTitle = await translateText(c, item.title, lang);
-            const translatedDescription = await translateText(c, item.description, lang);
+            // const translatedDescription = await translateText(c, item.description, lang);
 
             // Prepare data to be saved in KV store
             const kvObject = {
                 title: translatedTitle,
-                description: translatedDescription,
+                // description: translatedDescription,
             };
 
             // Save data to KV store
