@@ -92,7 +92,6 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async ({
         description: t("twitchClips.description"),
       },
     },
-    revalidate: 1800,
   };
 };
 

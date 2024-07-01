@@ -88,7 +88,6 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async ({
         description: t("youtubeClips.description"),
       },
     },
-    revalidate: 1800,
   };
 };
 
