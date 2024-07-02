@@ -265,7 +265,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     const lastUpdateDate = formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
       localeCode: locale,
     });
-    const revalidateWindow = 30;
+    const revalidateWindow = 60;
 
     const translations = await serverSideTranslations(locale, [
       "common",
