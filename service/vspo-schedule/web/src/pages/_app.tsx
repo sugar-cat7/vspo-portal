@@ -9,6 +9,7 @@ import { ThemeModeProvider } from "@/context/Theme";
 import { GoogleAnalytics } from "@/components/Elements";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { VideoModalContextProvider } from "@/context/VideoModalContext";
+import { TimeZoneContextProvider } from "@/context/TimeZoneContext";
 import { appWithTranslation } from "next-i18next";
 
 config.autoAddCss = false;
@@ -27,10 +28,12 @@ function App({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <>
       <ThemeModeProvider>
-        <VideoModalContextProvider>
-          {/* eslint-disable-next-line @typescript-eslint/no-unsafe-argument */}
-          {getLayout(<Component {...pageProps} />, pageProps)}
-        </VideoModalContextProvider>
+        <TimeZoneContextProvider>
+          <VideoModalContextProvider>
+            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-argument */}
+            {getLayout(<Component {...pageProps} />, pageProps)}
+          </VideoModalContextProvider>
+        </TimeZoneContextProvider>
       </ThemeModeProvider>
       <Analytics />
       <GoogleAnalytics />

@@ -38,6 +38,7 @@
       "discord": "Discord Bot"
     },
     "settings": "Settings",
+    "timeZone": "Time zone",
     "site-theme": "Theme"
   },
   "alert": {
