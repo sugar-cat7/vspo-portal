@@ -23,10 +23,12 @@ export const LanguageSelector = () => {
         label={t("drawer.language")}
         value={locale}
         onChange={(event) => {
+          const selectedLocale = event.target.value;
+          document.cookie = `NEXT_LOCALE=${selectedLocale};max-age=34560000;path=/`;
           router.replace(
             { pathname: router.pathname, query: router.query },
             router.asPath,
-            { locale: event.target.value },
+            { locale: selectedLocale },
           );
         }}
       >
