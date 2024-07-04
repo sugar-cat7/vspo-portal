@@ -2,7 +2,7 @@ import React, { createContext } from "react";
 import { useLocalStorage } from "@/hooks";
 
 type ContextProps = {
-  timeZone?: string;
+  timeZone: string;
   setTimeZone: (timeZone?: string) => void;
 };
 
@@ -17,7 +17,12 @@ export const TimeZoneContextProvider: React.FC<{
   const [timeZone, setTimeZone] = useLocalStorage("time-zone", defaultTimeZone);
 
   return (
-    <TimeZoneContext.Provider value={{ timeZone, setTimeZone }}>
+    <TimeZoneContext.Provider
+      value={{
+        timeZone: timeZone ?? defaultTimeZone,
+        setTimeZone,
+      }}
+    >
       {children}
     </TimeZoneContext.Provider>
   );
