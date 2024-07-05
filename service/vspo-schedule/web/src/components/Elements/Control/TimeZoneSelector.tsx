@@ -3,29 +3,27 @@ import React, { useMemo } from "react";
 import { Autocomplete, Box, MenuItem, TextField } from "@mui/material";
 import { useTimeZoneContext } from "@/hooks";
 import { formatDate } from "@/lib/utils";
+import { getCurrentUTCDate } from "@/lib/dayjs";
 
 export const TimeZoneSelector = () => {
   const { t } = useTranslation("common");
   const { timeZone, setTimeZone } = useTimeZoneContext();
 
-  const timeZones = useMemo(() => Intl.supportedValuesOf("timeZone"), []);
-  const labels = useMemo(() => {
-    return timeZones.reduce<Record<string, React.ReactNode>>(
-      (acc, timeZone) => {
-        acc[timeZone] = getTimeZoneLabel(timeZone);
-        return acc;
-      },
-      {},
-    );
+  const { timeZones, timeZoneDisplayInfos } = useMemo(() => {
+    const timeZones = Intl.supportedValuesOf("timeZone");
+    const now = getCurrentUTCDate();
+    const timeZoneDisplayInfos: Record<
+      string,
+      { label: React.ReactNode; offset: string }
+    > = {};
+    for (const timeZone of timeZones) {
+      timeZoneDisplayInfos[timeZone] = {
+        label: getTimeZoneLabel(timeZone),
+        offset: formatDate(now, "OOOO", { timeZone }),
+      };
+    }
+    return { timeZones, timeZoneDisplayInfos };
   }, []);
-  const now = Date.now();
-  const formattedTimeZoneOffsets = timeZones.reduce<Record<string, string>>(
-    (acc, timeZone) => {
-      acc[timeZone] = formatDate(now, "OOOO", { timeZone });
-      return acc;
-    },
-    {},
-  );
 
   return (
     <Autocomplete
@@ -54,6 +52,7 @@ export const TimeZoneSelector = () => {
       renderOption={(props, tz) => {
         /* eslint-disable @typescript-eslint/no-unsafe-assignment */
         const { key, ...optionProps } = props;
+        const { label, offset } = timeZoneDisplayInfos[tz];
         return (
           <MenuItem
             key={key}
@@ -65,7 +64,7 @@ export const TimeZoneSelector = () => {
               gap: "8px",
             }}
           >
-            <Box sx={{ width: "200px" }}>{labels[tz]}</Box>
+            <Box sx={{ width: "200px" }}>{label}</Box>
             <Box
               sx={(theme) => ({
                 color: theme.vars.palette.text.secondary,
@@ -73,7 +72,7 @@ export const TimeZoneSelector = () => {
                 fontSize: "14px",
               })}
             >
-              {formattedTimeZoneOffsets[tz]}
+              {offset}
             </Box>
           </MenuItem>
         );
