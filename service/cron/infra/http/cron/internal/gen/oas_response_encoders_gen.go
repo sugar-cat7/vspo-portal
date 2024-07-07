@@ -11,9 +11,9 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func encodeCronCreatorsPostResponse(response CronCreatorsPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeAPICronCreatorsGetResponse(response APICronCreatorsGetRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *CronCreatorsPostOK:
+	case *APICronCreatorsGetOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -26,7 +26,7 @@ func encodeCronCreatorsPostResponse(response CronCreatorsPostRes, w http.Respons
 
 		return nil
 
-	case *CronCreatorsPostBadRequest:
+	case *APICronCreatorsGetBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -39,7 +39,7 @@ func encodeCronCreatorsPostResponse(response CronCreatorsPostRes, w http.Respons
 
 		return nil
 
-	case *CronCreatorsPostUnauthorized:
+	case *APICronCreatorsGetUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
@@ -52,7 +52,7 @@ func encodeCronCreatorsPostResponse(response CronCreatorsPostRes, w http.Respons
 
 		return nil
 
-	case *CronCreatorsPostForbidden:
+	case *APICronCreatorsGetForbidden:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
@@ -65,7 +65,7 @@ func encodeCronCreatorsPostResponse(response CronCreatorsPostRes, w http.Respons
 
 		return nil
 
-	case *CronCreatorsPostNotFound:
+	case *APICronCreatorsGetNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
@@ -78,7 +78,7 @@ func encodeCronCreatorsPostResponse(response CronCreatorsPostRes, w http.Respons
 
 		return nil
 
-	case *CronCreatorsPostInternalServerError:
+	case *APICronCreatorsGetInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -96,9 +96,9 @@ func encodeCronCreatorsPostResponse(response CronCreatorsPostRes, w http.Respons
 	}
 }
 
-func encodeCronVideosPostResponse(response CronVideosPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeAPICronVideosGetResponse(response APICronVideosGetRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *CronVideosPostOK:
+	case *APICronVideosGetOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -111,7 +111,7 @@ func encodeCronVideosPostResponse(response CronVideosPostRes, w http.ResponseWri
 
 		return nil
 
-	case *CronVideosPostBadRequest:
+	case *APICronVideosGetBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -124,7 +124,7 @@ func encodeCronVideosPostResponse(response CronVideosPostRes, w http.ResponseWri
 
 		return nil
 
-	case *CronVideosPostUnauthorized:
+	case *APICronVideosGetUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
@@ -137,7 +137,7 @@ func encodeCronVideosPostResponse(response CronVideosPostRes, w http.ResponseWri
 
 		return nil
 
-	case *CronVideosPostForbidden:
+	case *APICronVideosGetForbidden:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
@@ -150,7 +150,7 @@ func encodeCronVideosPostResponse(response CronVideosPostRes, w http.ResponseWri
 
 		return nil
 
-	case *CronVideosPostNotFound:
+	case *APICronVideosGetNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
@@ -163,7 +163,7 @@ func encodeCronVideosPostResponse(response CronVideosPostRes, w http.ResponseWri
 
 		return nil
 
-	case *CronVideosPostInternalServerError:
+	case *APICronVideosGetInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -181,7 +181,7 @@ func encodeCronVideosPostResponse(response CronVideosPostRes, w http.ResponseWri
 	}
 }
 
-func encodePostResponse(response *PostOK, w http.ResponseWriter, span trace.Span) error {
+func encodeAPIPingGetResponse(response *APIPingGetOK, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))

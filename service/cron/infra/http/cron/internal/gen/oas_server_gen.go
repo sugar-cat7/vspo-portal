@@ -8,24 +8,24 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
-	// CronCreatorsPost implements POST /cron/creators operation.
+	// APICronCreatorsGet implements GET /api/cron/creators operation.
 	//
 	// Creates creators by fetching from Youtube using provided Channel IDs.
 	//
-	// POST /cron/creators
-	CronCreatorsPost(ctx context.Context, req *CronCreatorsPostReq) (CronCreatorsPostRes, error)
-	// CronVideosPost implements POST /cron/videos operation.
+	// GET /api/cron/creators
+	APICronCreatorsGet(ctx context.Context, params APICronCreatorsGetParams) (APICronCreatorsGetRes, error)
+	// APICronVideosGet implements GET /api/cron/videos operation.
 	//
 	// Update videos related to a specific creator based on provided cronType.
 	//
-	// POST /cron/videos
-	CronVideosPost(ctx context.Context, req *CronVideosPostReq) (CronVideosPostRes, error)
-	// Post implements POST / operation.
+	// GET /api/cron/videos
+	APICronVideosGet(ctx context.Context, params APICronVideosGetParams) (APICronVideosGetRes, error)
+	// APIPingGet implements GET /api/ping operation.
 	//
 	// Returns a 200 status code if successful, or an error.
 	//
-	// POST /
-	Post(ctx context.Context) (*PostOK, error)
+	// GET /api/ping
+	APIPingGet(ctx context.Context) (*APIPingGetOK, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

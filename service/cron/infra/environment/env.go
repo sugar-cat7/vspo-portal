@@ -9,8 +9,9 @@ type Environment struct {
 }
 
 type ServerEnvironment struct {
-	ENV      string `env:"ENV,required" envDefault:"local"`
-	LogLevel string `env:"LOG_LEVEL,required" envDefault:"debug"`
+	ENV         string `env:"ENV,required" envDefault:"local"`
+	LogLevel    string `env:"LOG_LEVEL,required" envDefault:"debug"`
+	CRON_SECRET string `env:"CRON_SECRET,required" envDefault:"xxx"`
 }
 
 type DatabaseEnvironment struct {

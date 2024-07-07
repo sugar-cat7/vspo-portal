@@ -10,14 +10,14 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/input"
 )
 
-// CronVideosPost implements the POST /channels/{channel_id}/videos endpoint.
-func (h *VH) CronVideosPost(ctx context.Context, req *api.CronVideosPostReq) (api.CronVideosPostRes, error) {
+// APICronVideosGet implements the POST /channels/{channel_id}/videos endpoint.
+func (h *VH) APICronVideosGet(ctx context.Context, req api.APICronVideosGetParams) (api.APICronVideosGetRes, error) {
 	v, err := h.videoInteractor.BatchDeleteInsert(
 		ctx,
 		input.NewUpsertVideoInput(
 			dto.ConvertPlatFormTypeOgenToReqSlice(req.PlatformType),
-			string(req.VideoType.Value),
-			string(req.Period.Value),
+			string(req.VideoType),
+			string(req.Period),
 		),
 	)
 
@@ -25,7 +25,7 @@ func (h *VH) CronVideosPost(ctx context.Context, req *api.CronVideosPostReq) (ap
 		logger.New().Error(err.Error())
 		return nil, err
 	}
-	return &api.CronVideosPostOK{
+	return &api.APICronVideosGetOK{
 		Message: api.OptString{
 			Value: fmt.Sprintf("Updated videos: %v", v),
 		},

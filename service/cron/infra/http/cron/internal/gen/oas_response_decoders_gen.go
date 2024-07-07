@@ -14,7 +14,7 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func decodeCronCreatorsPostResponse(resp *http.Response) (res CronCreatorsPostRes, _ error) {
+func decodeAPICronCreatorsGetResponse(resp *http.Response) (res APICronCreatorsGetRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -30,7 +30,7 @@ func decodeCronCreatorsPostResponse(resp *http.Response) (res CronCreatorsPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronCreatorsPostOK
+			var response APICronCreatorsGetOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -65,7 +65,7 @@ func decodeCronCreatorsPostResponse(resp *http.Response) (res CronCreatorsPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronCreatorsPostBadRequest
+			var response APICronCreatorsGetBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -100,7 +100,7 @@ func decodeCronCreatorsPostResponse(resp *http.Response) (res CronCreatorsPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronCreatorsPostUnauthorized
+			var response APICronCreatorsGetUnauthorized
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -135,7 +135,7 @@ func decodeCronCreatorsPostResponse(resp *http.Response) (res CronCreatorsPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronCreatorsPostForbidden
+			var response APICronCreatorsGetForbidden
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -170,7 +170,7 @@ func decodeCronCreatorsPostResponse(resp *http.Response) (res CronCreatorsPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronCreatorsPostNotFound
+			var response APICronCreatorsGetNotFound
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -205,7 +205,7 @@ func decodeCronCreatorsPostResponse(resp *http.Response) (res CronCreatorsPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronCreatorsPostInternalServerError
+			var response APICronCreatorsGetInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -230,7 +230,7 @@ func decodeCronCreatorsPostResponse(resp *http.Response) (res CronCreatorsPostRe
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _ error) {
+func decodeAPICronVideosGetResponse(resp *http.Response) (res APICronVideosGetRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -246,7 +246,7 @@ func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronVideosPostOK
+			var response APICronVideosGetOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -281,7 +281,7 @@ func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronVideosPostBadRequest
+			var response APICronVideosGetBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -316,7 +316,7 @@ func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronVideosPostUnauthorized
+			var response APICronVideosGetUnauthorized
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -351,7 +351,7 @@ func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronVideosPostForbidden
+			var response APICronVideosGetForbidden
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -386,7 +386,7 @@ func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronVideosPostNotFound
+			var response APICronVideosGetNotFound
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -421,7 +421,7 @@ func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response CronVideosPostInternalServerError
+			var response APICronVideosGetInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -446,7 +446,7 @@ func decodeCronVideosPostResponse(resp *http.Response) (res CronVideosPostRes, _
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodePostResponse(resp *http.Response) (res *PostOK, _ error) {
+func decodeAPIPingGetResponse(resp *http.Response) (res *APIPingGetOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -462,7 +462,7 @@ func decodePostResponse(resp *http.Response) (res *PostOK, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response PostOK
+			var response APIPingGetOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

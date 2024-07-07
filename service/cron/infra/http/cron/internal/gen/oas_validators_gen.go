@@ -3,80 +3,10 @@
 package api
 
 import (
-	"fmt"
-
 	"github.com/go-faster/errors"
-
-	"github.com/ogen-go/ogen/validate"
 )
 
-func (s *CronCreatorsPostReq) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if value, ok := s.PlatformType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "platform_type",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if value, ok := s.Period.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "period",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if value, ok := s.CreatorType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "creator_type",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s CronCreatorsPostReqCreatorType) Validate() error {
+func (s APICronCreatorsGetCreatorTypeItem) Validate() error {
 	switch s {
 	case "vspo":
 		return nil
@@ -87,7 +17,7 @@ func (s CronCreatorsPostReqCreatorType) Validate() error {
 	}
 }
 
-func (s CronCreatorsPostReqPeriod) Validate() error {
+func (s APICronCreatorsGetPeriod) Validate() error {
 	switch s {
 	case "day":
 		return nil
@@ -102,7 +32,7 @@ func (s CronCreatorsPostReqPeriod) Validate() error {
 	}
 }
 
-func (s CronCreatorsPostReqPlatformType) Validate() error {
+func (s APICronCreatorsGetPlatformTypeItem) Validate() error {
 	switch s {
 	case "youtube":
 		return nil
@@ -117,80 +47,7 @@ func (s CronCreatorsPostReqPlatformType) Validate() error {
 	}
 }
 
-func (s *CronVideosPostReq) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		var failures []validate.FieldError
-		for i, elem := range s.PlatformType {
-			if err := func() error {
-				if err := elem.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				failures = append(failures, validate.FieldError{
-					Name:  fmt.Sprintf("[%d]", i),
-					Error: err,
-				})
-			}
-		}
-		if len(failures) > 0 {
-			return &validate.Error{Fields: failures}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "platform_type",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if value, ok := s.Period.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "period",
-			Error: err,
-		})
-	}
-	if err := func() error {
-		if value, ok := s.VideoType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "video_type",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s CronVideosPostReqPeriod) Validate() error {
+func (s APICronVideosGetPeriod) Validate() error {
 	switch s {
 	case "day":
 		return nil
@@ -203,7 +60,7 @@ func (s CronVideosPostReqPeriod) Validate() error {
 	}
 }
 
-func (s CronVideosPostReqPlatformTypeItem) Validate() error {
+func (s APICronVideosGetPlatformTypeItem) Validate() error {
 	switch s {
 	case "youtube":
 		return nil
@@ -218,7 +75,7 @@ func (s CronVideosPostReqPlatformTypeItem) Validate() error {
 	}
 }
 
-func (s CronVideosPostReqVideoType) Validate() error {
+func (s APICronVideosGetVideoType) Validate() error {
 	switch s {
 	case "vspo_broadcast":
 		return nil
