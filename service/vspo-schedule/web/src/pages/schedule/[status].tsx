@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { Livestream } from "@/types/streaming";
 import {
   getOneWeekRange,
@@ -11,7 +11,6 @@ import {
   removeDuplicateTitles,
   formatDate,
   getInitializedI18nInstance,
-  generateStaticPathsForLocales,
 } from "@/lib/utils";
 import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
@@ -133,34 +132,10 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   );
 };
 
-// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
-export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
-  const statusPaths = ["all", "live", "upcoming", "archive"].map((status) => ({
-    params: { status },
-  }));
-
-  const datePaths = [];
-
-  const currentDate = getCurrentUTCDate();
-  const numberOfDays = 6;
-  for (let i = -numberOfDays; i <= numberOfDays; i++) {
-    const newDate = convertToUTCDate(currentDate);
-    newDate.setDate(currentDate.getDate() + i);
-    const formattedDate = formatDate(newDate, "yyyy-MM-dd");
-    datePaths.push({ params: { status: formattedDate } });
-  }
-
-  const paths = generateStaticPathsForLocales(
-    [...statusPaths, ...datePaths],
-    locales,
-  );
-  return { paths, fallback: true };
-};
-
-export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
-  params,
-  locale = DEFAULT_LOCALE,
-}) => {
+export const getServerSideProps: GetServerSideProps<
+  LivestreamsProps,
+  Params
+> = async ({ params, locale = DEFAULT_LOCALE }) => {
   if (!params) {
     return {
       notFound: true,
