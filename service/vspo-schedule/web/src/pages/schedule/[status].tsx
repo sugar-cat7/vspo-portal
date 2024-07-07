@@ -240,7 +240,6 @@ export const getServerSideProps: GetServerSideProps<
     const lastUpdateDate = formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
       localeCode: locale,
     });
-    const revalidateWindow = 60;
 
     const translations = await serverSideTranslations(locale, [
       "common",
@@ -277,25 +276,6 @@ export const getServerSideProps: GetServerSideProps<
         title = t("titles.streamSchedule");
         headTitle = t("titles.dateStatus", { date: params.status });
         break;
-    }
-
-    if (["archive", "live", "upcoming"].includes(params.status)) {
-      return {
-        props: {
-          ...translations,
-          livestreamsByDate,
-          eventsByDate,
-          lastUpdateDate,
-          liveStatus: params.status,
-          footerMessage,
-          meta: {
-            title,
-            headTitle,
-            description,
-          },
-        },
-        revalidate: revalidateWindow,
-      };
     }
 
     const allDates: DateObject[] = uniqueLivestreams.map(
@@ -366,10 +346,9 @@ export const getServerSideProps: GetServerSideProps<
           description,
         },
       },
-      revalidate: revalidateWindow,
     };
   } catch (error) {
-    console.error("Error in getStaticProps:", error);
+    console.error("Error in getServerSideProps:", error);
     return {
       notFound: true,
     };
