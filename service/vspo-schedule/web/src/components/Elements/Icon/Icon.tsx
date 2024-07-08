@@ -86,9 +86,7 @@ export const DrawerIcon: React.FC<DrawerIconProps> = ({ id }) => {
     case "about":
       return <InfoIcon />;
     case "discord":
-      return (
-        <StyledFontAwesomeIcon icon={faDiscord} style={{ height: "20px" }} />
-      );
+      return <FontAwesomeIcon icon={faDiscord} style={{ height: "20px" }} />;
     default:
       return <></>;
   }
