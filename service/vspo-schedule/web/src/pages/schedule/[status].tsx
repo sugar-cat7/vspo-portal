@@ -1,17 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { Livestream } from "@/types/streaming";
 import {
   getOneWeekRange,
-  groupBy,
   getLiveStatus,
   isValidDate,
   removeDuplicateTitles,
   formatDate,
   getInitializedI18nInstance,
   generateStaticPathsForLocales,
+  groupBy,
 } from "@/lib/utils";
 import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
@@ -27,25 +27,17 @@ import { useTranslation } from "next-i18next";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
+import { useTimeZoneContext } from "@/hooks";
 
 type Params = {
   status: string;
 };
 
-type DateObject = {
-  date: string;
-  formattedDateString: string;
-};
-
 type LivestreamsProps = {
-  livestreamsByDate: Record<string, Livestream[]>;
-  eventsByDate: Record<string, VspoEvent[]>;
+  livestreams: Livestream[];
+  events: VspoEvent[];
   lastUpdateDate: string;
   liveStatus: string;
-  dateTabsInfo?: {
-    tabDates: DateObject[];
-    todayIndex: number;
-  };
   footerMessage: string;
   meta: {
     title: string;
@@ -71,18 +63,44 @@ const TabBox = styled(Box)(({ theme }) => ({
 }));
 
 const HomePage: NextPageWithLayout<LivestreamsProps> = ({
-  livestreamsByDate,
-  eventsByDate,
-  dateTabsInfo,
+  liveStatus,
+  livestreams,
+  events,
 }) => {
   const router = useRouter();
+  const { timeZone } = useTimeZoneContext();
   const { t } = useTranslation("streams");
+  const locale = router.locale ?? DEFAULT_LOCALE;
+  const [loading, setLoading] = useState(true);
 
-  if (router.isFallback) {
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
+  if (loading || router.isFallback) {
     return <Loading />;
   }
 
-  if (!dateTabsInfo) {
+  const livestreamsByDate = groupBy(livestreams, (livestream) => {
+    try {
+      return formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
+        timeZone,
+      });
+    } catch (err) {
+      console.error("Invalid livestream date:", livestream.scheduledStartTime);
+      return undefined;
+    }
+  });
+  const eventsByDate = groupBy(events, (event) => {
+    try {
+      return formatDate(event.startedAt, "yyyy-MM-dd", { timeZone });
+    } catch (err) {
+      console.error("Invalid event date:", event.startedAt);
+      return undefined;
+    }
+  });
+
+  if (["archive", "live", "upcoming"].includes(liveStatus)) {
     return (
       <LivestreamCards
         livestreamsByDate={livestreamsByDate}
@@ -90,9 +108,41 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
       />
     );
   }
-  const { tabDates, todayIndex } = dateTabsInfo;
+
+  const tabDates = Object.keys(livestreamsByDate)
+    .map((dateString) => ({
+      date: convertToUTCDate(dateString),
+      dateString,
+      shortDateString: formatDate(dateString, "MM/dd (E)", {
+        localeCode: locale,
+        timeZone: "UTC",
+      }),
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  const pageDateString =
+    liveStatus === "all"
+      ? formatDate(getCurrentUTCDate(), "yyyy-MM-dd", { timeZone })
+      : liveStatus;
+  const pageDate = convertToUTCDate(pageDateString);
+  let pageDateIndex = tabDates.findLastIndex(({ date }) => {
+    return date.getTime() <= pageDate.getTime();
+  });
+  if (pageDateIndex === -1) {
+    pageDateIndex = tabDates.length - 1;
+  }
+
+  const livestreamsOnDate =
+    livestreamsByDate[pageDateString] === undefined
+      ? {}
+      : { [pageDateString]: livestreamsByDate[pageDateString] };
+  const eventsOnDate =
+    eventsByDate[pageDateString] === undefined
+      ? {}
+      : { [pageDateString]: eventsByDate[pageDateString] };
+
   return (
-    <TabContext value={todayIndex.toString()}>
+    <TabContext value={pageDateIndex}>
       {/* Date */}
       <TabBox>
         <Tabs
@@ -100,34 +150,31 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
           textColor="primary"
           indicatorColor="primary"
           scrollButtons="auto"
-          value={todayIndex.toString()}
+          value={pageDateIndex}
           variant="scrollable"
         >
-          {tabDates.map(({ date, formattedDateString }, i) => {
-            const label = formattedDateString;
-            return (
-              <Tab
-                role="tab"
-                aria-selected={todayIndex === i}
-                label={label}
-                value={i.toString()}
-                key={date}
-                sx={{
-                  fontFamily: "Roboto, sans-serif",
-                  textAlign: "center",
-                  fontWeight: "700",
-                }}
-                LinkComponent={Link}
-                href={`/schedule/${date}`}
-              />
-            );
-          })}
+          {tabDates.map(({ dateString, shortDateString }, i) => (
+            <Tab
+              role="tab"
+              aria-selected={pageDateIndex === i}
+              label={shortDateString}
+              value={i}
+              key={dateString}
+              sx={{
+                fontFamily: "Roboto, sans-serif",
+                textAlign: "center",
+                fontWeight: "700",
+              }}
+              LinkComponent={Link}
+              href={`/schedule/${dateString}`}
+            />
+          ))}
         </Tabs>
       </TabBox>
       {/* Stream Content */}
       <LivestreamCards
-        livestreamsByDate={livestreamsByDate}
-        eventsByDate={eventsByDate}
+        livestreamsByDate={livestreamsOnDate}
+        eventsByDate={eventsOnDate}
       />
     </TabContext>
   );
@@ -173,94 +220,33 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       lang: locale,
     });
     const events = await fetchEvents({ lang: locale });
-    const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
-      (livestream) => !freechatVideoIds.includes(livestream.id),
-    );
 
     const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
     const isDateStatus = isValidDate(params.status);
-    const todayDate = getCurrentUTCDate();
-    const todayDateString = formatDate(todayDate, "yyyy-MM-dd", {
-      localeCode: locale,
-    });
 
-    let filteredLivestreams = uniqueLivestreams.filter((livestream) => {
-      const scheduledStartTimeString = formatDate(
-        convertToUTCDate(livestream.scheduledStartTime),
-        "yyyy-MM-dd",
-        { localeCode: locale },
-      );
-
-      const isAll = params.status === "all";
-      if (isAll) {
-        return scheduledStartTimeString === todayDateString;
-      } else if (isDateStatus) {
-        return scheduledStartTimeString === params.status;
-      } else {
+    const livestreams = removeDuplicateTitles(pastLivestreams)
+      .filter((livestream) => {
         const scheduledStartTime = convertToUTCDate(
           livestream.scheduledStartTime,
         );
+        if (
+          freechatVideoIds.includes(livestream.id) ||
+          scheduledStartTime < oneWeekAgo ||
+          scheduledStartTime > oneWeekLater
+        ) {
+          return false;
+        }
         return (
-          scheduledStartTime >= oneWeekAgo &&
-          scheduledStartTime <= oneWeekLater &&
-          !freechatVideoIds.includes(livestream.id) &&
+          params.status === "all" ||
+          isDateStatus ||
           params.status === getLiveStatus(livestream)
         );
-      }
-    });
-
-    if (filteredLivestreams.length === 0 && params.status === "all") {
-      filteredLivestreams = uniqueLivestreams.filter((livestream) => {
-        const yesterdayDate = getCurrentUTCDate();
-        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-        const yesterdayDateString = formatDate(yesterdayDate, "yyyy-MM-dd", {
-          localeCode: locale,
-        });
-        const scheduledStartTimeString = formatDate(
-          convertToUTCDate(livestream.scheduledStartTime),
-          "yyyy-MM-dd",
-          { localeCode: locale },
-        );
-        return scheduledStartTimeString === yesterdayDateString;
-      });
-    }
-
-    filteredLivestreams.sort((a, b) => {
-      return (
-        convertToUTCDate(a.scheduledStartTime).getTime() -
-        convertToUTCDate(b.scheduledStartTime).getTime()
+      })
+      .sort(
+        (a, b) =>
+          convertToUTCDate(a.scheduledStartTime).getTime() -
+          convertToUTCDate(b.scheduledStartTime).getTime(),
       );
-    });
-    filteredLivestreams.forEach((livestream) => {
-      livestream.formattedDateString = formatDate(
-        convertToUTCDate(livestream.scheduledStartTime),
-        "MM/dd(E)",
-        {
-          localeCode: locale,
-        },
-      );
-    });
-    const livestreamsByDate = groupBy(filteredLivestreams, (livestream) => {
-      try {
-        return formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
-          localeCode: locale,
-        });
-      } catch (err) {
-        console.error("Invalid date:", livestream.scheduledStartTime);
-        throw err;
-      }
-    });
-
-    const eventsByDate = groupBy(events, (event) => {
-      try {
-        return formatDate(event.startedAt, "yyyy-MM-dd", {
-          localeCode: locale,
-        });
-      } catch (err) {
-        console.error("Invalid date:", event.startedAt);
-        throw err;
-      }
-    });
 
     const lastUpdateDate = formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
       localeCode: locale,
@@ -274,14 +260,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     const { t } = getInitializedI18nInstance(translations, "streams");
 
     const footerMessage = t("membersOnlyStreamsHidden");
-
-    const livestreamDescription =
-      filteredLivestreams
-        .slice(-50)
-        .reverse()
-        .map((livestream) => livestream.title)
-        .join(", ") ?? "";
-    const description = `${t("description")}\n${livestreamDescription}`;
+    const description = t("description");
 
     let title = "";
     let headTitle = "";
@@ -304,86 +283,13 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         break;
     }
 
-    if (["archive", "live", "upcoming"].includes(params.status)) {
-      return {
-        props: {
-          ...translations,
-          livestreamsByDate,
-          eventsByDate,
-          lastUpdateDate,
-          liveStatus: params.status,
-          footerMessage,
-          meta: {
-            title,
-            headTitle,
-            description,
-          },
-        },
-        revalidate: revalidateWindow,
-      };
-    }
-
-    const allDates: DateObject[] = uniqueLivestreams.map(
-      (livestream: Livestream) => {
-        return {
-          date: formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
-            localeCode: locale,
-          }),
-          formattedDateString: formatDate(
-            livestream.scheduledStartTime,
-            "MM/dd(E)",
-            { localeCode: locale },
-          ),
-        };
-      },
-    );
-
-    // Use a map to remove duplicates by key
-    const dateMap = new Map<string, DateObject>();
-    allDates.forEach((dateObj) => {
-      dateMap.set(dateObj.date, dateObj);
-    });
-
-    const tabDates: DateObject[] = [...dateMap.values()]
-      .sort((a, b) => {
-        // Ensure that date strings are converted to Date objects for comparison
-        return (
-          convertToUTCDate(a.date).getTime() -
-          convertToUTCDate(b.date).getTime()
-        );
-      })
-      .filter((dateObj) => {
-        const date = convertToUTCDate(dateObj.date);
-        const now = getCurrentUTCDate();
-        now.setHours(0, 0, 0, 0);
-        const fiveDaysInMilliseconds = 5 * 24 * 60 * 60 * 1000;
-        const fiveDaysAgo = convertToUTCDate(
-          now.getTime() - fiveDaysInMilliseconds,
-        );
-        const fiveDaysLater = convertToUTCDate(
-          now.getTime() + fiveDaysInMilliseconds,
-        );
-        return date >= fiveDaysAgo && date <= fiveDaysLater;
-      });
-    const today = formatDate(getCurrentUTCDate(), "yyyy-MM-dd", {
-      localeCode: locale,
-    });
-    let todayIndex = tabDates.map((t) => t.date).indexOf(today);
-    if (isDateStatus) {
-      todayIndex = tabDates.map((t) => t.date).indexOf(params.status);
-    }
-    todayIndex = todayIndex >= 0 ? todayIndex : tabDates.length - 1;
     return {
       props: {
         ...translations,
-        livestreamsByDate,
-        eventsByDate,
+        livestreams,
+        events,
         lastUpdateDate,
         liveStatus: params.status,
-        dateTabsInfo: {
-          todayIndex: todayIndex,
-          tabDates: tabDates,
-        },
         footerMessage,
         meta: {
           title,

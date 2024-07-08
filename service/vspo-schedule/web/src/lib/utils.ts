@@ -25,17 +25,21 @@ import { convertToUTCDate, getCurrentUTCDate } from "./dayjs";
  * Group an array of items by a specified key.
  * @template T - The type of items in the array.
  * @param items - The array of items to group.
- * @param keyGetter - A function that returns the key for an item.
+ * @param keyGetter - A function that returns either the key for an item or undefined if the item is invalid.
  * @returns - An object with keys representing the groups and values as arrays of items.
  */
 export const groupBy = <T>(
   items: T[],
-  keyGetter: (item: T) => string,
+  keyGetter: (item: T) => string | undefined,
 ): Record<string, T[]> => {
   const groupedItems: Record<string, T[]> = {};
 
   for (const item of items) {
     const key = keyGetter(item);
+
+    if (key === undefined) {
+      continue;
+    }
 
     if (!groupedItems[key]) {
       groupedItems[key] = [];
@@ -458,12 +462,12 @@ const timeRanges = [
 /**
  * Groups livestreams into time ranges of 6 hours, starting at 0:00.
  * @param {Livestream[]} livestreams - The array of livestreams to group.
- * @param {string} localeCode - The locale code to use for formatting.
+ * @param {string} timeZone - The time zone to use for time comparison.
  * @returns {Array<{label: string, livestreams: Livestream[]}>} - An array of objects containing a label and an array of livestreams.
  */
 export const groupLivestreamsByTimeRange = (
   livestreams: Livestream[],
-  localeCode: string,
+  timeZone: string,
 ) => {
   return timeRanges.map((timeRange) => {
     return {
@@ -471,7 +475,7 @@ export const groupLivestreamsByTimeRange = (
       livestreams: livestreams.filter((livestream) => {
         const zonedStartTime = utcToZonedTime(
           livestream.scheduledStartTime,
-          localeTimeZoneMap[localeCode],
+          timeZone,
         );
         const hours = getHours(zonedStartTime);
         return hours >= timeRange.start && hours < timeRange.end;

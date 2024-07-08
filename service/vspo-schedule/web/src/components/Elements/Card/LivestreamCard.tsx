@@ -12,9 +12,8 @@ import { LiveStatus, Livestream } from "@/types/streaming";
 import { getLiveStatus, formatDate } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
 import Image from "next/image";
-import { useVideoModalContext } from "@/hooks";
+import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
 
 type StyledCardProps = {
   liveStatus: LiveStatus | "freechat";
@@ -141,8 +140,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
 }) => {
   const { pushVideo } = useVideoModalContext();
   const { t } = useTranslation("common");
-  const router = useRouter();
-  const { locale } = router;
+  const { timeZone } = useTimeZoneContext();
   const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
     livestream;
   const livestreamStatus = useMemo(
@@ -198,10 +196,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
                       paddingRight: "3px",
                     }}
                   >
-                    {formatDate(scheduledStartTime, "HH:mm", {
-                      localeCode: locale,
-                    })}
-                    ~
+                    {formatDate(scheduledStartTime, "HH:mm", { timeZone })}~
                   </Typography>
                   <PlatformIcon platform={platform} />
                 </ResponsiveTypography>

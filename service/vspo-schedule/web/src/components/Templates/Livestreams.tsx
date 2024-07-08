@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Livestream } from "@/types/streaming";
-import { groupLivestreamsByTimeRange } from "@/lib/utils";
+import { formatDate, groupLivestreamsByTimeRange } from "@/lib/utils";
 import { LivestreamCard } from "../Elements";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
@@ -19,6 +19,7 @@ import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { DEFAULT_LOCALE } from "@/lib/Const";
+import { useTimeZoneContext } from "@/hooks";
 
 type Props = {
   livestreamsByDate: Record<string, Livestream[]>;
@@ -92,6 +93,7 @@ export const LivestreamCards: React.FC<Props> = ({
   eventsByDate,
 }) => {
   const router = useRouter();
+  const { timeZone } = useTimeZoneContext();
   const { t } = useTranslation(["streams"]);
   const locale = router.locale ?? DEFAULT_LOCALE;
   const [expanded, setExpanded] = React.useState<boolean>(true);
@@ -113,15 +115,17 @@ export const LivestreamCards: React.FC<Props> = ({
       {Object.entries(livestreamsByDate).map(([date, livestreams]) => {
         const livestreamsByTimeRange = groupLivestreamsByTimeRange(
           livestreams,
-          locale,
+          timeZone,
         );
         let events: VspoEvent[] = [];
         if (date in eventsByDate) {
           events = eventsByDate[date];
         }
 
-        const formattedDate =
-          livestreamsByDate[date].at(0)?.formattedDateString;
+        const formattedDate = formatDate(date, "MM/dd (E)", {
+          localeCode: locale,
+          timeZone: "UTC",
+        });
 
         return (
           <Box
