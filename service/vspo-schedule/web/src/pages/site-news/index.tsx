@@ -114,7 +114,7 @@ const SiteNewsPage: NextPageWithLayout<Props> = () => {
                 <TableCell sx={{ fontSize: "16px", padding: "24px" }}>
                   <Link href={`/site-news/${siteNewsItem.id}`} passHref>
                     <Box sx={{ textDecoration: "none", color: "inherit" }}>
-                      {siteNewsItem.content}
+                      {siteNewsItem.title}
                     </Box>
                   </Link>
                 </TableCell>
