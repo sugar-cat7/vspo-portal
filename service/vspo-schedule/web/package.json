@@ -49,7 +49,7 @@
     "@biomejs/biome": "1.8.2",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
     "@typescript-eslint/parser": "^7.15.0",
-    "knip": "^5.22.3",
+    "knip": "^5.25.1",
     "lefthook": "^1.6.18"
   }
 }
