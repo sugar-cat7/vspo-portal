@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/samber/lo"
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
@@ -43,6 +44,8 @@ func (r *video) List(
 		PlatformTypes:   query.PlatformTypes,
 		VideoType:       query.VideoType,
 		BroadcastStatus: query.BroadcastStatus,
+		Limit:           int32(query.Limit.Uint64),
+		Offset:          int32(query.Page.Uint64 * query.Limit.Uint64),
 	})
 	if err != nil {
 		return nil, err
@@ -83,6 +86,15 @@ func (r *video) BatchDeleteInsert(
 
 	br := c.Queries.CreateVideo(ctx, dto.VideoModelsToCreateVideoParams(m))
 	defer br.Close()
+	var videoErrors []error
+	br.QueryRow(func(i int, video db_sqlc.Video, err error) {
+		if err != nil {
+			videoErrors = append(videoErrors, err)
+		}
+	})
 
+	if len(videoErrors) > 0 {
+		return nil, fmt.Errorf("failed to insert videos: %v", videoErrors)
+	}
 	return nil, nil
 }

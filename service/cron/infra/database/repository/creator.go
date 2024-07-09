@@ -51,7 +51,7 @@ func (r *creator) Count(
 	return uint64(cn), nil
 }
 
-func (r *creator) Upsert(
+func (r *creator) BatchCreate(
 	ctx context.Context,
 	m model.Creators,
 ) (model.Creators, error) {
@@ -71,4 +71,19 @@ func (r *creator) Upsert(
 	})
 
 	return i, nil
+}
+
+func (r *creator) Exist(
+	ctx context.Context,
+	query repository.GetCreatorQuery,
+) (bool, error) {
+	c, err := database.FromContext(ctx)
+	if err != nil {
+		return false, err
+	}
+	b, err := c.Queries.ExistsCreator(ctx, query.ID)
+	if err != nil {
+		return false, err
+	}
+	return b, nil
 }

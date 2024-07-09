@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/cmd/internal/cron_cmd"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/cmd/internal/db_migration_cmd"
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/cmd/internal/http_cmd"
 	"github.com/sugar-cat7/vspo-portal/service/cron/pkg/logger"
 )
 
@@ -14,7 +15,7 @@ func NewCmdRoot() *cobra.Command {
 		Short: "cli tool for vspo-portal app",
 		Long:  "cli tool for vspo-portal app",
 	}
-
+	rootCmd.AddCommand(http_cmd.NewHttpServeCmd())
 	rootCmd.AddCommand(cron_cmd.NewCronCmd())
 	rootCmd.AddCommand(db_migration_cmd.NewDBMigrationCmd())
 	rootCmd.AddCommand(&cobra.Command{

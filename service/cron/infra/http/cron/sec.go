@@ -2,24 +2,27 @@ package http
 
 import (
 	"context"
+	"errors"
 
+	"github.com/sugar-cat7/vspo-portal/service/cron/infra/environment"
 	api "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
 )
 
 var _ api.SecurityHandler = (*SecurityHandler)(nil)
 
-type SecurityHandler struct{}
-
-func NewSecurityHandler() *SecurityHandler {
-	return &SecurityHandler{}
+type SecurityHandler struct {
+	e *environment.Environment
 }
 
-func (h *SecurityHandler) HandleApiKeyAuth(ctx context.Context, operationName string, t api.ApiKeyAuth) (context.Context, error) {
-	// FIXME: implement
-	return ctx, nil
+func NewSecurityHandler(e *environment.Environment) *SecurityHandler {
+	return &SecurityHandler{
+		e: e,
+	}
 }
 
-func (h *SecurityHandler) HandleYoutubeApiKey(ctx context.Context, operationName string, t api.YoutubeApiKey) (context.Context, error) {
-	// FIXME: implement
+func (h *SecurityHandler) HandleBearerAuth(ctx context.Context, operationName string, t api.BearerAuth) (context.Context, error) {
+	if t.GetToken() != h.e.CRON_SECRET {
+		return nil, errors.New("invalid api key")
+	}
 	return ctx, nil
 }

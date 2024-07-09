@@ -48,7 +48,6 @@ type CreatorInfo struct {
 type VideoType string
 
 const (
-	VideoTypeAll           VideoType = "all"
 	VideoTypeVspoBroadcast VideoType = "vspo_broadcast"
 	VideoTypeClip          VideoType = "clip"
 	VideoTypeFreechat      VideoType = "freechat"

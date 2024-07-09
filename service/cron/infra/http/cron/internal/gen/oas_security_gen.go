@@ -14,10 +14,8 @@ import (
 
 // SecurityHandler is handler for security parameters.
 type SecurityHandler interface {
-	// HandleApiKeyAuth handles ApiKeyAuth security.
-	HandleApiKeyAuth(ctx context.Context, operationName string, t ApiKeyAuth) (context.Context, error)
-	// HandleYoutubeApiKey handles YoutubeApiKey security.
-	HandleYoutubeApiKey(ctx context.Context, operationName string, t YoutubeApiKey) (context.Context, error)
+	// HandleBearerAuth handles bearerAuth security.
+	HandleBearerAuth(ctx context.Context, operationName string, t BearerAuth) (context.Context, error)
 }
 
 func findAuthorization(h http.Header, prefix string) (string, bool) {
@@ -35,31 +33,14 @@ func findAuthorization(h http.Header, prefix string) (string, bool) {
 	return "", false
 }
 
-func (s *Server) securityApiKeyAuth(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
-	var t ApiKeyAuth
-	const parameterName = "x-api-key"
-	value := req.Header.Get(parameterName)
-	if value == "" {
+func (s *Server) securityBearerAuth(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
+	var t BearerAuth
+	token, ok := findAuthorization(req.Header, "Bearer")
+	if !ok {
 		return ctx, false, nil
 	}
-	t.APIKey = value
-	rctx, err := s.sec.HandleApiKeyAuth(ctx, operationName, t)
-	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
-		return nil, false, nil
-	} else if err != nil {
-		return nil, false, err
-	}
-	return rctx, true, err
-}
-func (s *Server) securityYoutubeApiKey(ctx context.Context, operationName string, req *http.Request) (context.Context, bool, error) {
-	var t YoutubeApiKey
-	const parameterName = "X-Youtube-API-Key"
-	value := req.Header.Get(parameterName)
-	if value == "" {
-		return ctx, false, nil
-	}
-	t.APIKey = value
-	rctx, err := s.sec.HandleYoutubeApiKey(ctx, operationName, t)
+	t.Token = token
+	rctx, err := s.sec.HandleBearerAuth(ctx, operationName, t)
 	if errors.Is(err, ogenerrors.ErrSkipServerSecurity) {
 		return nil, false, nil
 	} else if err != nil {
@@ -70,25 +51,15 @@ func (s *Server) securityYoutubeApiKey(ctx context.Context, operationName string
 
 // SecuritySource is provider of security values (tokens, passwords, etc.).
 type SecuritySource interface {
-	// ApiKeyAuth provides ApiKeyAuth security value.
-	ApiKeyAuth(ctx context.Context, operationName string) (ApiKeyAuth, error)
-	// YoutubeApiKey provides YoutubeApiKey security value.
-	YoutubeApiKey(ctx context.Context, operationName string) (YoutubeApiKey, error)
+	// BearerAuth provides bearerAuth security value.
+	BearerAuth(ctx context.Context, operationName string) (BearerAuth, error)
 }
 
-func (s *Client) securityApiKeyAuth(ctx context.Context, operationName string, req *http.Request) error {
-	t, err := s.sec.ApiKeyAuth(ctx, operationName)
+func (s *Client) securityBearerAuth(ctx context.Context, operationName string, req *http.Request) error {
+	t, err := s.sec.BearerAuth(ctx, operationName)
 	if err != nil {
-		return errors.Wrap(err, "security source \"ApiKeyAuth\"")
+		return errors.Wrap(err, "security source \"BearerAuth\"")
 	}
-	req.Header.Set("x-api-key", t.APIKey)
-	return nil
-}
-func (s *Client) securityYoutubeApiKey(ctx context.Context, operationName string, req *http.Request) error {
-	t, err := s.sec.YoutubeApiKey(ctx, operationName)
-	if err != nil {
-		return errors.Wrap(err, "security source \"YoutubeApiKey\"")
-	}
-	req.Header.Set("X-Youtube-API-Key", t.APIKey)
+	req.Header.Set("Authorization", "Bearer "+t.Token)
 	return nil
 }

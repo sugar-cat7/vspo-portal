@@ -8,6 +8,7 @@ import (
 
 // Channel represents a channel.
 type Channel struct {
+	ID          string
 	CreatorID   string
 	Youtube     ChannelSnippet
 	Twitch      ChannelSnippet

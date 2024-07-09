@@ -15,7 +15,8 @@ FROM
 WHERE
     platform_type = ANY(@platform_types::text[])
     AND broadcast_status = ANY(@broadcast_status::text[])
-    AND video_type = $1;
+    AND video_type = $1
+LIMIT $2 OFFSET $3;
 
 -- name: GetVideosByIDs :many
 SELECT
