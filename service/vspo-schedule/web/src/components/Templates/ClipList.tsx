@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Grid, Box, Pagination } from "@mui/material";
 import { Clip } from "@/types/streaming";
-import { ClipCard } from "../Elements/Card/ClipCard";
+import { ClipCard } from "../Elements";
 
 type Props = {
   clips: Clip[];
