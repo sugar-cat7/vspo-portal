@@ -8,7 +8,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/service/vspo-schedule/web/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
