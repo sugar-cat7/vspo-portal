@@ -15,6 +15,9 @@ func twVideoToVideo(twVideo twitch.Video) *model.Video {
 		ThumbnailURL: model.ThumbnailURL(twVideo.ThumbnailURL),
 		Status:       model.StatusEnded,
 		PublishedAt:  &twVideo.PublishedAt,
+		CreatorInfo: model.CreatorInfo{
+			ChannelID: twVideo.UserID,
+		},
 	}
 
 	return m

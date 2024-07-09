@@ -22,10 +22,27 @@ func (q *Queries) CountCreator(ctx context.Context) (int64, error) {
 	return count, err
 }
 
+const existsCreator = `-- name: ExistsCreator :one
+SELECT EXISTS (
+    SELECT COUNT(*)
+    FROM
+        creator
+    WHERE
+        id = $1
+)
+`
+
+func (q *Queries) ExistsCreator(ctx context.Context, id string) (bool, error) {
+	row := q.db.QueryRow(ctx, existsCreator, id)
+	var exists bool
+	err := row.Scan(&exists)
+	return exists, err
+}
+
 const getCreatorsWithChannels = `-- name: GetCreatorsWithChannels :many
 SELECT
     cr.id, cr.name, cr.member_type,
-    ch.id, ch.platform_id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
+    ch.id, ch.platform_channel_id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
 FROM
     creator cr
 JOIN
@@ -53,7 +70,7 @@ func (q *Queries) GetCreatorsWithChannels(ctx context.Context, memberTypes []str
 			&i.Creator.Name,
 			&i.Creator.MemberType,
 			&i.Channel.ID,
-			&i.Channel.PlatformID,
+			&i.Channel.PlatformChannelID,
 			&i.Channel.CreatorID,
 			&i.Channel.PlatformType,
 			&i.Channel.Title,

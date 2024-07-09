@@ -27,7 +27,8 @@ func (h *VH) APICronVideosGet(ctx context.Context, req api.APICronVideosGetParam
 	}
 	return &api.APICronVideosGetOK{
 		Message: api.OptString{
-			Value: fmt.Sprintf("Updated videos: %v", v),
+			Value: fmt.Sprintf("Updated videos Count: %v", len(v)),
+			Set:   true,
 		},
 	}, nil
 }

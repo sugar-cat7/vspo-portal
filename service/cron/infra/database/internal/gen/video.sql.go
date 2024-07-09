@@ -87,13 +87,16 @@ SELECT
 FROM
     video v
 WHERE
-    platform_type = ANY($2::text[])
-    AND broadcast_status = ANY($3::text[])
+    platform_type = ANY($4::text[])
+    AND broadcast_status = ANY($5::text[])
     AND video_type = $1
+LIMIT $2 OFFSET $3
 `
 
 type GetVideosByParamsParams struct {
 	VideoType       string
+	Limit           int32
+	Offset          int32
 	PlatformTypes   []string
 	BroadcastStatus []string
 }
@@ -103,7 +106,13 @@ type GetVideosByParamsRow struct {
 }
 
 func (q *Queries) GetVideosByParams(ctx context.Context, arg GetVideosByParamsParams) ([]GetVideosByParamsRow, error) {
-	rows, err := q.db.Query(ctx, getVideosByParams, arg.VideoType, arg.PlatformTypes, arg.BroadcastStatus)
+	rows, err := q.db.Query(ctx, getVideosByParams,
+		arg.VideoType,
+		arg.Limit,
+		arg.Offset,
+		arg.PlatformTypes,
+		arg.BroadcastStatus,
+	)
 	if err != nil {
 		return nil, err
 	}

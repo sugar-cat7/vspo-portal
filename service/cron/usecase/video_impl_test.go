@@ -60,7 +60,7 @@ func Test_BatchDeleteInsert(t *testing.T) {
 				// tw.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f.TwitchVs, nil)
 				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
 				// twi.EXPECT().GetVideos(ctx, gomock.Any()).Return(f.TwitcastingVs, nil)
-				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.VideoRepo, yt, tw, twi)
+				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
 			},
 			want:    10,
 			wantErr: false,
@@ -82,7 +82,7 @@ func Test_BatchDeleteInsert(t *testing.T) {
 				tw := mock_twitch.NewMockTwitchClient(ctrl)
 				tw.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f.VspoTwitchVs, nil)
 				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
-				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.VideoRepo, yt, tw, twi)
+				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
 			},
 			want:    5,
 			wantErr: false,
@@ -104,7 +104,7 @@ func Test_BatchDeleteInsert(t *testing.T) {
 				tw := mock_twitch.NewMockTwitchClient(ctrl)
 				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
 				twi.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f.VspoTwitcastingVs, nil)
-				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.VideoRepo, yt, tw, twi)
+				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
 			},
 			want:    5,
 			wantErr: false,
@@ -139,7 +139,7 @@ func Test_BatchDeleteInsert(t *testing.T) {
 				tw.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f1.VspoTwitchVs, nil)
 				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
 				twi.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f1.VspoTwitcastingVs, nil)
-				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.VideoRepo, yt, tw, twi)
+				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
 			},
 			want:    20,
 			wantErr: false,

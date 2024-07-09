@@ -27,6 +27,7 @@ func (d *Dependency) Inject(ctx context.Context, e *environment.Environment) {
 		e.DatabaseEnvironment.DBSSLMode,
 	)
 	creatorRepository := repository.NewCreator()
+	channelRepository := repository.NewChannel()
 	videosRepository := repository.NewVideo()
 	// channelRepository := repository.NewChannel()
 	youtubeClient := youtube.NewService(e.YoutubeEnvironment.YoutubeAPIKey)
@@ -41,6 +42,7 @@ func (d *Dependency) Inject(ctx context.Context, e *environment.Environment) {
 	videoInteractor := usecase.NewVideoInteractor(
 		tx,
 		creatorRepository,
+		channelRepository,
 		videosRepository,
 		youtubeClient,
 		twitchClient,

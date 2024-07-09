@@ -11,7 +11,7 @@ CREATE TABLE creator (
 -- Create a table to store channel information
 CREATE TABLE channel (
     id text PRIMARY KEY,                          -- Unique identifier for the channel
-    platform_id text NOT NULL unique,                    -- Unique identifier for the channel on the platform
+    platform_channel_id text NOT NULL unique,     -- Identifier for the channel on the platform
     creator_id text NOT NULL,                     -- Identifier for the creator of the channel
     platform_type text NOT NULL,                  -- Name of the platform (e.g. YouTube, Twitch)
     title text NOT NULL,                          -- Title of the channel
@@ -41,7 +41,7 @@ CREATE TABLE video (
     view_count integer NOT NULL,                   -- Number of views of the video
     thumbnail_url text NOT NULL,                   -- URL of the video's thumbnail image
     is_deleted boolean NOT NULL,                   -- Flag indicating if the video has been deleted
-    FOREIGN KEY (channel_id) REFERENCES channel(platform_id)
+    FOREIGN KEY (channel_id) REFERENCES channel(platform_channel_id)
 );
 
 -- +goose StatementEnd

@@ -42,6 +42,7 @@ type setupTx struct {
 	Transactable repository.Transactable
 	CreatorRepo  repository.Creator
 	VideoRepo    repository.Video
+	ChannelRepo  repository.Channel
 }
 
 func SetupRepo(ctx context.Context) setupTx {
@@ -86,6 +87,7 @@ func SetupRepo(ctx context.Context) setupTx {
 		Transactable: tx,
 		CreatorRepo:  repo.NewCreator(),
 		VideoRepo:    repo.NewVideo(),
+		ChannelRepo:  repo.NewChannel(),
 	}
 }
 

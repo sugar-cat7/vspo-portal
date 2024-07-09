@@ -41,47 +41,32 @@ func (m *MockChannel) EXPECT() *MockChannelMockRecorder {
 	return m.recorder
 }
 
-// Count mocks base method.
-func (m *MockChannel) Count(ctx context.Context, query repository.ListChannelsQuery) (uint64, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Count", ctx, query)
-	ret0, _ := ret[0].(uint64)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// Count indicates an expected call of Count.
-func (mr *MockChannelMockRecorder) Count(ctx, query any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Count", reflect.TypeOf((*MockChannel)(nil).Count), ctx, query)
-}
-
-// List mocks base method.
-func (m *MockChannel) List(ctx context.Context, query repository.ListChannelsQuery) (model.Channels, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "List", ctx, query)
-	ret0, _ := ret[0].(model.Channels)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// List indicates an expected call of List.
-func (mr *MockChannelMockRecorder) List(ctx, query any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "List", reflect.TypeOf((*MockChannel)(nil).List), ctx, query)
-}
-
-// Upsert mocks base method.
-func (m_2 *MockChannel) Upsert(ctx context.Context, m model.Channels) (model.Channels, error) {
+// BatchCreate mocks base method.
+func (m_2 *MockChannel) BatchCreate(ctx context.Context, m model.Channels) (model.Channels, error) {
 	m_2.ctrl.T.Helper()
-	ret := m_2.ctrl.Call(m_2, "Upsert", ctx, m)
+	ret := m_2.ctrl.Call(m_2, "BatchCreate", ctx, m)
 	ret0, _ := ret[0].(model.Channels)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Upsert indicates an expected call of Upsert.
-func (mr *MockChannelMockRecorder) Upsert(ctx, m any) *gomock.Call {
+// BatchCreate indicates an expected call of BatchCreate.
+func (mr *MockChannelMockRecorder) BatchCreate(ctx, m any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Upsert", reflect.TypeOf((*MockChannel)(nil).Upsert), ctx, m)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchCreate", reflect.TypeOf((*MockChannel)(nil).BatchCreate), ctx, m)
+}
+
+// Exist mocks base method.
+func (m *MockChannel) Exist(ctx context.Context, query repository.GetChannelQuery) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Exist", ctx, query)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Exist indicates an expected call of Exist.
+func (mr *MockChannelMockRecorder) Exist(ctx, query any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exist", reflect.TypeOf((*MockChannel)(nil).Exist), ctx, query)
 }
