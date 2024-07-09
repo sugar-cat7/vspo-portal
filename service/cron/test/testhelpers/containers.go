@@ -20,8 +20,8 @@ type PostgresContainer struct {
 }
 
 func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
-	pgContainer, err := postgres.RunContainer(ctx,
-		testcontainers.WithImage("postgres:latest"),
+	pgContainer, err := postgres.Run(ctx,
+		"postgres:latest",
 		postgres.WithDatabase("vspo"),
 		postgres.WithUsername("user"),
 		postgres.WithPassword("password"),
