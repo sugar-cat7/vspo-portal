@@ -1,0 +1,31 @@
+name: Code Check
+on:
+  pull_request:
+    branches: [main]
+    paths:
+        - 'service/vspo-schedule/web/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+        run:
+          working-directory: service/vspo-schedule/web
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.6.12
+
+      - name: Download deps
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
