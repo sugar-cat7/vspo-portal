@@ -1,0 +1,35 @@
+name: Code Check
+on:
+  pull_request:
+    branches: [main]
+    paths:
+        - 'service/vspo-schedule/web/**'
+
+jobs:
+  lint:
+    name: BiomeJS
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 8.6.12
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "pnpm"
+
+      - name: Download deps
+        run: pnpm install
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
