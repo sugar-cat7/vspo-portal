@@ -7,9 +7,11 @@ on:
 
 jobs:
   lint:
-    name: BiomeJS
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    defaults:
+        run:
+          working-directory: service/vspo-schedule/web
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
