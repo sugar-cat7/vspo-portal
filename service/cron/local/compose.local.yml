@@ -19,7 +19,7 @@ services:
       context: ..
       dockerfile: Dockerfile.migration
     volumes:
-      - ../test/testhelpers/migration:/migration
+      - ../infra/database/schema/migration:/migration
     command: ["goose", "-dir", "/migration", "postgres", "host=vspo-db user=user dbname=vspo password=password sslmode=disable", "up"]
     depends_on:
       vspo-db:

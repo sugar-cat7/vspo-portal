@@ -1,3 +1,5 @@
+-- +goose Up
+-- +goose StatementBegin
 -- vspo jp
 INSERT INTO creator (id, name, member_type)
 VALUES ('4f2b3fdb-8056-4e7a-acd0-44a674056aa0', '藍沢エマ', 'vspo_jp'),
@@ -136,8 +138,8 @@ INSERT INTO channel (
 -- vspo en
 INSERT INTO creator (id, name, member_type)
 VALUES ('e32cd370-c326-4ecf-b03b-611c96dea0d0', 'Remia Aotsuki', 'vspo_en'),
-    ('f7f20a06-0766-4456-be2d-c77e601f7835', 'Jira Jisaki', 'vspo_jp'),
-    ('8d8c4a35-3f24-4015-a06c-2224031ef225', 'Arya Kuroha', 'vspo_jp');
+    ('f7f20a06-0766-4456-be2d-c77e601f7835', 'Jira Jisaki', 'vspo_en'),
+    ('8d8c4a35-3f24-4015-a06c-2224031ef225', 'Arya Kuroha', 'vspo_en');
 
 -- channel youtube
 INSERT INTO channel (
@@ -162,3 +164,11 @@ INSERT INTO channel (
 -- channel twitch
 
 -- freechat
+
+-- +goose StatementEnd
+
+-- +goose Down
+-- +goose StatementBegin
+DROP TABLE IF EXISTS channel;
+DROP TABLE IF EXISTS creator;
+-- +goose StatementEnd
