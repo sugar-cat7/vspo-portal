@@ -11,7 +11,7 @@
         },
         {
             "path": "/api/cron/videos?platform_type=twitcasting,twitch,youtube&period=week&video_type=vspo_broadcast",
-            "schedule": "*/10 * * * *"
+            "schedule": "*/5 * * * *"
         }
     ],
     "functions": {
