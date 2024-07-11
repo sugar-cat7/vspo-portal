@@ -1,7 +1,6 @@
 import { VideosSchema } from "@/schema";
 import { convertToUTC } from "../dayjs";
 import { AppContext } from "../hono";
-import { translateText } from "../translator";
 
 export const videoProcessor = async (c: AppContext, data: any) => {
     const { kv } = c.get('services');
@@ -29,40 +28,23 @@ export const videoProcessor = async (c: AppContext, data: any) => {
         return parsedData
     }
     // Process each item
-    const translatedDataPromises = parsedData?.map(async item => {
+    const translatedData = await Promise.all(parsedData.map(async item => {
         const kvKey = `${item.id}_${lang}`;
-        let kvData: string | null = await kv?.get(kvKey)
-        if (!kvData) {
-            // Translate title and description
-            const translatedTitle = await translateText(c, item.title, lang);
-            // const translatedDescription = await translateText(c, item.description, lang);
+        const kvData = await kv?.get(kvKey);
 
-            // Prepare data to be saved in KV store
-            const kvObject = {
-                title: translatedTitle,
-                // description: translatedDescription,
-            };
-
-            // Save data to KV store
-            await kv?.put(kvKey, JSON.stringify(kvObject));
-            kvData = JSON.stringify(kvObject);
-        }
         if (kvData) {
-            // Convert data retrieved from KV store to object
             const parsedKvData = JSON.parse(kvData);
-
-            // Construct return data by merging original and translated data
             return {
                 ...item,
-                ...parsedKvData
+                ...parsedKvData,
+                titleTranslated: parsedKvData.title
             };
         }
-        // Construct return data by merging original and translated data
+
         return {
             ...item,
+            titleTranslated: null
         };
-    });
-
-    const translatedData = await Promise.all(translatedDataPromises);
+    }));
     return translatedData
 }

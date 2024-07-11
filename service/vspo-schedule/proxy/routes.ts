@@ -1,5 +1,6 @@
 import { App, AppContext } from './pkg/hono';
 import { videoProcessor, eventProcessor } from './pkg/processor';
+import { translateText } from './pkg/translator';
 
 export const registerOldAPIProxyRoutes = (app: App) => {
     app.get('*', async (c: AppContext) => {
@@ -14,6 +15,16 @@ export const registerOldAPIProxyRoutes = (app: App) => {
         // Livestream, freechat, clip.....
         const translatedData = await videoProcessor(c, data);
 
+        // background translation
+        c.executionCtx.waitUntil(
+            Promise.all(
+                translatedData
+                    .filter(item => !item.titleTranslated)
+                    .map(item =>
+                        translateText(c, item.title, c.req.query('lang') || 'ja', item.id)
+                    )
+            )
+        );
         // Return the translated data
         return c.json(translatedData);
     });
