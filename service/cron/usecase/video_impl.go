@@ -2,6 +2,9 @@ package usecase
 
 import (
 	"context"
+	"fmt"
+	"strings"
+	"sync"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/samber/lo"
@@ -236,23 +239,22 @@ func (i *videoInteractor) ytVideos(
 	var freeChats model.Videos
 	switch vt {
 	case model.VideoTypeVspoBroadcast:
-		// Retrieve new videos via youtube api
-		liveYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
-			SearchQuery: youtube.SearchQueryVspoJp,
-			EventType:   youtube.EventTypeLive,
-		})
-		if err != nil {
-			return nil, err
+		queries := []youtube.SearchQuery{youtube.SearchQueryVspoJp, youtube.SearchQueryVspoEn}
+		eventTypes := []youtube.EventType{youtube.EventTypeLive, youtube.EventTypeUpcoming}
+		var vs model.Videos
+		for _, query := range queries {
+			for _, eventType := range eventTypes {
+				result, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
+					SearchQuery: query,
+					EventType:   eventType,
+				})
+				if err != nil {
+					return nil, err
+				}
+				vs = append(vs, result...)
+			}
 		}
-		upcomingYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
-			SearchQuery: youtube.SearchQueryVspoJp,
-			EventType:   youtube.EventTypeUpcoming,
-		})
-		if err != nil {
-			return nil, err
-		}
-		vs = append(liveYoutubeVideos, upcomingYoutubeVideos...)
-		err = i.transactable.RWTx(
+		err := i.transactable.RWTx(
 			ctx,
 			func(ctx context.Context) error {
 				existVideos, err := i.videoRepository.List(
@@ -384,27 +386,45 @@ func (i *videoInteractor) updateVideosByPlatformTypes(
 	vt model.VideoType,
 ) (model.Videos, error) {
 	var updatedVideos model.Videos
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	var errs []error
+
 	for _, platformType := range pts.String() {
-		switch platformType {
-		case model.PlatformYouTube.String():
-			newYoutubeVideos, err := i.ytVideos(ctx, cs, vt)
-			if err != nil {
-				return nil, err
+		wg.Add(1)
+		go func(platformType string) {
+			defer wg.Done()
+			var newVideos model.Videos
+			var err error
+
+			switch platformType {
+			case model.PlatformYouTube.String():
+				newVideos, err = i.ytVideos(ctx, cs, vt)
+			case model.PlatformTwitch.String():
+				newVideos, err = i.twitchVideos(ctx, cs)
+			case model.PlatformTwitCasting.String():
+				newVideos, err = i.twitCastingVideos(ctx, cs)
 			}
-			updatedVideos = append(updatedVideos, newYoutubeVideos...)
-		case model.PlatformTwitch.String():
-			newTwitchVideos, err := i.twitchVideos(ctx, cs)
+
+			mu.Lock()
+			defer mu.Unlock()
 			if err != nil {
-				return nil, err
+				errs = append(errs, err)
+				return
 			}
-			updatedVideos = append(updatedVideos, newTwitchVideos...)
-		case model.PlatformTwitCasting.String():
-			newTwitcastingVideos, err := i.twitCastingVideos(ctx, cs)
-			if err != nil {
-				return nil, err
-			}
-			updatedVideos = append(updatedVideos, newTwitcastingVideos...)
-		}
+			updatedVideos = append(updatedVideos, newVideos...)
+		}(platformType)
 	}
+
+	wg.Wait()
+
+	if len(errs) > 0 {
+		errMessages := make([]string, len(errs))
+		for i, err := range errs {
+			errMessages[i] = err.Error()
+		}
+		return nil, fmt.Errorf("errors occurred: %v", strings.Join(errMessages, "; "))
+	}
+
 	return updatedVideos, nil
 }
