@@ -116,6 +116,10 @@ func (i *videoInteractor) BatchDeleteInsert(
 
 			var targetVideo model.Videos
 			for _, newVideo := range uvs {
+				// validate
+				if newVideo.CreatorInfo.ChannelID == "" {
+					continue
+				}
 				if newVideo.VideoType == "" {
 					newVideo.VideoType = videoType
 				}
@@ -133,11 +137,6 @@ func (i *videoInteractor) BatchDeleteInsert(
 
 			if len(targetVideo) == 0 {
 				return nil
-			}
-			// Update existing videos
-			_, err = i.videoRepository.BatchDeleteInsert(ctx, targetVideo)
-			if err != nil {
-				return err
 			}
 
 			// Create creators and channels if they do not exist
@@ -201,11 +200,8 @@ func (i *videoInteractor) BatchDeleteInsert(
 				}
 			}
 
-			// DeleteInsert Videos All
-			_, err = i.videoRepository.BatchDeleteInsert(
-				ctx,
-				uvs,
-			)
+			// Update existing videos
+			_, err = i.videoRepository.BatchDeleteInsert(ctx, targetVideo)
 			if err != nil {
 				return err
 			}
