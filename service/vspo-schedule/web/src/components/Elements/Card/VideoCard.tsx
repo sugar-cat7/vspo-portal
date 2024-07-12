@@ -3,6 +3,7 @@ import { Box, Card, CardActionArea } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useVideoModalContext } from "@/hooks";
 import { Video } from "@/types/streaming";
+import { HighlightedVideoChip } from "../Chip";
 
 type Props = {
   video: Video;
@@ -14,34 +15,23 @@ type Props = {
   };
 };
 
-const HighlightLabel = styled("div")<{
-  highlightColor: string;
-  bold: boolean;
-}>(({ theme, highlightColor, bold }) => ({
-  minWidth: "78px",
-  padding: "0 12px",
-  color: "white",
-  fontSize: "15px",
-  fontWeight: bold ? "700" : "400",
-  fontFamily: "Roboto, sans-serif",
-  textAlign: "center",
-  lineHeight: "24px",
-  background: highlightColor,
-  borderRadius: "12px",
-  position: "absolute",
-  top: "-12px",
-  right: "6px",
-  zIndex: "3",
-  transformOrigin: "center right",
-  [theme.breakpoints.down("md")]: {
-    transform: "scale(0.875)",
-    right: "5px",
-  },
-  [theme.breakpoints.down("sm")]: {
-    transform: "scale(0.75)",
-    right: "4px",
-  },
-}));
+const StyledHighlightedVideoChip = styled(HighlightedVideoChip)(
+  ({ theme }) => ({
+    position: "absolute",
+    top: "-12px",
+    right: "6px",
+    zIndex: "3",
+    transformOrigin: "center right",
+    [theme.breakpoints.down("md")]: {
+      transform: "scale(0.875)",
+      right: "5px",
+    },
+    [theme.breakpoints.down("sm")]: {
+      transform: "scale(0.75)",
+      right: "4px",
+    },
+  }),
+);
 
 const StyledCard = styled(Card, {
   shouldForwardProp: (prop) => prop !== "highlightColor",
@@ -68,9 +58,12 @@ export const VideoCard: React.FC<Props> = ({ video, highlight, children }) => {
   return (
     <Box sx={{ position: "relative" }}>
       {highlight && (
-        <HighlightLabel highlightColor={highlight.color} bold={highlight.bold}>
+        <StyledHighlightedVideoChip
+          highlightColor={highlight.color}
+          bold={highlight.bold}
+        >
           {highlight.label}
-        </HighlightLabel>
+        </StyledHighlightedVideoChip>
       )}
       <StyledCard highlightColor={highlight?.color}>
         <CardActionArea onClick={() => pushVideo(video)}>

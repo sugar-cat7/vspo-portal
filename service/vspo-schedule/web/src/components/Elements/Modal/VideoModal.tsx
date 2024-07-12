@@ -13,7 +13,7 @@ import {
   Tabs,
   BottomNavigation,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import { Video } from "@/types/streaming";
 import {
   formatDate,
@@ -34,6 +34,7 @@ import { useRouter } from "next/router";
 import { ChatEmbed } from "../ChatEmbed";
 import { useVideoModalContext } from "@/hooks";
 import { useTranslation } from "next-i18next";
+import { HighlightedVideoChip } from "../Chip";
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   backgroundColor: theme.vars.palette.customColors.vspoPurple,
@@ -44,26 +45,6 @@ const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   [theme.getColorSchemeSelector("dark")]: {
     backgroundColor: theme.vars.palette.customColors.darkGray,
   },
-}));
-
-const LiveLabel = styled("div")<{
-  isUpcoming?: boolean;
-}>(({ theme, isUpcoming }) => ({
-  width: "78px",
-  minWidth: "fit-content",
-  padding: "0 12px",
-  color: "white",
-  fontSize: "15px",
-  fontWeight: "700",
-  fontFamily: "Roboto, sans-serif",
-  textAlign: "center",
-  lineHeight: "24px",
-  background:
-    theme.vars.palette.customColors.videoHighlight[
-      isUpcoming ? "upcoming" : "live"
-    ],
-  borderRadius: "12px",
-  marginRight: "2.0rem",
 }));
 
 const StyledDialogContent = styled(DialogContent)({
@@ -160,6 +141,7 @@ const a11yProps = (index: number) => {
 const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
   const [value, setValue] = React.useState(0);
   const { t } = useTranslation("common");
+  const theme = useTheme();
   const router = useRouter();
   const { locale } = router;
 
@@ -171,6 +153,7 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
     "MM/dd HH:mm~",
     { localeCode: locale },
   );
+  const liveStatus = isLivestream(video) ? getLiveStatus(video) : undefined;
   const showChatTab =
     isLivestream(video) &&
     isOnPlatformWithChat(video) &&
@@ -212,15 +195,15 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
             <TypographySmallOnMobile sx={{ marginRight: "10px" }}>
               {formattedStartTime}
             </TypographySmallOnMobile>
-            {isLivestream(video) && (
-              <>
-                {getLiveStatus(video) === "live" && (
-                  <LiveLabel>{t("liveStatus.live")}</LiveLabel>
-                )}
-                {getLiveStatus(video) === "upcoming" && (
-                  <LiveLabel isUpcoming>{t("liveStatus.upcoming")}</LiveLabel>
-                )}
-              </>
+            {(liveStatus === "live" || liveStatus === "upcoming") && (
+              <HighlightedVideoChip
+                highlightColor={
+                  theme.vars.palette.customColors.videoHighlight[liveStatus]
+                }
+                bold
+              >
+                {t(`liveStatus.${liveStatus}`)}
+              </HighlightedVideoChip>
             )}
           </Box>
         </Box>
