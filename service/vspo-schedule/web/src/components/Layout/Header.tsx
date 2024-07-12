@@ -11,11 +11,11 @@ import { CustomDrawer } from "../Elements";
 import { useTranslation } from "next-i18next";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: "#7266cf",
+  backgroundColor: theme.vars.palette.customColors.vspoPurple,
   zIndex: 1300,
 
   [theme.getColorSchemeSelector("dark")]: {
-    backgroundColor: "#212121",
+    backgroundColor: theme.vars.palette.customColors.darkGray,
   },
 }));
 const StyledTypography = styled(Typography)({

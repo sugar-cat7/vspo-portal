@@ -1,18 +1,13 @@
 import React, { useMemo } from "react";
 import { CardContent, Typography, Avatar } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import { Box } from "@mui/system";
-import { LiveStatus, Livestream } from "@/types/streaming";
+import { Livestream } from "@/types/streaming";
 import { getLiveStatus, formatDate } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { VideoCard } from "./VideoCard";
-
-const highlightColors = {
-  live: "red",
-  upcoming: "rgb(45, 75, 112)",
-} satisfies Partial<Record<LiveStatus, string>>;
 
 const ResponsiveTypography = styled(Typography)(({ theme }) => ({
   paddingRight: "1em",
@@ -67,6 +62,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
   livestream,
 }) => {
   const { t } = useTranslation("common");
+  const theme = useTheme();
   const router = useRouter();
   const { locale } = router;
   const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
@@ -79,7 +75,8 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
     livestreamStatus === "live" || livestreamStatus === "upcoming"
       ? {
           label: t(`liveStatus.${livestreamStatus}`),
-          color: highlightColors[livestreamStatus],
+          color:
+            theme.vars.palette.customColors.videoHighlight[livestreamStatus],
           bold: true,
         }
       : undefined;

@@ -68,8 +68,8 @@ const StyledListItemIcon = styled(ListItemIcon)(() => ({
 const StyledChip = styled(Chip)(({ theme }) => ({
   backgroundColor: "transparent",
   border: "1px solid",
-  borderColor: "rgb(45, 75, 112)",
-  color: "rgb(45, 75, 112)",
+  borderColor: theme.vars.palette.customColors.darkBlue,
+  color: theme.vars.palette.customColors.darkBlue,
 
   [theme.getColorSchemeSelector("dark")]: {
     borderColor: "white",
@@ -77,16 +77,16 @@ const StyledChip = styled(Chip)(({ theme }) => ({
   },
 }));
 
-const StyledBadge = styled(Badge)({
+const StyledBadge = styled(Badge)(({ theme }) => ({
   "& .MuiBadge-badge": {
-    backgroundColor: "rgb(45, 75, 112)",
+    backgroundColor: theme.vars.palette.customColors.darkBlue,
     color: "white",
     transform: "scale(0.8)",
     fontSize: "0.65em",
     right: "-28px",
     top: "1px",
   },
-});
+}));
 
 const StyledButton = styled(Button)({
   display: "flex",

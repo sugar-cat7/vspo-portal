@@ -36,29 +36,32 @@ import { useVideoModalContext } from "@/hooks";
 import { useTranslation } from "next-i18next";
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
-  backgroundColor: "#7266cf",
+  backgroundColor: theme.vars.palette.customColors.vspoPurple,
   borderBottom: `1px solid ${theme.vars.palette.divider}`,
   padding: theme.spacing(1),
   color: "white",
 
   [theme.getColorSchemeSelector("dark")]: {
-    backgroundColor: "#212121",
+    backgroundColor: theme.vars.palette.customColors.darkGray,
   },
 }));
 
 const LiveLabel = styled("div")<{
   isUpcoming?: boolean;
-}>(({ isUpcoming }) => ({
+}>(({ theme, isUpcoming }) => ({
   width: "78px",
   minWidth: "fit-content",
   padding: "0 12px",
-  color: "rgb(255, 255, 255)",
+  color: "white",
   fontSize: "15px",
   fontWeight: "700",
   fontFamily: "Roboto, sans-serif",
   textAlign: "center",
   lineHeight: "24px",
-  background: isUpcoming ? "rgb(45, 75, 112)" : "rgb(255, 0, 0)",
+  background:
+    theme.vars.palette.customColors.videoHighlight[
+      isUpcoming ? "upcoming" : "live"
+    ],
   borderRadius: "12px",
   marginRight: "2.0rem",
 }));

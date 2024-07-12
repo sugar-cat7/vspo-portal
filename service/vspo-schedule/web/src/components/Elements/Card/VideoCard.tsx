@@ -53,7 +53,7 @@ const StyledCard = styled(Card, {
   border: highlightColor ? `3px solid ${highlightColor}` : "none",
   backgroundColor: "white",
   [theme.getColorSchemeSelector("dark")]: {
-    backgroundColor: "#353535",
+    backgroundColor: theme.vars.palette.customColors.gray,
   },
 }));
 

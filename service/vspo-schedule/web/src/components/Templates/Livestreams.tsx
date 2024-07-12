@@ -27,20 +27,20 @@ type Props = {
 
 const StyledAccordion = styled(Accordion)(({ theme }) => ({
   width: "100%",
-  backgroundColor: "rgb(45, 75, 112)",
+  backgroundColor: theme.vars.palette.customColors.darkBlue,
   color: "white",
   fontWeight: "bold",
   borderRadius: "4px",
 
   [theme.getColorSchemeSelector("dark")]: {
-    backgroundColor: "#353535",
+    backgroundColor: theme.vars.palette.customColors.gray,
   },
 }));
 
 const DateTypography = styled(Typography)(({ theme }) => ({
   width: "100%",
   textAlign: "center",
-  backgroundColor: "rgb(45, 75, 112)",
+  backgroundColor: theme.vars.palette.customColors.darkBlue,
   color: "white",
   fontWeight: "bold",
   padding: "0.75rem",
@@ -48,17 +48,17 @@ const DateTypography = styled(Typography)(({ theme }) => ({
   whiteSpace: "pre-line",
 
   [theme.getColorSchemeSelector("dark")]: {
-    backgroundColor: "#353535",
+    backgroundColor: theme.vars.palette.customColors.gray,
   },
 }));
 
 const TimeRangeLabel = styled(Typography)(({ theme }) => ({
   width: "12rem",
-  color: "rgb(255, 255, 255)",
+  color: "white",
   fontSize: "1.5rem",
   fontWeight: 600,
   textAlign: "center",
-  backgroundColor: "rgb(45, 75, 112)",
+  backgroundColor: theme.vars.palette.customColors.darkBlue,
   borderRadius: "1.35rem",
   marginBottom: theme.spacing(2),
   display: "flex",
@@ -66,7 +66,7 @@ const TimeRangeLabel = styled(Typography)(({ theme }) => ({
   alignItems: "center",
 
   [theme.getColorSchemeSelector("dark")]: {
-    backgroundColor: "#353535",
+    backgroundColor: theme.vars.palette.customColors.gray,
   },
   [theme.breakpoints.down("md")]: {
     width: "10rem",
