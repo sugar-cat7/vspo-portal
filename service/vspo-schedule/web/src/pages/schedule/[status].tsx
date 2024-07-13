@@ -8,7 +8,6 @@ import {
   groupBy,
   getLiveStatus,
   isValidDate,
-  removeDuplicateTitles,
   formatDate,
   getInitializedI18nInstance,
   generateStaticPathsForLocales,
@@ -168,14 +167,11 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
   }
 
   try {
-    const pastLivestreams = await fetchLivestreams({
+    const uniqueLivestreams = await fetchLivestreams({
       limit: 300,
       lang: locale,
     });
     const events = await fetchEvents({ lang: locale });
-    const uniqueLivestreams = removeDuplicateTitles(pastLivestreams).filter(
-      (livestream) => !freechatVideoIds.includes(livestream.id),
-    );
 
     const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
     const isDateStatus = isValidDate(params.status);
@@ -225,12 +221,6 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       });
     }
 
-    filteredLivestreams.sort((a, b) => {
-      return (
-        convertToUTCDate(a.scheduledStartTime).getTime() -
-        convertToUTCDate(b.scheduledStartTime).getTime()
-      );
-    });
     filteredLivestreams.forEach((livestream) => {
       livestream.formattedDateString = formatDate(
         convertToUTCDate(livestream.scheduledStartTime),
