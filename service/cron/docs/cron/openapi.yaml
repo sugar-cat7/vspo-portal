@@ -7,32 +7,42 @@ info:
 servers:
 - url: http://localhost:8080
 paths:
-  /cron/creators:
-    post:
+  /api/cron/creators:
+    get:
       tags:
         - Channels
       summary: Upsert Channel(Youtube/Twitch/Twitcasting)
       description: Creates creators by fetching from Youtube using provided Channel IDs.
-      requestBody:
-        description: Array of Channel IDs
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                platform_type:
-                  type: string
-                  enum: [youtube, twitch, twitcasting, niconico]
-                  description: Video's platform type.
-                period:
-                  type: string
-                  enum: [day, week, month, year]
-                  description: Period for performing updates.
-                creator_type:
-                  type: string
-                  enum: [vspo, general]
-                  description: Period for performing updates.
-        required: true
+      parameters:
+        - name: platform_type
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [youtube, twitch, twitcasting, niconico]
+          style: form
+          explode: false
+          description: Comma-separated list of video platform types.
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [day, week, month, year]
+          description: Period for performing updates.
+        - name: creator_type
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [vspo, general]
+          style: form
+          explode: false
+          description: Comma-separated list of creator types.
       responses:
         "200":
           description: Channels created successfully
@@ -77,35 +87,39 @@ paths:
                 type: object
                 $ref: '#/components/schemas/CronResponse'
       security:
-        - ApiKeyAuth: []
-        - YoutubeApiKey: []
-  /cron/videos:
-    post:
+        - bearerAuth: []
+  /api/cron/videos:
+    get:
       tags:
         - Videos
       summary: Upsert videos
       description: Update videos related to a specific creator based on provided cronType
-      requestBody:
-        description: Type of the cron
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                platform_type:
-                  type: array
-                  items:
-                    type: string
-                    enum: [youtube, twitch, twitcasting, niconico]
-                  description: Video's platform type.
-                period:
-                  type: string
-                  enum: [day, month, week]
-                  description: Period for performing updates.
-                video_type:
-                  type: string
-                  enum: [vspo_broadcast, clip, freechat]
+      parameters:
+        - name: platform_type
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [youtube, twitch, twitcasting, niconico]
+          style: form
+          explode: false
+          description: Comma-separated list of video platform types.
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [day, month, week]
+          description: Period for performing updates.
+        - name: video_type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [vspo_broadcast, clip, freechat]
+          description: Type of the cron
       responses:
         "200":
           description: Videos updated successfully
@@ -150,10 +164,9 @@ paths:
                 type: object
                 $ref: '#/components/schemas/CronResponse'
       security:
-        - ApiKeyAuth: []
-        - YoutubeApiKey: []
-  /:
-    post:
+        - bearerAuth: []
+  /api/ping:
+    get:
       summary: Ping endpoint
       description: Returns a 200 status code if successful, or an error.
       responses:
@@ -168,17 +181,13 @@ paths:
                     type: string
                     example: Pong
       security:
-        - ApiKeyAuth: []
+        - bearerAuth: []
 components:
   securitySchemes:
-    ApiKeyAuth:
-      type: apiKey
-      in: header
-      name: x-api-key
-    YoutubeApiKey:
-      type: apiKey
-      in: header
-      name: X-Youtube-API-Key
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Bearer
   schemas:
     CronResponse:
       type: object
@@ -187,12 +196,10 @@ components:
           type: string
           example: success
 security:
-  - ApiKeyAuth: []
-  - YoutubeApiKey: []
+  - bearerAuth: []
 
 tags:
   - name: Channels
     description: Operations related to creators
   - name: Videos
     description: Operations related to videos
-

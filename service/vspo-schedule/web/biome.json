@@ -11,5 +11,9 @@
   },
   "linter": {
     "enabled": false
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "ignore": ["**/*.json", "**/*.config.js", "node_modules", ".next"]
   }
 }

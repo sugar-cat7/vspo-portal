@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/caarlos0/env/v10"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/dependency"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/environment"
-	api "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
 	cron "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
 
 	"github.com/sugar-cat7/vspo-portal/service/cron/pkg/logger"
@@ -32,13 +34,49 @@ func Run(w http.ResponseWriter, r *http.Request) {
 			d.CreatorInteractor,
 			d.VideosInteractor,
 		),
-		NewSecurityHandler(),
-		api.WithMiddleware(),
+		NewSecurityHandler(e),
+		cron.WithMiddleware(),
 	)
+
 	if err != nil {
-		panic(err)
+		http.Error(w, fmt.Sprintf("failed to create cron server: %v", err), http.StatusInternalServerError)
+		return
 	}
 	cs.ServeHTTP(w, r)
+}
 
-	// TODO: graceful shutdown
+// StartServer for Debug
+func StartServer() {
+	logger := logger.New()
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		Run(w, r)
+	})
+
+	server := &http.Server{
+		Addr:    ":8080", // Change the port number as needed
+		Handler: nil,
+	}
+
+	// Graceful shutdown
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		sigint := make(chan os.Signal, 1)
+		signal.Notify(sigint, os.Interrupt, syscall.SIGTERM)
+		<-sigint
+
+		// Received an interrupt signal, shut down gracefully
+		if err := server.Shutdown(context.Background()); err != nil {
+			logger.Error(fmt.Sprintf("HTTP server Shutdown: %v", err))
+		}
+		close(idleConnsClosed)
+	}()
+
+	logger.Info("Starting server on :8080")
+	if err := server.ListenAndServe(); err != http.ErrServerClosed {
+		// Error starting or closing listener
+		logger.Error(fmt.Sprintf("HTTP server ListenAndServe: %v", err))
+	}
+
+	<-idleConnsClosed
+	logger.Info("Server gracefully stopped")
 }

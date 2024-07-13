@@ -20,8 +20,8 @@ type PostgresContainer struct {
 }
 
 func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
-	pgContainer, err := postgres.RunContainer(ctx,
-		testcontainers.WithImage("postgres:latest"),
+	pgContainer, err := postgres.Run(ctx,
+		"postgres:latest",
 		postgres.WithDatabase("vspo"),
 		postgres.WithUsername("user"),
 		postgres.WithPassword("password"),
@@ -42,6 +42,7 @@ type setupTx struct {
 	Transactable repository.Transactable
 	CreatorRepo  repository.Creator
 	VideoRepo    repository.Video
+	ChannelRepo  repository.Channel
 }
 
 func SetupRepo(ctx context.Context) setupTx {
@@ -86,6 +87,7 @@ func SetupRepo(ctx context.Context) setupTx {
 		Transactable: tx,
 		CreatorRepo:  repo.NewCreator(),
 		VideoRepo:    repo.NewVideo(),
+		ChannelRepo:  repo.NewChannel(),
 	}
 }
 

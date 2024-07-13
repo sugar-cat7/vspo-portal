@@ -32,10 +32,10 @@ const StyledFab = styled(Fab)(({ theme }) => ({
   position: "fixed",
   bottom: "4rem",
   right: "2rem",
-  backgroundColor: "#7266cf",
+  backgroundColor: theme.vars.palette.customColors.vspoPurple,
 
   [theme.getColorSchemeSelector("dark")]: {
-    backgroundColor: "#353535",
+    backgroundColor: theme.vars.palette.customColors.gray,
   },
 }));
 

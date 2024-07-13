@@ -35,6 +35,7 @@ func (q SearchQuery) String() string {
 
 const (
 	SearchQueryVspoJp = "ぶいすぽ"
+	SearchQueryVspoEn = "VspoEN"
 )
 
 type EventType string

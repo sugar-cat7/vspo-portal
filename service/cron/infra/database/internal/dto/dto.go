@@ -66,8 +66,9 @@ func VideoToModel(v *db_sqlc.Video) *model.Video {
 
 // CreatorsWithChannelsRowToModel converts db_sqlc.GetCreatorsWithChannelsRow to model.Creator
 func CreatorsWithChannelsRowToModel(c *db_sqlc.GetCreatorsWithChannelsRow, creator *model.Creator) {
+	creator.Channel.ID = c.Channel.ID
 	snippet := model.ChannelSnippet{
-		ID:              c.Channel.PlatformID,
+		ID:              c.Channel.PlatformChannelID,
 		Name:            c.Channel.Title,
 		Description:     c.Channel.Description,
 		ThumbnailURL:    model.ThumbnailURL(c.Channel.ThumbnailUrl),
@@ -240,4 +241,75 @@ func CreatorModelsToCreateCreatorParams(m model.Creators) []db_sqlc.CreateCreato
 		ps = append(ps, CreatorModelToCreateCreatorParams(c))
 	}
 	return ps
+}
+
+// ChannelModelsToCreateChannelParams converts model.Channels to []db_sqlc.CreateChannelParams
+func ChannelModelsToCreateChannelParams(m model.Channels) []db_sqlc.CreateChannelParams {
+	ps := []db_sqlc.CreateChannelParams{}
+	for _, c := range m {
+		ps = append(ps, ChannelModelToCreateChannelParams(c))
+	}
+	return ps
+}
+
+// ChannelModelToCreateChannelParams converts model.Channel to db_sqlc.CreateChannelParams
+func ChannelModelToCreateChannelParams(m *model.Channel) db_sqlc.CreateChannelParams {
+	p := db_sqlc.CreateChannelParams{
+		CreatorID: m.CreatorID,
+	}
+
+	if m.Youtube.ID != "" {
+		p.ID = m.ID
+		p.PlatformChannelID = m.Youtube.ID
+		p.PlatformType = model.PlatformYouTube.String()
+		p.Title = m.Youtube.Name
+		p.Description = m.Youtube.Description
+		p.PublishedAt = utime.TimeToTimestamptz(m.Youtube.PublishedAt)
+		p.TotalViewCount = int32(m.Youtube.TotalViewCount)
+		p.SubscriberCount = int32(m.Youtube.SubscriberCount)
+		p.HiddenSubscriberCount = false
+		p.TotalVideoCount = int32(m.Youtube.TotalVideoCount)
+		p.ThumbnailUrl = string(m.Youtube.ThumbnailURL)
+		p.IsDeleted = m.Youtube.IsDeleted
+	} else if m.Twitch.ID != "" {
+		p.ID = m.ID
+		p.PlatformChannelID = m.Twitch.ID
+		p.PlatformType = model.PlatformTwitch.String()
+		p.Title = m.Twitch.Name
+		p.Description = m.Twitch.Description
+		p.PublishedAt = utime.TimeToTimestamptz(m.Twitch.PublishedAt)
+		p.TotalViewCount = int32(m.Twitch.TotalViewCount)
+		p.SubscriberCount = int32(m.Twitch.SubscriberCount)
+		p.HiddenSubscriberCount = false
+		p.TotalVideoCount = int32(m.Twitch.TotalVideoCount)
+		p.ThumbnailUrl = string(m.Twitch.ThumbnailURL)
+		p.IsDeleted = m.Twitch.IsDeleted
+	} else if m.TwitCasting.ID != "" {
+		p.ID = m.ID
+		p.PlatformChannelID = m.TwitCasting.ID
+		p.PlatformType = model.PlatformTwitCasting.String()
+		p.Title = m.TwitCasting.Name
+		p.Description = m.TwitCasting.Description
+		p.PublishedAt = utime.TimeToTimestamptz(m.TwitCasting.PublishedAt)
+		p.TotalViewCount = int32(m.TwitCasting.TotalViewCount)
+		p.SubscriberCount = int32(m.TwitCasting.SubscriberCount)
+		p.HiddenSubscriberCount = false
+		p.TotalVideoCount = int32(m.TwitCasting.TotalVideoCount)
+		p.ThumbnailUrl = string(m.TwitCasting.ThumbnailURL)
+		p.IsDeleted = m.TwitCasting.IsDeleted
+	} else if m.Niconico.ID != "" {
+		p.ID = m.ID
+		p.PlatformChannelID = m.Niconico.ID
+		p.PlatformType = model.PlatformNiconico.String()
+		p.Title = m.Niconico.Name
+		p.Description = m.Niconico.Description
+		p.PublishedAt = utime.TimeToTimestamptz(m.Niconico.PublishedAt)
+		p.TotalViewCount = int32(m.Niconico.TotalViewCount)
+		p.SubscriberCount = int32(m.Niconico.SubscriberCount)
+		p.HiddenSubscriberCount = false
+		p.TotalVideoCount = int32(m.Niconico.TotalVideoCount)
+		p.ThumbnailUrl = string(m.Niconico.ThumbnailURL)
+		p.IsDeleted = m.Niconico.IsDeleted
+	}
+	return p
 }

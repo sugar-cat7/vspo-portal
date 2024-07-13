@@ -30,7 +30,6 @@ yarn-error.log*
 
 # vercel
 **/.vercel
-**/vercel.json
 
 # typescript
 *.tsbuildinfo
@@ -47,7 +46,6 @@ next-env.d.ts
 **/public/sw.js.map
 **/public/workbox-*.js.map
 **/public/worker-*.js.map
-
 
 **/.gradle
 **//gradle

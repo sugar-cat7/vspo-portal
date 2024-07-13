@@ -3,7 +3,6 @@ package transaction
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/repository"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database"
@@ -24,8 +23,13 @@ func runTx(ctx context.Context, client *database.Client, fn func(context.Context
 		return err
 	}
 	defer func() {
-		if err := tx.Rollback(ctx); err != nil {
-			log.Printf("Failed to rollback transaction: %v", err)
+		if p := recover(); p != nil {
+			_ = tx.Rollback(ctx)
+			panic(p) // Re-throw panic after Rollback
+		} else if err != nil {
+			_ = tx.Rollback(ctx) // err is non-nil; don't change it
+		} else {
+			err = tx.Commit(ctx) // if Commit returns error update err
 		}
 	}()
 

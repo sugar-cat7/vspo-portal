@@ -15,6 +15,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.19.0"
 	"go.opentelemetry.io/otel/trace"
 
+	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/ogen-go/ogen/uri"
@@ -22,24 +23,24 @@ import (
 
 // Invoker invokes operations described by OpenAPI v3 specification.
 type Invoker interface {
-	// CronCreatorsPost invokes POST /cron/creators operation.
+	// APICronCreatorsGet invokes GET /api/cron/creators operation.
 	//
 	// Creates creators by fetching from Youtube using provided Channel IDs.
 	//
-	// POST /cron/creators
-	CronCreatorsPost(ctx context.Context, request *CronCreatorsPostReq) (CronCreatorsPostRes, error)
-	// CronVideosPost invokes POST /cron/videos operation.
+	// GET /api/cron/creators
+	APICronCreatorsGet(ctx context.Context, params APICronCreatorsGetParams) (APICronCreatorsGetRes, error)
+	// APICronVideosGet invokes GET /api/cron/videos operation.
 	//
 	// Update videos related to a specific creator based on provided cronType.
 	//
-	// POST /cron/videos
-	CronVideosPost(ctx context.Context, request *CronVideosPostReq) (CronVideosPostRes, error)
-	// Post invokes POST / operation.
+	// GET /api/cron/videos
+	APICronVideosGet(ctx context.Context, params APICronVideosGetParams) (APICronVideosGetRes, error)
+	// APIPingGet invokes GET /api/ping operation.
 	//
 	// Returns a 200 status code if successful, or an error.
 	//
-	// POST /
-	Post(ctx context.Context) (*PostOK, error)
+	// GET /api/ping
+	APIPingGet(ctx context.Context) (*APIPingGetOK, error)
 }
 
 // Client implements OAS client.
@@ -92,20 +93,20 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 	return u
 }
 
-// CronCreatorsPost invokes POST /cron/creators operation.
+// APICronCreatorsGet invokes GET /api/cron/creators operation.
 //
 // Creates creators by fetching from Youtube using provided Channel IDs.
 //
-// POST /cron/creators
-func (c *Client) CronCreatorsPost(ctx context.Context, request *CronCreatorsPostReq) (CronCreatorsPostRes, error) {
-	res, err := c.sendCronCreatorsPost(ctx, request)
+// GET /api/cron/creators
+func (c *Client) APICronCreatorsGet(ctx context.Context, params APICronCreatorsGetParams) (APICronCreatorsGetRes, error) {
+	res, err := c.sendAPICronCreatorsGet(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendCronCreatorsPost(ctx context.Context, request *CronCreatorsPostReq) (res CronCreatorsPostRes, err error) {
+func (c *Client) sendAPICronCreatorsGet(ctx context.Context, params APICronCreatorsGetParams) (res APICronCreatorsGetRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/cron/creators"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/cron/creators"),
 	}
 
 	// Run stopwatch.
@@ -120,7 +121,7 @@ func (c *Client) sendCronCreatorsPost(ctx context.Context, request *CronCreators
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "CronCreatorsPost",
+	ctx, span := c.cfg.Tracer.Start(ctx, "APICronCreatorsGet",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -138,41 +139,91 @@ func (c *Client) sendCronCreatorsPost(ctx context.Context, request *CronCreators
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/cron/creators"
+	pathParts[0] = "/api/cron/creators"
 	uri.AddPathParts(u, pathParts[:]...)
 
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "platform_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "platform_type",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.PlatformType {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(string(item)))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "period" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(string(params.Period)))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "creator_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "creator_type",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.CreatorType {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(string(item)))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeCronCreatorsPostRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
 	}
 
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "CronCreatorsPost", r); {
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, "APICronCreatorsGet", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
 				// Skip this security.
 			default:
-				return res, errors.Wrap(err, "security \"ApiKeyAuth\"")
-			}
-		}
-		{
-			stage = "Security:YoutubeApiKey"
-			switch err := c.securityYoutubeApiKey(ctx, "CronCreatorsPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 1
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"YoutubeApiKey\"")
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
 			}
 		}
 
@@ -180,7 +231,6 @@ func (c *Client) sendCronCreatorsPost(ctx context.Context, request *CronCreators
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
-				{0b00000010},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {
@@ -203,7 +253,7 @@ func (c *Client) sendCronCreatorsPost(ctx context.Context, request *CronCreators
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeCronCreatorsPostResponse(resp)
+	result, err := decodeAPICronCreatorsGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -211,20 +261,20 @@ func (c *Client) sendCronCreatorsPost(ctx context.Context, request *CronCreators
 	return result, nil
 }
 
-// CronVideosPost invokes POST /cron/videos operation.
+// APICronVideosGet invokes GET /api/cron/videos operation.
 //
 // Update videos related to a specific creator based on provided cronType.
 //
-// POST /cron/videos
-func (c *Client) CronVideosPost(ctx context.Context, request *CronVideosPostReq) (CronVideosPostRes, error) {
-	res, err := c.sendCronVideosPost(ctx, request)
+// GET /api/cron/videos
+func (c *Client) APICronVideosGet(ctx context.Context, params APICronVideosGetParams) (APICronVideosGetRes, error) {
+	res, err := c.sendAPICronVideosGet(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendCronVideosPost(ctx context.Context, request *CronVideosPostReq) (res CronVideosPostRes, err error) {
+func (c *Client) sendAPICronVideosGet(ctx context.Context, params APICronVideosGetParams) (res APICronVideosGetRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/cron/videos"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/cron/videos"),
 	}
 
 	// Run stopwatch.
@@ -239,7 +289,7 @@ func (c *Client) sendCronVideosPost(ctx context.Context, request *CronVideosPost
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "CronVideosPost",
+	ctx, span := c.cfg.Tracer.Start(ctx, "APICronVideosGet",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -257,41 +307,82 @@ func (c *Client) sendCronVideosPost(ctx context.Context, request *CronVideosPost
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/cron/videos"
+	pathParts[0] = "/api/cron/videos"
 	uri.AddPathParts(u, pathParts[:]...)
 
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "platform_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "platform_type",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeArray(func(e uri.Encoder) error {
+				for i, item := range params.PlatformType {
+					if err := func() error {
+						return e.EncodeValue(conv.StringToString(string(item)))
+					}(); err != nil {
+						return errors.Wrapf(err, "[%d]", i)
+					}
+				}
+				return nil
+			})
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "period" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(string(params.Period)))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "video_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "video_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(string(params.VideoType)))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeCronVideosPostRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
 	}
 
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "CronVideosPost", r); {
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, "APICronVideosGet", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
 				// Skip this security.
 			default:
-				return res, errors.Wrap(err, "security \"ApiKeyAuth\"")
-			}
-		}
-		{
-			stage = "Security:YoutubeApiKey"
-			switch err := c.securityYoutubeApiKey(ctx, "CronVideosPost", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 1
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"YoutubeApiKey\"")
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
 			}
 		}
 
@@ -299,7 +390,6 @@ func (c *Client) sendCronVideosPost(ctx context.Context, request *CronVideosPost
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
-				{0b00000010},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {
@@ -322,7 +412,7 @@ func (c *Client) sendCronVideosPost(ctx context.Context, request *CronVideosPost
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeCronVideosPostResponse(resp)
+	result, err := decodeAPICronVideosGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -330,20 +420,20 @@ func (c *Client) sendCronVideosPost(ctx context.Context, request *CronVideosPost
 	return result, nil
 }
 
-// Post invokes POST / operation.
+// APIPingGet invokes GET /api/ping operation.
 //
 // Returns a 200 status code if successful, or an error.
 //
-// POST /
-func (c *Client) Post(ctx context.Context) (*PostOK, error) {
-	res, err := c.sendPost(ctx)
+// GET /api/ping
+func (c *Client) APIPingGet(ctx context.Context) (*APIPingGetOK, error) {
+	res, err := c.sendAPIPingGet(ctx)
 	return res, err
 }
 
-func (c *Client) sendPost(ctx context.Context) (res *PostOK, err error) {
+func (c *Client) sendAPIPingGet(ctx context.Context) (res *APIPingGetOK, err error) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/ping"),
 	}
 
 	// Run stopwatch.
@@ -358,7 +448,7 @@ func (c *Client) sendPost(ctx context.Context) (res *PostOK, err error) {
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "Post",
+	ctx, span := c.cfg.Tracer.Start(ctx, "APIPingGet",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -376,11 +466,11 @@ func (c *Client) sendPost(ctx context.Context) (res *PostOK, err error) {
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/"
+	pathParts[0] = "/api/ping"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeRequest"
-	r, err := ht.NewRequest(ctx, "POST", u)
+	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
@@ -389,14 +479,14 @@ func (c *Client) sendPost(ctx context.Context) (res *PostOK, err error) {
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			stage = "Security:ApiKeyAuth"
-			switch err := c.securityApiKeyAuth(ctx, "Post", r); {
+			stage = "Security:BearerAuth"
+			switch err := c.securityBearerAuth(ctx, "APIPingGet", r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
 				// Skip this security.
 			default:
-				return res, errors.Wrap(err, "security \"ApiKeyAuth\"")
+				return res, errors.Wrap(err, "security \"BearerAuth\"")
 			}
 		}
 
@@ -426,7 +516,7 @@ func (c *Client) sendPost(ctx context.Context) (res *PostOK, err error) {
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodePostResponse(resp)
+	result, err := decodeAPIPingGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

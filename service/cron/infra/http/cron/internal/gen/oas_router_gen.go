@@ -48,23 +48,16 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/"
+		case '/': // Prefix: "/api/"
 			origElem := elem
-			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			if l := len("/api/"); len(elem) >= l && elem[0:l] == "/api/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch r.Method {
-				case "POST":
-					s.handlePostRequest([0]string{}, elemIsEscaped, w, r)
-				default:
-					s.notAllowed(w, r, "POST")
-				}
-
-				return
+				break
 			}
 			switch elem[0] {
 			case 'c': // Prefix: "cron/"
@@ -90,10 +83,10 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if len(elem) == 0 {
 						// Leaf node.
 						switch r.Method {
-						case "POST":
-							s.handleCronCreatorsPostRequest([0]string{}, elemIsEscaped, w, r)
+						case "GET":
+							s.handleAPICronCreatorsGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "POST")
+							s.notAllowed(w, r, "GET")
 						}
 
 						return
@@ -111,16 +104,37 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if len(elem) == 0 {
 						// Leaf node.
 						switch r.Method {
-						case "POST":
-							s.handleCronVideosPostRequest([0]string{}, elemIsEscaped, w, r)
+						case "GET":
+							s.handleAPICronVideosGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
-							s.notAllowed(w, r, "POST")
+							s.notAllowed(w, r, "GET")
 						}
 
 						return
 					}
 
 					elem = origElem
+				}
+
+				elem = origElem
+			case 'p': // Prefix: "ping"
+				origElem := elem
+				if l := len("ping"); len(elem) >= l && elem[0:l] == "ping" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleAPIPingGetRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "GET")
+					}
+
+					return
 				}
 
 				elem = origElem
@@ -207,27 +221,16 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/"
+		case '/': // Prefix: "/api/"
 			origElem := elem
-			if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+			if l := len("/api/"); len(elem) >= l && elem[0:l] == "/api/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch method {
-				case "POST":
-					r.name = "Post"
-					r.summary = "Ping endpoint"
-					r.operationID = ""
-					r.pathPattern = "/"
-					r.args = args
-					r.count = 0
-					return r, true
-				default:
-					return
-				}
+				break
 			}
 			switch elem[0] {
 			case 'c': // Prefix: "cron/"
@@ -251,13 +254,13 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					if len(elem) == 0 {
+						// Leaf node.
 						switch method {
-						case "POST":
-							// Leaf: CronCreatorsPost
-							r.name = "CronCreatorsPost"
+						case "GET":
+							r.name = "APICronCreatorsGet"
 							r.summary = "Upsert Channel(Youtube/Twitch/Twitcasting)"
 							r.operationID = ""
-							r.pathPattern = "/cron/creators"
+							r.pathPattern = "/api/cron/creators"
 							r.args = args
 							r.count = 0
 							return r, true
@@ -276,13 +279,13 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					if len(elem) == 0 {
+						// Leaf node.
 						switch method {
-						case "POST":
-							// Leaf: CronVideosPost
-							r.name = "CronVideosPost"
+						case "GET":
+							r.name = "APICronVideosGet"
 							r.summary = "Upsert videos"
 							r.operationID = ""
-							r.pathPattern = "/cron/videos"
+							r.pathPattern = "/api/cron/videos"
 							r.args = args
 							r.count = 0
 							return r, true
@@ -292,6 +295,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
+				}
+
+				elem = origElem
+			case 'p': // Prefix: "ping"
+				origElem := elem
+				if l := len("ping"); len(elem) >= l && elem[0:l] == "ping" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = "APIPingGet"
+						r.summary = "Ping endpoint"
+						r.operationID = ""
+						r.pathPattern = "/api/ping"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
 				}
 
 				elem = origElem

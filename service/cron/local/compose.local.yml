@@ -19,21 +19,21 @@ services:
       context: ..
       dockerfile: Dockerfile.migration
     volumes:
-      - ../test/testhelpers/migration:/migration
+      - ../infra/database/schema/migration:/migration
     command: ["goose", "-dir", "/migration", "postgres", "host=vspo-db user=user dbname=vspo password=password sslmode=disable", "up"]
     depends_on:
       vspo-db:
         condition: service_healthy
-  vspo-cron-go:
-    container_name: vspo-cron-go
-    build:
-      context: ..
-      dockerfile: Dockerfile.local
-    volumes:
-      - ../:/project/
-    working_dir: /project
-    command: ["./tmp/main", "ping"]
-    ports:
-      - 8080:8080
-    env_file:
-      - ../.env.local
+  # vspo-cron-go:
+  #   container_name: vspo-cron-go
+  #   build:
+  #     context: ..
+  #     dockerfile: Dockerfile.local
+  #   volumes:
+  #     - ../:/project/
+  #   working_dir: /project
+  #   command: ["./tmp/main", "ping"]
+  #   ports:
+  #     - 8080:8080
+  #   # env_file:
+  #   #   - ../.env.local

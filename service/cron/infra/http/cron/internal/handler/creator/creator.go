@@ -6,8 +6,8 @@ import (
 	api "github.com/sugar-cat7/vspo-portal/service/cron/infra/http/cron/internal/gen"
 )
 
-// CronCreatorsPost is ...
-func (h *CH) CronCreatorsPost(ctx context.Context, req *api.CronCreatorsPostReq) (api.CronCreatorsPostRes, error) {
+// APICronCreatorsGet is ...
+func (h *CH) APICronCreatorsGet(ctx context.Context, req api.APICronCreatorsGetParams) (api.APICronCreatorsGetRes, error) {
 	return nil, nil
 	// err := h.creatorInteractor.BatchUpdate(
 	// 	ctx,
@@ -19,7 +19,7 @@ func (h *CH) CronCreatorsPost(ctx context.Context, req *api.CronCreatorsPostReq)
 	// if err != nil {
 	// 	return nil, err
 	// }
-	// return &api.CronCreatorsPostOK{
+	// return &api.APICronCreatorsGetOK{
 	// 	Message: api.OptString{
 	// 		Value: fmt.Sprintf("Updated videos"),
 	// 	},

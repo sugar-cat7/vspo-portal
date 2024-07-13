@@ -22,3 +22,12 @@ WHERE
 SELECT COUNT(*)
 FROM
     creator;
+
+-- name: ExistsCreator :one
+SELECT EXISTS (
+    SELECT COUNT(*)
+    FROM
+        creator
+    WHERE
+        id = $1
+);

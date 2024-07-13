@@ -7,7 +7,9 @@ import { mockFreechats } from "@/data/mocks/freechats";
 import { mockLivestreams } from "@/data/mocks/livestreams";
 import {
   convertThumbnailQualityInObjects,
+  formatDate,
   getLiveStatus,
+  getOneWeekRange,
   shuffleClips,
 } from "./utils";
 import { API_ROOT, ENVIRONMENT } from "./Const";
@@ -44,9 +46,19 @@ export const fetchEvents = async ({
 export const fetchLivestreams = async ({
   limit = 300,
   lang = "ja",
+  status = "all",
+  order,
+  startedDate,
+  endedDate,
+  timezone = "UTC",
 }: {
   limit?: number;
   lang?: string;
+  status?: string;
+  order: "desc" | "asc";
+  startedDate: string;
+  endedDate: string;
+  timezone?: string;
 }): Promise<Livestream[]> => {
   try {
     if (ENVIRONMENT === "production") {
@@ -59,6 +71,11 @@ export const fetchLivestreams = async ({
           params: {
             limit: limit,
             lang: lang,
+            status: status,
+            order: order,
+            started_at: startedDate,
+            ended_at: endedDate,
+            timezone: timezone,
           },
         },
       );
@@ -196,7 +213,14 @@ export const fetchRelatedVideos = async (
   limit = 10,
   lang = "ja",
 ): Promise<RelatedProps> => {
-  const pastLivestreams = await fetchLivestreams({ limit: 50 });
+  const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
+  const pastLivestreams = await fetchLivestreams({
+    limit: 50,
+    startedDate: formatDate(oneWeekAgo, "yyyy-MM-dd"),
+    endedDate: formatDate(oneWeekLater, "yyyy-MM-dd"),
+    order: "desc",
+    lang,
+  });
   const liveStreams = pastLivestreams.filter(
     (livestream) => getLiveStatus(livestream) === "live",
   );

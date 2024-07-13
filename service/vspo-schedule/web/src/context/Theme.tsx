@@ -1,4 +1,5 @@
 import {
+  ColorSystemOptions,
   Experimental_CssVarsProvider as CssVarsProvider,
   experimental_extendTheme as extendTheme,
 } from "@mui/material/styles";
@@ -11,7 +12,27 @@ type ThemeProviderProps = {
   children: React.ReactNode;
 };
 
+const sharedColorSystemOptions: ColorSystemOptions = {
+  palette: {
+    customColors: {
+      vspoPurple: "#7266cf",
+      darkBlue: "rgb(45, 75, 112)",
+      gray: "#353535",
+      darkGray: "#212121",
+      videoHighlight: {
+        live: "red",
+        upcoming: "rgb(45, 75, 112)",
+        trending: "red",
+      },
+    },
+  },
+};
+
 const theme = extendTheme({
+  colorSchemes: {
+    light: sharedColorSystemOptions,
+    dark: sharedColorSystemOptions,
+  },
   mixins: {
     scrollbar: {
       scrollbarWidth: "none",
@@ -39,7 +60,7 @@ export const ThemeModeProvider: React.FC<ThemeProviderProps> = ({
   children,
 }) => {
   return (
-    <CssVarsProvider theme={theme}>
+    <CssVarsProvider theme={theme} defaultMode="system">
       <CssBaseline />
       {children}
     </CssVarsProvider>

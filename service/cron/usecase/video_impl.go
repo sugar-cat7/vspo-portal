@@ -2,6 +2,9 @@ package usecase
 
 import (
 	"context"
+	"fmt"
+	"strings"
+	"sync"
 
 	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/samber/lo"
@@ -10,6 +13,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/twitcasting"
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/twitch"
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/youtube"
+	"github.com/sugar-cat7/vspo-portal/service/cron/pkg/uuid"
 	"github.com/sugar-cat7/vspo-portal/service/cron/usecase/input"
 	"github.com/volatiletech/null/v8"
 )
@@ -17,6 +21,7 @@ import (
 type videoInteractor struct {
 	transactable      repository.Transactable
 	creatorRepository repository.Creator
+	channelRepository repository.Channel
 	videoRepository   repository.Video
 	youtubeClient     youtube.YoutubeClient
 	twitchClient      twitch.TwitchClient
@@ -27,6 +32,7 @@ type videoInteractor struct {
 func NewVideoInteractor(
 	transactable repository.Transactable,
 	creatorRepository repository.Creator,
+	channelRepository repository.Channel,
 	videoRepository repository.Video,
 	youtubeClient youtube.YoutubeClient,
 	twitchClient twitch.TwitchClient,
@@ -35,6 +41,7 @@ func NewVideoInteractor(
 	return &videoInteractor{
 		transactable,
 		creatorRepository,
+		channelRepository,
 		videoRepository,
 		youtubeClient,
 		twitchClient,
@@ -86,11 +93,118 @@ func (i *videoInteractor) BatchDeleteInsert(
 				return err
 			}
 
-			// DeleteInsert Videos All
-			_, err = i.videoRepository.BatchDeleteInsert(
+			// Algorithm for detecting differences
+			// 1. Retrieve existing video information
+			existingVideos, err := i.videoRepository.List(
 				ctx,
-				uvs,
+				repository.ListVideosQuery{
+					PlatformTypes:   platformTypes.String(),
+					VideoType:       videoType.String(),
+					BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String(), model.StatusEnded.String()},
+					BaseListOptions: repository.BaseListOptions{
+						Limit: null.NewUint64(100, true),
+						Page:  null.NewUint64(0, true),
+					},
+				},
 			)
+			if err != nil {
+				return err
+			}
+			// 2. Compare video information with the same ID in existing and new ones
+			existingVideoMap := make(map[string]*model.Video)
+
+			for _, ev := range existingVideos {
+				existingVideoMap[ev.ID] = ev
+			}
+
+			var targetVideo model.Videos
+			for _, newVideo := range uvs {
+				// validate
+				if newVideo.CreatorInfo.ChannelID == "" {
+					continue
+				}
+				if newVideo.VideoType == "" {
+					newVideo.VideoType = videoType
+				}
+				if existingVideo, exists := existingVideoMap[newVideo.ID]; exists {
+					// 3. If there is an update to the video information and status with the same ID, update it
+					if existingVideo.Status != newVideo.Status {
+						targetVideo = append(targetVideo, newVideo)
+					}
+					delete(existingVideoMap, newVideo.ID)
+				} else {
+					// 4. Add new video information
+					targetVideo = append(targetVideo, newVideo)
+				}
+			}
+
+			if len(targetVideo) == 0 {
+				return nil
+			}
+
+			// Create creators and channels if they do not exist
+			var crs model.Creators
+			var chs model.Channels
+			for _, uv := range targetVideo {
+				b, err := i.channelRepository.Exist(
+					ctx,
+					repository.GetChannelQuery{
+						ID: uv.CreatorInfo.ChannelID,
+					},
+				)
+				if err != nil {
+					return err
+				}
+				if !b {
+					uuidCr := uuid.UUID()
+					uuidCh := uuid.UUID()
+					ch := &model.Channel{
+						ID:        uuidCh,
+						CreatorID: uuidCr,
+					}
+					cs := model.ChannelSnippet{
+						ID: uv.CreatorInfo.ChannelID,
+					}
+					if uv.Platform == model.PlatformYouTube {
+						ch.Youtube = cs
+					} else if uv.Platform == model.PlatformTwitch {
+						ch.Twitch = cs
+					} else if uv.Platform == model.PlatformTwitCasting {
+						ch.TwitCasting = cs
+					}
+					cr := model.NewCreator(
+						uuidCr,
+						"unknown",
+						model.MemberTypeGeneral,
+						model.ThumbnailURL(""),
+						*ch,
+					)
+					chs = append(chs, ch)
+					crs = append(crs, cr)
+				}
+			}
+			if len(crs) != 0 {
+				_, err = i.creatorRepository.BatchCreate(
+					ctx,
+					crs,
+				)
+
+				if err != nil {
+					return err
+				}
+
+				_, err = i.channelRepository.BatchCreate(
+					ctx,
+					chs,
+				)
+
+				if err != nil {
+					return err
+				}
+			}
+
+			// Update existing videos
+			_, err = i.videoRepository.BatchDeleteInsert(ctx, targetVideo)
 			if err != nil {
 				return err
 			}
@@ -101,9 +215,6 @@ func (i *videoInteractor) BatchDeleteInsert(
 					VideoIDs: lo.Map(uvs, func(v *model.Video, _ int) string {
 						return v.ID
 					}),
-					BaseListOptions: repository.BaseListOptions{
-						Limit: null.NewUint64(100, true), // null.Uint64型の値を正しく初期化
-					},
 				})
 
 			if err != nil {
@@ -127,24 +238,23 @@ func (i *videoInteractor) ytVideos(
 	var vs model.Videos
 	var freeChats model.Videos
 	switch vt {
-	case model.VideoTypeAll, model.VideoTypeVspoBroadcast:
-		// Retrieve new videos via youtube api
-		liveYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
-			SearchQuery: youtube.SearchQueryVspoJp,
-			EventType:   youtube.EventTypeLive,
-		})
-		if err != nil {
-			return nil, err
+	case model.VideoTypeVspoBroadcast:
+		queries := []youtube.SearchQuery{youtube.SearchQueryVspoJp, youtube.SearchQueryVspoEn}
+		eventTypes := []youtube.EventType{youtube.EventTypeLive, youtube.EventTypeUpcoming}
+		var vs model.Videos
+		for _, query := range queries {
+			for _, eventType := range eventTypes {
+				result, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
+					SearchQuery: query,
+					EventType:   eventType,
+				})
+				if err != nil {
+					return nil, err
+				}
+				vs = append(vs, result...)
+			}
 		}
-		upcomingYoutubeVideos, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
-			SearchQuery: youtube.SearchQueryVspoJp,
-			EventType:   youtube.EventTypeUpcoming,
-		})
-		if err != nil {
-			return nil, err
-		}
-		vs = append(liveYoutubeVideos, upcomingYoutubeVideos...)
-		err = i.transactable.RWTx(
+		err := i.transactable.RWTx(
 			ctx,
 			func(ctx context.Context) error {
 				existVideos, err := i.videoRepository.List(
@@ -153,6 +263,10 @@ func (i *videoInteractor) ytVideos(
 						PlatformTypes:   []string{model.PlatformYouTube.String()},
 						BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String()},
 						VideoType:       model.VideoTypeVspoBroadcast.String(),
+						BaseListOptions: repository.BaseListOptions{
+							Limit: null.NewUint64(100, true),
+							Page:  null.NewUint64(0, true),
+						},
 					},
 				)
 				if err != nil {
@@ -166,6 +280,10 @@ func (i *videoInteractor) ytVideos(
 						PlatformTypes:   []string{model.PlatformYouTube.String()},
 						BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String()},
 						VideoType:       model.VideoTypeFreechat.String(),
+						BaseListOptions: repository.BaseListOptions{
+							Limit: null.NewUint64(50, true),
+							Page:  null.NewUint64(0, true),
+						},
 					},
 				)
 				if err != nil {
@@ -208,13 +326,11 @@ func (i *videoInteractor) ytVideos(
 	if err != nil {
 		return nil, err
 	}
-
 	if vt == model.VideoTypeVspoBroadcast || vt == model.VideoTypeFreechat {
 		ytVideos = ytVideos.FilterCreator(cs)
 	}
-
 	switch vt {
-	case model.VideoTypeAll, model.VideoTypeVspoBroadcast:
+	case model.VideoTypeVspoBroadcast:
 		// All new videos are VspoBroadcast
 		ytVideos.SetVideoType(model.VideoTypeVspoBroadcast)
 	case model.VideoTypeClip:
@@ -227,8 +343,11 @@ func (i *videoInteractor) twitchVideos(
 	ctx context.Context,
 	cs model.Creators,
 ) (model.Videos, error) {
-	twitchUserIDs := lo.Map(cs, func(c *model.Creator, _ int) string {
-		return c.Channel.Twitch.ID
+	twitchUserIDs := lo.FilterMap(cs, func(c *model.Creator, _ int) (string, bool) {
+		if c.Channel.Twitch.ID != "" {
+			return c.Channel.Twitch.ID, true
+		}
+		return "", false
 	})
 	newTwitchVideos, err := i.twitchClient.GetVideos(ctx, twitch.TwitchVideosParam{
 		UserIDs: twitchUserIDs,
@@ -244,8 +363,11 @@ func (i *videoInteractor) twitCastingVideos(
 	ctx context.Context,
 	cs model.Creators,
 ) (model.Videos, error) {
-	twitCastingUserIDs := lo.Map(cs, func(c *model.Creator, _ int) string {
-		return c.Channel.TwitCasting.ID
+	twitCastingUserIDs := lo.FilterMap(cs, func(c *model.Creator, _ int) (string, bool) {
+		if c.Channel.TwitCasting.ID != "" {
+			return c.Channel.TwitCasting.ID, true
+		}
+		return "", false
 	})
 	newTwitcastingVideos, err := i.twitcastingClient.GetVideos(ctx, twitcasting.TwitcastingVideosParam{
 		UserIDs: twitCastingUserIDs,
@@ -264,27 +386,45 @@ func (i *videoInteractor) updateVideosByPlatformTypes(
 	vt model.VideoType,
 ) (model.Videos, error) {
 	var updatedVideos model.Videos
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	var errs []error
+
 	for _, platformType := range pts.String() {
-		switch platformType {
-		case model.PlatformYouTube.String():
-			newYoutubeVideos, err := i.ytVideos(ctx, cs, vt)
-			if err != nil {
-				return nil, err
+		wg.Add(1)
+		go func(platformType string) {
+			defer wg.Done()
+			var newVideos model.Videos
+			var err error
+
+			switch platformType {
+			case model.PlatformYouTube.String():
+				newVideos, err = i.ytVideos(ctx, cs, vt)
+			case model.PlatformTwitch.String():
+				newVideos, err = i.twitchVideos(ctx, cs)
+			case model.PlatformTwitCasting.String():
+				newVideos, err = i.twitCastingVideos(ctx, cs)
 			}
-			updatedVideos = append(updatedVideos, newYoutubeVideos...)
-		case model.PlatformTwitch.String():
-			newTwitchVideos, err := i.twitchVideos(ctx, cs)
+
+			mu.Lock()
+			defer mu.Unlock()
 			if err != nil {
-				return nil, err
+				errs = append(errs, err)
+				return
 			}
-			updatedVideos = append(updatedVideos, newTwitchVideos...)
-		case model.PlatformTwitCasting.String():
-			newTwitcastingVideos, err := i.twitCastingVideos(ctx, cs)
-			if err != nil {
-				return nil, err
-			}
-			updatedVideos = append(updatedVideos, newTwitcastingVideos...)
-		}
+			updatedVideos = append(updatedVideos, newVideos...)
+		}(platformType)
 	}
+
+	wg.Wait()
+
+	if len(errs) > 0 {
+		errMessages := make([]string, len(errs))
+		for i, err := range errs {
+			errMessages[i] = err.Error()
+		}
+		return nil, fmt.Errorf("errors occurred: %v", strings.Join(errMessages, "; "))
+	}
+
 	return updatedVideos, nil
 }

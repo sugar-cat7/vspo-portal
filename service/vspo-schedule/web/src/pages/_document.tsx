@@ -37,7 +37,7 @@ class MyDocument extends Document {
           <meta name="theme-color" content="#fff" />
         </Head>
         <body>
-          {getInitColorSchemeScript()}
+          {getInitColorSchemeScript({ defaultMode: "system" })}
           <Main />
           <NextScript />
         </body>

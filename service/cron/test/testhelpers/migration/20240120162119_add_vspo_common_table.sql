@@ -12,7 +12,7 @@ CREATE TABLE creator (
 CREATE TABLE channel (
     id text PRIMARY KEY,
     -- Unique identifier for the channel
-    platform_id text NOT NULL unique,
+    platform_channel_id text NOT NULL unique,
     -- Unique identifier for the channel on the platform
     creator_id text NOT NULL,
     -- Identifier for the creator of the channel
@@ -67,7 +67,7 @@ CREATE TABLE video (
     -- URL of the video's thumbnail image
     is_deleted boolean NOT NULL,
     -- Flag indicating if the video has been deleted
-    FOREIGN KEY (channel_id) REFERENCES channel(platform_id)
+    FOREIGN KEY (channel_id) REFERENCES channel(platform_channel_id)
 );
 -- Insert sample data into the 'creator' table
 INSERT INTO creator (id, name, member_type)
@@ -96,7 +96,7 @@ VALUES ('1', '藍沢エマ', 'vspo_jp'),
 -- Insert sample data into the 'channel' table
 INSERT INTO channel (
         id,
-        platform_id,
+        platform_channel_id,
         creator_id,
         platform_type,
         title,

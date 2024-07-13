@@ -266,75 +266,6 @@ const filterClips = (clips: Clip[], searchMemberIds: number[]): Clip[] => {
 };
 
 /**
- * Filters livestreams based on their titles.
- * Gives lower priority to streams marked as isTemp if there's another stream with the same title.
- *
- * @param livestreams - An array of Livream objects.
- * @returns An array of filtered Livream objects.
- */
-const titleFilter = (livestreams: Livestream[]): Livestream[] => {
-  return livestreams.filter((stream, index, self) => {
-    const currentTime = convertToUTCDate(stream.scheduledStartTime);
-    const currentTitle = stream.title;
-
-    return !self.some((otherStream, otherIndex) => {
-      if (stream.channelId === otherStream.channelId && index !== otherIndex) {
-        const otherTime = convertToUTCDate(otherStream.scheduledStartTime);
-        const timeDifference = Math.abs(
-          currentTime.getTime() - otherTime.getTime(),
-        );
-
-        return (
-          timeDifference < 6 * 60 * 60 * 1000 &&
-          otherIndex < index &&
-          currentTitle === otherStream.title &&
-          stream.platform === otherStream.platform &&
-          (!stream.isTemp || (stream.isTemp && !otherStream.isTemp))
-        );
-      }
-      return false;
-    });
-  });
-};
-
-/**
- * Removes duplicate livestreams based on their titles.
- *
- * @param livestreams - An array of Livestream objects.
- * @returns An array of unique Livestream objects.
- */
-export const removeDuplicateTitles = (
-  livestreams: Livestream[],
-): Livestream[] => {
-  const filteredLivestreams = removeDuplicateTwitchId(titleFilter(livestreams));
-  const seenTitles = new Set();
-  return filteredLivestreams.filter((livestream) => {
-    const isDuplicate = seenTitles.has(livestream.id);
-    seenTitles.add(livestream.id);
-    return !isDuplicate;
-  });
-};
-
-/**
- * Removes duplicate livestreams based on their Twitch ID.
- *
- * @param livestreams - An array of Livestream objects.
- * @returns An array of unique Livestream objects.
- */
-const removeDuplicateTwitchId = (livestreams: Livestream[]): Livestream[] => {
-  const seenTwitchIds = new Set();
-  return livestreams.filter((livestream) => {
-    if (!livestream.twitchPastVideoId) {
-      return true;
-    } else {
-      const isDuplicate = seenTwitchIds.has(livestream.twitchPastVideoId);
-      seenTwitchIds.add(livestream.twitchPastVideoId);
-      return !isDuplicate;
-    }
-  });
-};
-
-/**
  * Get a range of one week ago and one week later, without considering the time.
  * @returns - An object with `oneWeekAgo` and `oneWeekLater` properties representing the dates.
  */
@@ -358,10 +289,10 @@ export const locales: Record<string, Locale> = {
   ja: ja,
 };
 
-const localeTimeZoneMap: Record<string, string> = {
+export const localeTimeZoneMap: Record<string, string> = {
   ja: "Asia/Tokyo",
   en: "America/Los_Angeles",
-};
+} as const;
 
 /**
  * @deprecated Use `formatDate` instead.
@@ -687,6 +618,12 @@ export const isValidDate = (dateString: string) => {
   const dNum = d.getTime();
   if (!dNum && dNum !== 0) return false; // NaN value, Invalid date
   return d.toISOString().slice(0, 10) === dateString;
+};
+
+export const dateStringOffSet = (dateString: string) => {
+  const date = convertToUTCDate(dateString);
+  const offset = date.getTimezoneOffset();
+  return offset;
 };
 
 /**

@@ -16,10 +16,14 @@ type Creator interface {
 		ctx context.Context,
 		query ListCreatorsQuery,
 	) (uint64, error)
-	Upsert(
+	BatchCreate(
 		ctx context.Context,
 		m model.Creators,
 	) (model.Creators, error)
+	Exist(
+		ctx context.Context,
+		query GetCreatorQuery,
+	) (bool, error)
 }
 
 type GetCreatorQuery struct {

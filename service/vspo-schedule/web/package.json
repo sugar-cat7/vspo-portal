@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build && next-sitemap",
     "start": "next start",
-    "format": "biome format ./src",
+    "format": "biome format ./src --write .",
     "knip": "knip",
     "lint": "next lint",
     "postinstall": "lefthook install"
@@ -20,7 +20,7 @@
     "@mui/icons-material": "^5.15.20",
     "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "^5.15.20",
-    "@mui/system": "^5.15.20",
+    "@mui/system": "^5.16.0",
     "@types/node": "^20.14.8",
     "@types/react": "^18.3.3",
     "@types/react-dom": "18.3.0",
@@ -48,8 +48,8 @@
   "devDependencies": {
     "@biomejs/biome": "1.8.2",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
-    "@typescript-eslint/parser": "^7.15.0",
+    "@typescript-eslint/parser": "^7.16.0",
     "knip": "^5.22.3",
-    "lefthook": "^1.6.18"
+    "lefthook": "^1.7.1"
   }
 }

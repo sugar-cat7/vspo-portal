@@ -19,19 +19,19 @@ import (
 	"github.com/ogen-go/ogen/ogenerrors"
 )
 
-// handleCronCreatorsPostRequest handles POST /cron/creators operation.
+// handleAPICronCreatorsGetRequest handles GET /api/cron/creators operation.
 //
 // Creates creators by fetching from Youtube using provided Channel IDs.
 //
-// POST /cron/creators
-func (s *Server) handleCronCreatorsPostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /api/cron/creators
+func (s *Server) handleAPICronCreatorsGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/cron/creators"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/cron/creators"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "CronCreatorsPost",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "APICronCreatorsGet",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -62,7 +62,7 @@ func (s *Server) handleCronCreatorsPostRequest(args [0]string, argsEscaped bool,
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "CronCreatorsPost",
+			Name: "APICronCreatorsGet",
 			ID:   "",
 		}
 	)
@@ -70,14 +70,14 @@ func (s *Server) handleCronCreatorsPostRequest(args [0]string, argsEscaped bool,
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "CronCreatorsPost", r)
+			sctx, ok, err := s.securityBearerAuth(ctx, "APICronCreatorsGet", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:BearerAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -86,29 +86,11 @@ func (s *Server) handleCronCreatorsPostRequest(args [0]string, argsEscaped bool,
 				ctx = sctx
 			}
 		}
-		{
-			sctx, ok, err := s.securityYoutubeApiKey(ctx, "CronCreatorsPost", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "YoutubeApiKey",
-					Err:              err,
-				}
-				defer recordError("Security:YoutubeApiKey", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 1
-				ctx = sctx
-			}
-		}
 
 		if ok := func() bool {
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
-				{0b00000010},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {
@@ -128,38 +110,46 @@ func (s *Server) handleCronCreatorsPostRequest(args [0]string, argsEscaped bool,
 			return
 		}
 	}
-	request, close, err := s.decodeCronCreatorsPostRequest(r)
+	params, err := decodeAPICronCreatorsGetParams(args, argsEscaped, r)
 	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
+		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
 			Err:              err,
 		}
-		defer recordError("DecodeRequest", err)
+		defer recordError("DecodeParams", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
 
-	var response CronCreatorsPostRes
+	var response APICronCreatorsGetRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "CronCreatorsPost",
+			OperationName:    "APICronCreatorsGet",
 			OperationSummary: "Upsert Channel(Youtube/Twitch/Twitcasting)",
 			OperationID:      "",
-			Body:             request,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "platform_type",
+					In:   "query",
+				}: params.PlatformType,
+				{
+					Name: "period",
+					In:   "query",
+				}: params.Period,
+				{
+					Name: "creator_type",
+					In:   "query",
+				}: params.CreatorType,
+			},
+			Raw: r,
 		}
 
 		type (
-			Request  = *CronCreatorsPostReq
-			Params   = struct{}
-			Response = CronCreatorsPostRes
+			Request  = struct{}
+			Params   = APICronCreatorsGetParams
+			Response = APICronCreatorsGetRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -168,14 +158,14 @@ func (s *Server) handleCronCreatorsPostRequest(args [0]string, argsEscaped bool,
 		](
 			m,
 			mreq,
-			nil,
+			unpackAPICronCreatorsGetParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.CronCreatorsPost(ctx, request)
+				response, err = s.h.APICronCreatorsGet(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.CronCreatorsPost(ctx, request)
+		response, err = s.h.APICronCreatorsGet(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -183,7 +173,7 @@ func (s *Server) handleCronCreatorsPostRequest(args [0]string, argsEscaped bool,
 		return
 	}
 
-	if err := encodeCronCreatorsPostResponse(response, w, span); err != nil {
+	if err := encodeAPICronCreatorsGetResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -192,19 +182,19 @@ func (s *Server) handleCronCreatorsPostRequest(args [0]string, argsEscaped bool,
 	}
 }
 
-// handleCronVideosPostRequest handles POST /cron/videos operation.
+// handleAPICronVideosGetRequest handles GET /api/cron/videos operation.
 //
 // Update videos related to a specific creator based on provided cronType.
 //
-// POST /cron/videos
-func (s *Server) handleCronVideosPostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /api/cron/videos
+func (s *Server) handleAPICronVideosGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/cron/videos"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/cron/videos"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "CronVideosPost",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "APICronVideosGet",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -235,7 +225,7 @@ func (s *Server) handleCronVideosPostRequest(args [0]string, argsEscaped bool, w
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "CronVideosPost",
+			Name: "APICronVideosGet",
 			ID:   "",
 		}
 	)
@@ -243,14 +233,14 @@ func (s *Server) handleCronVideosPostRequest(args [0]string, argsEscaped bool, w
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "CronVideosPost", r)
+			sctx, ok, err := s.securityBearerAuth(ctx, "APICronVideosGet", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:BearerAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -259,29 +249,11 @@ func (s *Server) handleCronVideosPostRequest(args [0]string, argsEscaped bool, w
 				ctx = sctx
 			}
 		}
-		{
-			sctx, ok, err := s.securityYoutubeApiKey(ctx, "CronVideosPost", r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "YoutubeApiKey",
-					Err:              err,
-				}
-				defer recordError("Security:YoutubeApiKey", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 1
-				ctx = sctx
-			}
-		}
 
 		if ok := func() bool {
 		nextRequirement:
 			for _, requirement := range []bitset{
 				{0b00000001},
-				{0b00000010},
 			} {
 				for i, mask := range requirement {
 					if satisfied[i]&mask != mask {
@@ -301,38 +273,46 @@ func (s *Server) handleCronVideosPostRequest(args [0]string, argsEscaped bool, w
 			return
 		}
 	}
-	request, close, err := s.decodeCronVideosPostRequest(r)
+	params, err := decodeAPICronVideosGetParams(args, argsEscaped, r)
 	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
+		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
 			Err:              err,
 		}
-		defer recordError("DecodeRequest", err)
+		defer recordError("DecodeParams", err)
 		s.cfg.ErrorHandler(ctx, w, r, err)
 		return
 	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
 
-	var response CronVideosPostRes
+	var response APICronVideosGetRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "CronVideosPost",
+			OperationName:    "APICronVideosGet",
 			OperationSummary: "Upsert videos",
 			OperationID:      "",
-			Body:             request,
-			Params:           middleware.Parameters{},
-			Raw:              r,
+			Body:             nil,
+			Params: middleware.Parameters{
+				{
+					Name: "platform_type",
+					In:   "query",
+				}: params.PlatformType,
+				{
+					Name: "period",
+					In:   "query",
+				}: params.Period,
+				{
+					Name: "video_type",
+					In:   "query",
+				}: params.VideoType,
+			},
+			Raw: r,
 		}
 
 		type (
-			Request  = *CronVideosPostReq
-			Params   = struct{}
-			Response = CronVideosPostRes
+			Request  = struct{}
+			Params   = APICronVideosGetParams
+			Response = APICronVideosGetRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -341,14 +321,14 @@ func (s *Server) handleCronVideosPostRequest(args [0]string, argsEscaped bool, w
 		](
 			m,
 			mreq,
-			nil,
+			unpackAPICronVideosGetParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.CronVideosPost(ctx, request)
+				response, err = s.h.APICronVideosGet(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.CronVideosPost(ctx, request)
+		response, err = s.h.APICronVideosGet(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -356,7 +336,7 @@ func (s *Server) handleCronVideosPostRequest(args [0]string, argsEscaped bool, w
 		return
 	}
 
-	if err := encodeCronVideosPostResponse(response, w, span); err != nil {
+	if err := encodeAPICronVideosGetResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -365,19 +345,19 @@ func (s *Server) handleCronVideosPostRequest(args [0]string, argsEscaped bool, w
 	}
 }
 
-// handlePostRequest handles POST / operation.
+// handleAPIPingGetRequest handles GET /api/ping operation.
 //
 // Returns a 200 status code if successful, or an error.
 //
-// POST /
-func (s *Server) handlePostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /api/ping
+func (s *Server) handleAPIPingGetRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("POST"),
-		semconv.HTTPRouteKey.String("/"),
+		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/ping"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "Post",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "APIPingGet",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -408,7 +388,7 @@ func (s *Server) handlePostRequest(args [0]string, argsEscaped bool, w http.Resp
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "Post",
+			Name: "APIPingGet",
 			ID:   "",
 		}
 	)
@@ -416,14 +396,14 @@ func (s *Server) handlePostRequest(args [0]string, argsEscaped bool, w http.Resp
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityApiKeyAuth(ctx, "Post", r)
+			sctx, ok, err := s.securityBearerAuth(ctx, "APIPingGet", r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
-					Security:         "ApiKeyAuth",
+					Security:         "BearerAuth",
 					Err:              err,
 				}
-				defer recordError("Security:ApiKeyAuth", err)
+				defer recordError("Security:BearerAuth", err)
 				s.cfg.ErrorHandler(ctx, w, r, err)
 				return
 			}
@@ -457,11 +437,11 @@ func (s *Server) handlePostRequest(args [0]string, argsEscaped bool, w http.Resp
 		}
 	}
 
-	var response *PostOK
+	var response *APIPingGetOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "Post",
+			OperationName:    "APIPingGet",
 			OperationSummary: "Ping endpoint",
 			OperationID:      "",
 			Body:             nil,
@@ -472,7 +452,7 @@ func (s *Server) handlePostRequest(args [0]string, argsEscaped bool, w http.Resp
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *PostOK
+			Response = *APIPingGetOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -483,12 +463,12 @@ func (s *Server) handlePostRequest(args [0]string, argsEscaped bool, w http.Resp
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.Post(ctx)
+				response, err = s.h.APIPingGet(ctx)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.Post(ctx)
+		response, err = s.h.APIPingGet(ctx)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -496,7 +476,7 @@ func (s *Server) handlePostRequest(args [0]string, argsEscaped bool, w http.Resp
 		return
 	}
 
-	if err := encodePostResponse(response, w, span); err != nil {
+	if err := encodeAPIPingGetResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
