@@ -1,7 +1,7 @@
 import { useTranslation } from "next-i18next";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import { Avatar, Box, CardContent, Chip, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import { getVideoIconUrl, isTrending } from "@/lib/utils";
 import { Clip } from "@/types/streaming";
 import { VideoCard } from "./VideoCard";
@@ -48,10 +48,15 @@ const roundViewCount = (viewCount: number) => {
 
 export const ClipCard: React.FC<Props> = ({ clip }) => {
   const { t } = useTranslation("clips");
+  const theme = useTheme();
 
   const iconUrl = getVideoIconUrl(clip);
   const cardHighlight = isTrending(clip)
-    ? { label: t("clipLabels.trending"), color: "red", bold: false }
+    ? {
+        label: t("clipLabels.trending"),
+        color: theme.vars.palette.customColors.videoHighlight.trending,
+        bold: false,
+      }
     : undefined;
 
   return (
