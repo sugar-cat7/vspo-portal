@@ -237,6 +237,7 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     const fetchDateTabsInfo = async () => {
       const now = getCurrentUTCDate();
       now.setHours(0, 0, 0, 0);
+
       const fiveDaysInMilliseconds = 5 * 24 * 60 * 60 * 1000;
       const fiveDaysAgo = convertToUTCDate(
         now.getTime() - fiveDaysInMilliseconds,
@@ -244,7 +245,8 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
       const fiveDaysLater = convertToUTCDate(
         now.getTime() + fiveDaysInMilliseconds,
       );
-      const fetchList: Promise<Livestream[]>[] = [];
+
+      const fetchList = [];
       for (
         let d = fiveDaysAgo;
         d <= fiveDaysLater;
@@ -257,7 +259,10 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
             status: formatDate(d, "yyyy-MM-dd"),
             order: "asc",
             startedDate: formatDate(d, "yyyy-MM-dd"),
-            endedDate: formatDate(d.setDate(d.getDate() + 1), "yyyy-MM-dd"),
+            endedDate: formatDate(
+              d.getTime() + 24 * 60 * 60 * 1000,
+              "yyyy-MM-dd",
+            ),
             timezone: localeTimeZoneMap[locale],
           }),
         );
@@ -267,8 +272,14 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         .flat()
         .map((livestream: Livestream) => {
           return {
-            date: livestream.scheduledStartTimeString,
-            formattedDateString: livestream.formattedDateString,
+            date: formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
+              localeCode: locale,
+            }),
+            formattedDateString: formatDate(
+              livestream.scheduledStartTime,
+              "MM/dd(E)",
+              { localeCode: locale },
+            ),
           };
         });
 
