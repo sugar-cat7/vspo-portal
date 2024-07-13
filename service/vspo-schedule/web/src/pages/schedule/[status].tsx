@@ -267,14 +267,8 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
         .flat()
         .map((livestream: Livestream) => {
           return {
-            date: formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
-              localeCode: locale,
-            }),
-            formattedDateString: formatDate(
-              livestream.scheduledStartTime,
-              "MM/dd(E)",
-              { localeCode: locale },
-            ),
+            date: livestream.scheduledStartTimeString,
+            formattedDateString: livestream.formattedDateString,
           };
         });
 
