@@ -319,7 +319,9 @@ const IndexPage: NextPageWithLayout<Props> = ({
                     const today = formatDate(
                       getCurrentUTCDate(),
                       "yyyy-MM-dd",
-                      { localeCode: locale },
+                      {
+                        localeCode: locale,
+                      },
                     );
                     const isEventToday = eventDate === today;
                     return (
