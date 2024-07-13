@@ -2,6 +2,7 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
 import { styled, useColorScheme } from "@mui/material/styles";
+import { useTranslation } from "next-i18next";
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,
@@ -64,7 +65,8 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 }));
 
 export const ThemeToggleButton: React.FC = () => {
-  const { mode, setMode } = useColorScheme();
+  const { mode, systemMode, setMode } = useColorScheme();
+  const { t } = useTranslation("common");
 
   const handleModeChange = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -72,7 +74,7 @@ export const ThemeToggleButton: React.FC = () => {
   ) => {
     setMode(checked ? "dark" : "light");
   };
-  const label = `Theme: ${mode ?? "light"}`;
+  const label = `${t("drawer.site-theme")}: ${systemMode ?? mode ?? "light"}`;
   return (
     <FormGroup>
       <FormControlLabel
@@ -82,7 +84,7 @@ export const ThemeToggleButton: React.FC = () => {
         }}
         control={
           <MaterialUISwitch
-            checked={mode === "dark"}
+            checked={systemMode === "dark" || mode === "dark"}
             onChange={handleModeChange}
           />
         }
