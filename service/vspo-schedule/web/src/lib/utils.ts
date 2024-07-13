@@ -289,10 +289,10 @@ export const locales: Record<string, Locale> = {
   ja: ja,
 };
 
-const localeTimeZoneMap: Record<string, string> = {
+export const localeTimeZoneMap: Record<string, string> = {
   ja: "Asia/Tokyo",
   en: "America/Los_Angeles",
-};
+} as const;
 
 /**
  * @deprecated Use `formatDate` instead.
@@ -618,6 +618,12 @@ export const isValidDate = (dateString: string) => {
   const dNum = d.getTime();
   if (!dNum && dNum !== 0) return false; // NaN value, Invalid date
   return d.toISOString().slice(0, 10) === dateString;
+};
+
+export const dateStringOffSet = (dateString: string) => {
+  const date = convertToUTCDate(dateString);
+  const offset = date.getTimezoneOffset();
+  return offset;
 };
 
 /**

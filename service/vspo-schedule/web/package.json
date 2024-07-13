@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build && next-sitemap",
     "start": "next start",
-    "format": "biome format ./src",
+    "format": "biome format ./src --write .",
     "knip": "knip",
     "lint": "next lint",
     "postinstall": "lefthook install"
