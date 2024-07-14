@@ -253,6 +253,7 @@ func (i *videoInteractor) ytVideos(
 				vs = append(vs, result...)
 			}
 		}
+
 		err := i.transactable.RWTx(
 			ctx,
 			func(ctx context.Context) error {

@@ -12,6 +12,14 @@ type Channel interface {
 		ctx context.Context,
 		m model.Channels,
 	) (model.Channels, error)
+	Update(
+		ctx context.Context,
+		m *model.Channel,
+	) (*model.Channel, error)
+	List(
+		ctx context.Context,
+		query ListChannelQuery,
+	) (model.Channels, error)
 	Exist(
 		ctx context.Context,
 		query GetChannelQuery,
@@ -21,4 +29,9 @@ type Channel interface {
 type GetChannelQuery struct {
 	ID string
 	BaseGetOptions
+}
+
+type ListChannelQuery struct {
+	PlatformType string
+	BaseListOptions
 }

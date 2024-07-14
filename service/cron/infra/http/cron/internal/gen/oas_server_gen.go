@@ -8,6 +8,12 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
+	// APICronChannelsGet implements GET /api/cron/channels operation.
+	//
+	// Update channels.
+	//
+	// GET /api/cron/channels
+	APICronChannelsGet(ctx context.Context, params APICronChannelsGetParams) (APICronChannelsGetRes, error)
 	// APICronCreatorsGet implements GET /api/cron/creators operation.
 	//
 	// Creates creators by fetching from Youtube using provided Channel IDs.

@@ -7,6 +7,234 @@ import (
 	"github.com/go-faster/jx"
 )
 
+// Encode encodes APICronChannelsGetBadRequest as json.
+func (s *APICronChannelsGetBadRequest) Encode(e *jx.Encoder) {
+	unwrapped := (*CronResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APICronChannelsGetBadRequest from json.
+func (s *APICronChannelsGetBadRequest) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APICronChannelsGetBadRequest to nil")
+	}
+	var unwrapped CronResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APICronChannelsGetBadRequest(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APICronChannelsGetBadRequest) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APICronChannelsGetBadRequest) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APICronChannelsGetForbidden as json.
+func (s *APICronChannelsGetForbidden) Encode(e *jx.Encoder) {
+	unwrapped := (*CronResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APICronChannelsGetForbidden from json.
+func (s *APICronChannelsGetForbidden) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APICronChannelsGetForbidden to nil")
+	}
+	var unwrapped CronResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APICronChannelsGetForbidden(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APICronChannelsGetForbidden) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APICronChannelsGetForbidden) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APICronChannelsGetInternalServerError as json.
+func (s *APICronChannelsGetInternalServerError) Encode(e *jx.Encoder) {
+	unwrapped := (*CronResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APICronChannelsGetInternalServerError from json.
+func (s *APICronChannelsGetInternalServerError) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APICronChannelsGetInternalServerError to nil")
+	}
+	var unwrapped CronResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APICronChannelsGetInternalServerError(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APICronChannelsGetInternalServerError) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APICronChannelsGetInternalServerError) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APICronChannelsGetNotFound as json.
+func (s *APICronChannelsGetNotFound) Encode(e *jx.Encoder) {
+	unwrapped := (*CronResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APICronChannelsGetNotFound from json.
+func (s *APICronChannelsGetNotFound) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APICronChannelsGetNotFound to nil")
+	}
+	var unwrapped CronResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APICronChannelsGetNotFound(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APICronChannelsGetNotFound) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APICronChannelsGetNotFound) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APICronChannelsGetOK as json.
+func (s *APICronChannelsGetOK) Encode(e *jx.Encoder) {
+	unwrapped := (*CronResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APICronChannelsGetOK from json.
+func (s *APICronChannelsGetOK) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APICronChannelsGetOK to nil")
+	}
+	var unwrapped CronResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APICronChannelsGetOK(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APICronChannelsGetOK) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APICronChannelsGetOK) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes APICronChannelsGetUnauthorized as json.
+func (s *APICronChannelsGetUnauthorized) Encode(e *jx.Encoder) {
+	unwrapped := (*CronResponse)(s)
+
+	unwrapped.Encode(e)
+}
+
+// Decode decodes APICronChannelsGetUnauthorized from json.
+func (s *APICronChannelsGetUnauthorized) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode APICronChannelsGetUnauthorized to nil")
+	}
+	var unwrapped CronResponse
+	if err := func() error {
+		if err := unwrapped.Decode(d); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		return errors.Wrap(err, "alias")
+	}
+	*s = APICronChannelsGetUnauthorized(unwrapped)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *APICronChannelsGetUnauthorized) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *APICronChannelsGetUnauthorized) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes APICronCreatorsGetBadRequest as json.
 func (s *APICronCreatorsGetBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := (*CronResponse)(s)

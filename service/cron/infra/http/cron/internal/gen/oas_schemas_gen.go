@@ -6,6 +6,85 @@ import (
 	"github.com/go-faster/errors"
 )
 
+type APICronChannelsGetBadRequest CronResponse
+
+func (*APICronChannelsGetBadRequest) aPICronChannelsGetRes() {}
+
+type APICronChannelsGetForbidden CronResponse
+
+func (*APICronChannelsGetForbidden) aPICronChannelsGetRes() {}
+
+type APICronChannelsGetInternalServerError CronResponse
+
+func (*APICronChannelsGetInternalServerError) aPICronChannelsGetRes() {}
+
+type APICronChannelsGetNotFound CronResponse
+
+func (*APICronChannelsGetNotFound) aPICronChannelsGetRes() {}
+
+type APICronChannelsGetOK CronResponse
+
+func (*APICronChannelsGetOK) aPICronChannelsGetRes() {}
+
+type APICronChannelsGetPlatformType string
+
+const (
+	APICronChannelsGetPlatformTypeYoutube     APICronChannelsGetPlatformType = "youtube"
+	APICronChannelsGetPlatformTypeTwitch      APICronChannelsGetPlatformType = "twitch"
+	APICronChannelsGetPlatformTypeTwitcasting APICronChannelsGetPlatformType = "twitcasting"
+	APICronChannelsGetPlatformTypeNiconico    APICronChannelsGetPlatformType = "niconico"
+)
+
+// AllValues returns all APICronChannelsGetPlatformType values.
+func (APICronChannelsGetPlatformType) AllValues() []APICronChannelsGetPlatformType {
+	return []APICronChannelsGetPlatformType{
+		APICronChannelsGetPlatformTypeYoutube,
+		APICronChannelsGetPlatformTypeTwitch,
+		APICronChannelsGetPlatformTypeTwitcasting,
+		APICronChannelsGetPlatformTypeNiconico,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s APICronChannelsGetPlatformType) MarshalText() ([]byte, error) {
+	switch s {
+	case APICronChannelsGetPlatformTypeYoutube:
+		return []byte(s), nil
+	case APICronChannelsGetPlatformTypeTwitch:
+		return []byte(s), nil
+	case APICronChannelsGetPlatformTypeTwitcasting:
+		return []byte(s), nil
+	case APICronChannelsGetPlatformTypeNiconico:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *APICronChannelsGetPlatformType) UnmarshalText(data []byte) error {
+	switch APICronChannelsGetPlatformType(data) {
+	case APICronChannelsGetPlatformTypeYoutube:
+		*s = APICronChannelsGetPlatformTypeYoutube
+		return nil
+	case APICronChannelsGetPlatformTypeTwitch:
+		*s = APICronChannelsGetPlatformTypeTwitch
+		return nil
+	case APICronChannelsGetPlatformTypeTwitcasting:
+		*s = APICronChannelsGetPlatformTypeTwitcasting
+		return nil
+	case APICronChannelsGetPlatformTypeNiconico:
+		*s = APICronChannelsGetPlatformTypeNiconico
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type APICronChannelsGetUnauthorized CronResponse
+
+func (*APICronChannelsGetUnauthorized) aPICronChannelsGetRes() {}
+
 type APICronCreatorsGetBadRequest CronResponse
 
 func (*APICronCreatorsGetBadRequest) aPICronCreatorsGetRes() {}

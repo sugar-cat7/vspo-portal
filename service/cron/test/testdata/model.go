@@ -6,15 +6,15 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/model"
 )
 
-// NewVspoFactory is  5 youtube videos, 5 twitch videos, 5 twitcasting videos
+// NewVspoFactory is 3 creators, 5 youtube videos, 5 twitch videos, 5 twitcasting videos
 func NewVspoFactory() struct {
-	Creator           model.Creator
-	VspoYtVs          model.Videos // Youtube videos 5 videos
-	VspoTwitchVs      model.Videos // Twitch videos 5 videos
-	VspoTwitcastingVs model.Videos // Twitcasting videos 5 videos
+	Creators          model.Creators // 3 creators
+	VspoYtVs          model.Videos   // Youtube videos 5 videos
+	VspoTwitchVs      model.Videos   // Twitch videos 5 videos
+	VspoTwitcastingVs model.Videos   // Twitcasting videos 5 videos
 } {
-	creator := &model.Creator{}
-	if err := faker.FakeData(creator); err != nil {
+	creators := make(model.Creators, 3)
+	if err := faker.FakeData(&creators, options.WithRandomMapAndSliceMaxSize(3), options.WithRandomMapAndSliceMinSize(3)); err != nil {
 		panic(err)
 	}
 
@@ -32,23 +32,26 @@ func NewVspoFactory() struct {
 	if err := faker.FakeData(&twiVs, options.WithRandomMapAndSliceMaxSize(5), options.WithRandomMapAndSliceMinSize(5)); err != nil {
 		panic(err)
 	}
-	creator.ID = VspoInfoMap[0].CreatorID
-	creator.Channel.Youtube.ID = VspoInfoMap[0].YoutubeChannelID
-	creator.Channel.Twitch.ID = VspoInfoMap[0].TwitchChannelID
-	creator.Channel.TwitCasting.ID = VspoInfoMap[0].TwitcastingChannelID
+	for i := 0; i < 3; i++ {
+		creators[i].ID = VspoInfoMap[i].CreatorID
+		creators[i].Channel.Youtube.ID = VspoInfoMap[i].YoutubeChannelID
+		creators[i].Channel.Twitch.ID = VspoInfoMap[i].TwitchChannelID
+		creators[i].Channel.TwitCasting.ID = VspoInfoMap[i].TwitcastingChannelID
+		creators[i].Channel.Youtube.IsDeleted = false
+	}
 	for i := 0; i < 5; i++ {
-		ytVs[i].CreatorInfo.ChannelID = creator.Channel.Youtube.ID
-		twVs[i].CreatorInfo.ChannelID = creator.Channel.Twitch.ID
-		twiVs[i].CreatorInfo.ChannelID = creator.Channel.TwitCasting.ID
+		ytVs[i].CreatorInfo.ChannelID = creators[i%2].Channel.Youtube.ID
+		twVs[i].CreatorInfo.ChannelID = creators[i%2].Channel.Twitch.ID
+		twiVs[i].CreatorInfo.ChannelID = creators[i%2].Channel.TwitCasting.ID
 	}
 
 	return struct {
-		Creator           model.Creator
+		Creators          model.Creators
 		VspoYtVs          model.Videos
 		VspoTwitchVs      model.Videos
 		VspoTwitcastingVs model.Videos
 	}{
-		Creator:           *creator,
+		Creators:          creators,
 		VspoYtVs:          ytVs,
 		VspoTwitchVs:      twVs,
 		VspoTwitcastingVs: twiVs,

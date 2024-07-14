@@ -7,6 +7,8 @@ package db_sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const existsChannel = `-- name: ExistsChannel :one
@@ -24,4 +26,104 @@ func (q *Queries) ExistsChannel(ctx context.Context, id string) (bool, error) {
 	var exists bool
 	err := row.Scan(&exists)
 	return exists, err
+}
+
+const getChannelsByParams = `-- name: GetChannelsByParams :many
+SELECT
+     id, platform_channel_id, creator_id, platform_type, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, updated_at, is_deleted
+FROM
+    channel ch
+WHERE
+    platform_type = $1
+ORDER BY updated_at ASC
+LIMIT $2 OFFSET $3
+`
+
+type GetChannelsByParamsParams struct {
+	PlatformType string
+	Limit        int32
+	Offset       int32
+}
+
+func (q *Queries) GetChannelsByParams(ctx context.Context, arg GetChannelsByParamsParams) ([]Channel, error) {
+	rows, err := q.db.Query(ctx, getChannelsByParams, arg.PlatformType, arg.Limit, arg.Offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Channel
+	for rows.Next() {
+		var i Channel
+		if err := rows.Scan(
+			&i.ID,
+			&i.PlatformChannelID,
+			&i.CreatorID,
+			&i.PlatformType,
+			&i.Title,
+			&i.Description,
+			&i.PublishedAt,
+			&i.TotalViewCount,
+			&i.SubscriberCount,
+			&i.HiddenSubscriberCount,
+			&i.TotalVideoCount,
+			&i.ThumbnailUrl,
+			&i.UpdatedAt,
+			&i.IsDeleted,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const updateChannel = `-- name: UpdateChannel :one
+UPDATE channel
+SET
+    title = $2,
+    description = $3,
+    thumbnail_url = $4,
+    updated_at = $5
+WHERE
+    platform_channel_id = $1
+RETURNING id, platform_channel_id, creator_id, platform_type, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, updated_at, is_deleted
+`
+
+type UpdateChannelParams struct {
+	PlatformChannelID string
+	Title             string
+	Description       string
+	ThumbnailUrl      string
+	UpdatedAt         pgtype.Timestamptz
+}
+
+func (q *Queries) UpdateChannel(ctx context.Context, arg UpdateChannelParams) (Channel, error) {
+	row := q.db.QueryRow(ctx, updateChannel,
+		arg.PlatformChannelID,
+		arg.Title,
+		arg.Description,
+		arg.ThumbnailUrl,
+		arg.UpdatedAt,
+	)
+	var i Channel
+	err := row.Scan(
+		&i.ID,
+		&i.PlatformChannelID,
+		&i.CreatorID,
+		&i.PlatformType,
+		&i.Title,
+		&i.Description,
+		&i.PublishedAt,
+		&i.TotalViewCount,
+		&i.SubscriberCount,
+		&i.HiddenSubscriberCount,
+		&i.TotalVideoCount,
+		&i.ThumbnailUrl,
+		&i.UpdatedAt,
+		&i.IsDeleted,
+	)
+	return i, err
 }

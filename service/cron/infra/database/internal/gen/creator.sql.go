@@ -42,7 +42,7 @@ func (q *Queries) ExistsCreator(ctx context.Context, id string) (bool, error) {
 const getCreatorsWithChannels = `-- name: GetCreatorsWithChannels :many
 SELECT
     cr.id, cr.name, cr.member_type,
-    ch.id, ch.platform_channel_id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.is_deleted
+    ch.id, ch.platform_channel_id, ch.creator_id, ch.platform_type, ch.title, ch.description, ch.published_at, ch.total_view_count, ch.subscriber_count, ch.hidden_subscriber_count, ch.total_video_count, ch.thumbnail_url, ch.updated_at, ch.is_deleted
 FROM
     creator cr
 JOIN
@@ -81,6 +81,7 @@ func (q *Queries) GetCreatorsWithChannels(ctx context.Context, memberTypes []str
 			&i.Channel.HiddenSubscriberCount,
 			&i.Channel.TotalVideoCount,
 			&i.Channel.ThumbnailUrl,
+			&i.Channel.UpdatedAt,
 			&i.Channel.IsDeleted,
 		); err != nil {
 			return nil, err

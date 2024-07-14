@@ -138,6 +138,7 @@ func ytChannelToChannel(ytChannel *youtube.Channel) (*model.Channel, error) {
 			Name:         ytChannel.Snippet.Title,
 			Description:  ytChannel.Snippet.Description,
 			ThumbnailURL: model.ThumbnailURL(ytChannel.Snippet.Thumbnails.Default.Url),
+			UpdateAt:     utime.Utc.Now(),
 		},
 	}
 	return m, nil

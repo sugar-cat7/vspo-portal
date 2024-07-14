@@ -21,6 +21,7 @@ type Channel struct {
 	HiddenSubscriberCount bool
 	TotalVideoCount       int32
 	ThumbnailUrl          string
+	UpdatedAt             pgtype.Timestamptz
 	IsDeleted             bool
 }
 
