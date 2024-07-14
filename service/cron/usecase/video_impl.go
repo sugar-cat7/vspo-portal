@@ -240,8 +240,7 @@ func (i *videoInteractor) ytVideos(
 	switch vt {
 	case model.VideoTypeVspoBroadcast:
 		queries := []youtube.SearchQuery{youtube.SearchQueryVspoJp, youtube.SearchQueryVspoEn}
-		eventTypes := []youtube.EventType{youtube.EventTypeLive, youtube.EventTypeUpcoming}
-		var vs model.Videos
+		eventTypes := []youtube.EventType{youtube.EventTypeLive, youtube.EventTypeUpcoming, youtube.EventTypeCompleted}
 		for _, query := range queries {
 			for _, eventType := range eventTypes {
 				result, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
