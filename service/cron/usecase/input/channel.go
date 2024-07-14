@@ -1,21 +1,15 @@
 package input
 
-// UpsertChannels is the input for UpsertChannel
-type UpsertChannels struct {
-	ChannelType  string
+// BatchUpdateChannels is the input for BatchUpdateChannel
+type BatchUpdateChannels struct {
 	PlatformType string
-	Period       string
 }
 
-// NewUpsertChannelInput returns a new UpsertChannelInput
-func NewUpsertChannelInput(
-	channelType string,
+// NewBatchUpdateChannelInput returns a new BatchUpdateChannelInput
+func NewBatchUpdateChannelInput(
 	platformType string,
-	period string,
-) *UpsertChannels {
-	return &UpsertChannels{
-		ChannelType:  channelType,
+) *BatchUpdateChannels {
+	return &BatchUpdateChannels{
 		PlatformType: platformType,
-		Period:       period,
 	}
 }

@@ -16,6 +16,7 @@ import (
 type Dependency struct {
 	CreatorInteractor usecase.CreatorInteractor
 	VideosInteractor  usecase.VideoInteractor
+	ChannelInteractor usecase.ChannelInteractor
 }
 
 func (d *Dependency) Inject(ctx context.Context, e *environment.Environment) {
@@ -48,11 +49,13 @@ func (d *Dependency) Inject(ctx context.Context, e *environment.Environment) {
 		twitchClient,
 		twitcastingClient,
 	)
-	// channelInteractor := usecase.NewChannelInteractor(
-	// 	creatorRepository,
-	// 	// channelRepository,
-	// 	youtubeClient,
-	// )
+	channelInteractor := usecase.NewChannelInteractor(
+		tx,
+		creatorRepository,
+		channelRepository,
+		youtubeClient,
+	)
 	d.CreatorInteractor = creatorInteractor
 	d.VideosInteractor = videoInteractor
+	d.ChannelInteractor = channelInteractor
 }

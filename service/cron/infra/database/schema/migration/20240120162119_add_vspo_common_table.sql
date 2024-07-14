@@ -22,9 +22,13 @@ CREATE TABLE channel (
     hidden_subscriber_count boolean NOT NULL,     -- Whether the subscriber count is hidden
     total_video_count integer NOT NULL,           -- Total number of videos uploaded to the channel
     thumbnail_url text NOT NULL,                  -- URL of the channel's thumbnail image
+    updated_at timestamp with time zone NOT NULL DEFAULT now(), -- The date and time the channel information was last updated
     is_deleted boolean NOT NULL,                  -- Flag indicating if the channel has been deleted
     FOREIGN KEY (creator_id) REFERENCES creator(id)
 );
+
+CREATE INDEX idx_channel_platform_type_updated_at_asc ON channel (platform_type, updated_at ASC);
+
 
 CREATE TABLE video (
     id text PRIMARY KEY,                           -- Unique identifier for the video
@@ -43,6 +47,8 @@ CREATE TABLE video (
     is_deleted boolean NOT NULL,                   -- Flag indicating if the video has been deleted
     FOREIGN KEY (channel_id) REFERENCES channel(platform_channel_id)
 );
+
+
 
 -- +goose StatementEnd
 

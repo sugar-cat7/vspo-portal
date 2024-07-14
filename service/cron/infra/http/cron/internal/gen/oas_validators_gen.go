@@ -6,6 +6,21 @@ import (
 	"github.com/go-faster/errors"
 )
 
+func (s APICronChannelsGetPlatformType) Validate() error {
+	switch s {
+	case "youtube":
+		return nil
+	case "twitch":
+		return nil
+	case "twitcasting":
+		return nil
+	case "niconico":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s APICronCreatorsGetCreatorTypeItem) Validate() error {
 	switch s {
 	case "vspo":

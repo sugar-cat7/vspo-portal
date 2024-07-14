@@ -19,9 +19,12 @@ func CreatorToModel(c *db_sqlc.Creator) *model.Creator {
 
 // ChannelToModel converts db_sqlc.Channel to model.Channel
 func ChannelToModel(c *db_sqlc.Channel) *model.Channel {
-	ch := &model.Channel{}
+	ch := &model.Channel{
+		ID:        c.ID,
+		CreatorID: c.CreatorID,
+	}
 	snippet := model.ChannelSnippet{
-		ID:              c.ID,
+		ID:              c.PlatformChannelID,
 		Name:            c.Title,
 		Description:     c.Description,
 		ThumbnailURL:    model.ThumbnailURL(c.ThumbnailUrl),
@@ -29,6 +32,7 @@ func ChannelToModel(c *db_sqlc.Channel) *model.Channel {
 		TotalViewCount:  int(c.TotalViewCount),
 		SubscriberCount: int(c.SubscriberCount),
 		TotalVideoCount: int(c.TotalVideoCount),
+		UpdateAt:        c.UpdatedAt.Time,
 		IsDeleted:       c.IsDeleted,
 	}
 
@@ -43,6 +47,15 @@ func ChannelToModel(c *db_sqlc.Channel) *model.Channel {
 		ch.Niconico = snippet
 	}
 	return ch
+}
+
+// ChannelsToModel converts []db_sqlc.Channel to model.Channels
+func ChannelsToModel(cs []db_sqlc.Channel) model.Channels {
+	res := make(model.Channels, 0)
+	for _, c := range cs {
+		res = append(res, ChannelToModel(&c))
+	}
+	return res
 }
 
 // VideoToModel converts db_sqlc.Video to model.Video
@@ -76,6 +89,7 @@ func CreatorsWithChannelsRowToModel(c *db_sqlc.GetCreatorsWithChannelsRow, creat
 		TotalViewCount:  int(c.Channel.TotalViewCount),
 		SubscriberCount: int(c.Channel.SubscriberCount),
 		TotalVideoCount: int(c.Channel.TotalVideoCount),
+		UpdateAt:        c.Channel.UpdatedAt.Time,
 		IsDeleted:       c.Channel.IsDeleted,
 	}
 
@@ -252,6 +266,25 @@ func ChannelModelsToCreateChannelParams(m model.Channels) []db_sqlc.CreateChanne
 	return ps
 }
 
+// ChannelModelToUpdateChannelParams converts model.Channel to db_sqlc.UpdateChannelParams
+func ChannelModelToUpdateChannelParams(m *model.Channel) db_sqlc.UpdateChannelParams {
+	p := db_sqlc.UpdateChannelParams{
+		Title:        m.Youtube.Name,
+		Description:  m.Youtube.Description,
+		ThumbnailUrl: string(m.Youtube.ThumbnailURL),
+		UpdatedAt:    utime.TimeToTimestamptz(m.Youtube.UpdateAt),
+	}
+
+	if m.Youtube.ID != "" {
+		p.PlatformChannelID = m.Youtube.ID
+	} else if m.Twitch.ID != "" {
+		p.PlatformChannelID = m.Twitch.ID
+	} else if m.TwitCasting.ID != "" {
+		p.PlatformChannelID = m.TwitCasting.ID
+	}
+	return p
+}
+
 // ChannelModelToCreateChannelParams converts model.Channel to db_sqlc.CreateChannelParams
 func ChannelModelToCreateChannelParams(m *model.Channel) db_sqlc.CreateChannelParams {
 	p := db_sqlc.CreateChannelParams{
@@ -270,6 +303,7 @@ func ChannelModelToCreateChannelParams(m *model.Channel) db_sqlc.CreateChannelPa
 		p.HiddenSubscriberCount = false
 		p.TotalVideoCount = int32(m.Youtube.TotalVideoCount)
 		p.ThumbnailUrl = string(m.Youtube.ThumbnailURL)
+		p.UpdatedAt = utime.TimeToTimestamptz(m.Youtube.UpdateAt)
 		p.IsDeleted = m.Youtube.IsDeleted
 	} else if m.Twitch.ID != "" {
 		p.ID = m.ID
@@ -283,6 +317,7 @@ func ChannelModelToCreateChannelParams(m *model.Channel) db_sqlc.CreateChannelPa
 		p.HiddenSubscriberCount = false
 		p.TotalVideoCount = int32(m.Twitch.TotalVideoCount)
 		p.ThumbnailUrl = string(m.Twitch.ThumbnailURL)
+		p.UpdatedAt = utime.TimeToTimestamptz(m.Twitch.UpdateAt)
 		p.IsDeleted = m.Twitch.IsDeleted
 	} else if m.TwitCasting.ID != "" {
 		p.ID = m.ID
@@ -296,6 +331,7 @@ func ChannelModelToCreateChannelParams(m *model.Channel) db_sqlc.CreateChannelPa
 		p.HiddenSubscriberCount = false
 		p.TotalVideoCount = int32(m.TwitCasting.TotalVideoCount)
 		p.ThumbnailUrl = string(m.TwitCasting.ThumbnailURL)
+		p.UpdatedAt = utime.TimeToTimestamptz(m.TwitCasting.UpdateAt)
 		p.IsDeleted = m.TwitCasting.IsDeleted
 	} else if m.Niconico.ID != "" {
 		p.ID = m.ID
@@ -309,6 +345,7 @@ func ChannelModelToCreateChannelParams(m *model.Channel) db_sqlc.CreateChannelPa
 		p.HiddenSubscriberCount = false
 		p.TotalVideoCount = int32(m.Niconico.TotalVideoCount)
 		p.ThumbnailUrl = string(m.Niconico.ThumbnailURL)
+		p.UpdatedAt = utime.TimeToTimestamptz(m.Niconico.UpdateAt)
 		p.IsDeleted = m.Niconico.IsDeleted
 	}
 	return p

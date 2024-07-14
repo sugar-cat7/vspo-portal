@@ -26,6 +26,7 @@ type ChannelSnippet struct {
 	TotalViewCount  int
 	SubscriberCount int
 	TotalVideoCount int
+	UpdateAt        time.Time
 	IsDeleted       bool
 }
 
@@ -45,16 +46,19 @@ func (cs Channels) RetrieveYoutubeIDs() []string {
 func (cs Channels) FilterUpdateTarget(comparisonChannels Channels) Channels {
 	return lo.Filter(cs, func(newChannel *Channel, _ int) bool {
 		// Check if the deleted channel is included in the existing channels
-		return !lo.SomeBy(comparisonChannels, func(channel *Channel) bool {
+		return lo.SomeBy(comparisonChannels, func(channel *Channel) bool {
 			if channel.Youtube.ID == newChannel.Youtube.ID {
-				if channel.Youtube.Description == newChannel.Youtube.Description {
-					return false
-				}
 				if channel.Youtube.IsDeleted {
 					return false
 				}
+				if channel.Youtube.Name != newChannel.Youtube.Name {
+					return true
+				}
+				if channel.Youtube.ThumbnailURL != newChannel.Youtube.ThumbnailURL {
+					return true
+				}
 			}
-			return true
+			return false
 		})
 	})
 }
