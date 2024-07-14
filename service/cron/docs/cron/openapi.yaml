@@ -165,6 +165,64 @@ paths:
                 $ref: '#/components/schemas/CronResponse'
       security:
         - bearerAuth: []
+  /api/cron/channels:
+    get:
+      tags:
+        - Channels
+      summary: Update Channels
+      description: Update channels
+      parameters:
+        - name: platform_type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [youtube, twitch, twitcasting, niconico]
+      responses:
+        "200":
+          description: Videos updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+      security:
+        - bearerAuth: []
   /api/ping:
     get:
       summary: Ping endpoint

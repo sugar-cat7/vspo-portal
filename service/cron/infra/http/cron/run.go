@@ -33,6 +33,7 @@ func Run(w http.ResponseWriter, r *http.Request) {
 		NewHandler(
 			d.CreatorInteractor,
 			d.VideosInteractor,
+			d.ChannelInteractor,
 		),
 		NewSecurityHandler(e),
 		cron.WithMiddleware(),

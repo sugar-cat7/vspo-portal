@@ -4,14 +4,14 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/cron/usecase"
 )
 
-// CH is Handler implementation.
-type CH struct {
+// CR is Handler implementation.
+type CR struct {
 	creatorInteractor usecase.CreatorInteractor
 }
 
 // NewHandler returns a new instance of a creator handler.
-func NewHandler(creatorInteractor usecase.CreatorInteractor) CH {
-	return CH{
+func NewHandler(creatorInteractor usecase.CreatorInteractor) CR {
+	return CR{
 		creatorInteractor: creatorInteractor,
 	}
 }

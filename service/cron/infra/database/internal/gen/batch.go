@@ -19,11 +19,11 @@ var (
 
 const createChannel = `-- name: CreateChannel :batchone
 INSERT INTO channel (
-    id, platform_channel_id, creator_id, platform_type, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, is_deleted
+    id, platform_channel_id, creator_id, platform_type, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, updated_at, is_deleted
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14
 )
-RETURNING id, platform_channel_id, creator_id, platform_type, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, is_deleted
+RETURNING id, platform_channel_id, creator_id, platform_type, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, updated_at, is_deleted
 `
 
 type CreateChannelBatchResults struct {
@@ -45,6 +45,7 @@ type CreateChannelParams struct {
 	HiddenSubscriberCount bool
 	TotalVideoCount       int32
 	ThumbnailUrl          string
+	UpdatedAt             pgtype.Timestamptz
 	IsDeleted             bool
 }
 
@@ -64,6 +65,7 @@ func (q *Queries) CreateChannel(ctx context.Context, arg []CreateChannelParams) 
 			a.HiddenSubscriberCount,
 			a.TotalVideoCount,
 			a.ThumbnailUrl,
+			a.UpdatedAt,
 			a.IsDeleted,
 		}
 		batch.Queue(createChannel, vals...)
@@ -96,6 +98,7 @@ func (b *CreateChannelBatchResults) QueryRow(f func(int, Channel, error)) {
 			&i.HiddenSubscriberCount,
 			&i.TotalVideoCount,
 			&i.ThumbnailUrl,
+			&i.UpdatedAt,
 			&i.IsDeleted,
 		)
 		if f != nil {
