@@ -18,6 +18,7 @@ func twVideoToVideo(twVideo twitch.Video) *model.Video {
 		CreatorInfo: model.CreatorInfo{
 			ChannelID: twVideo.UserID,
 		},
+		StartedAt: &twVideo.PublishedAt,
 	}
 
 	return m
