@@ -4,12 +4,6 @@
   margin: 0;
 }
 
-html,
-body {
-  height: 100%;
-  overflow-x: hidden;
-}
-
 body {
   position: relative;
 }

@@ -51,6 +51,9 @@ const nextConfig = {
     ],
   },
   i18n,
+  experimental: {
+    scrollRestoration: true,
+  },
   async redirects() {
     return [
       {
