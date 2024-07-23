@@ -1,7 +1,7 @@
-import { memberNames } from "@/data/members";
+import { members } from "@/data/members";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
 import { RelatedProps, fetcher } from "@/lib/api";
-import { formatDate } from "@/lib/utils";
+import { formatDate, isRelevantMember } from "@/lib/utils";
 import { Clip, Livestream, Video } from "@/types/streaming";
 import {
   Card,
@@ -103,7 +103,7 @@ const getRelatedVideos = (
 
   const relatedMemberClip = relatedVideos.clips.filter((c) => {
     if (
-      memberNames.find((m) => c.title.includes(m.replace(" ", ""))) &&
+      members.some((member) => isRelevantMember(member, c.title)) &&
       !clipIdSet.has(c.id)
     ) {
       clipIdSet.add(c.id);

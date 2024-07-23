@@ -5,10 +5,13 @@ import { useRouter } from "next/router";
 import { NextPageWithLayout } from "../../_app";
 import { VspoEvent } from "@/types/events";
 import { TweetEmbed } from "@/components/Elements";
-import { formatDate, generateStaticPathsForLocales } from "@/lib/utils";
+import {
+  formatDate,
+  generateStaticPathsForLocales,
+  getRelevantMembers,
+} from "@/lib/utils";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ContentLayout } from "@/components/Layout";
-import { members } from "@/data/members";
 import { fetchEvents } from "@/lib/api";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -132,20 +135,9 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
               { localeCode: locale, timeZone },
             )}
           </Typography>
-          {members.map((member, index) => {
-            const isMatch = member.keywords.some((keyword) =>
-              event.contentSummary.includes(keyword),
-            );
-            return (
-              isMatch && (
-                <StyledAvatar
-                  key={index}
-                  alt={member.name}
-                  src={member.iconUrl}
-                />
-              )
-            );
-          })}
+          {getRelevantMembers(event.contentSummary).map((member, index) => (
+            <StyledAvatar key={index} alt={member.name} src={member.iconUrl} />
+          ))}
         </Box>
         <Box sx={{ marginBottom: "20px" }}>
           {event.contentSummary.split("\n").map((line, index) => {

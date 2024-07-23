@@ -299,5 +299,3 @@ export const members: Member[] = [
     keywords: ["Riko Solari", "Riko", "Solari", "ソラリリコ", "ソラリ リコ"],
   },
 ];
-
-export const memberNames = members.map(({ name }) => name);
