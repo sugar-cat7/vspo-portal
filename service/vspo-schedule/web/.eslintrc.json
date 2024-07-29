@@ -6,6 +6,7 @@
     "eslint:recommended",
     "next/core-web-vitals"
   ],
+  "ignorePatterns": ["node_modules/", ".next/", "out/", "internal"],
   "rules": {
     // Allow but flag full-width whitespace
     "no-irregular-whitespace": "warn",
