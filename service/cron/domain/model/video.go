@@ -91,3 +91,39 @@ func (vs Videos) FilterCreator(cs Creators) Videos {
 		}), video.CreatorInfo.ChannelID)
 	})
 }
+
+// UpdateVideos updates existing videos with new videos information and returns the updated list of videos.
+func (vs *Videos) UpdateVideos(newVideos Videos, videoType VideoType) Videos {
+	existingVideoMap := make(map[string]*Video)
+
+	for _, ev := range *vs {
+		existingVideoMap[ev.ID] = ev
+	}
+
+	var targetVideos Videos
+	for _, newVideo := range newVideos {
+		// validate
+		if newVideo.CreatorInfo.ChannelID == "" {
+			continue
+		}
+		if newVideo.VideoType == "" {
+			newVideo.VideoType = videoType
+		}
+		if existingVideo, exists := existingVideoMap[newVideo.ID]; exists {
+			// Check for updates
+			if existingVideo.Status != newVideo.Status ||
+				existingVideo.StartedAt != newVideo.StartedAt ||
+				existingVideo.EndedAt != newVideo.EndedAt ||
+				existingVideo.Title != newVideo.Title ||
+				existingVideo.ThumbnailURL != newVideo.ThumbnailURL {
+				targetVideos = append(targetVideos, newVideo)
+			}
+			delete(existingVideoMap, newVideo.ID)
+		} else {
+			// Add new video
+			targetVideos = append(targetVideos, newVideo)
+		}
+	}
+
+	return targetVideos
+}

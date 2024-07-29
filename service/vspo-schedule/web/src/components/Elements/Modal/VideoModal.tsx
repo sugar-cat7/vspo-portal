@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -298,6 +298,11 @@ export const VideoModal: React.FC = () => {
   const router = useRouter();
   const { activeVideo, popVideo, clearVideos } = useVideoModalContext();
   const { t } = useTranslation("common");
+
+  //Clear video modal on url changes
+  useEffect(() => {
+    clearVideos();
+  }, [router]);
 
   return (
     <Dialog open={activeVideo !== undefined} fullScreen>

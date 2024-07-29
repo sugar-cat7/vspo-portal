@@ -9,6 +9,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/cron/domain/repository"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/database"
 	repo "github.com/sugar-cat7/vspo-portal/service/cron/infra/database/repository"
+	migration "github.com/sugar-cat7/vspo-portal/service/cron/infra/database/schema"
 	"github.com/sugar-cat7/vspo-portal/service/cron/infra/environment"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -63,7 +64,7 @@ func SetupRepo(ctx context.Context) setupTx {
 		panic(err)
 	}
 
-	RunUp(
+	migration.RunUp(
 		fmt.Sprintf("%s:%s", host, port.Port()),
 		e.DatabaseEnvironment.DBUser,
 		e.DatabaseEnvironment.DBPassword,

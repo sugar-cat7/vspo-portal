@@ -15,6 +15,71 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
+// APICronChannelsGetParams is parameters of GET /api/cron/channels operation.
+type APICronChannelsGetParams struct {
+	PlatformType APICronChannelsGetPlatformType
+}
+
+func unpackAPICronChannelsGetParams(packed middleware.Parameters) (params APICronChannelsGetParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "platform_type",
+			In:   "query",
+		}
+		params.PlatformType = packed[key].(APICronChannelsGetPlatformType)
+	}
+	return params
+}
+
+func decodeAPICronChannelsGetParams(args [0]string, argsEscaped bool, r *http.Request) (params APICronChannelsGetParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: platform_type.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "platform_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.PlatformType = APICronChannelsGetPlatformType(c)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := params.PlatformType.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "platform_type",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // APICronCreatorsGetParams is parameters of GET /api/cron/creators operation.
 type APICronCreatorsGetParams struct {
 	// Comma-separated list of video platform types.

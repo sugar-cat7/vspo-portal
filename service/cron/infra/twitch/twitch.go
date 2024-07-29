@@ -80,7 +80,7 @@ func (s *twitchServiceImpl) GetVideos(ctx context.Context, param doamin_twitch.T
 	var videos model.Videos
 	// Past videos
 	for _, userID := range param.UserIDs {
-		video, err := s.service.client.Videos.List().UserID(userID).Do(ctx, twitch.WithBearerToken(token))
+		video, err := s.service.client.Videos.List().UserID(userID).Type("archive").Do(ctx, twitch.WithBearerToken(token))
 		if err != nil {
 			return nil, err
 		}

@@ -110,33 +110,8 @@ func (i *videoInteractor) BatchDeleteInsert(
 			if err != nil {
 				return err
 			}
-			// 2. Compare video information with the same ID in existing and new ones
-			existingVideoMap := make(map[string]*model.Video)
 
-			for _, ev := range existingVideos {
-				existingVideoMap[ev.ID] = ev
-			}
-
-			var targetVideo model.Videos
-			for _, newVideo := range uvs {
-				// validate
-				if newVideo.CreatorInfo.ChannelID == "" {
-					continue
-				}
-				if newVideo.VideoType == "" {
-					newVideo.VideoType = videoType
-				}
-				if existingVideo, exists := existingVideoMap[newVideo.ID]; exists {
-					// 3. If there is an update to the video information and status with the same ID, update it
-					if existingVideo.Status != newVideo.Status {
-						targetVideo = append(targetVideo, newVideo)
-					}
-					delete(existingVideoMap, newVideo.ID)
-				} else {
-					// 4. Add new video information
-					targetVideo = append(targetVideo, newVideo)
-				}
-			}
+			targetVideo := existingVideos.UpdateVideos(uvs, videoType)
 
 			if len(targetVideo) == 0 {
 				return nil
@@ -240,8 +215,7 @@ func (i *videoInteractor) ytVideos(
 	switch vt {
 	case model.VideoTypeVspoBroadcast:
 		queries := []youtube.SearchQuery{youtube.SearchQueryVspoJp, youtube.SearchQueryVspoEn}
-		eventTypes := []youtube.EventType{youtube.EventTypeLive, youtube.EventTypeUpcoming}
-		var vs model.Videos
+		eventTypes := []youtube.EventType{youtube.EventTypeLive, youtube.EventTypeUpcoming, youtube.EventTypeCompleted}
 		for _, query := range queries {
 			for _, eventType := range eventTypes {
 				result, err := i.youtubeClient.SearchVideos(ctx, youtube.SearchVideosParam{
@@ -254,6 +228,7 @@ func (i *videoInteractor) ytVideos(
 				vs = append(vs, result...)
 			}
 		}
+
 		err := i.transactable.RWTx(
 			ctx,
 			func(ctx context.Context) error {

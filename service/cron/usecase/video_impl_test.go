@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	mock_twitcasting "github.com/sugar-cat7/vspo-portal/service/cron/domain/twitcasting/mock"
 	mock_twitch "github.com/sugar-cat7/vspo-portal/service/cron/domain/twitch/mock"
-	"github.com/sugar-cat7/vspo-portal/service/cron/domain/youtube"
 	mock_youtube "github.com/sugar-cat7/vspo-portal/service/cron/domain/youtube/mock"
 	"github.com/sugar-cat7/vspo-portal/service/cron/test/testdata"
 	"github.com/sugar-cat7/vspo-portal/service/cron/test/testhelpers"
@@ -30,7 +29,7 @@ func Test_BatchDeleteInsert(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "success_fetch_vspo_broadcast_youtube_live_ and_upcoming",
+			name: "success_fetch_vspo_broadcast_youtube_live_ and_upcoming_achieve",
 			args: args{
 				ctx: context.Background(),
 				param: &input.UpsertVideos{
@@ -43,26 +42,14 @@ func Test_BatchDeleteInsert(t *testing.T) {
 				r := testhelpers.SetupRepo(ctx)
 				yt := mock_youtube.NewMockYoutubeClient(ctrl)
 				f1 := testdata.NewVspoFactory()
-				f2 := testdata.NewVspoFactory()
-				// live
-				yt.EXPECT().SearchVideos(gomock.Any(), youtube.SearchVideosParam{
-					SearchQuery: youtube.SearchQueryVspoJp,
-					EventType:   youtube.EventTypeLive,
-				}).Return(f1.VspoYtVs, nil)
-				// upcoming
-				yt.EXPECT().SearchVideos(gomock.Any(), youtube.SearchVideosParam{
-					SearchQuery: youtube.SearchQueryVspoJp,
-					EventType:   youtube.EventTypeUpcoming,
-				}).Return(f2.VspoYtVs, nil)
-				yt.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(append(f1.VspoYtVs, f2.VspoYtVs...), nil)
-
+				// all return 5 videos
+				yt.EXPECT().SearchVideos(gomock.Any(), gomock.Any()).Return(f1.VspoYtVs, nil).Times(6)
+				yt.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f1.VspoYtVs, nil)
 				tw := mock_twitch.NewMockTwitchClient(ctrl)
-				// tw.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f.TwitchVs, nil)
 				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
-				// twi.EXPECT().GetVideos(ctx, gomock.Any()).Return(f.TwitcastingVs, nil)
 				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
 			},
-			want:    10,
+			want:    5,
 			wantErr: false,
 		},
 		{
@@ -123,25 +110,15 @@ func Test_BatchDeleteInsert(t *testing.T) {
 				r := testhelpers.SetupRepo(ctx)
 				yt := mock_youtube.NewMockYoutubeClient(ctrl)
 				f1 := testdata.NewVspoFactory()
-				f2 := testdata.NewVspoFactory()
-				// live
-				yt.EXPECT().SearchVideos(gomock.Any(), youtube.SearchVideosParam{
-					SearchQuery: youtube.SearchQueryVspoJp,
-					EventType:   youtube.EventTypeLive,
-				}).Return(f1.VspoYtVs, nil)
-				// upcoming
-				yt.EXPECT().SearchVideos(gomock.Any(), youtube.SearchVideosParam{
-					SearchQuery: youtube.SearchQueryVspoJp,
-					EventType:   youtube.EventTypeUpcoming,
-				}).Return(f2.VspoYtVs, nil)
-				yt.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(append(f1.VspoYtVs, f2.VspoYtVs...), nil)
+				yt.EXPECT().SearchVideos(gomock.Any(), gomock.Any()).Return(f1.VspoYtVs, nil).Times(6)
+				yt.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f1.VspoYtVs, nil)
 				tw := mock_twitch.NewMockTwitchClient(ctrl)
 				tw.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f1.VspoTwitchVs, nil)
 				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
 				twi.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f1.VspoTwitcastingVs, nil)
 				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
 			},
-			want:    20,
+			want:    15,
 			wantErr: false,
 		},
 	}

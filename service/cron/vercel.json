@@ -12,6 +12,10 @@
         {
             "path": "/api/cron/videos?platform_type=twitcasting,twitch,youtube&period=week&video_type=vspo_broadcast",
             "schedule": "*/5 * * * *"
+        },
+        {
+            "path": "/api/cron/channels?platform_type=youtube",
+            "schedule": "0 */12 * * *"
         }
     ],
     "functions": {

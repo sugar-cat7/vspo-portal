@@ -45,6 +45,8 @@ func (t EventType) String() string {
 }
 
 const (
-	EventTypeLive     = "live"
-	EventTypeUpcoming = "upcoming"
+	EventTypeLive      = "live"
+	EventTypeUpcoming  = "upcoming"
+	EventTypeNone      = "none"
+	EventTypeCompleted = "completed"
 )

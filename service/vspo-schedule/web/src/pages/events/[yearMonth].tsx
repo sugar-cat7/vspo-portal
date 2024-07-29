@@ -298,7 +298,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                     variant="h6"
                     sx={{
                       marginLeft: matches ? "30px" : "0px",
-                      width: "100px",
+                      width: matches ? "130px" : "100px",
                     }}
                   >
                     {formatDate(date, "MM/dd (E)", {

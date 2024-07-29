@@ -7,7 +7,7 @@ import (
 )
 
 // APICronCreatorsGet is ...
-func (h *CH) APICronCreatorsGet(ctx context.Context, req api.APICronCreatorsGetParams) (api.APICronCreatorsGetRes, error) {
+func (h *CR) APICronCreatorsGet(ctx context.Context, req api.APICronCreatorsGetParams) (api.APICronCreatorsGetRes, error) {
 	return nil, nil
 	// err := h.creatorInteractor.BatchUpdate(
 	// 	ctx,

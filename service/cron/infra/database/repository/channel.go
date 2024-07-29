@@ -55,3 +55,38 @@ func (r *channel) Exist(
 	}
 	return b, nil
 }
+
+func (r *channel) Update(
+	ctx context.Context,
+	m *model.Channel,
+) (*model.Channel, error) {
+	c, err := database.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ch, err := c.Queries.UpdateChannel(ctx, dto.ChannelModelToUpdateChannelParams(m))
+
+	if err != nil {
+		return nil, err
+	}
+	return dto.ChannelToModel(&ch), nil
+}
+
+func (r *channel) List(
+	ctx context.Context,
+	q repository.ListChannelQuery,
+) (model.Channels, error) {
+	c, err := database.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	chs, err := c.Queries.GetChannelsByParams(ctx, db_sqlc.GetChannelsByParamsParams{
+		PlatformType: q.PlatformType,
+		Offset:       int32(q.Page.Uint64) * int32(q.Limit.Uint64),
+		Limit:        int32(q.Limit.Uint64),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return dto.ChannelsToModel(chs), nil
+}

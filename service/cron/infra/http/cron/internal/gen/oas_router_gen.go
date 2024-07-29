@@ -72,24 +72,60 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					break
 				}
 				switch elem[0] {
-				case 'c': // Prefix: "creators"
+				case 'c': // Prefix: "c"
 					origElem := elem
-					if l := len("creators"); len(elem) >= l && elem[0:l] == "creators" {
+					if l := len("c"); len(elem) >= l && elem[0:l] == "c" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						// Leaf node.
-						switch r.Method {
-						case "GET":
-							s.handleAPICronCreatorsGetRequest([0]string{}, elemIsEscaped, w, r)
-						default:
-							s.notAllowed(w, r, "GET")
+						break
+					}
+					switch elem[0] {
+					case 'h': // Prefix: "hannels"
+						origElem := elem
+						if l := len("hannels"); len(elem) >= l && elem[0:l] == "hannels" {
+							elem = elem[l:]
+						} else {
+							break
 						}
 
-						return
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleAPICronChannelsGetRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
+					case 'r': // Prefix: "reators"
+						origElem := elem
+						if l := len("reators"); len(elem) >= l && elem[0:l] == "reators" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleAPICronCreatorsGetRequest([0]string{}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, "GET")
+							}
+
+							return
+						}
+
+						elem = origElem
 					}
 
 					elem = origElem
@@ -245,28 +281,68 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					break
 				}
 				switch elem[0] {
-				case 'c': // Prefix: "creators"
+				case 'c': // Prefix: "c"
 					origElem := elem
-					if l := len("creators"); len(elem) >= l && elem[0:l] == "creators" {
+					if l := len("c"); len(elem) >= l && elem[0:l] == "c" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
 					if len(elem) == 0 {
-						// Leaf node.
-						switch method {
-						case "GET":
-							r.name = "APICronCreatorsGet"
-							r.summary = "Upsert Channel(Youtube/Twitch/Twitcasting)"
-							r.operationID = ""
-							r.pathPattern = "/api/cron/creators"
-							r.args = args
-							r.count = 0
-							return r, true
-						default:
-							return
+						break
+					}
+					switch elem[0] {
+					case 'h': // Prefix: "hannels"
+						origElem := elem
+						if l := len("hannels"); len(elem) >= l && elem[0:l] == "hannels" {
+							elem = elem[l:]
+						} else {
+							break
 						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = "APICronChannelsGet"
+								r.summary = "Update Channels"
+								r.operationID = ""
+								r.pathPattern = "/api/cron/channels"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
+					case 'r': // Prefix: "reators"
+						origElem := elem
+						if l := len("reators"); len(elem) >= l && elem[0:l] == "reators" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = "APICronCreatorsGet"
+								r.summary = "Upsert Channel(Youtube/Twitch/Twitcasting)"
+								r.operationID = ""
+								r.pathPattern = "/api/cron/creators"
+								r.args = args
+								r.count = 0
+								return r, true
+							default:
+								return
+							}
+						}
+
+						elem = origElem
 					}
 
 					elem = origElem

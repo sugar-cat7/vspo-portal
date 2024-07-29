@@ -13,6 +13,15 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
+// APICronChannelsGet implements GET /api/cron/channels operation.
+//
+// Update channels.
+//
+// GET /api/cron/channels
+func (UnimplementedHandler) APICronChannelsGet(ctx context.Context, params APICronChannelsGetParams) (r APICronChannelsGetRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // APICronCreatorsGet implements GET /api/cron/creators operation.
 //
 // Creates creators by fetching from Youtube using provided Channel IDs.
