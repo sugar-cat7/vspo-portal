@@ -5,13 +5,13 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/service/vspo-schedule/web/"
-    schedule:
-      interval: "monthly"
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+  # - package-ecosystem: "npm"
+  #   directory: "/service/vspo-schedule/web/"
+  #   schedule:
+  #     interval: "monthly"
+  #   ignore:
+  #     - dependency-name: "*"
+  #       update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "gomod"
     directory: "/service/cron/"
