@@ -1,31 +1,42 @@
+import { getCache, createCache } from './pkg/cache';
 import { App, AppContext } from './pkg/hono';
 import { videoProcessor, eventProcessor } from './pkg/processor';
 import { translateText } from './pkg/translator';
 
+
 export const registerOldAPIProxyRoutes = (app: App) => {
     app.get('*', async (c: AppContext) => {
-        const response = await fetch(c.get('requestUrl'), { ...c.req.raw, headers: c.req.header() });
-        const data = await response.json();
-        // Event...
-        if (c.req.path.includes('events')) {
-            const translatedData = await eventProcessor(c, data);
-            return c.json(translatedData);
+        const { kv } = c.get('services');
+        const requestUrl = c.get('requestUrl');
+        const { cache, isExpired } = await getCache(kv, requestUrl);
+
+        if (cache && !isExpired) {
+            const data = JSON.parse(cache);
+            return c.json(data);
         }
 
-        // Livestream, freechat, clip.....
-        const translatedData = await videoProcessor(c, data);
+        const response = await fetch(requestUrl, { ...c.req.raw, headers: c.req.header() });
+        const data = await response.json();
 
-        // background translation
-        c.executionCtx.waitUntil(
-            Promise.all(
-                translatedData
-                    .filter(item => !item.titleTranslated)
-                    .map(item =>
-                        translateText(c, item.title, c.req.query('lang') || 'ja', item.id)
-                    )
-            )
-        );
-        // Return the translated data
+        let translatedData;
+        if (c.req.path.includes('events')) {
+            translatedData = await eventProcessor(c, data);
+        } else {
+            translatedData = await videoProcessor(c, data);
+            c.executionCtx.waitUntil(
+                Promise.all(
+                    translatedData
+                        .filter(item => !item.titleTranslated)
+                        .map(item => translateText(c, item.title, c.req.query('lang') || 'ja', item.id))
+                )
+            );
+        }
+
+        // Cache the translated data if it is expired or not found
+        if (isExpired || !cache) {
+            c.executionCtx.waitUntil(createCache(kv, requestUrl, JSON.stringify(translatedData), 60));
+        }
+
         return c.json(translatedData);
     });
-}
+};
