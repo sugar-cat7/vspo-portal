@@ -8,10 +8,7 @@ const app = newApp();
 app.notFound((c) => {
     return c.text('Not Found', 404)
 })
-app.use("*", init(), cache({
-    cacheName: 'vspo-proxy-cache',
-    cacheControl: 'max-age=30',
-}))
+app.use("*", init())
 
 registerOldAPIProxyRoutes(app)
 
