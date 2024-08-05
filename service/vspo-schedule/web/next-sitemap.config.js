@@ -7,16 +7,11 @@ module.exports = {
   robotsTxtOptions: {
     additionalSitemaps: ["https://www.vspo-schedule.com/sitemap.xml"],
   },
+  additionalPaths: async () => {
+    const schedulePaths = await generateSchedulePaths();
+    return [...schedulePaths];
+  },
   transform: (config, path) => {
-    if (path.startsWith("/schedule") && path !== "/schedule/all") {
-      return null;
-    }
-    if (path.startsWith("/ja/schedule") && path !== "/ja/schedule/all") {
-      return null;
-    }
-    if (path.startsWith("/en/schedule") && path !== "/en/schedule/all") {
-      return null;
-    }
     return {
       loc: path,
       lastmod: config.autoLastmod ? new Date().toISOString() : undefined,
@@ -24,4 +19,21 @@ module.exports = {
       priority: config.priority,
     };
   },
+};
+
+const generateSchedulePaths = async () => {
+  return [
+    {
+      loc: '/schedule/all',
+      changefreq: 'daily',
+      priority: 0.8,
+      lastmod: new Date().toISOString(),
+    },
+    {
+      loc: '/en/schedule/all',
+      changefreq: 'daily',
+      priority: 0.8,
+      lastmod: new Date().toISOString(),
+    },
+  ];
 };

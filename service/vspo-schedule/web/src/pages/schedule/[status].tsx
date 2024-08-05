@@ -1,14 +1,13 @@
 import React from "react";
 import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { GetServerSideProps } from "next";
 import { Livestream } from "@/types/streaming";
 import {
   groupBy,
   isValidDate,
   formatDate,
   getInitializedI18nInstance,
-  generateStaticPathsForLocales,
   getOneWeekRange,
   localeTimeZoneMap,
 } from "@/lib/utils";
@@ -131,34 +130,10 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   );
 };
 
-// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
-export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
-  const statusPaths = ["all", "live", "upcoming", "archive"].map((status) => ({
-    params: { status },
-  }));
-
-  const datePaths = [];
-
-  const currentDate = getCurrentUTCDate();
-  const numberOfDays = 6;
-  for (let i = -numberOfDays; i <= numberOfDays; i++) {
-    const newDate = convertToUTCDate(currentDate);
-    newDate.setDate(currentDate.getDate() + i);
-    const formattedDate = formatDate(newDate, "yyyy-MM-dd");
-    datePaths.push({ params: { status: formattedDate } });
-  }
-
-  const paths = generateStaticPathsForLocales(
-    [...statusPaths, ...datePaths],
-    locales,
-  );
-  return { paths, fallback: true };
-};
-
-export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
-  params,
-  locale = DEFAULT_LOCALE,
-}) => {
+export const getServerSideProps: GetServerSideProps<
+  LivestreamsProps,
+  Params
+> = async ({ params, locale = DEFAULT_LOCALE }) => {
   if (!params) {
     return {
       notFound: true,
@@ -370,7 +345,6 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
     const lastUpdateDate = formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
       localeCode: locale,
     });
-    const revalidateWindow = 60;
 
     return {
       props: {
@@ -390,10 +364,9 @@ export const getStaticProps: GetStaticProps<LivestreamsProps, Params> = async ({
           description: description,
         },
       },
-      revalidate: revalidateWindow,
     };
   } catch (error) {
-    console.error("Error in getStaticProps:", error);
+    console.error("Error in getServerSideProps:", error);
     return {
       notFound: true,
     };
