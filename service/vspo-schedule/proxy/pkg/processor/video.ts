@@ -37,13 +37,13 @@ export const videoProcessor = async (c: AppContext, data: any) => {
             return {
                 ...item,
                 ...parsedKvData,
-                titleTranslated: parsedKvData.title
+                isTitleTranslated: true
             };
         }
 
         return {
             ...item,
-            titleTranslated: null
+            isTitleTranslated: false
         };
     }));
     return translatedData
