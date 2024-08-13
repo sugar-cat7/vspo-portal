@@ -25,7 +25,7 @@ export const translateText = async (c: AppContext, text: string, targetLang: str
     id: string;
     translatedText: string;
 }> => {
-    const { logger } = c.get('services')
+    const { logger, kv } = c.get('services')
     const parseResult = TargetLangSchema.safeParse(targetLang);
     if (!parseResult.success) {
         logger.error('Invalid target language:', { targetLang });
@@ -44,6 +44,15 @@ export const translateText = async (c: AppContext, text: string, targetLang: str
         return {
             id: uniqueId,
             translatedText: text
+        };
+    }
+
+    const d = await kv?.get(`${uniqueId}_${targetLang}`)
+    if (d) {
+        const parsedData = JSON.parse(d);
+        return {
+            id: uniqueId,
+            translatedText: parsedData.title
         };
     }
 
@@ -76,7 +85,6 @@ export const translateText = async (c: AppContext, text: string, targetLang: str
         };
     }
 
-    const { kv } = c.get('services');
     await kv?.put(`${uniqueId}_${targetLang}`, JSON.stringify({
         title: r.data.content,
     }));
