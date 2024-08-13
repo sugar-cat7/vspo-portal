@@ -26,7 +26,7 @@ export const registerOldAPIProxyRoutes = (app: App) => {
             c.executionCtx.waitUntil(
                 Promise.all(
                     translatedData
-                        .filter(item => !item.titleTranslated)
+                        .filter(item => !item.isTitleTranslated)
                         .map(item => translateText(c, item.title, c.req.query('lang') || 'ja', item.id))
                 )
             );
