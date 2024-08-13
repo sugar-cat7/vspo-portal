@@ -13,7 +13,10 @@ export const zEnv = z.object({
     SERVICE_NAME: z.string(),
     API_BASE_URL: z.string(),
     APP_KV: z.custom<KVNamespace>(),
-    TRANSLATE_URL: z.string(),
+    OPENAI_ORGANIZATION: z.string(),
+    OPENAI_PROJECT: z.string(),
+    OPENAI_API_KEY: z.string(),
+    OPENAI_BASE_URL: z.string(),
 });
 
 export type Env = z.infer<typeof zEnv>;
