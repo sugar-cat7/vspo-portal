@@ -33,7 +33,6 @@ export function init(): MiddlewareHandler<HonoEnv> {
         const url = new URL(c.req.url);
         const requestUrl = `${envResult.data.API_BASE_URL}${url.pathname}${url.search}`;
         c.set("requestUrl", requestUrl);
-        c.set("translateUrl", envResult.data.TRANSLATE_URL);
         c.set("apiKey", apiKey);
         logger.info(`[Request started]: ${requestUrl}`);
         await next();

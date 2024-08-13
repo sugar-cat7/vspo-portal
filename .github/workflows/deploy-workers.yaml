@@ -25,8 +25,15 @@ jobs:
           environment: production
           command: deploy --env production
           secrets: |
-            TRANSLATE_URL
+            OPENAI_ORGANIZATION
+            OPENAI_PROJECT
+            OPENAI_API_KEY
+            OPENAI_BASE_URL
             API_BASE_URL
+
         env:
-          TRANSLATE_URL: ${{ secrets.TRANSLATE_URL }}
+          OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
+          OPENAI_PROJECT: ${{ secrets.OPENAI_PROJECT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
