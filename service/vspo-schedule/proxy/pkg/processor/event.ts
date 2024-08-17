@@ -21,11 +21,11 @@ export const eventProcessor = async (c: AppContext, data: any) => {
         const kvKey = `${item.newsId}_${lang}`;
         let kvData: string | null = await kv?.get(kvKey);
         if (!kvData) {
-            const translatedTitle = await translateText(c, item.title, lang, item.newsId);
+            const r = await translateText(c, item.title, lang, item.newsId);
             // const translatedContentSummary = await translateText(c, item.contentSummary, lang);
 
             const kvObject = {
-                title: translatedTitle,
+                title: r.translatedText,
                 // contentSummary: translatedContentSummary,
             };
 
