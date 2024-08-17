@@ -75,7 +75,7 @@ export const translateText = async (c: AppContext, text: string, targetLang: str
         response_format: { type: "json_object" },
     });
 
-    const response = chatCompletion.choices[0].message;
+    const response = chatCompletion.choices[0].message?.content;
     const r = openAIResponseSchema.safeParse(response);
     if (!r.success) {
         logger.error('Invalid OpenAI response:', { response });
