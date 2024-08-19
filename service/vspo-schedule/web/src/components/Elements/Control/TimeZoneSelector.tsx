@@ -10,13 +10,15 @@ export const TimeZoneSelector = () => {
   const { timeZone, setTimeZone } = useTimeZoneContext();
   const { t } = useTranslation("common");
 
-  const timeZones = Intl.supportedValuesOf("timeZone");
   const labels = useMemo(() => {
-    return timeZones.reduce<Record<string, React.ReactNode>>((acc, tz) => {
+    return Intl.supportedValuesOf("timeZone").reduce<
+      Record<string, React.ReactNode>
+    >((acc, tz) => {
       acc[tz] = getTimeZoneLabel(tz);
       return acc;
     }, {});
-  }, [timeZones]);
+  }, []);
+  const timeZones = Intl.supportedValuesOf("timeZone");
   const now = Date.now();
   const formattedTimeZoneOffsets = timeZones.reduce<Record<string, string>>(
     (acc, tz) => {
@@ -40,8 +42,13 @@ export const TimeZoneSelector = () => {
       )}
       value={timeZone}
       onChange={(event, newValue) => {
-        setTimeZone(newValue ?? timeZone);
-        router.replace(router.asPath, undefined, { scroll: false });
+        const value = newValue ?? timeZone;
+        setTimeZone(value);
+        if (
+          formattedTimeZoneOffsets[value] !== formattedTimeZoneOffsets[timeZone]
+        ) {
+          router.replace(router.asPath, undefined, { scroll: false });
+        }
       }}
       options={timeZones}
       filterOptions={(options, state) => {
