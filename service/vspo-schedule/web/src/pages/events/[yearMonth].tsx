@@ -44,7 +44,7 @@ type Params = {
 
 type Props = {
   events: VspoEvent[];
-  lastUpdateDate: string;
+  lastUpdateTimestamp: number;
   nextYearMonth?: string;
   beforeYearMonth?: string;
   currentYearMonth?: string;
@@ -187,7 +187,7 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     props: {
       ...translations,
       events: sortedData,
-      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm"),
+      lastUpdateTimestamp: getCurrentUTCDate().getTime(),
       beforeYearMonth: beforeYearMonth,
       nextYearMonth: nextYearMonth,
       currentYearMonth: yearMonth,
@@ -433,7 +433,7 @@ IndexPage.getLayout = (page, pageProps) => (
   <ContentLayout
     title={pageProps.meta?.title}
     description={pageProps.meta?.description}
-    lastUpdateDate={pageProps.lastUpdateDate}
+    lastUpdateTimestamp={pageProps.lastUpdateTimestamp}
     path={`/events/${pageProps.currentYearMonth}`}
     maxPageWidth="md"
   >

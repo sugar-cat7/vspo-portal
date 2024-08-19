@@ -40,7 +40,7 @@ type DateObject = {
 type LivestreamsProps = {
   livestreamsByDate: Record<string, Livestream[]>;
   eventsByDate: Record<string, VspoEvent[]>;
-  lastUpdateDate: string;
+  lastUpdateTimestamp: number;
   liveStatus: string;
   dateTabsInfo?: {
     tabDates: DateObject[];
@@ -342,16 +342,12 @@ export const getServerSideProps: GetServerSideProps<
       }
     });
 
-    const lastUpdateDate = formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
-      timeZone,
-    });
-
     return {
       props: {
         ...translations,
         livestreamsByDate,
         eventsByDate,
-        lastUpdateDate,
+        lastUpdateTimestamp: getCurrentUTCDate().getTime(),
         liveStatus: params.status,
         dateTabsInfo: {
           todayIndex,
@@ -361,7 +357,7 @@ export const getServerSideProps: GetServerSideProps<
         meta: {
           title,
           headTitle,
-          description: description,
+          description,
         },
       },
     };
@@ -377,7 +373,7 @@ HomePage.getLayout = (page, pageProps) => (
   <ContentLayout
     title={pageProps.meta?.title}
     description={pageProps.meta?.description}
-    lastUpdateDate={pageProps.lastUpdateDate}
+    lastUpdateTimestamp={pageProps.lastUpdateTimestamp}
     footerMessage={pageProps.footerMessage}
     headTitle={pageProps.meta?.headTitle}
     path={`/schedule/${pageProps.liveStatus}`}

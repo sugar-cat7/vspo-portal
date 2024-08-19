@@ -5,7 +5,7 @@ export const useCookie = (key: string, initialValue?: string) => {
 
   useEffect(() => {
     setValue(getCookie(key));
-  }, []);
+  }, [key]);
 
   const setCookie = (newValue: string | undefined) => {
     if (newValue === undefined) {

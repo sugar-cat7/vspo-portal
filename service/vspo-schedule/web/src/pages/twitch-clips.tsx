@@ -1,11 +1,7 @@
 import React, { useEffect } from "react";
 import { GetStaticProps } from "next";
 import { Clip } from "@/types/streaming";
-import {
-  filterByTimeframe,
-  formatDate,
-  getInitializedI18nInstance,
-} from "@/lib/utils";
+import { filterByTimeframe, getInitializedI18nInstance } from "@/lib/utils";
 import { Box } from "@mui/system";
 import { NextPageWithLayout } from "./_app";
 import { Loading, SearchDialog } from "@/components/Elements";
@@ -19,7 +15,7 @@ import { getCurrentUTCDate } from "@/lib/dayjs";
 
 type ClipsProps = {
   clips: Clip[];
-  lastUpdateDate: string;
+  lastUpdateTimestamp: number;
   meta: {
     title: string;
     description: string;
@@ -84,7 +80,7 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async ({
     props: {
       ...translations,
       clips,
-      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm"),
+      lastUpdateTimestamp: getCurrentUTCDate().getTime(),
       meta: {
         title: t("twitchClips.title"),
         description: t("twitchClips.description"),
@@ -98,7 +94,7 @@ TwitchClipPage.getLayout = (page, pageProps) => {
     <ContentLayout
       title={pageProps.meta.title}
       description={pageProps.meta.description}
-      lastUpdateDate={pageProps.lastUpdateDate}
+      lastUpdateTimestamp={pageProps.lastUpdateTimestamp}
       path="/twitch-clips"
     >
       {page}
