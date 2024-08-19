@@ -3,6 +3,7 @@ on:
   pull_request:
     branches: [main]
     paths:
+        - '.github/workflows/ci-vspo-schedule-web.yaml'
         - 'service/vspo-schedule/web/**'
 
 jobs:
@@ -22,7 +23,7 @@ jobs:
           version: 8.6.12
 
       - name: Download deps
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
       - name: Lint
         run: pnpm lint
