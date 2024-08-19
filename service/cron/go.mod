@@ -25,11 +25,11 @@ require (
 	go.opentelemetry.io/otel/trace v1.28.0
 	go.uber.org/mock v0.4.0
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8
-	google.golang.org/api v0.191.0
+	google.golang.org/api v0.192.0
 )
 
 require (
-	cloud.google.com/go/auth v0.7.3 // indirect
+	cloud.google.com/go/auth v0.8.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.3 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	dario.cat/mergo v1.0.0 // indirect
