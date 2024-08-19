@@ -25,6 +25,7 @@ import { DrawerIcon } from "../Icon";
 import { ThemeToggleButton } from "../Button";
 import { useTranslation } from "next-i18next";
 import { TimeZoneSelector } from "../Control";
+import { useTimeZoneContext } from "@/hooks";
 
 const drawerNavigationSections: NavSectionProps[] = [
   {
@@ -104,8 +105,9 @@ const NavSectionHeading: React.FC<{ text: string }> = ({ text }) => (
 
 const NavLink: React.FC<NavLinkProps> = ({ id, isBeta, supplementaryIcon }) => {
   const { t } = useTranslation("common");
+  const { timeZone } = useTimeZoneContext();
 
-  const { link, isExternalLink } = getNavigationRouteInfo(id);
+  const { link, isExternalLink } = getNavigationRouteInfo(id, timeZone);
   const buttonProps = isExternalLink
     ? { component: "a", target: "_blank", rel: "noopener noreferrer" }
     : { component: Link };
