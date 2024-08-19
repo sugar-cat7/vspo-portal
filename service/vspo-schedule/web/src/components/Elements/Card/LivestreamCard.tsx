@@ -6,7 +6,7 @@ import { Livestream } from "@/types/streaming";
 import { getLiveStatus, formatDate } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+import { useTimeZoneContext } from "@/hooks";
 import { VideoCard } from "./VideoCard";
 
 const ResponsiveTypography = styled(Typography)(({ theme }) => ({
@@ -63,8 +63,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
 }) => {
   const { t } = useTranslation("common");
   const theme = useTheme();
-  const router = useRouter();
-  const { locale } = router;
+  const { timeZone } = useTimeZoneContext();
   const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
     livestream;
   const livestreamStatus = useMemo(
@@ -114,10 +113,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
                   paddingRight: "3px",
                 }}
               >
-                {formatDate(scheduledStartTime, "HH:mm", {
-                  localeCode: locale,
-                })}
-                ~
+                {formatDate(scheduledStartTime, "HH:mm", { timeZone })}~
               </Typography>
               <PlatformIcon platform={platform} />
             </ResponsiveTypography>

@@ -80,9 +80,7 @@ export const getStaticProps: GetStaticProps<ClipsProps> = async ({
     props: {
       ...translations,
       clips: pastClips,
-      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
-        localeCode: locale,
-      }),
+      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm"),
       meta: {
         title: t("youtubeClips.title"),
         description: t("youtubeClips.description"),

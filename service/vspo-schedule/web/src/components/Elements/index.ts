@@ -2,6 +2,7 @@ export * from "./Button";
 export * from "./Card";
 export * from "./ChatEmbed";
 export * from "./Chip";
+export * from "./Control";
 export * from "./Dialog";
 export * from "./Drawer";
 export * from "./Google";

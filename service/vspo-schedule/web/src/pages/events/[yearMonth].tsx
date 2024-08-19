@@ -36,6 +36,7 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
+import { useTimeZoneContext } from "@/hooks";
 
 type Params = {
   yearMonth: string;
@@ -186,9 +187,7 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     props: {
       ...translations,
       events: sortedData,
-      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
-        localeCode: locale,
-      }),
+      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm"),
       beforeYearMonth: beforeYearMonth,
       nextYearMonth: nextYearMonth,
       currentYearMonth: yearMonth,
@@ -212,6 +211,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
   const todayEventRef = React.useRef<HTMLDivElement>(null);
   const { t } = useTranslation("common");
   const locale = router.locale ?? DEFAULT_LOCALE;
+  const { timeZone } = useTimeZoneContext();
 
   const matches = useMediaQuery("(max-width:600px)");
   const [searchText, setSearchText] = React.useState("");
@@ -303,6 +303,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                   >
                     {formatDate(date, "MM/dd (E)", {
                       localeCode: locale,
+                      timeZone,
                     })}
                   </Typography>
                 </TimelineOppositeContent>
@@ -319,9 +320,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                     const today = formatDate(
                       getCurrentUTCDate(),
                       "yyyy-MM-dd",
-                      {
-                        localeCode: locale,
-                      },
+                      { timeZone },
                     );
                     const isEventToday = eventDate === today;
                     return (

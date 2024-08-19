@@ -289,7 +289,7 @@ export const locales: Record<string, Locale> = {
   ja: ja,
 };
 
-export const localeTimeZoneMap: Record<string, string> = {
+const localeTimeZoneMap: Record<string, string> = {
   ja: "Asia/Tokyo",
   en: "America/Los_Angeles",
 } as const;
@@ -325,18 +325,15 @@ export const formatDate = (
   dateFormat: string,
   {
     localeCode = DEFAULT_LOCALE,
-    timeZone,
+    timeZone = "UTC",
   }: { localeCode?: string; timeZone?: string } = {},
 ): string => {
   const locale = locales[localeCode] ?? enUS;
-  const effectiveTimeZone = timeZone || localeTimeZoneMap[localeCode] || "UTC";
-  return formatInTimeZone(
-    convertToUTCDate(date),
-    effectiveTimeZone,
-    dateFormat,
-    { locale },
-  );
+  return formatInTimeZone(convertToUTCDate(date), timeZone, dateFormat, {
+    locale,
+  });
 };
+
 /**
  * Determines if a livestream is live, upcoming, archived, or is a freechat.
  * @param {Livestream} livestream - The livestream to check the live status of.
@@ -389,12 +386,12 @@ const timeRanges = [
 /**
  * Groups livestreams into time ranges of 6 hours, starting at 0:00.
  * @param {Livestream[]} livestreams - The array of livestreams to group.
- * @param {string} localeCode - The locale code to use for formatting.
+ * @param {string} timeZone - The time zone to use for time comparison.
  * @returns {Array<{label: string, livestreams: Livestream[]}>} - An array of objects containing a label and an array of livestreams.
  */
 export const groupLivestreamsByTimeRange = (
   livestreams: Livestream[],
-  localeCode: string,
+  timeZone: string,
 ) => {
   return timeRanges.map((timeRange) => {
     return {
@@ -402,7 +399,7 @@ export const groupLivestreamsByTimeRange = (
       livestreams: livestreams.filter((livestream) => {
         const zonedStartTime = utcToZonedTime(
           livestream.scheduledStartTime,
-          localeTimeZoneMap[localeCode],
+          timeZone,
         );
         const hours = getHours(zonedStartTime);
         return hours >= timeRange.start && hours < timeRange.end;

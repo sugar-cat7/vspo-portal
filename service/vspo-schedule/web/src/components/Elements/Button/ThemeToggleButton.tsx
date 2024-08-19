@@ -78,10 +78,7 @@ export const ThemeToggleButton: React.FC = () => {
   return (
     <FormGroup>
       <FormControlLabel
-        sx={{
-          marginRight: 0,
-          padding: "6px 24px",
-        }}
+        sx={{ margin: 0 }}
         control={
           <MaterialUISwitch
             checked={systemMode === "dark" || mode === "dark"}

@@ -16,7 +16,7 @@ import { styled } from "@mui/material/styles";
 import React, { useMemo } from "react";
 import useSWRInfinite from "swr/infinite";
 import { Loading } from "../Elements";
-import { useVideoModalContext } from "@/hooks";
+import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 
@@ -131,6 +131,7 @@ const RelatedVideoCard: React.FC<RelatedVideoCardProps> = ({
 }) => {
   const router = useRouter();
   const locale = router.locale ?? DEFAULT_LOCALE;
+  const { timeZone } = useTimeZoneContext();
 
   return (
     <StyledCard>
@@ -155,7 +156,7 @@ const RelatedVideoCard: React.FC<RelatedVideoCardProps> = ({
               {formatDate(
                 video.scheduledStartTime || video.createdAt || TEMP_TIMESTAMP,
                 "MM/dd (E)",
-                { localeCode: locale },
+                { localeCode: locale, timeZone },
               )}
             </Typography>
           </StyledCardContent>

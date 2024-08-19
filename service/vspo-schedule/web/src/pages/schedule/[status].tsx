@@ -9,7 +9,6 @@ import {
   formatDate,
   getInitializedI18nInstance,
   getOneWeekRange,
-  localeTimeZoneMap,
 } from "@/lib/utils";
 import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
@@ -21,7 +20,11 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Loading } from "@/components/Elements";
 import { useTranslation } from "next-i18next";
-import { DEFAULT_LOCALE } from "@/lib/Const";
+import {
+  DEFAULT_LOCALE,
+  DEFAULT_TIME_ZONE,
+  TIME_ZONE_COOKIE,
+} from "@/lib/Const";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
 
@@ -133,7 +136,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
 export const getServerSideProps: GetServerSideProps<
   LivestreamsProps,
   Params
-> = async ({ params, locale = DEFAULT_LOCALE }) => {
+> = async ({ params, locale = DEFAULT_LOCALE, req }) => {
   if (!params) {
     return {
       notFound: true,
@@ -141,6 +144,7 @@ export const getServerSideProps: GetServerSideProps<
   }
 
   try {
+    const timeZone = req.cookies[TIME_ZONE_COOKIE] ?? DEFAULT_TIME_ZONE;
     const isDateStatus = isValidDate(params.status);
 
     // Logic 1: Fetch uniqueLivestreams
@@ -165,7 +169,7 @@ export const getServerSideProps: GetServerSideProps<
           endedDate.setDate(endedDate.getDate() + 1),
           "yyyy-MM-dd",
         ),
-        timezone: localeTimeZoneMap[locale],
+        timezone: timeZone,
       });
     };
 
@@ -238,7 +242,7 @@ export const getServerSideProps: GetServerSideProps<
               d.getTime() + 24 * 60 * 60 * 1000,
               "yyyy-MM-dd",
             ),
-            timezone: localeTimeZoneMap[locale],
+            timezone: timeZone,
           }),
         );
       }
@@ -248,12 +252,12 @@ export const getServerSideProps: GetServerSideProps<
         .map((livestream: Livestream) => {
           return {
             date: formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
-              localeCode: locale,
+              timeZone,
             }),
             formattedDateString: formatDate(
               livestream.scheduledStartTime,
-              "MM/dd(E)",
-              { localeCode: locale },
+              "MM/dd (E)",
+              { localeCode: locale, timeZone },
             ),
           };
         });
@@ -285,9 +289,7 @@ export const getServerSideProps: GetServerSideProps<
           );
           return date >= fiveDaysAgo && date <= fiveDaysLater;
         });
-      const today = formatDate(getCurrentUTCDate(), "yyyy-MM-dd", {
-        localeCode: locale,
-      });
+      const today = formatDate(getCurrentUTCDate(), "yyyy-MM-dd", { timeZone });
       let todayIndex = tabDates.map((t) => t.date).indexOf(today);
       if (isDateStatus) {
         todayIndex = tabDates.map((t) => t.date).indexOf(params.status);
@@ -323,7 +325,7 @@ export const getServerSideProps: GetServerSideProps<
     const livestreamsByDate = groupBy(filteredLivestreams, (livestream) => {
       try {
         return formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
-          localeCode: locale,
+          timeZone,
         });
       } catch (err) {
         console.error("Invalid date:", livestream.scheduledStartTime);
@@ -333,9 +335,7 @@ export const getServerSideProps: GetServerSideProps<
 
     const eventsByDate = groupBy(events, (event) => {
       try {
-        return formatDate(event.startedAt, "yyyy-MM-dd", {
-          localeCode: locale,
-        });
+        return formatDate(event.startedAt, "yyyy-MM-dd", { timeZone });
       } catch (err) {
         console.error("Invalid date:", event.startedAt);
         throw err;
@@ -343,7 +343,7 @@ export const getServerSideProps: GetServerSideProps<
     });
 
     const lastUpdateDate = formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
-      localeCode: locale,
+      timeZone,
     });
 
     return {

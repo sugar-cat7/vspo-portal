@@ -60,9 +60,7 @@ export const getStaticProps: GetStaticProps<FreechatsProps> = async ({
     props: {
       ...translations,
       freechats: freechats,
-      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
-        localeCode: locale,
-      }),
+      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm"),
       meta: {
         title: t("title"),
         description: t("description"),

@@ -15,6 +15,7 @@ import { DEFAULT_LOCALE } from "@/lib/Const";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
+import { useTimeZoneContext } from "@/hooks";
 
 type Params = {
   id: string;
@@ -31,9 +32,11 @@ const SiteNewsItemPage: NextPageWithLayout<Props> = ({ siteNewsItem }) => {
   const router = useRouter();
   const locale = router.locale ?? DEFAULT_LOCALE;
   const { t } = useTranslation("site-news");
+  const { timeZone } = useTimeZoneContext();
 
   const formattedDate = formatDate(siteNewsItem.updated, "PPP", {
     localeCode: locale,
+    timeZone,
   });
 
   return (
