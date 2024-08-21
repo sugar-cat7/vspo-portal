@@ -1,4 +1,4 @@
-import { getCache, createCache } from './pkg/cache';
+// import { getCache, createCache } from './pkg/cache';
 import { App, AppContext } from './pkg/hono';
 import { videoProcessor, eventProcessor } from './pkg/processor';
 import { translateText } from './pkg/translator';
@@ -8,12 +8,12 @@ export const registerOldAPIProxyRoutes = (app: App) => {
     app.get('*', async (c: AppContext) => {
         const { kv } = c.get('services');
         const requestUrl = c.get('requestUrl');
-        const { cache, isExpired } = await getCache(kv, requestUrl);
+        // const { cache, isExpired } = await getCache(kv, requestUrl);
 
-        if (cache && !isExpired) {
-            const data = JSON.parse(cache);
-            return c.json(data);
-        }
+        // if (cache && !isExpired) {
+        //     const data = JSON.parse(cache);
+        //     return c.json(data);
+        // }
 
         const response = await fetch(requestUrl, { ...c.req.raw, headers: c.req.header() });
         const data = await response.json();
@@ -32,12 +32,12 @@ export const registerOldAPIProxyRoutes = (app: App) => {
             );
         }
 
-        // Cache the translated data if it is expired or not found
-        if (isExpired || !cache) {
-            if (translatedData?.length > 0) {
-                c.executionCtx.waitUntil(createCache(kv, requestUrl, JSON.stringify(translatedData), 60));
-            }
-        }
+        // // Cache the translated data if it is expired or not found
+        // if (isExpired || !cache) {
+        //     if (translatedData?.length > 0) {
+        //         c.executionCtx.waitUntil(createCache(kv, requestUrl, JSON.stringify(translatedData), 60));
+        //     }
+        // }
 
         return c.json(translatedData);
     });

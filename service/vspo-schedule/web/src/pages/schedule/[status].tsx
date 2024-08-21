@@ -146,6 +146,7 @@ export const getServerSideProps: GetServerSideProps<
     const timeZone = req.cookies[TIME_ZONE_COOKIE] ?? DEFAULT_TIME_ZONE;
     const isDateStatus = isValidDate(params.status);
 
+    console.info("[DEBUG1]", params.status, timeZone);
     // Logic 1: Fetch uniqueLivestreams
     const fetchLivestreamsData = async () => {
       const { oneWeekAgo, oneWeekLater } = getOneWeekRange();
@@ -321,6 +322,8 @@ export const getServerSideProps: GetServerSideProps<
     const description = `${t("description")}\n${livestreamDescription}`;
 
     const filteredLivestreams = uniqueLivestreams;
+    console.info("[DEBUG2]", JSON.stringify(filteredLivestreams));
+    console.info("[DEBUG3]", JSON.stringify(events));
 
     const livestreamsByDate = groupBy(filteredLivestreams, (livestream) => {
       try {

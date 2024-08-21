@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  DEFAULT_TIME_ZONE,
-  TIME_ZONE_COOKIE,
-  TIME_ZONE_HEADER,
-} from "./lib/Const";
+import { DEFAULT_TIME_ZONE, TIME_ZONE_COOKIE, TIME_ZONE_HEADER } from "./lib/Const";
 
 const publicFileRegex = /\.(.*)$/;
 
