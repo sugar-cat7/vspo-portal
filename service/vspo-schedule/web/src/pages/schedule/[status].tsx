@@ -41,7 +41,6 @@ type LivestreamsProps = {
   eventsByDate: Record<string, VspoEvent[]>;
   lastUpdateTimestamp: number;
   liveStatus: string;
-  locale: string;
   dateTabsInfo?: {
     tabDates: DateObject[];
     todayIndex: number;
@@ -77,7 +76,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
 }) => {
   const router = useRouter();
   const { t } = useTranslation("streams");
-  const locale = router?.locale ?? DEFAULT_LOCALE;
+
   if (router.isFallback) {
     return <Loading />;
   }
@@ -118,7 +117,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
                   fontWeight: "700",
                 }}
                 LinkComponent={Link}
-                href={`/${locale}/schedule/${date}`}
+                href={`/schedule/${date}`}
               />
             );
           })}
@@ -350,7 +349,6 @@ export const getServerSideProps: GetServerSideProps<
         eventsByDate,
         lastUpdateTimestamp: getCurrentUTCDate().getTime(),
         liveStatus: params.status,
-        locale: locale,
         dateTabsInfo: {
           todayIndex,
           tabDates,
@@ -378,7 +376,7 @@ HomePage.getLayout = (page, pageProps) => (
     lastUpdateTimestamp={pageProps.lastUpdateTimestamp}
     footerMessage={pageProps.footerMessage}
     headTitle={pageProps.meta?.headTitle}
-    path={`/${pageProps?.locale}/schedule/${pageProps.liveStatus}`}
+    path={`/schedule/${pageProps.liveStatus}`}
     // canonicalPath={`/schedule/all`}
   >
     {page}

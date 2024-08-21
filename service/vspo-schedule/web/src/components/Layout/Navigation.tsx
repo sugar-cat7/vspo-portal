@@ -9,7 +9,6 @@ import {
 } from "@/constants/navigation";
 import { useTranslation } from "next-i18next";
 import { useTimeZoneContext } from "@/hooks";
-import { DEFAULT_LOCALE } from "@/lib/Const";
 
 const bottomNavigationRoutes = [
   "list",
@@ -18,18 +17,14 @@ const bottomNavigationRoutes = [
   "event",
 ] satisfies NavigationRouteId[];
 
-const getActiveNavOption = (
-  activePath: string,
-  timeZone: string,
-  locale: string,
-) => {
+const getActiveNavOption = (activePath: string, timeZone: string) => {
   const pathParts = activePath.split("/");
   if (pathParts.length < 2) {
     return undefined;
   }
   const basePath = pathParts.slice(0, 2).join("/");
   return bottomNavigationRoutes.find((id) => {
-    const link = getNavigationRouteInfo(id, timeZone, locale).link;
+    const link = getNavigationRouteInfo(id, timeZone).link;
     return link.startsWith(basePath);
   });
 };
@@ -45,10 +40,9 @@ export const CustomBottomNavigation: React.FC = () => {
   const router = useRouter();
   const { timeZone } = useTimeZoneContext();
   const { t } = useTranslation("common");
-  const locale = router.locale ?? DEFAULT_LOCALE;
 
   useEffect(() => {
-    const activeNavOption = getActiveNavOption(router.asPath, timeZone, locale);
+    const activeNavOption = getActiveNavOption(router.asPath, timeZone);
     setValue(activeNavOption ?? "");
   }, [router.asPath, timeZone]);
 
@@ -64,7 +58,7 @@ export const CustomBottomNavigation: React.FC = () => {
           {bottomNavigationRoutes.map((id) => (
             <BottomNavigationAction
               component={Link}
-              href={getNavigationRouteInfo(id, timeZone, locale).link}
+              href={getNavigationRouteInfo(id, timeZone).link}
               key={id}
               label={t(`bottomNav.pages.${id}`)}
               value={id}
