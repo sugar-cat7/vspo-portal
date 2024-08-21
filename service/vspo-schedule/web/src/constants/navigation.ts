@@ -28,16 +28,9 @@ export type NavigationRouteId = keyof typeof navigationRoutes;
 export const getNavigationRouteInfo = (
   id: NavigationRouteId,
   timeZone: string,
-  locale: string,
 ) => {
-  let link =
+  const link =
     id === "event" ? navigationRoutes[id](timeZone) : navigationRoutes[id];
-
-  // /schedule に関連するルートの場合は /locale を動的に追加
-  if (link?.startsWith("/schedule")) {
-    link = `/${locale}${link}`;
-  }
-
   return {
     link: link ?? "",
     isExternalLink: id in externalRoutes,

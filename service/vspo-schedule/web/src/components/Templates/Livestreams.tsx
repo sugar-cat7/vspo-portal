@@ -6,7 +6,6 @@ import {
   Avatar,
   Box,
   Grid,
-  Link,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -16,6 +15,7 @@ import { LivestreamCard } from "../Elements";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
 import { members } from "@/data/members";
+import Link from "next/link";
 import { useTranslation } from "next-i18next";
 import { useTimeZoneContext } from "@/hooks";
 
