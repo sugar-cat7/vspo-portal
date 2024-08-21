@@ -77,7 +77,6 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
 }) => {
   const router = useRouter();
   const { t } = useTranslation("streams");
-  const locale = router?.locale ?? DEFAULT_LOCALE;
   if (router.isFallback) {
     return <Loading />;
   }

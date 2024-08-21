@@ -8,8 +8,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
 import { CustomDrawer, Link } from "../Elements";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
-import { DEFAULT_LOCALE } from "@/lib/Const";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.vars.palette.customColors.vspoPurple,
@@ -65,8 +63,6 @@ type Props = {
 export const Header: React.FC<Props> = ({ title }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { t } = useTranslation("common");
-  const router = useRouter();
-  const locale = router?.locale ?? DEFAULT_LOCALE;
   const toggleDrawerOpen = () => {
     setDrawerOpen(!drawerOpen);
   };

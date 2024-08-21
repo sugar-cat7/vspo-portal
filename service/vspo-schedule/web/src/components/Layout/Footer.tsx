@@ -5,8 +5,6 @@ import { useTranslation } from "next-i18next";
 import { getCurrentUTCDate } from "@/lib/dayjs";
 import { formatDate } from "@/lib/utils";
 import { useTimeZoneContext } from "@/hooks";
-import { useRouter } from "next/router";
-import { DEFAULT_LOCALE } from "@/lib/Const";
 import { Link } from "../Elements";
 
 type Props = {
@@ -19,8 +17,6 @@ export const Footer: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation("common");
   const { timeZone } = useTimeZoneContext();
-  const router = useRouter();
-  const locale = router.locale ?? DEFAULT_LOCALE;
 
   return (
     <Box mt={4} mb={2} textAlign="center">

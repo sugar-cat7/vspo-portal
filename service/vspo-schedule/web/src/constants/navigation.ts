@@ -28,9 +28,8 @@ export type NavigationRouteId = keyof typeof navigationRoutes;
 export const getNavigationRouteInfo = (
   id: NavigationRouteId,
   timeZone: string,
-  locale: string,
 ) => {
-  let link =
+  const link =
     id === "event" ? navigationRoutes[id](timeZone) : navigationRoutes[id];
 
   return {
