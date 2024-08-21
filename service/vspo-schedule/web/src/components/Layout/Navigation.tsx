@@ -64,7 +64,7 @@ export const CustomBottomNavigation: React.FC = () => {
           {bottomNavigationRoutes.map((id) => (
             <BottomNavigationAction
               component={Link}
-              href={getNavigationRouteInfo(id, timeZone).link}
+              href={getNavigationRouteInfo(id, timeZone, locale).link}
               key={id}
               label={t(`bottomNav.pages.${id}`)}
               value={id}
