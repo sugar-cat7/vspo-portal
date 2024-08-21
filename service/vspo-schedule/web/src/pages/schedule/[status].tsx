@@ -153,6 +153,7 @@ export const getServerSideProps: GetServerSideProps<
       const endedDate = isDateStatus
         ? convertToUTCDate(params.status)
         : oneWeekLater;
+      endedDate.setDate(endedDate.getDate() + 1);
       const today = getCurrentUTCDate();
 
       return await fetchLivestreams({
@@ -163,12 +164,11 @@ export const getServerSideProps: GetServerSideProps<
         startedDate: isDateStatus
           ? params.status
           : params.status === "archive"
-            ? formatDate(oneWeekAgo, "yyyy-MM-dd")
-            : formatDate(today, "yyyy-MM-dd"),
-        endedDate: formatDate(
-          endedDate.setDate(endedDate.getDate() + 1),
-          "yyyy-MM-dd",
-        ),
+            ? formatDate(oneWeekAgo, "yyyy-MM-dd", { timeZone })
+            : formatDate(today, "yyyy-MM-dd", { timeZone }),
+        endedDate: isDateStatus
+          ? formatDate(endedDate, "yyyy-MM-dd")
+          : formatDate(endedDate, "yyyy-MM-dd", { timeZone }),
         timezone: timeZone,
       });
     };
