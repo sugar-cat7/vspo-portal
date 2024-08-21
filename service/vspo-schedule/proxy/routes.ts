@@ -34,9 +34,7 @@ export const registerOldAPIProxyRoutes = (app: App) => {
 
         // Cache the translated data if it is expired or not found
         if (isExpired || !cache) {
-            if (translatedData?.length > 0) {
-                c.executionCtx.waitUntil(createCache(kv, requestUrl, JSON.stringify(translatedData), 60));
-            }
+            c.executionCtx.waitUntil(createCache(kv, requestUrl, JSON.stringify(translatedData), 60));
         }
 
         return c.json(translatedData);
