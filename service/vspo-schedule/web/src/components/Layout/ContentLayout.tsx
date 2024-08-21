@@ -11,7 +11,7 @@ import { OverridableComponent } from "@mui/material/OverridableComponent";
 type ContentLayoutProps = {
   children: React.ReactNode;
   title: string;
-  lastUpdateDate?: string;
+  lastUpdateTimestamp?: number;
   description?: string;
   path?: string;
   canonicalPath?: string;
@@ -38,7 +38,7 @@ const StyledContainer = styled(Container, {
 export const ContentLayout = ({
   children,
   title,
-  lastUpdateDate,
+  lastUpdateTimestamp,
   description,
   path,
   canonicalPath,
@@ -76,7 +76,10 @@ export const ContentLayout = ({
         {children}
       </StyledContainer>
       <GoogleAd />
-      <Footer lastUpdateDate={lastUpdateDate} description={footerMessage} />
+      <Footer
+        lastUpdateTimestamp={lastUpdateTimestamp}
+        description={footerMessage}
+      />
       <CustomBottomNavigation />
     </>
   );

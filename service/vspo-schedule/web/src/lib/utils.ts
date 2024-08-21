@@ -10,7 +10,7 @@ import {
   Video,
 } from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
-import { format, formatInTimeZone, utcToZonedTime } from "date-fns-tz";
+import { formatInTimeZone, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
 import { Locale, getHours } from "date-fns";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "./Const";
@@ -284,32 +284,9 @@ export const getOneWeekRange = () => {
   };
 };
 
-export const locales: Record<string, Locale> = {
+const locales: Record<string, Locale> = {
   en: enUS,
   ja: ja,
-};
-
-export const localeTimeZoneMap: Record<string, string> = {
-  ja: "Asia/Tokyo",
-  en: "America/Los_Angeles",
-} as const;
-
-/**
- * @deprecated Use `formatDate` instead.
- * Format a date with the given locale and format, converted to the specified timezone.
- * @param date - A Date object or date string to format.
- * @param localeCode - The locale code to use for formatting.
- * @param dateFormat - The date format to use for formatting.
- * @returns - A formatted date string.
- */
-export const formatWithTimeZone = (
-  date: Date | number | string,
-  localeCode: string,
-  dateFormat: string,
-): string => {
-  const timeZone = localeTimeZoneMap[localeCode] || "UTC";
-  const zonedDate = utcToZonedTime(date, timeZone);
-  return format(zonedDate, dateFormat, { locale: locales[localeCode] });
 };
 
 /**
@@ -325,18 +302,15 @@ export const formatDate = (
   dateFormat: string,
   {
     localeCode = DEFAULT_LOCALE,
-    timeZone,
+    timeZone = "UTC",
   }: { localeCode?: string; timeZone?: string } = {},
 ): string => {
   const locale = locales[localeCode] ?? enUS;
-  const effectiveTimeZone = timeZone || localeTimeZoneMap[localeCode] || "UTC";
-  return formatInTimeZone(
-    convertToUTCDate(date),
-    effectiveTimeZone,
-    dateFormat,
-    { locale },
-  );
+  return formatInTimeZone(convertToUTCDate(date), timeZone, dateFormat, {
+    locale,
+  });
 };
+
 /**
  * Determines if a livestream is live, upcoming, archived, or is a freechat.
  * @param {Livestream} livestream - The livestream to check the live status of.
@@ -389,12 +363,12 @@ const timeRanges = [
 /**
  * Groups livestreams into time ranges of 6 hours, starting at 0:00.
  * @param {Livestream[]} livestreams - The array of livestreams to group.
- * @param {string} localeCode - The locale code to use for formatting.
+ * @param {string} timeZone - The time zone to use for time comparison.
  * @returns {Array<{label: string, livestreams: Livestream[]}>} - An array of objects containing a label and an array of livestreams.
  */
 export const groupLivestreamsByTimeRange = (
   livestreams: Livestream[],
-  localeCode: string,
+  timeZone: string,
 ) => {
   return timeRanges.map((timeRange) => {
     return {
@@ -402,7 +376,7 @@ export const groupLivestreamsByTimeRange = (
       livestreams: livestreams.filter((livestream) => {
         const zonedStartTime = utcToZonedTime(
           livestream.scheduledStartTime,
-          localeTimeZoneMap[localeCode],
+          timeZone,
         );
         const hours = getHours(zonedStartTime);
         return hours >= timeRange.start && hours < timeRange.end;

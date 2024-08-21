@@ -1,6 +1,6 @@
 import { DISCORD_LINK, QA_LINK } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { formatWithTimeZone } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 
 const internalRoutes = {
   list: "/schedule/all",
@@ -10,23 +10,29 @@ const internalRoutes = {
   freechat: "/freechat",
   clip: "/clips",
   "twitch-clip": "/twitch-clips",
-  get event() {
-    return `/events/${formatWithTimeZone(getCurrentUTCDate(), "ja", "yyyy-MM")}`;
-  },
+  event: (timeZone: string) =>
+    `/events/${formatDate(getCurrentUTCDate(), "yyyy-MM", { timeZone })}`,
   about: "/about",
   "site-news": "/site-news",
-} as const satisfies Record<string, string>;
+} as const;
 
 const externalRoutes = {
   qa: QA_LINK,
   discord: DISCORD_LINK,
-} as const satisfies Record<string, string | undefined>;
+} as const;
 
-const navigationRoutes = { ...internalRoutes, ...externalRoutes } as const;
+const navigationRoutes = { ...internalRoutes, ...externalRoutes };
 
 export type NavigationRouteId = keyof typeof navigationRoutes;
 
-export const getNavigationRouteInfo = (id: NavigationRouteId) => ({
-  link: navigationRoutes[id] || "",
-  isExternalLink: id in externalRoutes,
-});
+export const getNavigationRouteInfo = (
+  id: NavigationRouteId,
+  timeZone: string,
+) => {
+  const link =
+    id === "event" ? navigationRoutes[id](timeZone) : navigationRoutes[id];
+  return {
+    link: link ?? "",
+    isExternalLink: id in externalRoutes,
+  };
+};

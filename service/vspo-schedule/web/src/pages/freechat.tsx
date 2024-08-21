@@ -1,6 +1,6 @@
 import { LivestreamCard } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
-import { formatDate, getInitializedI18nInstance } from "@/lib/utils";
+import { getInitializedI18nInstance } from "@/lib/utils";
 import { GetStaticProps } from "next";
 import React from "react";
 import { NextPageWithLayout } from "./_app";
@@ -14,7 +14,7 @@ import { getCurrentUTCDate } from "@/lib/dayjs";
 
 type FreechatsProps = {
   freechats: Livestream[];
-  lastUpdateDate: string;
+  lastUpdateTimestamp: number;
   meta: {
     title: string;
     description: string;
@@ -60,9 +60,7 @@ export const getStaticProps: GetStaticProps<FreechatsProps> = async ({
     props: {
       ...translations,
       freechats: freechats,
-      lastUpdateDate: formatDate(getCurrentUTCDate(), "yyyy/MM/dd HH:mm", {
-        localeCode: locale,
-      }),
+      lastUpdateTimestamp: getCurrentUTCDate().getTime(),
       meta: {
         title: t("title"),
         description: t("description"),
@@ -75,7 +73,7 @@ FreechatPage.getLayout = (page, pageProps) => (
   <ContentLayout
     title={pageProps.meta.title}
     description={pageProps.meta.description}
-    lastUpdateDate={pageProps.lastUpdateDate}
+    lastUpdateTimestamp={pageProps.lastUpdateTimestamp}
     path="/freechat"
     maxPageWidth="lg"
     padTop

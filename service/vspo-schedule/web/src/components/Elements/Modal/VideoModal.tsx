@@ -32,7 +32,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { ChatEmbed } from "../ChatEmbed";
-import { useVideoModalContext } from "@/hooks";
+import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { useTranslation } from "next-i18next";
 import { HighlightedVideoChip } from "../Chip";
 
@@ -142,8 +142,7 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
   const [value, setValue] = React.useState(0);
   const { t } = useTranslation("common");
   const theme = useTheme();
-  const router = useRouter();
-  const { locale } = router;
+  const { timeZone } = useTimeZoneContext();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -151,7 +150,7 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
   const formattedStartTime = formatDate(
     video.scheduledStartTime || video.createdAt || "",
     "MM/dd HH:mm~",
-    { localeCode: locale },
+    { timeZone },
   );
   const liveStatus = isLivestream(video) ? getLiveStatus(video) : undefined;
   const showChatTab =

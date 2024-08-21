@@ -17,8 +17,7 @@ import { VspoEvent } from "@/types/events";
 import { members } from "@/data/members";
 import Link from "next/link";
 import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
-import { DEFAULT_LOCALE } from "@/lib/Const";
+import { useTimeZoneContext } from "@/hooks";
 
 type Props = {
   livestreamsByDate: Record<string, Livestream[]>;
@@ -91,9 +90,8 @@ export const LivestreamCards: React.FC<Props> = ({
   livestreamsByDate,
   eventsByDate,
 }) => {
-  const router = useRouter();
+  const { timeZone } = useTimeZoneContext();
   const { t } = useTranslation(["streams"]);
-  const locale = router.locale ?? DEFAULT_LOCALE;
   const [expanded, setExpanded] = React.useState<boolean>(true);
   if (Object.keys(livestreamsByDate).length === 0) {
     return (
@@ -113,7 +111,7 @@ export const LivestreamCards: React.FC<Props> = ({
       {Object.entries(livestreamsByDate).map(([date, livestreams]) => {
         const livestreamsByTimeRange = groupLivestreamsByTimeRange(
           livestreams,
-          locale,
+          timeZone,
         );
         let events: VspoEvent[] = [];
         if (date in eventsByDate) {

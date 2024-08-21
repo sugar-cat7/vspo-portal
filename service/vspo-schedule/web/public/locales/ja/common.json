@@ -38,6 +38,7 @@
       "discord": "Discord Bot"
     },
     "settings": "設定",
+    "timeZone": "タイムゾーン",
     "site-theme": "背景のテーマ"
   },
   "alert": {

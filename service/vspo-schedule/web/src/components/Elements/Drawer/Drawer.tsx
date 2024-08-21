@@ -1,7 +1,6 @@
 import {
   Badge,
   Box,
-  Button,
   Chip,
   Divider,
   List,
@@ -9,15 +8,12 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Menu,
-  MenuItem,
   Stack,
   SwipeableDrawer,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import SettingsIcon from "@mui/icons-material/Settings";
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -28,6 +24,8 @@ import {
 import { DrawerIcon } from "../Icon";
 import { ThemeToggleButton } from "../Button";
 import { useTranslation } from "next-i18next";
+import { TimeZoneSelector } from "../Control";
+import { useTimeZoneContext } from "@/hooks";
 
 const drawerNavigationSections: NavSectionProps[] = [
   {
@@ -88,23 +86,6 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const StyledButton = styled(Button)({
-  display: "flex",
-  justifyContent: "flex-start",
-  paddingLeft: "16px",
-  "&:hover": {
-    backgroundColor: "transparent",
-  },
-  borderRadius: 0,
-  fontSize: "1rem",
-  "& .MuiButton-startIcon": {
-    marginLeft: 0,
-    "& .MuiSvgIcon-root": {
-      fontSize: "24px",
-    },
-  },
-});
-
 type NavLinkProps = {
   id: NavigationRouteId;
   isBeta?: boolean;
@@ -124,8 +105,9 @@ const NavSectionHeading: React.FC<{ text: string }> = ({ text }) => (
 
 const NavLink: React.FC<NavLinkProps> = ({ id, isBeta, supplementaryIcon }) => {
   const { t } = useTranslation("common");
+  const { timeZone } = useTimeZoneContext();
 
-  const { link, isExternalLink } = getNavigationRouteInfo(id);
+  const { link, isExternalLink } = getNavigationRouteInfo(id, timeZone);
   const buttonProps = isExternalLink
     ? { component: "a", target: "_blank", rel: "noopener noreferrer" }
     : { component: Link };
@@ -205,19 +187,6 @@ export const CustomDrawer: React.FC<DrawerProps> = ({
   onOpen,
   onClose,
 }) => {
-  const { t } = useTranslation("common");
-  const [settingsAnchorEl, setSettingsAnchorEl] = useState<null | HTMLElement>(
-    null,
-  );
-
-  const handleSettingsClick = (event: React.MouseEvent<HTMLElement>) => {
-    setSettingsAnchorEl(event.currentTarget);
-  };
-
-  const handleSettingsClose = () => {
-    setSettingsAnchorEl(null);
-  };
-
   return (
     <SwipeableDrawer
       anchor="left"
@@ -244,36 +213,18 @@ export const CustomDrawer: React.FC<DrawerProps> = ({
 
       <Stack direction="column" justifyContent="space-between" flex="1">
         <DrawerNavigation sections={drawerNavigationSections} />
-        <StyledButton
-          aria-label="settings"
-          aria-controls="settings-menu"
-          aria-haspopup="true"
-          onClick={handleSettingsClick}
-          color="inherit"
-          startIcon={<SettingsIcon />}
+        <Divider />
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "16px",
+            padding: "20px 12px",
+          }}
         >
-          {t("settings")}
-        </StyledButton>
-        <Menu
-          id="settings-menu"
-          anchorEl={settingsAnchorEl}
-          open={Boolean(settingsAnchorEl)}
-          onClose={handleSettingsClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
-          sx={{ top: "-30px" }}
-        >
-          <MenuItem
-            sx={{
-              display: "flex",
-              justifyContent: "flex-start",
-              alignItems: "center",
-              padding: 0,
-            }}
-          >
-            <ThemeToggleButton />
-          </MenuItem>
-        </Menu>
+          <TimeZoneSelector />
+          <ThemeToggleButton />
+        </Box>
       </Stack>
     </SwipeableDrawer>
   );
