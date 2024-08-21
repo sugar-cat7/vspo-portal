@@ -314,9 +314,10 @@ export const VideoModal: React.FC = () => {
             alignItems="center"
             sx={{ gap: "10px", cursor: "pointer" }}
             onClick={() => {
-              router.push("/schedule/all");
               clearVideos();
             }}
+            component={Link}
+            href={"/schedule/all"}
           >
             <Image
               src="/icon-top_transparent.png"
