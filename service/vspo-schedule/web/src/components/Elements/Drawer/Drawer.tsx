@@ -3,6 +3,7 @@ import {
   Box,
   Chip,
   Divider,
+  Link,
   List,
   ListItem,
   ListItemButton,
@@ -14,7 +15,6 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React from "react";
-import Link from "next/link";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -26,6 +26,8 @@ import { ThemeToggleButton } from "../Button";
 import { useTranslation } from "next-i18next";
 import { TimeZoneSelector } from "../Control";
 import { useTimeZoneContext } from "@/hooks";
+import { DEFAULT_LOCALE } from "@/lib/Const";
+import { useRouter } from "next/router";
 
 const drawerNavigationSections: NavSectionProps[] = [
   {
@@ -106,8 +108,9 @@ const NavSectionHeading: React.FC<{ text: string }> = ({ text }) => (
 const NavLink: React.FC<NavLinkProps> = ({ id, isBeta, supplementaryIcon }) => {
   const { t } = useTranslation("common");
   const { timeZone } = useTimeZoneContext();
-
-  const { link, isExternalLink } = getNavigationRouteInfo(id, timeZone);
+  const router = useRouter();
+  const locale = router?.locale ?? DEFAULT_LOCALE;
+  const { link, isExternalLink } = getNavigationRouteInfo(id, timeZone, locale);
   const buttonProps = isExternalLink
     ? { component: "a", target: "_blank", rel: "noopener noreferrer" }
     : { component: Link };

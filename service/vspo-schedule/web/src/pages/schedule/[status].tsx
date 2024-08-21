@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Tab, Tabs } from "@mui/material";
+import { Box, Link, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetServerSideProps } from "next";
 import { Livestream } from "@/types/streaming";
@@ -16,7 +16,6 @@ import { NextPageWithLayout } from "../_app";
 import { LivestreamCards } from "@/components/Templates";
 import { fetchEvents, fetchLivestreams } from "@/lib/api";
 import { VspoEvent } from "@/types/events";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { Loading } from "@/components/Elements";
 import { useTranslation } from "next-i18next";
@@ -42,6 +41,7 @@ type LivestreamsProps = {
   eventsByDate: Record<string, VspoEvent[]>;
   lastUpdateTimestamp: number;
   liveStatus: string;
+  locale: string;
   dateTabsInfo?: {
     tabDates: DateObject[];
     todayIndex: number;
@@ -77,7 +77,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
 }) => {
   const router = useRouter();
   const { t } = useTranslation("streams");
-
+  const locale = router?.locale ?? DEFAULT_LOCALE;
   if (router.isFallback) {
     return <Loading />;
   }
@@ -118,7 +118,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
                   fontWeight: "700",
                 }}
                 LinkComponent={Link}
-                href={`/schedule/${date}`}
+                href={`/${locale}/schedule/${date}`}
               />
             );
           })}
@@ -322,6 +322,7 @@ export const getServerSideProps: GetServerSideProps<
     const description = `${t("description")}\n${livestreamDescription}`;
 
     const filteredLivestreams = uniqueLivestreams;
+
     const livestreamsByDate = groupBy(filteredLivestreams, (livestream) => {
       try {
         return formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
@@ -349,6 +350,7 @@ export const getServerSideProps: GetServerSideProps<
         eventsByDate,
         lastUpdateTimestamp: getCurrentUTCDate().getTime(),
         liveStatus: params.status,
+        locale: locale,
         dateTabsInfo: {
           todayIndex,
           tabDates,
@@ -376,7 +378,7 @@ HomePage.getLayout = (page, pageProps) => (
     lastUpdateTimestamp={pageProps.lastUpdateTimestamp}
     footerMessage={pageProps.footerMessage}
     headTitle={pageProps.meta?.headTitle}
-    path={`/schedule/${pageProps.liveStatus}`}
+    path={`/${pageProps?.locale}/schedule/${pageProps.liveStatus}`}
     // canonicalPath={`/schedule/all`}
   >
     {page}

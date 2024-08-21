@@ -1,14 +1,15 @@
 import React, { useState } from "react";
-import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
+import { AppBar, IconButton, Link, Toolbar, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from "@mui/system";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
-import Link from "next/link";
 import { CustomDrawer } from "../Elements";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import { DEFAULT_LOCALE } from "@/lib/Const";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.vars.palette.customColors.vspoPurple,
@@ -32,7 +33,7 @@ const StyledSubtitle = styled(Typography)({
   paddingLeft: "0px",
 });
 
-const SocialIconLink: React.FC<{
+const SocialIconNextLink: React.FC<{
   url: string;
   icon: React.ReactNode;
 }> = ({ url, icon }) => {
@@ -64,7 +65,8 @@ type Props = {
 export const Header: React.FC<Props> = ({ title }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { t } = useTranslation("common");
-
+  const router = useRouter();
+  const locale = router?.locale ?? DEFAULT_LOCALE;
   const toggleDrawerOpen = () => {
     setDrawerOpen(!drawerOpen);
   };
@@ -90,11 +92,13 @@ export const Header: React.FC<Props> = ({ title }) => {
               <MenuIcon />
             </IconButton>
             <Link
-              style={{
+              sx={{
+                color: "inherit",
+                textDecoration: "none",
                 display: "flex",
                 width: "100%",
               }}
-              href="/schedule/all"
+              href={`/${locale}/schedule/all`}
             >
               <Image
                 src="/icon-top_transparent.png"
@@ -115,11 +119,11 @@ export const Header: React.FC<Props> = ({ title }) => {
                 marginLeft: "12px",
               }}
             >
-              <SocialIconLink
+              <SocialIconNextLink
                 url="https://github.com/sugar-cat7/vspo-portal"
                 icon={<FontAwesomeIcon icon={faGithub} />}
               />
-              <SocialIconLink
+              <SocialIconNextLink
                 url="https://twitter.com/vspodule"
                 icon={<FontAwesomeIcon icon={faXTwitter} />}
               />

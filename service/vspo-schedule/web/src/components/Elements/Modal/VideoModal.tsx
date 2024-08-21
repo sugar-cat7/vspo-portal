@@ -35,6 +35,7 @@ import { ChatEmbed } from "../ChatEmbed";
 import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { useTranslation } from "next-i18next";
 import { HighlightedVideoChip } from "../Chip";
+import { DEFAULT_LOCALE } from "@/lib/Const";
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   backgroundColor: theme.vars.palette.customColors.vspoPurple,
@@ -297,7 +298,7 @@ export const VideoModal: React.FC = () => {
   const router = useRouter();
   const { activeVideo, popVideo, clearVideos } = useVideoModalContext();
   const { t } = useTranslation("common");
-
+  const locale = router.locale ?? DEFAULT_LOCALE;
   //Clear video modal on url changes
   useEffect(() => {
     clearVideos();
@@ -312,11 +313,17 @@ export const VideoModal: React.FC = () => {
             flexGrow={1}
             display="flex"
             alignItems="center"
-            sx={{ gap: "10px", cursor: "pointer" }}
+            sx={{
+              gap: "10px",
+              cursor: "pointer",
+              color: "inherit",
+              textDecoration: "none",
+            }}
             onClick={() => {
-              router.push("/schedule/all");
               clearVideos();
             }}
+            component={Link}
+            href={`/${locale}/schedule/all`}
           >
             <Image
               src="/icon-top_transparent.png"
