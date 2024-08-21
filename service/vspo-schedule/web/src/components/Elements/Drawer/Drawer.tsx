@@ -3,6 +3,7 @@ import {
   Box,
   Chip,
   Divider,
+  Link,
   List,
   ListItem,
   ListItemButton,
@@ -14,7 +15,6 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React from "react";
-import Link from "next/link";
 import { faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
