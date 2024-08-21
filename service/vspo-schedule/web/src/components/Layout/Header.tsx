@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import { AppBar, IconButton, Link, Toolbar, Typography } from "@mui/material";
+import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from "@mui/system";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
-import { CustomDrawer } from "../Elements";
+import { CustomDrawer, Link } from "../Elements";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import { DEFAULT_LOCALE } from "@/lib/Const";
@@ -93,12 +93,10 @@ export const Header: React.FC<Props> = ({ title }) => {
             </IconButton>
             <Link
               sx={{
-                color: "inherit",
-                textDecoration: "none",
                 display: "flex",
                 width: "100%",
               }}
-              href={`/${locale}/schedule/all`}
+              href={`/schedule/all`}
             >
               <Image
                 src="/icon-top_transparent.png"

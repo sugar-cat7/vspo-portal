@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Link, Tab, Tabs } from "@mui/material";
+import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetServerSideProps } from "next";
 import { Livestream } from "@/types/streaming";
@@ -17,7 +17,7 @@ import { LivestreamCards } from "@/components/Templates";
 import { fetchEvents, fetchLivestreams } from "@/lib/api";
 import { VspoEvent } from "@/types/events";
 import { useRouter } from "next/router";
-import { Loading } from "@/components/Elements";
+import { Link, Loading } from "@/components/Elements";
 import { useTranslation } from "next-i18next";
 import {
   DEFAULT_LOCALE,
@@ -118,7 +118,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
                   fontWeight: "700",
                 }}
                 LinkComponent={Link}
-                href={`/${locale}/schedule/${date}`}
+                href={`/schedule/${date}`}
               />
             );
           })}

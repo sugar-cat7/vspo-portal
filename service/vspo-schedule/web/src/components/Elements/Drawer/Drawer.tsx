@@ -3,7 +3,6 @@ import {
   Box,
   Chip,
   Divider,
-  Link,
   List,
   ListItem,
   ListItemButton,
@@ -28,6 +27,7 @@ import { TimeZoneSelector } from "../Control";
 import { useTimeZoneContext } from "@/hooks";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { useRouter } from "next/router";
+import { Link } from "../Link";
 
 const drawerNavigationSections: NavSectionProps[] = [
   {

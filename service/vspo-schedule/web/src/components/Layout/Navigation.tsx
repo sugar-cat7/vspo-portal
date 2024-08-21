@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { BottomNavigation, BottomNavigationAction, Link } from "@mui/material";
+import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { Box } from "@mui/system";
-import { DrawerIcon } from "../Elements";
+import { DrawerIcon, Link } from "../Elements";
 import { useRouter } from "next/router";
 import {
   getNavigationRouteInfo,

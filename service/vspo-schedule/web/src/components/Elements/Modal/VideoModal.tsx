@@ -8,7 +8,6 @@ import {
   Avatar,
   Button,
   IconButton,
-  Link,
   Tab,
   Tabs,
   BottomNavigation,
@@ -24,7 +23,7 @@ import {
   isLivestream,
   isOnPlatformWithChat,
 } from "@/lib/utils";
-import { PlatformIcon } from "..";
+import { Link, PlatformIcon } from "..";
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
 import { RelatedVideos } from "@/components/Templates";
@@ -323,7 +322,7 @@ export const VideoModal: React.FC = () => {
               clearVideos();
             }}
             component={Link}
-            href={`/${locale}/schedule/all`}
+            href={`/schedule/all`}
           >
             <Image
               src="/icon-top_transparent.png"
