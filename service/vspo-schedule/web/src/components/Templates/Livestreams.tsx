@@ -6,13 +6,12 @@ import {
   Avatar,
   Box,
   Grid,
-  Link,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Livestream } from "@/types/streaming";
 import { groupLivestreamsByTimeRange } from "@/lib/utils";
-import { LivestreamCard } from "../Elements";
+import { Link, LivestreamCard } from "../Elements";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
 import { members } from "@/data/members";

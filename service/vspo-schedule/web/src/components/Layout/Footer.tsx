@@ -1,12 +1,11 @@
 import React from "react";
-import { Box, Link, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import NextLink from "next/link";
 import { useTranslation } from "next-i18next";
 import { getCurrentUTCDate } from "@/lib/dayjs";
 import { formatDate } from "@/lib/utils";
 import { useTimeZoneContext } from "@/hooks";
-import { useRouter } from "next/router";
-import { DEFAULT_LOCALE } from "@/lib/Const";
+import { Link } from "../Elements";
 
 type Props = {
   lastUpdateTimestamp?: number;
@@ -18,8 +17,6 @@ export const Footer: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation("common");
   const { timeZone } = useTimeZoneContext();
-  const router = useRouter();
-  const locale = router.locale ?? DEFAULT_LOCALE;
 
   return (
     <Box mt={4} mb={2} textAlign="center">
@@ -39,7 +36,7 @@ export const Footer: React.FC<Props> = ({
       )}
       <Typography variant="body2" color="text.secondary" mt={1}>
         <Link
-          href={`/${locale}/schedule/all`}
+          href={`/schedule/all`}
           sx={{
             color: "inherit",
             textDecoration: "none",

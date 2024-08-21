@@ -8,7 +8,6 @@ import {
   Avatar,
   Button,
   IconButton,
-  Link,
   Tab,
   Tabs,
   BottomNavigation,
@@ -24,7 +23,7 @@ import {
   isLivestream,
   isOnPlatformWithChat,
 } from "@/lib/utils";
-import { PlatformIcon } from "..";
+import { Link, PlatformIcon } from "..";
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
 import { RelatedVideos } from "@/components/Templates";
@@ -35,7 +34,6 @@ import { ChatEmbed } from "../ChatEmbed";
 import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { useTranslation } from "next-i18next";
 import { HighlightedVideoChip } from "../Chip";
-import { DEFAULT_LOCALE } from "@/lib/Const";
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   backgroundColor: theme.vars.palette.customColors.vspoPurple,
@@ -298,7 +296,6 @@ export const VideoModal: React.FC = () => {
   const router = useRouter();
   const { activeVideo, popVideo, clearVideos } = useVideoModalContext();
   const { t } = useTranslation("common");
-  const locale = router.locale ?? DEFAULT_LOCALE;
   //Clear video modal on url changes
   useEffect(() => {
     clearVideos();
@@ -323,7 +320,7 @@ export const VideoModal: React.FC = () => {
               clearVideos();
             }}
             component={Link}
-            href={`/${locale}/schedule/all`}
+            href={`/schedule/all`}
           >
             <Image
               src="/icon-top_transparent.png"

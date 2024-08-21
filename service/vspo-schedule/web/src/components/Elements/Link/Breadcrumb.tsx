@@ -1,8 +1,8 @@
 // components/Elements/Breadcrumb.tsx
-import { Breadcrumbs, Link, Typography } from "@mui/material";
+import { Breadcrumbs, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import NextLink from "next/link";
 import { useTranslation } from "next-i18next";
+import { Link } from "./Link";
 
 export const Breadcrumb = () => {
   const router = useRouter();
@@ -11,9 +11,7 @@ export const Breadcrumb = () => {
 
   return (
     <Breadcrumbs aria-label="breadcrumb">
-      <Link href="/" component={NextLink} color="inherit">
-        {t("breadcrumbs.pages.home")}
-      </Link>
+      <Link href="/">{t("breadcrumbs.pages.home")}</Link>
       {pathnames.map((value, index) => {
         const last = index === pathnames.length - 1;
         const to = `/${pathnames.slice(0, index + 1).join("/")}`;
@@ -24,7 +22,7 @@ export const Breadcrumb = () => {
             {name}
           </Typography>
         ) : (
-          <Link key={to} href={to} component={NextLink} color="inherit">
+          <Link key={to} href={to}>
             {name}
           </Link>
         );
