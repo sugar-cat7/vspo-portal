@@ -89,7 +89,9 @@ export const Header: React.FC<Props> = ({ title }) => {
               <MenuIcon />
             </IconButton>
             <Link
-              style={{
+              sx={{
+                color: "inherit",
+                textDecoration: "none",
                 display: "flex",
                 width: "100%",
               }}

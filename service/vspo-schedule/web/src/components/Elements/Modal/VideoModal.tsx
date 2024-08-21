@@ -312,7 +312,12 @@ export const VideoModal: React.FC = () => {
             flexGrow={1}
             display="flex"
             alignItems="center"
-            sx={{ gap: "10px", cursor: "pointer" }}
+            sx={{
+              gap: "10px",
+              cursor: "pointer",
+              color: "inherit",
+              textDecoration: "none",
+            }}
             onClick={() => {
               clearVideos();
             }}
