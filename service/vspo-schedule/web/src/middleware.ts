@@ -20,14 +20,21 @@ export const middleware = (req: NextRequest) => {
   // - default app time zone
   const cookieTimeZone = getCookieTimeZone(req);
   if (cookieTimeZone !== undefined) {
-    return NextResponse.next();
+    const res = NextResponse.next();
+    addNoCacheHeader(res);
+    return res;
   }
   const headerTimeZone = getHeaderTimeZone(req);
   const timeZoneToSet = headerTimeZone ?? DEFAULT_TIME_ZONE;
   setCookie(req, TIME_ZONE_COOKIE, timeZoneToSet);
   const res = NextResponse.next({ request: req });
+  addNoCacheHeader(res);
   setCookie(res, TIME_ZONE_COOKIE, timeZoneToSet);
   return res;
+};
+
+const addNoCacheHeader = (res: NextResponse) => {
+  res.headers.set("x-middleware-cache", "no-cache");
 };
 
 const getCookieTimeZone = (req: NextRequest) => {
