@@ -38,7 +38,7 @@ type DateObject = {
 
 type LivestreamsProps = {
   livestreams: Livestream[];
-  eventsByDate: Record<string, VspoEvent[]>;
+  events: VspoEvent[];
   lastUpdateTimestamp: number;
   liveStatus: string;
   locale: string;
@@ -73,7 +73,7 @@ const TabBox = styled(Box)(({ theme }) => ({
 
 const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   livestreams,
-  eventsByDate,
+  events,
   dateTabsInfo,
   timeZone,
 }) => {
@@ -87,6 +87,11 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
       });
     });
   }, [livestreams, timeZone]);
+  const eventsByDate = useMemo(() => {
+    return groupBy(events, (event) => {
+      return formatDate(event.startedAt, "yyyy-MM-dd", { timeZone });
+    });
+  }, [events, timeZone]);
 
   if (router.isFallback) {
     return <Loading />;
@@ -331,21 +336,12 @@ export const getServerSideProps: GetServerSideProps<
         .join(", ") ?? "";
     const description = `${t("description")}\n${livestreamDescription}`;
 
-    const eventsByDate = groupBy(events, (event) => {
-      try {
-        return formatDate(event.startedAt, "yyyy-MM-dd", { timeZone });
-      } catch (err) {
-        console.error("Invalid date:", event.startedAt);
-        throw err;
-      }
-    });
-
     return {
       props: {
         ...translations,
         livestreams: uniqueLivestreams,
+        events,
         timeZone,
-        eventsByDate,
         lastUpdateTimestamp: getCurrentUTCDate().getTime(),
         liveStatus: params.status,
         locale: locale,
