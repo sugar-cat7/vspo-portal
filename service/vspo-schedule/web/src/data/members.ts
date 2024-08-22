@@ -246,7 +246,13 @@ export const members: Member[] = [
     channelId: "UCCra1t-eIlO3ULyXQQMD9Xw",
     iconUrl:
       "https://yt3.ggpht.com/_ZXWSEkZc-HWDhMzW_uOCGqJPbnMKNzAUOx_28omus1sUw4YOb3qixY7fRzT7o5P_ONFzAfYqsU=s88-c-k-c0x00ffffff-no-rj",
-    keywords: ["Remia Aotsuki", "Remia", "Aotsuki Remia"],
+    keywords: [
+      "Remia Aotsuki",
+      "Remia",
+      "Aotsuki Remia",
+      "青月レミア",
+      "青月 レミア",
+    ],
   },
   {
     id: 24,
@@ -254,7 +260,7 @@ export const members: Member[] = [
     channelId: "UCeCWj-SiJG9SWN6wGORiLmw",
     iconUrl:
       "https://yt3.ggpht.com/-vNvJ64yYeDrjAKWz0z0atBNWSW_1p3lCRZjQpfzaKp3JvQY46focTOTXN3-uXAK65hcy31oOQ=s88-c-k-c0x00ffffff-no-rj",
-    keywords: ["Jira Jisaki", "Jira", "Jisaki Jira"],
+    keywords: ["Jira Jisaki", "Jira", "Jisaki Jira", "地崎ジラ", "地崎 ジラ"],
   },
   {
     id: 25,
@@ -262,7 +268,35 @@ export const members: Member[] = [
     channelId: "UCLlJpxXt6L5d-XQ0cDdIyDQ",
     iconUrl:
       "https://yt3.ggpht.com/5mAqbF3j7cJ4DoAgcglo5lrnJaNR3uzyjAUf4UKi-ud3PA8gtdWL-rMAp45U4qNd-gV7mgww0co=s88-c-k-c0x00ffffff-no-rj",
-    keywords: ["Arya Kuroha", "Arya", "Kuroha Arya"],
+    keywords: [
+      "Arya Kuroha",
+      "Arya",
+      "Kuroha Arya",
+      "黒刃アリヤ",
+      "黒刃 アリヤ",
+    ],
+  },
+  {
+    id: 26,
+    name: "Narin Mikure",
+    channelId: "UCKSpM183c85d5V2cW5qaUjA",
+    iconUrl:
+      "https://yt3.ggpht.com/NOzYOqi7WSPcuVTEmNDr_VK4uMo3j-MsSLE6LL4LR4NjFENWnW-Z8tJ8g6-a8h8sXbaN9dUp6g=s240-c-k-c0x00ffffff-no-rj",
+    keywords: [
+      "Narin Mikure",
+      "Narin",
+      "Mikure Narin",
+      "美暮ナリン",
+      "美暮 ナリン",
+    ],
+  },
+  {
+    id: 27,
+    name: "Riko Solari",
+    channelId: "UC7Xglp1fske9zmRe7Oj8YyA",
+    iconUrl:
+      "https://yt3.ggpht.com/NOzYOqi7WSPcuVTEmNDr_VK4uMo3j-MsSLE6LL4LR4NjFENWnW-Z8tJ8g6-a8h8sXbaN9dUp6g=s88-c-k-c0x00ffffff-no-rj",
+    keywords: ["Riko Solari", "Riko", "Solari", "ソラリリコ", "ソラリ リコ"],
   },
 ];
 
