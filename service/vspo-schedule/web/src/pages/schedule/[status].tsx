@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetServerSideProps } from "next";
@@ -37,11 +37,12 @@ type DateObject = {
 };
 
 type LivestreamsProps = {
-  livestreamsByDate: Record<string, Livestream[]>;
-  eventsByDate: Record<string, VspoEvent[]>;
+  livestreams: Livestream[];
+  events: VspoEvent[];
   lastUpdateTimestamp: number;
   liveStatus: string;
   locale: string;
+  timeZone: string;
   dateTabsInfo?: {
     tabDates: DateObject[];
     todayIndex: number;
@@ -71,12 +72,27 @@ const TabBox = styled(Box)(({ theme }) => ({
 }));
 
 const HomePage: NextPageWithLayout<LivestreamsProps> = ({
-  livestreamsByDate,
-  eventsByDate,
+  livestreams,
+  events,
   dateTabsInfo,
+  timeZone,
 }) => {
   const router = useRouter();
   const { t } = useTranslation("streams");
+
+  const livestreamsByDate = useMemo(() => {
+    return groupBy(livestreams, (livestream) => {
+      return formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
+        timeZone,
+      });
+    });
+  }, [livestreams, timeZone]);
+  const eventsByDate = useMemo(() => {
+    return groupBy(events, (event) => {
+      return formatDate(event.startedAt, "yyyy-MM-dd", { timeZone });
+    });
+  }, [events, timeZone]);
+
   if (router.isFallback) {
     return <Loading />;
   }
@@ -155,7 +171,7 @@ export const getServerSideProps: GetServerSideProps<
       endedDate.setDate(endedDate.getDate() + 1);
       const today = getCurrentUTCDate();
 
-      return await fetchLivestreams({
+      return fetchLivestreams({
         limit: params.status === "archive" ? 300 : 50,
         lang: locale,
         status: params.status,
@@ -174,7 +190,7 @@ export const getServerSideProps: GetServerSideProps<
 
     // Logic 2: Fetch events
     const fetchEventsData = async () => {
-      return await fetchEvents({ lang: locale });
+      return fetchEvents({ lang: locale });
     };
 
     // Logic 3: Fetch translations and create metadata
@@ -320,33 +336,12 @@ export const getServerSideProps: GetServerSideProps<
         .join(", ") ?? "";
     const description = `${t("description")}\n${livestreamDescription}`;
 
-    const filteredLivestreams = uniqueLivestreams;
-
-    const livestreamsByDate = groupBy(filteredLivestreams, (livestream) => {
-      try {
-        return formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
-          timeZone,
-        });
-      } catch (err) {
-        console.error("Invalid date:", livestream.scheduledStartTime);
-        throw err;
-      }
-    });
-
-    const eventsByDate = groupBy(events, (event) => {
-      try {
-        return formatDate(event.startedAt, "yyyy-MM-dd", { timeZone });
-      } catch (err) {
-        console.error("Invalid date:", event.startedAt);
-        throw err;
-      }
-    });
-
     return {
       props: {
         ...translations,
-        livestreamsByDate,
-        eventsByDate,
+        livestreams: uniqueLivestreams,
+        events,
+        timeZone,
         lastUpdateTimestamp: getCurrentUTCDate().getTime(),
         liveStatus: params.status,
         locale: locale,
