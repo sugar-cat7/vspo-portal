@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { GetServerSideProps } from "next";
@@ -37,11 +37,12 @@ type DateObject = {
 };
 
 type LivestreamsProps = {
-  livestreamsByDate: Record<string, Livestream[]>;
+  livestreams: Livestream[];
   eventsByDate: Record<string, VspoEvent[]>;
   lastUpdateTimestamp: number;
   liveStatus: string;
   locale: string;
+  timeZone: string;
   dateTabsInfo?: {
     tabDates: DateObject[];
     todayIndex: number;
@@ -71,12 +72,22 @@ const TabBox = styled(Box)(({ theme }) => ({
 }));
 
 const HomePage: NextPageWithLayout<LivestreamsProps> = ({
-  livestreamsByDate,
+  livestreams,
   eventsByDate,
   dateTabsInfo,
+  timeZone,
 }) => {
   const router = useRouter();
   const { t } = useTranslation("streams");
+
+  const livestreamsByDate = useMemo(() => {
+    return groupBy(livestreams, (livestream) => {
+      return formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
+        timeZone,
+      });
+    });
+  }, [livestreams, timeZone]);
+
   if (router.isFallback) {
     return <Loading />;
   }
@@ -320,19 +331,6 @@ export const getServerSideProps: GetServerSideProps<
         .join(", ") ?? "";
     const description = `${t("description")}\n${livestreamDescription}`;
 
-    const filteredLivestreams = uniqueLivestreams;
-
-    const livestreamsByDate = groupBy(filteredLivestreams, (livestream) => {
-      try {
-        return formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", {
-          timeZone,
-        });
-      } catch (err) {
-        console.error("Invalid date:", livestream.scheduledStartTime);
-        throw err;
-      }
-    });
-
     const eventsByDate = groupBy(events, (event) => {
       try {
         return formatDate(event.startedAt, "yyyy-MM-dd", { timeZone });
@@ -345,7 +343,8 @@ export const getServerSideProps: GetServerSideProps<
     return {
       props: {
         ...translations,
-        livestreamsByDate,
+        livestreams: uniqueLivestreams,
+        timeZone,
         eventsByDate,
         lastUpdateTimestamp: getCurrentUTCDate().getTime(),
         liveStatus: params.status,
