@@ -155,7 +155,7 @@ export const getServerSideProps: GetServerSideProps<
       endedDate.setDate(endedDate.getDate() + 1);
       const today = getCurrentUTCDate();
 
-      return await fetchLivestreams({
+      return fetchLivestreams({
         limit: params.status === "archive" ? 300 : 50,
         lang: locale,
         status: params.status,
@@ -174,7 +174,7 @@ export const getServerSideProps: GetServerSideProps<
 
     // Logic 2: Fetch events
     const fetchEventsData = async () => {
-      return await fetchEvents({ lang: locale });
+      return fetchEvents({ lang: locale });
     };
 
     // Logic 3: Fetch translations and create metadata
