@@ -13,13 +13,14 @@ import { Timeframe } from "@/types/timeframe";
 import { formatInTimeZone, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja } from "date-fns/locale";
 import { Locale, getHours } from "date-fns";
-import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "./Const";
+import { DEFAULT_LOCALE, TEMP_TIMESTAMP, TIME_ZONE_COOKIE } from "./Const";
 import { platforms } from "@/constants/platforms";
 import { SSRConfig } from "next-i18next";
 import { createInstance as createI18nInstance } from "i18next";
 import { SiteNewsTag } from "@/types/site-news";
 import { ParsedUrlQuery } from "querystring";
 import { convertToUTCDate, getCurrentUTCDate } from "./dayjs";
+import { ServerResponse } from "http";
 
 /**
  * Group an array of items by a specified key.
@@ -646,4 +647,45 @@ export const getInitializedI18nInstance = (
   });
   i18n.init();
   return i18n;
+};
+
+/**
+ * Gets the value of the cookie with the given `cookieName` found in `str`.
+ * @param cookieName - The name of the desired cookie.
+ * @param str - The string to search for the cookie in, e.g. `document.cookie`.
+ * @returns The value of the cookie with the given name, or
+ * undefined if no such cookie found in `str`.
+ */
+export const getCookieValue = (cookieName: string, str: string) => {
+  for (const maybeCookie of str.split(";")) {
+    const parts = maybeCookie.trim().split("=");
+    if (parts[0] === cookieName && parts.length >= 2) {
+      const value = parts.slice(1).join("=");
+      return decodeURIComponent(value);
+    }
+  }
+  return undefined;
+};
+
+/**
+ * Gets the time zone contained in the given response's set-cookie header.
+ * @param res - The server response object containing the header.
+ * @returns The value of the time zone in the set-cookie header, or
+ * undefined if the set-cookie header does not set a time zone.
+ */
+export const getSetCookieTimeZone = (res: ServerResponse) => {
+  const setCookieHeader = res.getHeader("set-cookie");
+  if (setCookieHeader === undefined || typeof setCookieHeader === "number") {
+    return undefined;
+  }
+  const cookies = Array.isArray(setCookieHeader)
+    ? setCookieHeader
+    : [setCookieHeader];
+  for (const cookie of cookies) {
+    const cookieValue = getCookieValue(TIME_ZONE_COOKIE, cookie);
+    if (cookieValue !== undefined) {
+      return cookieValue;
+    }
+  }
+  return undefined;
 };
