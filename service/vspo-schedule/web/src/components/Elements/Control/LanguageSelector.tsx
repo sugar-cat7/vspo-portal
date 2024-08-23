@@ -1,5 +1,4 @@
 import { MenuItem, TextField } from "@mui/material";
-import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { useLocale } from "@/hooks";
 
@@ -9,11 +8,8 @@ const localeLabels: { [localeCode: string]: string } = {
 };
 
 export const LanguageSelector = () => {
-  const router = useRouter();
   const { t } = useTranslation("common");
-  const [locale, setLocale] = useLocale();
-
-  const locales = router.locales;
+  const { locale, setLocale } = useLocale();
 
   return (
     locale !== undefined && (
@@ -26,18 +22,13 @@ export const LanguageSelector = () => {
         onChange={(event) => {
           const selectedLocale = event.target.value;
           setLocale(selectedLocale);
-          router.replace(router.asPath, undefined, {
-            scroll: false,
-            locale: selectedLocale,
-          });
         }}
       >
-        {locales !== undefined &&
-          locales.map((loc) => (
-            <MenuItem key={loc} value={loc}>
-              {localeLabels[loc]}
-            </MenuItem>
-          ))}
+        {Object.keys(localeLabels).map((loc) => (
+          <MenuItem key={loc} value={loc}>
+            {localeLabels[loc]}
+          </MenuItem>
+        ))}
       </TextField>
     )
   );
