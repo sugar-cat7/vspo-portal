@@ -213,13 +213,14 @@ export const CustomDrawer: React.FC<DrawerProps> = ({
 
       <Stack direction="column" justifyContent="space-between" flex="1">
         <DrawerNavigation sections={drawerNavigationSections} />
-        <Divider />
         <Box
           sx={{
             display: "flex",
             flexDirection: "column",
             gap: "16px",
             padding: "20px 12px",
+            borderTop: 1,
+            borderColor: "divider",
           }}
         >
           <LanguageSelector />
