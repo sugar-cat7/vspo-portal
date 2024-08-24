@@ -16,11 +16,11 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
 import { members } from "@/data/members";
 import { useTranslation } from "next-i18next";
-import { useTimeZoneContext } from "@/hooks";
 
 type Props = {
   livestreamsByDate: Record<string, Livestream[]>;
   eventsByDate: Record<string, VspoEvent[]>;
+  timeZone: string;
 };
 
 const StyledAccordion = styled(Accordion)(({ theme }) => ({
@@ -88,8 +88,8 @@ const StyledAvatar = styled(Avatar)(({ theme }) => ({
 export const LivestreamCards: React.FC<Props> = ({
   livestreamsByDate,
   eventsByDate,
+  timeZone,
 }) => {
-  const { timeZone } = useTimeZoneContext();
   const { t } = useTranslation(["streams"]);
   const [expanded, setExpanded] = React.useState<boolean>(true);
   if (Object.keys(livestreamsByDate).length === 0) {
@@ -231,7 +231,11 @@ export const LivestreamCards: React.FC<Props> = ({
                           lg={3}
                           key={livestream.id}
                         >
-                          <LivestreamCard livestream={livestream} />
+                          <LivestreamCard
+                            livestream={livestream}
+                            isFreechat={false}
+                            timeZone={timeZone}
+                          />
                         </Grid>
                       ))}
                     </Grid>
