@@ -9,6 +9,7 @@ import {
   formatDate,
   getInitializedI18nInstance,
   getOneWeekRange,
+  getSetCookieTimeZone,
 } from "@/lib/utils";
 import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
@@ -151,7 +152,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
 export const getServerSideProps: GetServerSideProps<
   LivestreamsProps,
   Params
-> = async ({ params, locale = DEFAULT_LOCALE, req }) => {
+> = async ({ params, locale = DEFAULT_LOCALE, req, res }) => {
   if (!params) {
     return {
       notFound: true,
@@ -159,7 +160,10 @@ export const getServerSideProps: GetServerSideProps<
   }
 
   try {
-    const timeZone = req.cookies[TIME_ZONE_COOKIE] ?? DEFAULT_TIME_ZONE;
+    const timeZone =
+      getSetCookieTimeZone(res) ??
+      req.cookies[TIME_ZONE_COOKIE] ??
+      DEFAULT_TIME_ZONE;
     const isDateStatus = isValidDate(params.status);
 
     // Logic 1: Fetch uniqueLivestreams

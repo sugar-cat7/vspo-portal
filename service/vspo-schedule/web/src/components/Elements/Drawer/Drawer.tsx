@@ -23,7 +23,7 @@ import {
 import { DrawerIcon } from "../Icon";
 import { ThemeToggleButton } from "../Button";
 import { useTranslation } from "next-i18next";
-import { TimeZoneSelector } from "../Control";
+import { LanguageSelector, TimeZoneSelector } from "../Control";
 import { useTimeZoneContext } from "@/hooks";
 import { Link } from "../Link";
 
@@ -222,6 +222,7 @@ export const CustomDrawer: React.FC<DrawerProps> = ({
             padding: "20px 12px",
           }}
         >
+          <LanguageSelector />
           <TimeZoneSelector />
           <ThemeToggleButton />
         </Box>

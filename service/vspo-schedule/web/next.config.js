@@ -51,6 +51,7 @@ const nextConfig = {
     ],
   },
   i18n,
+  skipMiddlewareUrlNormalize: true,
   experimental: {
     scrollRestoration: true,
   },
