@@ -11,12 +11,12 @@ const languageNameMapping = {
     "fr": "French",
     "de": "German",
     "es": "Spanish",
-    "ch": "Chinese (Simplified)",
+    "cn": "Chinese (Simplified)",
     "tw": "Chinese (Traditional)",
     "ko": "Korean",
 };
 
-const TargetLangSchema = z.enum(["en", "ja", "fr", "de", "es", "zh", "ko"]);
+const TargetLangSchema = z.enum(["en", "ja", "fr", "de", "es", "cn", "tw", "ko"]);
 
 const openAIResponseSchema = z.object({
     content: z.string(),
