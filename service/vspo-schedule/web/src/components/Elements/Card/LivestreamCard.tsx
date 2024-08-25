@@ -6,7 +6,6 @@ import { Livestream } from "@/types/streaming";
 import { getLiveStatus, formatDate } from "@/lib/utils";
 import { PlatformIcon } from "../Icon";
 import { useTranslation } from "next-i18next";
-import { useTimeZoneContext } from "@/hooks";
 import { VideoCard } from "./VideoCard";
 
 const ResponsiveTypography = styled(Typography)(({ theme }) => ({
@@ -54,16 +53,21 @@ const FontSizeOnTypography = styled(Typography)(
   }),
 );
 
-type LivestreamCardProps = {
-  livestream: Livestream;
-};
+type LivestreamCardProps =
+  | {
+      livestream: Livestream;
+      isFreechat: false;
+      timeZone: string;
+    }
+  | {
+      livestream: Livestream;
+      isFreechat: true;
+    };
 
-export const LivestreamCard: React.FC<LivestreamCardProps> = ({
-  livestream,
-}) => {
+export const LivestreamCard: React.FC<LivestreamCardProps> = (props) => {
+  const { livestream, isFreechat } = props;
   const { t } = useTranslation("common");
   const theme = useTheme();
-  const { timeZone } = useTimeZoneContext();
   const { title, channelTitle, scheduledStartTime, iconUrl, platform } =
     livestream;
   const livestreamStatus = useMemo(
@@ -100,7 +104,7 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
             alignItems: "center",
           }}
         >
-          {livestreamStatus !== "freechat" && (
+          {!isFreechat && (
             <ResponsiveTypography
               variant="subtitle1"
               color="text.secondary"
@@ -113,7 +117,10 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = ({
                   paddingRight: "3px",
                 }}
               >
-                {formatDate(scheduledStartTime, "HH:mm", { timeZone })}~
+                {formatDate(scheduledStartTime, "HH:mm", {
+                  timeZone: props.timeZone,
+                })}
+                ~
               </Typography>
               <PlatformIcon platform={platform} />
             </ResponsiveTypography>

@@ -103,6 +103,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
       <LivestreamCards
         livestreamsByDate={livestreamsByDate}
         eventsByDate={eventsByDate}
+        timeZone={timeZone}
       />
     );
   }
@@ -144,6 +145,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
       <LivestreamCards
         livestreamsByDate={livestreamsByDate}
         eventsByDate={eventsByDate}
+        timeZone={timeZone}
       />
     </TabContext>
   );

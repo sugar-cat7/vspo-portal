@@ -26,7 +26,7 @@ const FreechatPage: NextPageWithLayout<FreechatsProps> = ({ freechats }) => {
     <Grid container spacing={3}>
       {freechats.map((freechat) => (
         <Grid item xs={6} md={3} key={freechat.id}>
-          <LivestreamCard livestream={freechat} />
+          <LivestreamCard livestream={freechat} isFreechat={true} />
         </Grid>
       ))}
     </Grid>
