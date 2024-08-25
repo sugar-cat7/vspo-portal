@@ -1,0 +1,67 @@
+{
+  "spodule": "Spodule",
+  "vspo": "VSPO",
+  "search": "搜索",
+  "cancel": "取消",
+  "back": "返回",
+  "liveStatus": {
+    "live": "直播",
+    "upcoming": "即将直播"
+  },
+  "footer": {
+    "lastUpdated": "最后更新日期: {{date}}",
+    "pages": {
+      "home": "主页",
+      "terms": "服务条款",
+      "privacy": "隐私政策"
+    }
+  },
+  "bottomNav": {
+    "pages": {
+      "list": "直播列表",
+      "clip": "剪辑",
+      "twitch-clip": "Twitch 剪辑",
+      "event": "活动"
+    }
+  },
+  "drawer": {
+    "pages": {
+      "live": "直播中",
+      "upcoming": "即将直播",
+      "archive": "存档",
+      "freechat": "自由聊天",
+      "clip": "剪辑列表",
+      "twitch-clip": "Twitch 剪辑列表",
+      "about": "关于Spodule",
+      "site-news": "网站新闻",
+      "qa": "联系我们",
+      "discord": "Discord 机器人"
+    },
+    "language": "语言",
+    "timeZone": "时区",
+    "site-theme": "主题"
+  },
+  "alert": {
+    "title": "通知",
+    "message": "现在可以从导航栏中选择语言/时区了！"
+  },
+  "videoModal": {
+    "tabLabels": {
+      "overview": "概述",
+      "relatedVideos": "相关视频",
+      "chat": "直播聊天"
+    },
+    "watch": "观看",
+    "share": "分享"
+  },
+  "relatedVideos": {
+    "dataLoadError": "数据加载失败。",
+    "loadMore": "加载更多"
+  },
+  "breadcrumbs": {
+    "pages": {
+      "home": "主页",
+      "site-news": "网站新闻"
+    }
+  }
+}

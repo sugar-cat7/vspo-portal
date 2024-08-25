@@ -5,6 +5,8 @@ import { useLocale } from "@/hooks";
 const localeLabels: { [localeCode: string]: string } = {
   en: "English",
   ja: "日本語",
+  cn: "简体中文",
+  tw: "繁體中文",
 };
 
 export const LanguageSelector = () => {

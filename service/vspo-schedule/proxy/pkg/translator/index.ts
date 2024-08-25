@@ -11,7 +11,8 @@ const languageNameMapping = {
     "fr": "French",
     "de": "German",
     "es": "Spanish",
-    "zh": "Chinese",
+    "ch": "Chinese (Simplified)",
+    "tw": "Chinese (Traditional)",
     "ko": "Korean",
 };
 

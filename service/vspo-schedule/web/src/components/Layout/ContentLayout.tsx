@@ -51,11 +51,11 @@ export const ContentLayout = ({
 
   const handleAlertClose = () => {
     setAlertOpen(false);
-    localStorage.setItem("alertSeen-20240821", "true");
+    localStorage.setItem("alertSeen-20240826", "true");
   };
 
   useEffect(() => {
-    const hasSeenAlert = localStorage.getItem("alertSeen-20240821");
+    const hasSeenAlert = localStorage.getItem("alertSeen-20240826");
 
     if (!hasSeenAlert) {
       setAlertOpen(true);
