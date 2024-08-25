@@ -10,11 +10,10 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Livestream } from "@/types/streaming";
-import { groupLivestreamsByTimeRange } from "@/lib/utils";
+import { getRelevantMembers, groupLivestreamsByTimeRange } from "@/lib/utils";
 import { Link, LivestreamCard } from "../Elements";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
-import { members } from "@/data/members";
 import { useTranslation } from "next-i18next";
 
 type Props = {
@@ -150,26 +149,21 @@ export const LivestreamCards: React.FC<Props> = ({
                   </Typography>
                 </AccordionSummary>
                 <AccordionDetails sx={{ backgroundColor: "transparent" }}>
-                  {events.map((event, index) => (
-                    <Box
-                      display="flex"
-                      sx={{
-                        gap: "10px",
-                        marginBottom: "10px",
-                        flexDirection: "column",
-                      }}
-                      key={index}
-                    >
-                      {event.isNotLink ? (
-                        <Typography
-                          sx={{
-                            fontSize: "16px",
-                          }}
-                        >
-                          ・{event.title}
-                        </Typography>
-                      ) : (
-                        <Link href={`/events/details/${event.newsId}`}>
+                  {events.map((event, eventIndex) => {
+                    const eventMembers = getRelevantMembers(
+                      event.contentSummary,
+                    );
+                    return (
+                      <Box
+                        display="flex"
+                        sx={{
+                          gap: "10px",
+                          marginBottom: "10px",
+                          flexDirection: "column",
+                        }}
+                        key={eventIndex}
+                      >
+                        {event.isNotLink ? (
                           <Typography
                             sx={{
                               fontSize: "16px",
@@ -177,30 +171,37 @@ export const LivestreamCards: React.FC<Props> = ({
                           >
                             ・{event.title}
                           </Typography>
-                        </Link>
-                      )}
-                      <Box
-                        display="flex"
-                        sx={{
-                          gap: "10px",
-                          marginBottom: "10px",
-                        }}
-                      >
-                        {members.map(
-                          (member, index) =>
-                            event.contentSummary.includes(
-                              (member.name || "").replace(" ", ""),
-                            ) && (
+                        ) : (
+                          <Link href={`/events/details/${event.newsId}`}>
+                            <Typography
+                              sx={{
+                                fontSize: "16px",
+                              }}
+                            >
+                              ・{event.title}
+                            </Typography>
+                          </Link>
+                        )}
+                        {eventMembers.length > 0 && (
+                          <Box
+                            display="flex"
+                            sx={{
+                              gap: "10px",
+                              marginBottom: "10px",
+                            }}
+                          >
+                            {eventMembers.map((member, memberIndex) => (
                               <StyledAvatar
-                                key={index}
+                                key={memberIndex}
                                 alt={member.name}
                                 src={member.iconUrl}
                               />
-                            ),
+                            ))}
+                          </Box>
                         )}
                       </Box>
-                    </Box>
-                  ))}
+                    );
+                  })}
                 </AccordionDetails>
               </StyledAccordion>
             )}

@@ -21,11 +21,11 @@ import { NextPageWithLayout } from "../_app";
 import { VspoEvent } from "@/types/events";
 import { ContentLayout } from "@/components/Layout";
 import { useMediaQuery } from "@mui/material";
-import { members } from "@/data/members";
 import {
   formatDate,
   generateStaticPathsForLocales,
   getInitializedI18nInstance,
+  getRelevantMembers,
   groupEventsByYearMonth,
 } from "@/lib/utils";
 import React, { useEffect } from "react";
@@ -315,7 +315,6 @@ const IndexPage: NextPageWithLayout<Props> = ({
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: matches ? "40px" : "20px", px: 2 }}>
                   {eventsOnDate.map((event, eventIndex) => {
-                    // TODO: Consider whether an event should hold time zone info
                     const eventDate = event.startedAt.split("T")[0]; // Get the date part of the ISO string
                     const today = formatDate(
                       getCurrentUTCDate(),
@@ -323,6 +322,9 @@ const IndexPage: NextPageWithLayout<Props> = ({
                       { timeZone },
                     );
                     const isEventToday = eventDate === today;
+                    const eventMembers = getRelevantMembers(
+                      event.contentSummary,
+                    );
                     return (
                       <React.Fragment key={eventIndex}>
                         {event.isNotLink ? (
@@ -344,29 +346,23 @@ const IndexPage: NextPageWithLayout<Props> = ({
                               >
                                 {event.title}
                               </Typography>
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  gap: "10px",
-                                  marginTop: "10px",
-                                }}
-                              >
-                                {members.map((member, index) => {
-                                  const isMatch = member.keywords.some(
-                                    (keyword) =>
-                                      event.contentSummary.includes(keyword),
-                                  );
-                                  return (
-                                    isMatch && (
-                                      <StyledAvatar
-                                        key={index}
-                                        alt={member.name}
-                                        src={member.iconUrl}
-                                      />
-                                    )
-                                  );
-                                })}
-                              </Box>
+                              {eventMembers.length > 0 && (
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    gap: "10px",
+                                    marginTop: "10px",
+                                  }}
+                                >
+                                  {eventMembers.map((member, memberIndex) => (
+                                    <StyledAvatar
+                                      key={memberIndex}
+                                      alt={member.name}
+                                      src={member.iconUrl}
+                                    />
+                                  ))}
+                                </Box>
+                              )}
                             </CardContent>
                           </Card>
                         ) : (
@@ -389,29 +385,23 @@ const IndexPage: NextPageWithLayout<Props> = ({
                                 >
                                   {event.title}
                                 </Typography>
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    gap: "10px",
-                                    marginTop: "10px",
-                                  }}
-                                >
-                                  {members.map((member, index) => {
-                                    const isMatch = member.keywords.some(
-                                      (keyword) =>
-                                        event.contentSummary.includes(keyword),
-                                    );
-                                    return (
-                                      isMatch && (
-                                        <StyledAvatar
-                                          key={index}
-                                          alt={member.name}
-                                          src={member.iconUrl}
-                                        />
-                                      )
-                                    );
-                                  })}
-                                </Box>
+                                {eventMembers.length > 0 && (
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      gap: "10px",
+                                      marginTop: "10px",
+                                    }}
+                                  >
+                                    {eventMembers.map((member, memberIndex) => (
+                                      <StyledAvatar
+                                        key={memberIndex}
+                                        alt={member.name}
+                                        src={member.iconUrl}
+                                      />
+                                    ))}
+                                  </Box>
+                                )}
                               </CardContent>
                             </Card>
                           </Link>

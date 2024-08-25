@@ -21,6 +21,7 @@ import { SiteNewsTag } from "@/types/site-news";
 import { ParsedUrlQuery } from "querystring";
 import { convertToUTCDate, getCurrentUTCDate } from "./dayjs";
 import { ServerResponse } from "http";
+import { Member } from "@/types/member";
 
 /**
  * Group an array of items by a specified key.
@@ -565,6 +566,25 @@ export const groupEventsByYearMonth = (events: VspoEvent[]) => {
       },
       {} as { [key: string]: VspoEvent[] },
     );
+};
+
+/**
+ * Searches for members who are relevant to the given string.
+ * @param str - The string to search through.
+ * @returns The list of relevant members.
+ */
+export const getRelevantMembers = (str: string) => {
+  return members.filter((member) => isRelevantMember(member, str));
+};
+
+/**
+ * Determines whether the given member is relevant to the given string.
+ * @param member - The query member.
+ * @param str - The string to search through.
+ * @returns true if the member is relevant to the string, false otherwise.
+ */
+export const isRelevantMember = (member: Member, str: string) => {
+  return member.keywords.some((keyword) => str.includes(keyword));
 };
 
 type HasThumbnailUrl = { thumbnailUrl: string };
