@@ -43,7 +43,7 @@
   },
   "alert": {
     "title": "Notice",
-    "message": "The option to select a time zone is now available from the navigation bar!"
+    "message": "The language/time zone can now be selected from the navigation bar!"
   },
   "videoModal": {
     "tabLabels": {

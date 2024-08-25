@@ -1,0 +1,36 @@
+{
+  "noClips": "没有符合条件的剪辑。",
+  "clipLabels": {
+    "new": "新",
+    "popular": "热门",
+    "recommended": "推荐",
+    "trending": "趋势"
+  },
+  "youtubeClips": {
+    "title": "$t(common:vspo)剪辑列表",
+    "description": "汇总$t(common:vspo)成员的YouTube剪辑视频。"
+  },
+  "twitchClips": {
+    "title": "$t(common:vspo) Twitch剪辑列表",
+    "description": "汇总$t(common:vspo)成员的Twitch剪辑。"
+  },
+  "viewCountLabel": "{{views, number}}+次观看",
+  "searchDialog": {
+    "title": "剪辑搜索",
+    "alertMessage": "目前只能搜索1个月以内的剪辑。",
+    "timeframe": "时间范围",
+    "timeframes": {
+      "1day": "今天",
+      "1week": "本周",
+      "1month": "本月"
+    },
+    "members": "成员",
+    "keyword": "关键词",
+    "keywords": [
+      "Apex",
+      "Valorant"
+    ],
+    "cancel": "$t(common:cancel)",
+    "search": "$t(common:search)"
+  }
+}

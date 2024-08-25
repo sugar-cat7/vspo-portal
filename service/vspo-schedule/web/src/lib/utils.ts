@@ -11,7 +11,7 @@ import {
 } from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
 import { formatInTimeZone, utcToZonedTime } from "date-fns-tz";
-import { enUS, ja } from "date-fns/locale";
+import { enUS, ja, zhCN, zhTW, ko } from "date-fns/locale";
 import { Locale, getHours } from "date-fns";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP, TIME_ZONE_COOKIE } from "./Const";
 import { platforms } from "@/constants/platforms";
@@ -289,6 +289,9 @@ export const getOneWeekRange = () => {
 const locales: Record<string, Locale> = {
   en: enUS,
   ja: ja,
+  cn: zhCN,
+  tw: zhTW,
+  ko: ko,
 };
 
 /**

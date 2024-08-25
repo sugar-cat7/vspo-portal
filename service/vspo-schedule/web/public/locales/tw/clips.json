@@ -1,0 +1,36 @@
+{
+  "noClips": "沒有符合條件的剪輯。",
+  "clipLabels": {
+    "new": "最新",
+    "popular": "人氣",
+    "recommended": "推薦",
+    "trending": "趨勢"
+  },
+  "youtubeClips": {
+    "title": "$t(common:vspo) 剪輯列表",
+    "description": "彙整$t(common:vspo)成員的YouTube剪輯。"
+  },
+  "twitchClips": {
+    "title": "$t(common:vspo) Twitch 剪輯",
+    "description": "彙整$t(common:vspo)成員的Twitch剪輯。"
+  },
+  "viewCountLabel": "{{views, number}}次觀看以上",
+  "searchDialog": {
+    "title": "詳細搜尋",
+    "alertMessage": "目前無法搜尋超過1個月前的剪輯。",
+    "timeframe": "時間範圍",
+    "timeframes": {
+      "1day": "1天",
+      "1week": "1週",
+      "1month": "1個月"
+    },
+    "members": "成員",
+    "keyword": "關鍵字",
+    "keywords": [
+      "Apex",
+      "Valorant"
+    ],
+    "cancel": "$t(common:cancel)",
+    "search": "$t(common:search)"
+  }
+}

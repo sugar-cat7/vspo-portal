@@ -8,7 +8,7 @@ import {
 } from "./lib/Const";
 
 const publicFileRegex = /\.(.*)$/;
-const locales = ["en", "ja"];
+const locales = ["en", "ja", "cn", "tw", "ko"];
 
 export const middleware = (req: NextRequest) => {
   try {
@@ -45,9 +45,8 @@ export const middleware = (req: NextRequest) => {
 const setLocale = (req: NextRequest, res: NextResponse) => {
   const pathLocale = getPathLocale(req);
   if (pathLocale === undefined) {
-    const locale = getCookieLocale(req)
-      ?? getHeaderLocale(req)
-      ?? DEFAULT_LOCALE;
+    const locale =
+      getCookieLocale(req) ?? getHeaderLocale(req) ?? DEFAULT_LOCALE;
     return NextResponse.redirect(createUrlWithLocale(req, locale));
   }
   setCookie(res, LOCALE_COOKIE, pathLocale);
@@ -60,9 +59,8 @@ const setLocale = (req: NextRequest, res: NextResponse) => {
  * - default app time zone
  */
 const setTimeZone = (req: NextRequest, res: NextResponse) => {
-  const timeZone = getCookieTimeZone(req)
-    ?? getHeaderTimeZone(req)
-    ?? DEFAULT_TIME_ZONE;
+  const timeZone =
+    getCookieTimeZone(req) ?? getHeaderTimeZone(req) ?? DEFAULT_TIME_ZONE;
   setCookie(res, TIME_ZONE_COOKIE, timeZone);
 };
 
@@ -104,6 +102,6 @@ const setCookie = (res: NextResponse, name: string, value: string) => {
 const createUrlWithLocale = (req: NextRequest, locale: string) => {
   return new URL(
     `/${locale}${req.nextUrl.pathname}${req.nextUrl.search}`,
-    req.url,
+    req.url
   );
 };
