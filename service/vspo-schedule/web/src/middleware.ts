@@ -8,7 +8,7 @@ import {
 } from "./lib/Const";
 
 const publicFileRegex = /\.(.*)$/;
-const locales = ["en", "ja", "cn", "tw"];
+const locales = ["en", "ja", "cn", "tw", "ko"];
 
 export const middleware = (req: NextRequest) => {
   try {

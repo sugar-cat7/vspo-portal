@@ -11,7 +11,7 @@ import {
 } from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
 import { formatInTimeZone, utcToZonedTime } from "date-fns-tz";
-import { enUS, ja, zhCN, zhTW } from "date-fns/locale";
+import { enUS, ja, zhCN, zhTW, ko } from "date-fns/locale";
 import { Locale, getHours } from "date-fns";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP, TIME_ZONE_COOKIE } from "./Const";
 import { platforms } from "@/constants/platforms";
@@ -291,6 +291,7 @@ const locales: Record<string, Locale> = {
   ja: ja,
   cn: zhCN,
   tw: zhTW,
+  ko: ko,
 };
 
 /**

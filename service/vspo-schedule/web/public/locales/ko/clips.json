@@ -1,0 +1,36 @@
+{
+  "noClips": "일치하는 클립이 없습니다.",
+  "clipLabels": {
+    "new": "새로운",
+    "popular": "인기 있는",
+    "recommended": "추천",
+    "trending": "트렌딩"
+  },
+  "youtubeClips": {
+    "title": "$t(common:vspo) 클립",
+    "description": "$t(common:vspo) 멤버들의 YouTube 클립(기리누키)을 확인하세요."
+  },
+  "twitchClips": {
+    "title": "$t(common:vspo) Twitch 클립",
+    "description": "$t(common:vspo) 멤버들의 Twitch 클립을 확인하세요."
+  },
+  "viewCountLabel": "{{views, number}}+ 조회수",
+  "searchDialog": {
+    "title": "클립 검색",
+    "alertMessage": "1개월 이내의 클립만 검색 가능합니다.",
+    "timeframe": "기간",
+    "timeframes": {
+      "1day": "오늘",
+      "1week": "이번 주",
+      "1month": "이번 달"
+    },
+    "members": "멤버",
+    "keyword": "키워드",
+    "keywords": [
+      "Apex",
+      "Valorant"
+    ],
+    "cancel": "$t(common:cancel)",
+    "search": "$t(common:search)"
+  }
+}
