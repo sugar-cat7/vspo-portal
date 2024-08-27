@@ -77,6 +77,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   events,
   dateTabsInfo,
   timeZone,
+  locale,
 }) => {
   const router = useRouter();
   const { t } = useTranslation("streams");
@@ -104,6 +105,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
         livestreamsByDate={livestreamsByDate}
         eventsByDate={eventsByDate}
         timeZone={timeZone}
+        locale={locale}
       />
     );
   }
@@ -146,6 +148,7 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
         livestreamsByDate={livestreamsByDate}
         eventsByDate={eventsByDate}
         timeZone={timeZone}
+        locale={locale}
       />
     </TabContext>
   );

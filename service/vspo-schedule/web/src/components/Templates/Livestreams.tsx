@@ -10,7 +10,11 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Livestream } from "@/types/streaming";
-import { getRelevantMembers, groupLivestreamsByTimeRange } from "@/lib/utils";
+import {
+  formatDate,
+  getRelevantMembers,
+  groupLivestreamsByTimeRange,
+} from "@/lib/utils";
 import { Link, LivestreamCard } from "../Elements";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { VspoEvent } from "@/types/events";
@@ -20,6 +24,7 @@ type Props = {
   livestreamsByDate: Record<string, Livestream[]>;
   eventsByDate: Record<string, VspoEvent[]>;
   timeZone: string;
+  locale: string;
 };
 
 const StyledAccordion = styled(Accordion)(({ theme }) => ({
@@ -88,6 +93,7 @@ export const LivestreamCards: React.FC<Props> = ({
   livestreamsByDate,
   eventsByDate,
   timeZone,
+  locale,
 }) => {
   const { t } = useTranslation(["streams"]);
   const [expanded, setExpanded] = React.useState<boolean>(true);
@@ -116,8 +122,9 @@ export const LivestreamCards: React.FC<Props> = ({
           events = eventsByDate[date];
         }
 
-        const formattedDate =
-          livestreamsByDate[date].at(0)?.formattedDateString;
+        const formattedDate = formatDate(date, "MM/dd (E)", {
+          localeCode: locale,
+        });
 
         return (
           <Box
