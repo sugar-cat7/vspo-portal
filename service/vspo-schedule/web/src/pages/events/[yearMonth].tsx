@@ -325,85 +325,52 @@ const IndexPage: NextPageWithLayout<Props> = ({
                     const eventMembers = getRelevantMembers(
                       event.contentSummary,
                     );
+                    const eventCard = (
+                      <Card
+                        sx={{
+                          marginBottom: "20px",
+                          border: isEventToday ? "2px solid red" : "none",
+                        }}
+                        ref={isEventToday ? todayEventRef : null}
+                      >
+                        <CardContent>
+                          <Typography
+                            variant="h6"
+                            component="div"
+                            align="left"
+                            sx={{
+                              fontSize: matches ? "1.00rem" : "1.25rem",
+                            }}
+                          >
+                            {event.title}
+                          </Typography>
+                          {eventMembers.length > 0 && (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                gap: "10px",
+                                marginTop: "10px",
+                              }}
+                            >
+                              {eventMembers.map((member, memberIndex) => (
+                                <StyledAvatar
+                                  key={memberIndex}
+                                  alt={member.name}
+                                  src={member.iconUrl}
+                                />
+                              ))}
+                            </Box>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
                     return (
                       <React.Fragment key={eventIndex}>
                         {event.isNotLink ? (
-                          <Card
-                            sx={{
-                              marginBottom: "20px",
-                              border: isEventToday ? "2px solid red" : "none",
-                            }}
-                            ref={isEventToday ? todayEventRef : null}
-                          >
-                            <CardContent>
-                              <Typography
-                                variant="h6"
-                                component="div"
-                                align="left"
-                                sx={{
-                                  fontSize: matches ? "1.00rem" : "1.25rem",
-                                }}
-                              >
-                                {event.title}
-                              </Typography>
-                              {eventMembers.length > 0 && (
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    gap: "10px",
-                                    marginTop: "10px",
-                                  }}
-                                >
-                                  {eventMembers.map((member, memberIndex) => (
-                                    <StyledAvatar
-                                      key={memberIndex}
-                                      alt={member.name}
-                                      src={member.iconUrl}
-                                    />
-                                  ))}
-                                </Box>
-                              )}
-                            </CardContent>
-                          </Card>
+                          eventCard
                         ) : (
                           <Link href={`/events/details/${event.newsId}`}>
-                            <Card
-                              sx={{
-                                marginBottom: "20px",
-                                border: isEventToday ? "2px solid red" : "none",
-                              }}
-                              ref={isEventToday ? todayEventRef : null}
-                            >
-                              <CardContent>
-                                <Typography
-                                  variant="h6"
-                                  component="div"
-                                  align="left"
-                                  sx={{
-                                    fontSize: matches ? "1.00rem" : "1.25rem",
-                                  }}
-                                >
-                                  {event.title}
-                                </Typography>
-                                {eventMembers.length > 0 && (
-                                  <Box
-                                    sx={{
-                                      display: "flex",
-                                      gap: "10px",
-                                      marginTop: "10px",
-                                    }}
-                                  >
-                                    {eventMembers.map((member, memberIndex) => (
-                                      <StyledAvatar
-                                        key={memberIndex}
-                                        alt={member.name}
-                                        src={member.iconUrl}
-                                      />
-                                    ))}
-                                  </Box>
-                                )}
-                              </CardContent>
-                            </Card>
+                            {eventCard}
                           </Link>
                         )}
                       </React.Fragment>

@@ -160,6 +160,11 @@ export const LivestreamCards: React.FC<Props> = ({
                     const eventMembers = getRelevantMembers(
                       event.contentSummary,
                     );
+                    const eventTitle = (
+                      <Typography sx={{ fontSize: "16px" }}>
+                        ・{event.title}
+                      </Typography>
+                    );
                     return (
                       <Box
                         display="flex"
@@ -171,22 +176,10 @@ export const LivestreamCards: React.FC<Props> = ({
                         key={eventIndex}
                       >
                         {event.isNotLink ? (
-                          <Typography
-                            sx={{
-                              fontSize: "16px",
-                            }}
-                          >
-                            ・{event.title}
-                          </Typography>
+                          eventTitle
                         ) : (
                           <Link href={`/events/details/${event.newsId}`}>
-                            <Typography
-                              sx={{
-                                fontSize: "16px",
-                              }}
-                            >
-                              ・{event.title}
-                            </Typography>
+                            {eventTitle}
                           </Link>
                         )}
                         {eventMembers.length > 0 && (
