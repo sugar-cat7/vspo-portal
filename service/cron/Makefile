@@ -22,7 +22,7 @@ local-build:
 
 migrate:
 	@echo "Migrating database..."
-	go run cmd/migration/index.go
+	go run cmd/index.go db-migration
 	@echo "Migrating database...done"
 
 sqlc:
