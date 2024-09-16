@@ -12,7 +12,7 @@ require (
 	github.com/go-faster/jx v1.1.0
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.7.0
-	github.com/ogen-go/ogen v1.4.0
+	github.com/ogen-go/ogen v1.4.1
 	github.com/pressly/goose/v3 v3.22.0
 	github.com/samber/lo v1.47.0
 	github.com/spf13/cobra v1.8.1
