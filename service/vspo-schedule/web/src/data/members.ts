@@ -170,7 +170,7 @@ export const members: Member[] = [
     twitcastingScreenId: "tsuna_nekota",
     twitcastingUserId: "1535916492155678721",
     iconUrl:
-      "https://yt3.ggpht.com/5cB1RxA8O44yMKNGvEMqvS3E1FaTloSC1GoTfY48kjAcxllPwyySVO9ioRoSfLSKFATLJycV=s88-c-k-c0x00ffffff-no-rj",
+      "https://yt3.ggpht.com/TDn7-FHas27cTkn2ILrg4pWaizLw8ySaCwD0mp6G6zmu843q4lZZgqYGJtMnoAobGBFGG6BZ=s88-c-k-c0x00ffffff-no-rj",
     keywords: ["猫汰つな", "猫汰 つな", "Tsuna Nekota", "Nekota Tsuna"],
   },
   {
@@ -192,7 +192,7 @@ export const members: Member[] = [
     twitcastingScreenId: "beni_yakumo",
     twitcastingUserId: "1381969294624313344",
     iconUrl:
-      "https://yt3.ggpht.com/v2me3hWW0qXxF5LEgag_o5HSr3m94U3OVXoq9t4_sKE8qRRhZahK_zf66b3XTvn6zXe8M44=s88-c-k-c0x00ffffff-no-rj",
+      "https://yt3.ggpht.com/Sj_DDAvj1RvPVy-C8SUPe29zQAkOUqFYgAzkM-_UUyJOEL_xVdTFRuvB9L1s121dWnMY5DZ1FA=s88-c-k-c0x00ffffff-no-rj",
     keywords: ["八雲べに", "八雲 べに", "Beni Yakumo", "Yakumo Beni"],
   },
   {
