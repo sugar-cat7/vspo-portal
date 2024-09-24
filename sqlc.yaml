@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "service/common-job/infra/database/schema/query"
+    schema: "service/common-job/infra/database/schema/migration"
+    gen:
+      go:
+        package: "db_sqlc"
+        out: "service/common-job/infra/database/internal/gen"
+        sql_package: "pgx/v5"

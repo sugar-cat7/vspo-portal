@@ -5,7 +5,7 @@ on:
       branches:
         - main
       paths:
-        - 'service/cron/**'
+        - 'service/common-job/**'
 
 permissions:
   contents: read
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
         run:
-          working-directory: ./service/cron
+          working-directory: ./service/common-job
 
     steps:
       - uses: actions/checkout@v4
@@ -39,4 +39,4 @@ jobs:
         uses: golangci/golangci-lint-action@v5
         with:
           version: v1.58.0
-          working-directory: ./service/cron
+          working-directory: ./service/common-job
