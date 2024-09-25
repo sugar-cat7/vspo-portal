@@ -23,7 +23,7 @@ type PostgresContainer struct {
 func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
 	pgContainer, err := postgres.Run(ctx,
 		"postgres:latest",
-		postgres.WithDatabase("vspo"),
+		postgres.WithDatabase("test_vspo"),
 		postgres.WithUsername("user"),
 		postgres.WithPassword("password"),
 		testcontainers.WithWaitStrategy(
@@ -64,20 +64,25 @@ func SetupRepo(ctx context.Context) setupTx {
 		panic(err)
 	}
 
+	dbName := "test_vspo"
+	dbUser := "user"
+	dbPassword := "password"
+	dbSSLMode := "disable"
+
 	migration.RunUp(
 		fmt.Sprintf("%s:%s", host, port.Port()),
-		e.DatabaseEnvironment.DBUser,
-		e.DatabaseEnvironment.DBPassword,
-		e.DatabaseEnvironment.DBDatabase,
-		e.DatabaseEnvironment.DBSSLMode,
+		dbUser,
+		dbPassword,
+		dbName,
+		dbSSLMode,
 	)
 
 	dbClient := database.NewClientPool(ctx,
 		fmt.Sprintf("%s:%s", host, port.Port()),
-		e.DatabaseEnvironment.DBUser,
-		e.DatabaseEnvironment.DBPassword,
-		e.DatabaseEnvironment.DBDatabase,
-		e.DatabaseEnvironment.DBSSLMode,
+		dbUser,
+		dbPassword,
+		dbName,
+		dbSSLMode,
 	)
 
 	tx := NewTestTransactable(

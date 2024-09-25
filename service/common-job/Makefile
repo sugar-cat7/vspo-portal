@@ -1,4 +1,4 @@
-DIR ?= ./infra/database/internal/schema/migration
+DIR ?= infra/database/schema/migration
 DRIVER ?= postgres
 MIGRATION_IMAGE_NAME ?= migration-image
 DBSTRING ?= host=vspo-db user=user password=password dbname=vspo sslmode=disable
@@ -35,9 +35,9 @@ sqlc:
 
 ddl:
 	@echo "Building Docker image first..."
-	docker build -f ./Dockerfile.migration -t $(MIGRATION_IMAGE_NAME) .
+	docker build -f ./Dockerfile --target db-migration -t $(MIGRATION_IMAGE_NAME) .
 	@echo "Creating new migration..."
-	docker run --rm -v ${PWD}/${DIR}:/migrations $(MIGRATION_IMAGE_NAME) goose -dir=/migrations create $(name) sql
+	docker run --rm -v ${PWD}/${DIR}:/migrations $(MIGRATION_IMAGE_NAME) goose -dir=/migrations create add sql
 	@echo "Creating new migration done."
 
 gen.mock:

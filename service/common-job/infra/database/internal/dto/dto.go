@@ -66,11 +66,8 @@ func VideoToModel(v *db_sqlc.Video) *model.Video {
 		Title:        v.Title,
 		Description:  v.Description,
 		PublishedAt:  &v.PublishedAt.Time,
-		StartedAt:    &v.StartedAt.Time,
-		EndedAt:      &v.EndedAt.Time,
 		Platform:     model.Platform(v.PlatformType),
 		Tags:         strings.Split(v.Tags, ","),
-		ViewCount:    uint64(v.ViewCount),
 		ThumbnailURL: model.ThumbnailURL(v.ThumbnailUrl),
 		IsDeleted:    v.IsDeleted,
 	}
@@ -80,9 +77,12 @@ func VideoToModel(v *db_sqlc.Video) *model.Video {
 // GetVideosByPlatformsWithStatusRowToModel converts db_sqlc.GetVideosByPlatformsWithStatusRow to model.Video
 func GetVideosByPlatformsWithStatusRowToModel(v *db_sqlc.GetVideosByPlatformsWithStatusRow) *model.Video {
 	m := VideoToModel(&v.Video)
-	m.Status = model.Status(v.BroadcastStatus.Status)
+	m.ViewCount = uint64(v.StreamStatus.ViewCount)
+	m.StartedAt = &v.StreamStatus.StartedAt.Time
+	m.EndedAt = &v.StreamStatus.EndedAt.Time
+	m.Status = model.Status(v.StreamStatus.Status)
 	m.CreatorInfo = model.CreatorInfo{
-		ID:        v.BroadcastStatus.CreatorID,
+		ID:        v.StreamStatus.CreatorID,
 		ChannelID: v.Video.ChannelID,
 	}
 	return m
@@ -224,18 +224,11 @@ func VideoModelToCreateVideoParams(m *model.Video) db_sqlc.CreateVideoParams {
 		PlatformType: m.Platform.String(),
 		VideoType:    m.VideoType.String(),
 		Tags:         strings.Join(m.Tags, ","),
-		ViewCount:    int32(m.ViewCount),
 		ThumbnailUrl: string(m.ThumbnailURL),
 		IsDeleted:    m.IsDeleted,
 	}
 	if m.PublishedAt != nil {
 		p.PublishedAt = utime.TimeToTimestamptz(*m.PublishedAt)
-	}
-	if m.StartedAt != nil {
-		p.StartedAt = utime.TimeToTimestamptz(*m.StartedAt)
-	}
-	if m.EndedAt != nil {
-		p.EndedAt = utime.TimeToTimestamptz(*m.EndedAt)
 	}
 	return p
 }
@@ -361,16 +354,19 @@ func ChannelModelToCreateChannelParams(m *model.Channel) db_sqlc.CreateChannelPa
 	return p
 }
 
-// VideoModelsToCreateBroadcastStatusParams converts model.Videos to []db_sqlc.CreateBroadcastStatusParams
-func VideoModelsToCreateBroadcastStatusParams(m model.Videos) []db_sqlc.CreateBroadcastStatusParams {
-	ps := []db_sqlc.CreateBroadcastStatusParams{}
+// VideoModelsToCreateStreamStatusParams converts model.Videos to []db_sqlc.CreateStreamStatusParams
+func VideoModelsToCreateStreamStatusParams(m model.Videos) []db_sqlc.CreateStreamStatusParams {
+	ps := []db_sqlc.CreateStreamStatusParams{}
 	for _, v := range m {
-		ps = append(ps, db_sqlc.CreateBroadcastStatusParams{
+		ps = append(ps, db_sqlc.CreateStreamStatusParams{
 			ID:        uuid.UUID(),
 			VideoID:   v.ID,
 			CreatorID: v.CreatorInfo.ID,
 			Status:    v.Status.String(),
 			UpdatedAt: utime.TimeToTimestamptz(utime.Utc.Now()),
+			ViewCount: int32(v.ViewCount),
+			StartedAt: utime.TimeToTimestamptz(*v.StartedAt),
+			EndedAt:   utime.TimeToTimestamptz(*v.EndedAt),
 		})
 	}
 	return ps

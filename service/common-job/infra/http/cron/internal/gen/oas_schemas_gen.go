@@ -390,7 +390,7 @@ func (*APICronVideosGetUnauthorized) aPICronVideosGetRes() {}
 type APICronVideosGetVideoType string
 
 const (
-	APICronVideosGetVideoTypeVspoBroadcast APICronVideosGetVideoType = "vspo_broadcast"
+	APICronVideosGetVideoTypeVspoStream APICronVideosGetVideoType = "vspo_stream"
 	APICronVideosGetVideoTypeClip          APICronVideosGetVideoType = "clip"
 	APICronVideosGetVideoTypeFreechat      APICronVideosGetVideoType = "freechat"
 )
@@ -398,7 +398,7 @@ const (
 // AllValues returns all APICronVideosGetVideoType values.
 func (APICronVideosGetVideoType) AllValues() []APICronVideosGetVideoType {
 	return []APICronVideosGetVideoType{
-		APICronVideosGetVideoTypeVspoBroadcast,
+		APICronVideosGetVideoTypeVspoStream,
 		APICronVideosGetVideoTypeClip,
 		APICronVideosGetVideoTypeFreechat,
 	}
@@ -407,7 +407,7 @@ func (APICronVideosGetVideoType) AllValues() []APICronVideosGetVideoType {
 // MarshalText implements encoding.TextMarshaler.
 func (s APICronVideosGetVideoType) MarshalText() ([]byte, error) {
 	switch s {
-	case APICronVideosGetVideoTypeVspoBroadcast:
+	case APICronVideosGetVideoTypeVspoStream:
 		return []byte(s), nil
 	case APICronVideosGetVideoTypeClip:
 		return []byte(s), nil
@@ -421,8 +421,8 @@ func (s APICronVideosGetVideoType) MarshalText() ([]byte, error) {
 // UnmarshalText implements encoding.TextUnmarshaler.
 func (s *APICronVideosGetVideoType) UnmarshalText(data []byte) error {
 	switch APICronVideosGetVideoType(data) {
-	case APICronVideosGetVideoTypeVspoBroadcast:
-		*s = APICronVideosGetVideoTypeVspoBroadcast
+	case APICronVideosGetVideoTypeVspoStream:
+		*s = APICronVideosGetVideoTypeVspoStream
 		return nil
 	case APICronVideosGetVideoTypeClip:
 		*s = APICronVideosGetVideoTypeClip

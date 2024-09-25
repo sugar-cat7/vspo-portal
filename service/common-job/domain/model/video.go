@@ -48,15 +48,15 @@ type CreatorInfo struct {
 type VideoType string
 
 const (
-	VideoTypeVspoBroadcast VideoType = "vspo_broadcast"
-	VideoTypeClip          VideoType = "clip"
-	VideoTypeFreechat      VideoType = "freechat"
+	VideoTypeVspoStream VideoType = "vspo_stream"
+	VideoTypeClip       VideoType = "clip"
+	VideoTypeFreechat   VideoType = "freechat"
 )
 
 // NewVideoType is ...
 func NewVideoType(s string) (VideoType, error) {
 	switch s {
-	case "all", "vspo_broadcast", "clip", "freechat":
+	case "all", "vspo_stream", "clip", "freechat":
 		return VideoType(s), nil
 	default:
 		return "", fmt.Errorf("invalid VideoType: %s", s)

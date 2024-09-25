@@ -98,9 +98,9 @@ func (i *videoInteractor) BatchDeleteInsert(
 			existingVideos, err := i.videoRepository.List(
 				ctx,
 				repository.ListVideosQuery{
-					PlatformTypes:   platformTypes.String(),
-					VideoType:       videoType.String(),
-					BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String(), model.StatusEnded.String()},
+					PlatformTypes: platformTypes.String(),
+					VideoType:     videoType.String(),
+					StreamStatus:  []string{model.StatusLive.String(), model.StatusUpcoming.String(), model.StatusEnded.String()},
 					BaseListOptions: repository.BaseListOptions{
 						Limit: null.NewUint64(100, true),
 						Page:  null.NewUint64(0, true),
@@ -213,7 +213,7 @@ func (i *videoInteractor) ytVideos(
 	var vs model.Videos
 	var freeChats model.Videos
 	switch vt {
-	case model.VideoTypeVspoBroadcast:
+	case model.VideoTypeVspoStream:
 		queries := []youtube.SearchQuery{youtube.SearchQueryVspoJp, youtube.SearchQueryVspoEn}
 		eventTypes := []youtube.EventType{youtube.EventTypeLive, youtube.EventTypeUpcoming, youtube.EventTypeCompleted}
 		for _, query := range queries {
@@ -235,9 +235,9 @@ func (i *videoInteractor) ytVideos(
 				existVideos, err := i.videoRepository.List(
 					ctx,
 					repository.ListVideosQuery{
-						PlatformTypes:   []string{model.PlatformYouTube.String()},
-						BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String()},
-						VideoType:       model.VideoTypeVspoBroadcast.String(),
+						PlatformTypes: []string{model.PlatformYouTube.String()},
+						StreamStatus:  []string{model.StatusLive.String(), model.StatusUpcoming.String()},
+						VideoType:     model.VideoTypeVspoStream.String(),
 						BaseListOptions: repository.BaseListOptions{
 							Limit: null.NewUint64(100, true),
 							Page:  null.NewUint64(0, true),
@@ -252,9 +252,9 @@ func (i *videoInteractor) ytVideos(
 				freeChats, err = i.videoRepository.List(
 					ctx,
 					repository.ListVideosQuery{
-						PlatformTypes:   []string{model.PlatformYouTube.String()},
-						BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String()},
-						VideoType:       model.VideoTypeFreechat.String(),
+						PlatformTypes: []string{model.PlatformYouTube.String()},
+						StreamStatus:  []string{model.StatusLive.String(), model.StatusUpcoming.String()},
+						VideoType:     model.VideoTypeFreechat.String(),
 						BaseListOptions: repository.BaseListOptions{
 							Limit: null.NewUint64(50, true),
 							Page:  null.NewUint64(0, true),
@@ -301,13 +301,13 @@ func (i *videoInteractor) ytVideos(
 	if err != nil {
 		return nil, err
 	}
-	if vt == model.VideoTypeVspoBroadcast || vt == model.VideoTypeFreechat {
+	if vt == model.VideoTypeVspoStream || vt == model.VideoTypeFreechat {
 		ytVideos = ytVideos.FilterCreator(cs)
 	}
 	switch vt {
-	case model.VideoTypeVspoBroadcast:
-		// All new videos are VspoBroadcast
-		ytVideos.SetVideoType(model.VideoTypeVspoBroadcast)
+	case model.VideoTypeVspoStream:
+		// All new videos are VspoStream
+		ytVideos.SetVideoType(model.VideoTypeVspoStream)
 	case model.VideoTypeClip:
 		ytVideos.SetVideoType(model.VideoTypeClip)
 	}

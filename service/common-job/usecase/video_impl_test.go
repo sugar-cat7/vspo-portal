@@ -29,12 +29,12 @@ func Test_BatchDeleteInsert(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "success_fetch_vspo_broadcast_youtube_live_ and_upcoming_achieve",
+			name: "success_fetch_vspo_stream_youtube_live_ and_upcoming_achieve",
 			args: args{
 				ctx: context.Background(),
 				param: &input.UpsertVideos{
 					PlatformTypes: []string{"youtube"},
-					VideoType:     "vspo_broadcast",
+					VideoType:     "vspo_stream",
 					Period:        "period",
 				},
 			},
@@ -53,12 +53,12 @@ func Test_BatchDeleteInsert(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "success_fetch_vspo_broadcast_twitch_live_ and_upcoming",
+			name: "success_fetch_vspo_stream_twitch_live_ and_upcoming",
 			args: args{
 				ctx: context.Background(),
 				param: &input.UpsertVideos{
 					PlatformTypes: []string{"twitch"},
-					VideoType:     "vspo_broadcast",
+					VideoType:     "vspo_stream",
 					Period:        "period",
 				},
 			},
@@ -75,12 +75,12 @@ func Test_BatchDeleteInsert(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "success_fetch_vspo_broadcast_twitcasting_live_ and_upcoming",
+			name: "success_fetch_vspo_stream_twitcasting_live_ and_upcoming",
 			args: args{
 				ctx: context.Background(),
 				param: &input.UpsertVideos{
 					PlatformTypes: []string{"twitcasting"},
-					VideoType:     "vspo_broadcast",
+					VideoType:     "vspo_stream",
 					Period:        "period",
 				},
 			},
@@ -97,12 +97,12 @@ func Test_BatchDeleteInsert(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "success_fetch_vspo_broadcast_all_live_ and_upcoming",
+			name: "success_fetch_vspo_stream_all_live_ and_upcoming",
 			args: args{
 				ctx: context.Background(),
 				param: &input.UpsertVideos{
 					PlatformTypes: []string{"youtube", "twitch", "twitcasting"},
-					VideoType:     "vspo_broadcast",
+					VideoType:     "vspo_stream",
 					Period:        "period",
 				},
 			},

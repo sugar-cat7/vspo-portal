@@ -17,74 +17,6 @@ var (
 	ErrBatchAlreadyClosed = errors.New("batch already closed")
 )
 
-const createBroadcastStatus = `-- name: CreateBroadcastStatus :batchone
-INSERT INTO broadcast_status (
-    id, video_id, creator_id, status, updated_at
-) VALUES (
-    $1, $2, $3, $4, $5
-)
-RETURNING id, video_id, creator_id, status, updated_at
-`
-
-type CreateBroadcastStatusBatchResults struct {
-	br     pgx.BatchResults
-	tot    int
-	closed bool
-}
-
-type CreateBroadcastStatusParams struct {
-	ID        string
-	VideoID   string
-	CreatorID string
-	Status    string
-	UpdatedAt pgtype.Timestamptz
-}
-
-func (q *Queries) CreateBroadcastStatus(ctx context.Context, arg []CreateBroadcastStatusParams) *CreateBroadcastStatusBatchResults {
-	batch := &pgx.Batch{}
-	for _, a := range arg {
-		vals := []interface{}{
-			a.ID,
-			a.VideoID,
-			a.CreatorID,
-			a.Status,
-			a.UpdatedAt,
-		}
-		batch.Queue(createBroadcastStatus, vals...)
-	}
-	br := q.db.SendBatch(ctx, batch)
-	return &CreateBroadcastStatusBatchResults{br, len(arg), false}
-}
-
-func (b *CreateBroadcastStatusBatchResults) QueryRow(f func(int, BroadcastStatus, error)) {
-	defer b.br.Close()
-	for t := 0; t < b.tot; t++ {
-		var i BroadcastStatus
-		if b.closed {
-			if f != nil {
-				f(t, i, ErrBatchAlreadyClosed)
-			}
-			continue
-		}
-		row := b.br.QueryRow()
-		err := row.Scan(
-			&i.ID,
-			&i.VideoID,
-			&i.CreatorID,
-			&i.Status,
-			&i.UpdatedAt,
-		)
-		if f != nil {
-			f(t, i, err)
-		}
-	}
-}
-
-func (b *CreateBroadcastStatusBatchResults) Close() error {
-	b.closed = true
-	return b.br.Close()
-}
-
 const createChannel = `-- name: CreateChannel :batchone
 INSERT INTO channel (
     id, platform_channel_id, creator_id, platform_type, title, description, published_at, total_view_count, subscriber_count, hidden_subscriber_count, total_video_count, thumbnail_url, updated_at, is_deleted
@@ -238,13 +170,90 @@ func (b *CreateCreatorBatchResults) Close() error {
 	return b.br.Close()
 }
 
+const createStreamStatus = `-- name: CreateStreamStatus :batchone
+INSERT INTO stream_status (
+    id, video_id, creator_id, status, updated_at,  started_at, ended_at, view_count
+) VALUES (
+    $1, $2, $3, $4, $5, $6, $7, $8
+)
+RETURNING id, video_id, creator_id, status, started_at, ended_at, view_count, updated_at
+`
+
+type CreateStreamStatusBatchResults struct {
+	br     pgx.BatchResults
+	tot    int
+	closed bool
+}
+
+type CreateStreamStatusParams struct {
+	ID        string
+	VideoID   string
+	CreatorID string
+	Status    string
+	UpdatedAt pgtype.Timestamptz
+	StartedAt pgtype.Timestamptz
+	EndedAt   pgtype.Timestamptz
+	ViewCount int32
+}
+
+func (q *Queries) CreateStreamStatus(ctx context.Context, arg []CreateStreamStatusParams) *CreateStreamStatusBatchResults {
+	batch := &pgx.Batch{}
+	for _, a := range arg {
+		vals := []interface{}{
+			a.ID,
+			a.VideoID,
+			a.CreatorID,
+			a.Status,
+			a.UpdatedAt,
+			a.StartedAt,
+			a.EndedAt,
+			a.ViewCount,
+		}
+		batch.Queue(createStreamStatus, vals...)
+	}
+	br := q.db.SendBatch(ctx, batch)
+	return &CreateStreamStatusBatchResults{br, len(arg), false}
+}
+
+func (b *CreateStreamStatusBatchResults) QueryRow(f func(int, StreamStatus, error)) {
+	defer b.br.Close()
+	for t := 0; t < b.tot; t++ {
+		var i StreamStatus
+		if b.closed {
+			if f != nil {
+				f(t, i, ErrBatchAlreadyClosed)
+			}
+			continue
+		}
+		row := b.br.QueryRow()
+		err := row.Scan(
+			&i.ID,
+			&i.VideoID,
+			&i.CreatorID,
+			&i.Status,
+			&i.StartedAt,
+			&i.EndedAt,
+			&i.ViewCount,
+			&i.UpdatedAt,
+		)
+		if f != nil {
+			f(t, i, err)
+		}
+	}
+}
+
+func (b *CreateStreamStatusBatchResults) Close() error {
+	b.closed = true
+	return b.br.Close()
+}
+
 const createVideo = `-- name: CreateVideo :batchone
 INSERT INTO video (
-    id, channel_id, platform_type, title, description, video_type, published_at, started_at, ended_at, tags, view_count, thumbnail_url, is_deleted
+    id, channel_id, platform_type, title, description, video_type, published_at, tags, thumbnail_url, is_deleted
 ) VALUES (
-    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
 )
-RETURNING id, channel_id, platform_type, title, description, video_type, published_at, started_at, ended_at, tags, view_count, thumbnail_url, is_deleted
+RETURNING id, channel_id, platform_type, title, description, video_type, published_at, tags, thumbnail_url, is_deleted
 `
 
 type CreateVideoBatchResults struct {
@@ -261,10 +270,7 @@ type CreateVideoParams struct {
 	Description  string
 	VideoType    string
 	PublishedAt  pgtype.Timestamptz
-	StartedAt    pgtype.Timestamptz
-	EndedAt      pgtype.Timestamptz
 	Tags         string
-	ViewCount    int32
 	ThumbnailUrl string
 	IsDeleted    bool
 }
@@ -280,10 +286,7 @@ func (q *Queries) CreateVideo(ctx context.Context, arg []CreateVideoParams) *Cre
 			a.Description,
 			a.VideoType,
 			a.PublishedAt,
-			a.StartedAt,
-			a.EndedAt,
 			a.Tags,
-			a.ViewCount,
 			a.ThumbnailUrl,
 			a.IsDeleted,
 		}
@@ -312,10 +315,7 @@ func (b *CreateVideoBatchResults) QueryRow(f func(int, Video, error)) {
 			&i.Description,
 			&i.VideoType,
 			&i.PublishedAt,
-			&i.StartedAt,
-			&i.EndedAt,
 			&i.Tags,
-			&i.ViewCount,
 			&i.ThumbnailUrl,
 			&i.IsDeleted,
 		)

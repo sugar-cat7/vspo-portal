@@ -8,14 +8,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type BroadcastStatus struct {
-	ID        string
-	VideoID   string
-	CreatorID string
-	Status    string
-	UpdatedAt pgtype.Timestamptz
-}
-
 type Channel struct {
 	ID                    string
 	PlatformChannelID     string
@@ -39,6 +31,17 @@ type Creator struct {
 	MemberType string
 }
 
+type StreamStatus struct {
+	ID        string
+	VideoID   string
+	CreatorID string
+	Status    string
+	StartedAt pgtype.Timestamptz
+	EndedAt   pgtype.Timestamptz
+	ViewCount int32
+	UpdatedAt pgtype.Timestamptz
+}
+
 type Video struct {
 	ID           string
 	ChannelID    string
@@ -47,10 +50,7 @@ type Video struct {
 	Description  string
 	VideoType    string
 	PublishedAt  pgtype.Timestamptz
-	StartedAt    pgtype.Timestamptz
-	EndedAt      pgtype.Timestamptz
 	Tags         string
-	ViewCount    int32
 	ThumbnailUrl string
 	IsDeleted    bool
 }

@@ -1,4 +1,13 @@
 services:
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:1.54
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
   vspo-db:
     container_name: vspo-db
     image: postgres:latest
@@ -16,13 +25,13 @@ services:
   vspo-db-migration:
     container_name: vspo-db-migration
     build:
-      context: ..
+      context: ../service/common-job
       dockerfile: Dockerfile
-      target: db-migration
+      target: local-db-migration
     environment:
       DB_HOST: vspo-db
     volumes:
-      - ../infra/database/schema/migration:/migration
+      - ../service/common-job/infra/database/schema/migration:/migration
     depends_on:
       vspo-db:
         condition: service_healthy

@@ -118,7 +118,7 @@ paths:
           required: true
           schema:
             type: string
-            enum: [vspo_broadcast, clip, freechat]
+            enum: [vspo_stream, clip, freechat]
           description: Type of the cron
       responses:
         "200":

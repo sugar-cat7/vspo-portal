@@ -23,3 +23,10 @@ FROM gcr.io/distroless/base-debian12 AS http-serve
 COPY --from=build /tmp/app /usr/local/bin/app
 EXPOSE 8080
 CMD ["/usr/local/bin/app", "http-serve"]
+
+# Local DB migration
+FROM base AS local-db-migration
+COPY . .
+COPY ./local/seed/ ./infra/database/schema/migration/
+RUN go build -o /tmp/app ./cmd/index.go
+CMD ["/tmp/app", "db-migration"]

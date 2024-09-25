@@ -30,9 +30,9 @@ type GetVideoQuery struct {
 
 // ListVideosQuery is ...
 type ListVideosQuery struct {
-	VideoIDs        []string
-	PlatformTypes   []string
-	BroadcastStatus []string
-	VideoType       string
+	VideoIDs      []string
+	PlatformTypes []string
+	StreamStatus  []string
+	VideoType     string
 	BaseListOptions
 }

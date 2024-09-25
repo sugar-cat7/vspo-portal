@@ -96,17 +96,17 @@ func (r *video) BatchDeleteInsert(
 		return nil, fmt.Errorf("failed to insert videos: %v", videoErrors)
 	}
 
-	bbs := c.Queries.CreateBroadcastStatus(ctx, dto.VideoModelsToCreateBroadcastStatusParams(m))
+	bbs := c.Queries.CreateStreamStatus(ctx, dto.VideoModelsToCreateStreamStatusParams(m))
 	defer bbs.Close()
-	var broadcastStatusErrors []error
-	bbs.QueryRow(func(i int, broadcastStatus db_sqlc.BroadcastStatus, err error) {
+	var streamStatusErrors []error
+	bbs.QueryRow(func(i int, streamStatus db_sqlc.StreamStatus, err error) {
 		if err != nil {
-			broadcastStatusErrors = append(broadcastStatusErrors, err)
+			streamStatusErrors = append(streamStatusErrors, err)
 		}
 	})
 
-	if len(broadcastStatusErrors) > 0 {
-		return nil, fmt.Errorf("failed to insert broadcast status: %v", broadcastStatusErrors)
+	if len(streamStatusErrors) > 0 {
+		return nil, fmt.Errorf("failed to insert stream status: %v", streamStatusErrors)
 	}
 
 	return nil, nil

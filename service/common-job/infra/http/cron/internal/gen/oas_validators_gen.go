@@ -92,7 +92,7 @@ func (s APICronVideosGetPlatformTypeItem) Validate() error {
 
 func (s APICronVideosGetVideoType) Validate() error {
 	switch s {
-	case "vspo_broadcast":
+	case "vspo_stream":
 		return nil
 	case "clip":
 		return nil
