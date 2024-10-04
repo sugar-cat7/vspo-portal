@@ -12,7 +12,7 @@ import (
 
 // APICronVideosGet implements the POST /channels/{channel_id}/videos endpoint.
 func (h *VH) APICronVideosGet(ctx context.Context, req api.APICronVideosGetParams) (api.APICronVideosGetRes, error) {
-	v, err := h.videoInteractor.BatchDeleteInsert(
+	v, err := h.videoInteractor.UpdatePlatformVideos(
 		ctx,
 		input.NewUpsertVideoInput(
 			dto.ConvertPlatFormTypeOgenToReqSlice(req.PlatformType),

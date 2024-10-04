@@ -42,17 +42,17 @@ func NewVspoFactory() struct {
 	for i := 0; i < 5; i++ {
 		c := creators[i%2]
 		ytVs[i].CreatorInfo = model.CreatorInfo{
-			ID:        c.ID,
 			ChannelID: c.Channel.Youtube.ID,
 		}
+		ytVs[i].Platform = model.PlatformYouTube
 		twVs[i].CreatorInfo = model.CreatorInfo{
-			ID:        c.ID,
 			ChannelID: c.Channel.Twitch.ID,
 		}
+		twVs[i].Platform = model.PlatformTwitch
 		twiVs[i].CreatorInfo = model.CreatorInfo{
-			ID:        c.ID,
 			ChannelID: c.Channel.TwitCasting.ID,
 		}
+		twiVs[i].Platform = model.PlatformTwitCasting
 	}
 
 	return struct {

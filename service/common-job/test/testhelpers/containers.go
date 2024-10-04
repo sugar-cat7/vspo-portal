@@ -88,7 +88,6 @@ func SetupRepo(ctx context.Context) setupTx {
 	tx := NewTestTransactable(
 		dbClient,
 	)
-
 	return setupTx{
 		Transactable: tx,
 		CreatorRepo:  repo.NewCreator(),

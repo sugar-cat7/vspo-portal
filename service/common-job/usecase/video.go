@@ -9,8 +9,8 @@ import (
 
 // VideoInteractor is ...
 type VideoInteractor interface {
-	BatchDeleteInsert(
+	UpdatePlatformVideos(
 		ctx context.Context,
-		param *input.UpsertVideos,
+		param *input.UpdatePlatformVideos,
 	) (model.Videos, error)
 }

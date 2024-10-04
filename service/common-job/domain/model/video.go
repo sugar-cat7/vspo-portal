@@ -36,6 +36,13 @@ func (vs Videos) SetVideoType(t VideoType) Videos {
 	return vs
 }
 
+// VideoIDs returns a slice of video IDs.
+func (vs Videos) IDs() []string {
+	return lo.Map(vs, func(v *Video, _ int) string {
+		return v.ID
+	})
+}
+
 // CreatorInfo represents the information about the creator of a video.
 type CreatorInfo struct {
 	ID           string
@@ -78,52 +85,81 @@ const (
 
 func (s Status) String() string {
 	return string(s)
+
 }
 
-// FilterCreator filters videos by creator ID
-func (vs Videos) FilterCreator(cs Creators) Videos {
-	if len(cs) == 0 {
-		return vs
+func (vs Videos) UpdateCreatorInfo(cs Creators) Videos {
+	for i := range vs {
+		for _, c := range cs {
+			updated := false
+			switch vs[i].Platform {
+			case PlatformYouTube:
+				if vs[i].CreatorInfo.ChannelID == c.Channel.Youtube.ID {
+					vs[i].CreatorInfo.ID = c.ID
+					vs[i].CreatorInfo.Name = c.Name
+					vs[i].CreatorInfo.ThumbnailURL = c.ThumbnailURL
+					updated = true
+				}
+			case PlatformTwitch:
+				if vs[i].CreatorInfo.ChannelID == c.Channel.Twitch.ID {
+					vs[i].CreatorInfo.ID = c.ID
+					vs[i].CreatorInfo.Name = c.Name
+					vs[i].CreatorInfo.ThumbnailURL = c.ThumbnailURL
+					updated = true
+				}
+			case PlatformTwitCasting:
+				if vs[i].CreatorInfo.ChannelID == c.Channel.TwitCasting.ID {
+					vs[i].CreatorInfo.ID = c.ID
+					vs[i].CreatorInfo.Name = c.Name
+					vs[i].CreatorInfo.ThumbnailURL = c.ThumbnailURL
+					updated = true
+				}
+			}
+			if updated {
+				break
+			}
+		}
 	}
-	return lo.Filter(vs, func(video *Video, _ int) bool {
-		return lo.Contains(lo.Map(cs, func(c *Creator, _ int) string {
-			return c.Channel.Youtube.ID
-		}), video.CreatorInfo.ChannelID)
-	})
+	return vs
 }
 
-// UpdateVideos updates existing videos with new videos information and returns the updated list of videos.
-func (vs *Videos) UpdateVideos(newVideos Videos, videoType VideoType) Videos {
-	existingVideoMap := make(map[string]*Video)
+func (vs Videos) FilterUpdatedVideos(comparedVideos Videos) Videos {
+	var updatedVideos Videos
+	// Create a map for quick lookup of comparedVideos by ID
+	comparedVideosMap := make(map[string]*Video)
+	// Create a map to track already added video IDs
+	addedVideoIDs := make(map[string]bool)
 
-	for _, ev := range *vs {
-		existingVideoMap[ev.ID] = ev
+	for _, comparedVideo := range comparedVideos {
+		comparedVideosMap[comparedVideo.ID] = comparedVideo
 	}
 
-	var targetVideos Videos
-	for _, newVideo := range newVideos {
-		// validate
-		if newVideo.CreatorInfo.ChannelID == "" {
+	// Iterate through the videos in vs
+	for _, v := range vs {
+		comparedVideo, exists := comparedVideosMap[v.ID]
+
+		// If the video has already been added, skip it
+		if addedVideoIDs[v.ID] {
 			continue
 		}
-		if newVideo.VideoType == "" {
-			newVideo.VideoType = videoType
+
+		// If the video does not exist in comparedVideos, add it to updatedVideos
+		if !exists {
+			updatedVideos = append(updatedVideos, v)
+			addedVideoIDs[v.ID] = true
+			continue
 		}
-		if existingVideo, exists := existingVideoMap[newVideo.ID]; exists {
-			// Check for updates
-			if existingVideo.Status != newVideo.Status ||
-				existingVideo.StartedAt != newVideo.StartedAt ||
-				existingVideo.EndedAt != newVideo.EndedAt ||
-				existingVideo.Title != newVideo.Title ||
-				existingVideo.ThumbnailURL != newVideo.ThumbnailURL {
-				targetVideos = append(targetVideos, newVideo)
-			}
-			delete(existingVideoMap, newVideo.ID)
-		} else {
-			// Add new video
-			targetVideos = append(targetVideos, newVideo)
+
+		// If the video exists but its properties differ, add it to updatedVideos
+		if v.Title != comparedVideo.Title ||
+			v.ThumbnailURL != comparedVideo.ThumbnailURL ||
+			v.StartedAt != comparedVideo.StartedAt ||
+			v.EndedAt != comparedVideo.EndedAt ||
+			v.Status != comparedVideo.Status {
+			updatedVideos = append(updatedVideos, v)
+			addedVideoIDs[v.ID] = true
 		}
 	}
 
-	return targetVideos
+	return updatedVideos
 }

@@ -1,7 +1,7 @@
 package input
 
-// UpsertVideos is the input for UpsertVideo
-type UpsertVideos struct {
+// UpdatePlatformVideos is the input for UpsertVideo
+type UpdatePlatformVideos struct {
 	VideoIDs      []string
 	PlatformTypes []string
 	VideoType     string
@@ -13,8 +13,8 @@ func NewUpsertVideoInput(
 	platformTypes []string,
 	videoType string,
 	period string,
-) *UpsertVideos {
-	return &UpsertVideos{
+) *UpdatePlatformVideos {
+	return &UpdatePlatformVideos{
 		PlatformTypes: platformTypes,
 		Period:        period,
 		VideoType:     videoType,

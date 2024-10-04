@@ -15,11 +15,11 @@ import (
 	"go.uber.org/mock/gomock"
 )
 
-func Test_BatchDeleteInsert(t *testing.T) {
+func Test_UpdatePlatformVideos(t *testing.T) {
 
 	type args struct {
 		ctx   context.Context
-		param *input.UpsertVideos
+		param *input.UpdatePlatformVideos
 	}
 	tests := []struct {
 		name    string
@@ -29,10 +29,10 @@ func Test_BatchDeleteInsert(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "success_fetch_vspo_stream_youtube_live_ and_upcoming_achieve",
+			name: "success_new_fetch_vspo_stream_youtube_live_ and_upcoming_achieve",
 			args: args{
 				ctx: context.Background(),
-				param: &input.UpsertVideos{
+				param: &input.UpdatePlatformVideos{
 					PlatformTypes: []string{"youtube"},
 					VideoType:     "vspo_stream",
 					Period:        "period",
@@ -41,10 +41,8 @@ func Test_BatchDeleteInsert(t *testing.T) {
 			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
 				r := testhelpers.SetupRepo(ctx)
 				yt := mock_youtube.NewMockYoutubeClient(ctrl)
-				f1 := testdata.NewVspoFactory()
 				// all return 5 videos
-				yt.EXPECT().SearchVideos(gomock.Any(), gomock.Any()).Return(f1.VspoYtVs, nil).Times(6)
-				yt.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f1.VspoYtVs, nil)
+				yt.EXPECT().SearchVideos(gomock.Any(), gomock.Any()).Return(testdata.NewVspoFactory().VspoYtVs, nil).Times(6)
 				tw := mock_twitch.NewMockTwitchClient(ctrl)
 				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
 				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
@@ -53,10 +51,10 @@ func Test_BatchDeleteInsert(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "success_fetch_vspo_stream_twitch_live_ and_upcoming",
+			name: "success_new_fetch_vspo_stream_twitch_live_ and_upcoming",
 			args: args{
 				ctx: context.Background(),
-				param: &input.UpsertVideos{
+				param: &input.UpdatePlatformVideos{
 					PlatformTypes: []string{"twitch"},
 					VideoType:     "vspo_stream",
 					Period:        "period",
@@ -75,10 +73,10 @@ func Test_BatchDeleteInsert(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "success_fetch_vspo_stream_twitcasting_live_ and_upcoming",
+			name: "success_new_fetch_vspo_stream_twitcasting_live_ and_upcoming",
 			args: args{
 				ctx: context.Background(),
-				param: &input.UpsertVideos{
+				param: &input.UpdatePlatformVideos{
 					PlatformTypes: []string{"twitcasting"},
 					VideoType:     "vspo_stream",
 					Period:        "period",
@@ -97,10 +95,10 @@ func Test_BatchDeleteInsert(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "success_fetch_vspo_stream_all_live_ and_upcoming",
+			name: "success_new_fetch_vspo_stream_all_live_ and_upcoming",
 			args: args{
 				ctx: context.Background(),
-				param: &input.UpsertVideos{
+				param: &input.UpdatePlatformVideos{
 					PlatformTypes: []string{"youtube", "twitch", "twitcasting"},
 					VideoType:     "vspo_stream",
 					Period:        "period",
@@ -111,7 +109,6 @@ func Test_BatchDeleteInsert(t *testing.T) {
 				yt := mock_youtube.NewMockYoutubeClient(ctrl)
 				f1 := testdata.NewVspoFactory()
 				yt.EXPECT().SearchVideos(gomock.Any(), gomock.Any()).Return(f1.VspoYtVs, nil).Times(6)
-				yt.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f1.VspoYtVs, nil)
 				tw := mock_twitch.NewMockTwitchClient(ctrl)
 				tw.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(f1.VspoTwitchVs, nil)
 				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
@@ -128,7 +125,7 @@ func Test_BatchDeleteInsert(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 			i := tt.setup(tt.args.ctx, ctrl)
-			v, err := i.BatchDeleteInsert(tt.args.ctx, tt.args.param)
+			v, err := i.UpdatePlatformVideos(tt.args.ctx, tt.args.param)
 			if !tt.wantErr {
 				assert.NoError(t, err)
 				assert.Len(t, v, tt.want)
