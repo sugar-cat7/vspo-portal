@@ -67,3 +67,21 @@ func NewVspoFactory() struct {
 		VspoTwitcastingVs: twiVs,
 	}
 }
+
+// NewYoutubeVideosWithCreator is 3 youtube videos with creator
+func NewYoutubeVideosWithCreator() model.Videos {
+	videos := make(model.Videos, 3)
+	if err := faker.FakeData(&videos, options.WithRandomMapAndSliceMaxSize(3), options.WithRandomMapAndSliceMinSize(3)); err != nil {
+		panic(err)
+	}
+	for i := 0; i < 3; i++ {
+		videos[i].CreatorInfo = model.CreatorInfo{
+			ID:        VspoInfoMap[i].CreatorID,
+			ChannelID: VspoInfoMap[i].YoutubeChannelID,
+		}
+		videos[i].Platform = model.PlatformYouTube
+		videos[i].Status = model.StatusLive
+		videos[i].VideoType = model.VideoTypeVspoStream
+	}
+	return videos
+}

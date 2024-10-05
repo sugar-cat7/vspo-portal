@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 
-	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/model"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/usecase/input"
 )
 
@@ -12,5 +11,9 @@ type VideoInteractor interface {
 	UpdatePlatformVideos(
 		ctx context.Context,
 		param *input.UpdatePlatformVideos,
-	) (model.Videos, error)
+	) (int, error)
+	UpdatwExistVideos(
+		ctx context.Context,
+		param *input.UpdateExistVideos,
+	) (int, error)
 }

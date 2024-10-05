@@ -150,11 +150,17 @@ func (vs Videos) FilterUpdatedVideos(comparedVideos Videos) Videos {
 			continue
 		}
 
+		// Truncate time to seconds for comparison
+		startedAtEqual := (v.StartedAt == nil && comparedVideo.StartedAt == nil) ||
+			(v.StartedAt != nil && comparedVideo.StartedAt != nil && v.StartedAt.Truncate(time.Second).Equal(comparedVideo.StartedAt.Truncate(time.Second)))
+		endedAtEqual := (v.EndedAt == nil && comparedVideo.EndedAt == nil) ||
+			(v.EndedAt != nil && comparedVideo.EndedAt != nil && v.EndedAt.Truncate(time.Second).Equal(comparedVideo.EndedAt.Truncate(time.Second)))
+
 		// If the video exists but its properties differ, add it to updatedVideos
 		if v.Title != comparedVideo.Title ||
 			v.ThumbnailURL != comparedVideo.ThumbnailURL ||
-			v.StartedAt != comparedVideo.StartedAt ||
-			v.EndedAt != comparedVideo.EndedAt ||
+			!startedAtEqual ||
+			!endedAtEqual ||
 			v.Status != comparedVideo.Status {
 			updatedVideos = append(updatedVideos, v)
 			addedVideoIDs[v.ID] = true
@@ -162,4 +168,23 @@ func (vs Videos) FilterUpdatedVideos(comparedVideos Videos) Videos {
 	}
 
 	return updatedVideos
+}
+
+func (vs Videos) FilterDeletedVideos(comparedVideos Videos) Videos {
+	var deletedVideos Videos
+	// Create a map for quick lookup of comparedVideos by ID
+	comparedVideosMap := make(map[string]*Video)
+
+	for _, comparedVideo := range comparedVideos {
+		comparedVideosMap[comparedVideo.ID] = comparedVideo
+	}
+
+	for _, v := range vs {
+		// If the video does not exist in comparedVideos, add it to deletedVideos
+		if _, exists := comparedVideosMap[v.ID]; !exists {
+			deletedVideos = append(deletedVideos, v)
+		}
+	}
+
+	return deletedVideos
 }

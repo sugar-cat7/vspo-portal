@@ -20,3 +20,9 @@ func NewUpsertVideoInput(
 		VideoType:     videoType,
 	}
 }
+
+type UpdateExistVideos struct{}
+
+func NewUpdateExistVideos() *UpdateExistVideos {
+	return &UpdateExistVideos{}
+}

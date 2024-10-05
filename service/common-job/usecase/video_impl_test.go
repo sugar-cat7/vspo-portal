@@ -128,7 +128,105 @@ func Test_UpdatePlatformVideos(t *testing.T) {
 			v, err := i.UpdatePlatformVideos(tt.args.ctx, tt.args.param)
 			if !tt.wantErr {
 				assert.NoError(t, err)
-				assert.Len(t, v, tt.want)
+				assert.Equal(t, tt.want, v)
+			} else {
+				assert.Error(t, err)
+			}
+		})
+	}
+}
+
+func Test_UpdatwExistVideos(t *testing.T) {
+	type args struct {
+		ctx   context.Context
+		param *input.UpdateExistVideos
+	}
+	tests := []struct {
+		name    string
+		args    args
+		setup   func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor
+		want    int // want is the number of videos
+		wantErr bool
+	}{
+		{
+			name: "success_update_exist_videos_no_diff",
+			args: args{
+				ctx:   context.Background(),
+				param: &input.UpdateExistVideos{},
+			},
+			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
+				r := testhelpers.SetupRepo(ctx)
+				yt := mock_youtube.NewMockYoutubeClient(ctrl)
+				vs := testdata.NewYoutubeVideosWithCreator()
+				err := testhelpers.CreateMockData(ctx, r.Transactable, vs)
+				yt.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(vs, nil).Times(1)
+				if err != nil {
+					t.Fatal(err)
+				}
+				tw := mock_twitch.NewMockTwitchClient(ctrl)
+				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
+				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
+			},
+			want:    0,
+			wantErr: false,
+		},
+		{
+			name: "success_update_exist_videos_diff",
+			args: args{
+				ctx:   context.Background(),
+				param: &input.UpdateExistVideos{},
+			},
+			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
+				r := testhelpers.SetupRepo(ctx)
+				yt := mock_youtube.NewMockYoutubeClient(ctrl)
+				vs := testdata.NewYoutubeVideosWithCreator()
+				err := testhelpers.CreateMockData(ctx, r.Transactable, vs)
+				vs[0].Title = "updated"
+				yt.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(vs, nil).Times(1)
+				if err != nil {
+					t.Fatal(err)
+				}
+				tw := mock_twitch.NewMockTwitchClient(ctrl)
+				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
+				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
+			},
+			want:    1,
+			wantErr: false,
+		},
+		{
+			name: "success_delete_exist_videos_diff",
+			args: args{
+				ctx:   context.Background(),
+				param: &input.UpdateExistVideos{},
+			},
+			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
+				r := testhelpers.SetupRepo(ctx)
+				yt := mock_youtube.NewMockYoutubeClient(ctrl)
+				vs := testdata.NewYoutubeVideosWithCreator()
+				err := testhelpers.CreateMockData(ctx, r.Transactable, vs)
+				vs = vs[1:]
+				yt.EXPECT().GetVideos(gomock.Any(), gomock.Any()).Return(vs, nil).Times(1)
+				if err != nil {
+					t.Fatal(err)
+				}
+				tw := mock_twitch.NewMockTwitchClient(ctrl)
+				twi := mock_twitcasting.NewMockTwitcastingClient(ctrl)
+				return usecase.NewVideoInteractor(r.Transactable, r.CreatorRepo, r.ChannelRepo, r.VideoRepo, yt, tw, twi)
+			},
+			want:    1,
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+			i := tt.setup(tt.args.ctx, ctrl)
+			v, err := i.UpdatwExistVideos(tt.args.ctx, tt.args.param)
+			if !tt.wantErr {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.want, v)
 			} else {
 				assert.Error(t, err)
 			}

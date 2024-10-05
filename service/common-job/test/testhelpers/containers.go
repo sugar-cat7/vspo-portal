@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/caarlos0/env/v10"
+	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/model"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/repository"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/database"
 	repo "github.com/sugar-cat7/vspo-portal/service/common-job/infra/database/repository"
@@ -96,6 +97,36 @@ func SetupRepo(ctx context.Context) setupTx {
 	}
 }
 
+// RollbackKey is used to store rollback flag in context
+type rollbackKey struct{}
+
+// WithRollbackFlag adds the rollback flag to the context
+func WithRollbackFlag(ctx context.Context, rollback bool) context.Context {
+	return context.WithValue(ctx, rollbackKey{}, rollback)
+}
+
+// ShouldRollback checks if the context contains a rollback flag
+func ShouldRollback(ctx context.Context) bool {
+	if rollback, ok := ctx.Value(rollbackKey{}).(bool); ok {
+		return rollback
+	}
+	return true
+}
+
+func CreateMockData(ctx context.Context, tx repository.Transactable, videos model.Videos) error {
+	ctx = WithRollbackFlag(ctx, false)
+
+	return tx.RWTx(ctx, func(ctx context.Context) error {
+		v := repo.NewVideo()
+
+		_, err := v.BatchDeleteInsert(ctx, videos)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
 func runTx(ctx context.Context, client *database.Client, fn func(context.Context) error) error {
 	tx, err := client.Pool.Begin(ctx)
 	if err != nil {
@@ -105,10 +136,21 @@ func runTx(ctx context.Context, client *database.Client, fn func(context.Context
 	txCtx := context.WithValue(ctx, database.ClientKey{}, &database.Client{Queries: client.Queries.WithTx(tx)})
 	err = fn(txCtx)
 	if err != nil {
+		if rbErr := tx.Rollback(ctx); rbErr != nil {
+			return fmt.Errorf("transaction rollback failed: %v, original error: %v", rbErr, err)
+		}
 		return err
 	}
-	if err := tx.Rollback(ctx); err != nil {
-		return err
+
+	if ShouldRollback(ctx) {
+		if err := tx.Rollback(ctx); err != nil {
+			return err
+		}
+	} else {
+		fmt.Println("commit")
+		if err := tx.Commit(ctx); err != nil {
+			return err
+		}
 	}
 
 	return nil

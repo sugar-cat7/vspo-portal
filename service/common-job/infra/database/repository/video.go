@@ -111,3 +111,21 @@ func (r *video) BatchDeleteInsert(
 
 	return nil, nil
 }
+
+func (r *video) BatchDelete(
+	ctx context.Context,
+	m model.Videos,
+) error {
+	c, err := database.FromContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	if c.Queries.DeleteVideosByIDs(ctx, lo.Map(m, func(v *model.Video, index int) string {
+		return v.ID
+	})) != nil {
+		return err
+	}
+
+	return nil
+}

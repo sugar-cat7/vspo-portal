@@ -13,6 +13,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/twitch"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/youtube"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/usecase/input"
+	"github.com/volatiletech/null/v8"
 )
 
 type videoInteractor struct {
@@ -49,21 +50,18 @@ func NewVideoInteractor(
 func (i *videoInteractor) UpdatePlatformVideos(
 	ctx context.Context,
 	param *input.UpdatePlatformVideos,
-) (model.Videos, error) {
+) (int, error) {
 	// validate input
 	videoType, err := model.NewVideoType(param.VideoType)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	// startedAt, endedAt, err := model.NewPeriod(param.Period)
-	// if err != nil {
-	// 	return nil, err
-	// }
+
 	platformTypes, err := model.NewPlatforms(param.PlatformTypes)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	var vs model.Videos
+	var updatedCount int
 	err = i.transactable.RWTx(
 		ctx,
 		func(ctx context.Context) error {
@@ -107,21 +105,14 @@ func (i *videoInteractor) UpdatePlatformVideos(
 				return err
 			}
 
-			vs, err = i.videoRepository.List(
-				ctx,
-				repository.ListVideosQuery{
-					VideoIDs: uvs.IDs(),
-				})
-			if err != nil {
-				return err
-			}
+			updatedCount = len(uvs)
 			return nil
 		},
 	)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	return vs, nil
+	return updatedCount, nil
 }
 
 func (i *videoInteractor) ytVideos(
@@ -244,4 +235,56 @@ func (i *videoInteractor) updateVideosByPlatformTypes(
 	}
 
 	return updatedVideos, nil
+}
+
+func (i *videoInteractor) UpdatwExistVideos(
+	ctx context.Context,
+	param *input.UpdateExistVideos,
+) (int, error) {
+
+	var updatedCount int
+	err := i.transactable.RWTx(
+		ctx,
+		func(ctx context.Context) error {
+			existVs, err := i.videoRepository.List(
+				ctx,
+				repository.ListVideosQuery{
+					PlatformTypes: []string{model.PlatformYouTube.String()},
+					VideoType:     model.VideoTypeVspoStream.String(),
+					BaseListOptions: repository.BaseListOptions{
+						Limit: null.Uint64From(100),
+						Page:  null.Uint64From(0),
+					},
+				},
+			)
+			if err != nil {
+				return err
+			}
+			fmt.Println("exist videos: ", existVs.IDs())
+
+			uvs, err := i.youtubeClient.GetVideos(ctx, youtube.VideosParam{
+				VideoIDs: existVs.IDs(),
+			})
+			if err != nil {
+				return err
+			}
+			deleted := existVs.FilterDeletedVideos(uvs)
+			err = i.videoRepository.BatchDelete(ctx, deleted)
+			if err != nil {
+				return err
+			}
+			updated := uvs.FilterUpdatedVideos(existVs)
+			_, err = i.videoRepository.BatchDeleteInsert(ctx, updated)
+			if err != nil {
+				return err
+			}
+			updatedCount = len(updated) + len(deleted)
+
+			return nil
+		},
+	)
+	if err != nil {
+		return 0, err
+	}
+	return updatedCount, nil
 }

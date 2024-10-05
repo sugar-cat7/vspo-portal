@@ -20,6 +20,10 @@ type Video interface {
 		ctx context.Context,
 		m model.Videos,
 	) (model.Videos, error)
+	BatchDelete(
+		ctx context.Context,
+		m model.Videos,
+	) error
 }
 
 // GetVideoQuery is ...

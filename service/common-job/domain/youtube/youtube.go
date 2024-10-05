@@ -14,7 +14,6 @@ type YoutubeClient interface {
 }
 
 type VideosParam struct {
-	UserIDs  []string
 	VideoIDs []string
 }
 
