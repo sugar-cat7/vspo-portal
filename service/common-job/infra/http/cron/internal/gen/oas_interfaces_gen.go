@@ -9,6 +9,10 @@ type APICronCreatorsGetRes interface {
 	aPICronCreatorsGetRes()
 }
 
-type APICronVideosGetRes interface {
-	aPICronVideosGetRes()
+type APICronExistVideosGetRes interface {
+	aPICronExistVideosGetRes()
+}
+
+type APICronSearchVideosGetRes interface {
+	aPICronSearchVideosGetRes()
 }

@@ -304,42 +304,99 @@ func decodeAPICronCreatorsGetParams(args [0]string, argsEscaped bool, r *http.Re
 	return params, nil
 }
 
-// APICronVideosGetParams is parameters of GET /api/cron/videos operation.
-type APICronVideosGetParams struct {
-	// Comma-separated list of video platform types.
-	PlatformType []APICronVideosGetPlatformTypeItem
+// APICronExistVideosGetParams is parameters of GET /api/cron/exist_videos operation.
+type APICronExistVideosGetParams struct {
 	// Period for performing updates.
-	Period APICronVideosGetPeriod
-	// Type of the cron.
-	VideoType APICronVideosGetVideoType
+	Period APICronExistVideosGetPeriod
 }
 
-func unpackAPICronVideosGetParams(packed middleware.Parameters) (params APICronVideosGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "platform_type",
-			In:   "query",
-		}
-		params.PlatformType = packed[key].([]APICronVideosGetPlatformTypeItem)
-	}
+func unpackAPICronExistVideosGetParams(packed middleware.Parameters) (params APICronExistVideosGetParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "period",
 			In:   "query",
 		}
-		params.Period = packed[key].(APICronVideosGetPeriod)
+		params.Period = packed[key].(APICronExistVideosGetPeriod)
+	}
+	return params
+}
+
+func decodeAPICronExistVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (params APICronExistVideosGetParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: period.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				val, err := d.DecodeValue()
+				if err != nil {
+					return err
+				}
+
+				c, err := conv.ToString(val)
+				if err != nil {
+					return err
+				}
+
+				params.Period = APICronExistVideosGetPeriod(c)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if err := params.Period.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		} else {
+			return validate.ErrFieldRequired
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "period",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// APICronSearchVideosGetParams is parameters of GET /api/cron/search_videos operation.
+type APICronSearchVideosGetParams struct {
+	// Comma-separated list of video platform types.
+	PlatformType []APICronSearchVideosGetPlatformTypeItem
+	// Type of the cron.
+	VideoType APICronSearchVideosGetVideoType
+}
+
+func unpackAPICronSearchVideosGetParams(packed middleware.Parameters) (params APICronSearchVideosGetParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "platform_type",
+			In:   "query",
+		}
+		params.PlatformType = packed[key].([]APICronSearchVideosGetPlatformTypeItem)
 	}
 	{
 		key := middleware.ParameterKey{
 			Name: "video_type",
 			In:   "query",
 		}
-		params.VideoType = packed[key].(APICronVideosGetVideoType)
+		params.VideoType = packed[key].(APICronSearchVideosGetVideoType)
 	}
 	return params
 }
 
-func decodeAPICronVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (params APICronVideosGetParams, _ error) {
+func decodeAPICronSearchVideosGetParams(args [0]string, argsEscaped bool, r *http.Request) (params APICronSearchVideosGetParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode query: platform_type.
 	if err := func() error {
@@ -352,7 +409,7 @@ func decodeAPICronVideosGetParams(args [0]string, argsEscaped bool, r *http.Requ
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotPlatformTypeVal APICronVideosGetPlatformTypeItem
+					var paramsDotPlatformTypeVal APICronSearchVideosGetPlatformTypeItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -364,7 +421,7 @@ func decodeAPICronVideosGetParams(args [0]string, argsEscaped bool, r *http.Requ
 							return err
 						}
 
-						paramsDotPlatformTypeVal = APICronVideosGetPlatformTypeItem(c)
+						paramsDotPlatformTypeVal = APICronSearchVideosGetPlatformTypeItem(c)
 						return nil
 					}(); err != nil {
 						return err
@@ -411,50 +468,6 @@ func decodeAPICronVideosGetParams(args [0]string, argsEscaped bool, r *http.Requ
 			Err:  err,
 		}
 	}
-	// Decode query: period.
-	if err := func() error {
-		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "period",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.HasParam(cfg); err == nil {
-			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToString(val)
-				if err != nil {
-					return err
-				}
-
-				params.Period = APICronVideosGetPeriod(c)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if err := params.Period.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "period",
-			In:   "query",
-			Err:  err,
-		}
-	}
 	// Decode query: video_type.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
@@ -475,7 +488,7 @@ func decodeAPICronVideosGetParams(args [0]string, argsEscaped bool, r *http.Requ
 					return err
 				}
 
-				params.VideoType = APICronVideosGetVideoType(c)
+				params.VideoType = APICronSearchVideosGetVideoType(c)
 				return nil
 			}); err != nil {
 				return err

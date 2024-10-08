@@ -31,12 +31,21 @@ func (UnimplementedHandler) APICronCreatorsGet(ctx context.Context, params APICr
 	return r, ht.ErrNotImplemented
 }
 
-// APICronVideosGet implements GET /api/cron/videos operation.
+// APICronExistVideosGet implements GET /api/cron/exist_videos operation.
 //
-// Update videos related to a specific creator based on provided cronType.
+// Update exist videos.
 //
-// GET /api/cron/videos
-func (UnimplementedHandler) APICronVideosGet(ctx context.Context, params APICronVideosGetParams) (r APICronVideosGetRes, _ error) {
+// GET /api/cron/exist_videos
+func (UnimplementedHandler) APICronExistVideosGet(ctx context.Context, params APICronExistVideosGetParams) (r APICronExistVideosGetRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// APICronSearchVideosGet implements GET /api/cron/search_videos operation.
+//
+// Update videos related to a specific creator based on provided.
+//
+// GET /api/cron/search_videos
+func (UnimplementedHandler) APICronSearchVideosGet(ctx context.Context, params APICronSearchVideosGetParams) (r APICronSearchVideosGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

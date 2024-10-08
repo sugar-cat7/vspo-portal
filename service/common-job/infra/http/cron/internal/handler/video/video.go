@@ -10,13 +10,33 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-job/usecase/input"
 )
 
-// APICronVideosGet implements the POST /channels/{channel_id}/videos endpoint.
-func (h *VH) APICronVideosGet(ctx context.Context, req api.APICronVideosGetParams) (api.APICronVideosGetRes, error) {
+// APICronSearchVideosGet implements the POST /channels/{channel_id}/videos endpoint.
+func (h *VH) APICronSearchVideosGet(ctx context.Context, req api.APICronSearchVideosGetParams) (api.APICronSearchVideosGetRes, error) {
 	v, err := h.videoInteractor.UpdatePlatformVideos(
 		ctx,
 		input.NewUpsertVideoInput(
 			dto.ConvertPlatFormTypeOgenToReqSlice(req.PlatformType),
 			string(req.VideoType),
+		),
+	)
+
+	if err != nil {
+		logger.New().Error(err.Error())
+		return nil, err
+	}
+	return &api.APICronSearchVideosGetOK{
+		Message: api.OptString{
+			Value: fmt.Sprintf("Updated videos Count: %v", v),
+			Set:   true,
+		},
+	}, nil
+}
+
+// APICronExistVideosGet implements the POST /channels/{channel_id}/videos endpoint.
+func (h *VH) APICronExistVideosGet(ctx context.Context, req api.APICronExistVideosGetParams) (api.APICronExistVideosGetRes, error) {
+	v, err := h.videoInteractor.UpdatwExistVideos(
+		ctx,
+		input.NewUpdateExistVideos(
 			string(req.Period),
 		),
 	)
@@ -25,7 +45,7 @@ func (h *VH) APICronVideosGet(ctx context.Context, req api.APICronVideosGetParam
 		logger.New().Error(err.Error())
 		return nil, err
 	}
-	return &api.APICronVideosGetOK{
+	return &api.APICronExistVideosGetOK{
 		Message: api.OptString{
 			Value: fmt.Sprintf("Updated videos Count: %v", v),
 			Set:   true,

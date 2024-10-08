@@ -129,9 +129,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					elem = origElem
-				case 'v': // Prefix: "videos"
+				case 'e': // Prefix: "exist_videos"
 					origElem := elem
-					if l := len("videos"); len(elem) >= l && elem[0:l] == "videos" {
+					if l := len("exist_videos"); len(elem) >= l && elem[0:l] == "exist_videos" {
 						elem = elem[l:]
 					} else {
 						break
@@ -141,7 +141,28 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleAPICronVideosGetRequest([0]string{}, elemIsEscaped, w, r)
+							s.handleAPICronExistVideosGetRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, "GET")
+						}
+
+						return
+					}
+
+					elem = origElem
+				case 's': // Prefix: "search_videos"
+					origElem := elem
+					if l := len("search_videos"); len(elem) >= l && elem[0:l] == "search_videos" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleAPICronSearchVideosGetRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, "GET")
 						}
@@ -346,9 +367,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					}
 
 					elem = origElem
-				case 'v': // Prefix: "videos"
+				case 'e': // Prefix: "exist_videos"
 					origElem := elem
-					if l := len("videos"); len(elem) >= l && elem[0:l] == "videos" {
+					if l := len("exist_videos"); len(elem) >= l && elem[0:l] == "exist_videos" {
 						elem = elem[l:]
 					} else {
 						break
@@ -358,10 +379,35 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						// Leaf node.
 						switch method {
 						case "GET":
-							r.name = "APICronVideosGet"
+							r.name = "APICronExistVideosGet"
+							r.summary = "update exist videos"
+							r.operationID = ""
+							r.pathPattern = "/api/cron/exist_videos"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+					elem = origElem
+				case 's': // Prefix: "search_videos"
+					origElem := elem
+					if l := len("search_videos"); len(elem) >= l && elem[0:l] == "search_videos" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = "APICronSearchVideosGet"
 							r.summary = "Upsert videos"
 							r.operationID = ""
-							r.pathPattern = "/api/cron/videos"
+							r.pathPattern = "/api/cron/search_videos"
 							r.args = args
 							r.count = 0
 							return r, true

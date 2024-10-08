@@ -16,7 +16,6 @@ import (
 )
 
 func Test_UpdatePlatformVideos(t *testing.T) {
-
 	type args struct {
 		ctx   context.Context
 		param *input.UpdatePlatformVideos
@@ -35,7 +34,6 @@ func Test_UpdatePlatformVideos(t *testing.T) {
 				param: &input.UpdatePlatformVideos{
 					PlatformTypes: []string{"youtube"},
 					VideoType:     "vspo_stream",
-					Period:        "period",
 				},
 			},
 			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
@@ -57,7 +55,6 @@ func Test_UpdatePlatformVideos(t *testing.T) {
 				param: &input.UpdatePlatformVideos{
 					PlatformTypes: []string{"twitch"},
 					VideoType:     "vspo_stream",
-					Period:        "period",
 				},
 			},
 			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
@@ -79,7 +76,6 @@ func Test_UpdatePlatformVideos(t *testing.T) {
 				param: &input.UpdatePlatformVideos{
 					PlatformTypes: []string{"twitcasting"},
 					VideoType:     "vspo_stream",
-					Period:        "period",
 				},
 			},
 			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
@@ -101,7 +97,6 @@ func Test_UpdatePlatformVideos(t *testing.T) {
 				param: &input.UpdatePlatformVideos{
 					PlatformTypes: []string{"youtube", "twitch", "twitcasting"},
 					VideoType:     "vspo_stream",
-					Period:        "period",
 				},
 			},
 			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
