@@ -88,6 +88,21 @@ func (s Status) String() string {
 
 }
 
+func (vs Videos) FilterByChannels(channels Channels) Videos {
+	var filteredVideos Videos
+	for _, v := range vs {
+		for _, c := range channels {
+			if v.CreatorInfo.ChannelID == c.Youtube.ID ||
+				v.CreatorInfo.ChannelID == c.Twitch.ID ||
+				v.CreatorInfo.ChannelID == c.TwitCasting.ID {
+				filteredVideos = append(filteredVideos, v)
+				break
+			}
+		}
+	}
+	return filteredVideos
+}
+
 func (vs Videos) UpdateCreatorInfo(cs Creators) Videos {
 	for i := range vs {
 		for _, c := range cs {

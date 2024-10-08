@@ -147,7 +147,6 @@ func runTx(ctx context.Context, client *database.Client, fn func(context.Context
 			return err
 		}
 	} else {
-		fmt.Println("commit")
 		if err := tx.Commit(ctx); err != nil {
 			return err
 		}

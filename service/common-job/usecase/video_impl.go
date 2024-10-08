@@ -94,7 +94,7 @@ func (i *videoInteractor) UpdatePlatformVideos(
 			if err != nil {
 				return err
 			}
-
+			uvs = uvs.FilterByChannels(cs.RetrieveChannels())
 			uvs = uvs.FilterUpdatedVideos(existVs)
 			// Update creator info
 			uvs = uvs.UpdateCreatorInfo(cs)
@@ -245,6 +245,18 @@ func (i *videoInteractor) UpdatwExistVideos(
 	err := i.transactable.RWTx(
 		ctx,
 		func(ctx context.Context) error {
+
+			// Retrieve creators
+			cs, err := i.creatorRepository.List(
+				ctx,
+				repository.ListCreatorsQuery{
+					MemberTypes: model.VideoTypeToMemberTypes(model.VideoTypeVspoStream),
+				},
+			)
+
+			if err != nil {
+				return err
+			}
 			existVs, err := i.videoRepository.ListByTimeRange(
 				ctx,
 				repository.ListByTimeRangeQuery{
@@ -268,6 +280,7 @@ func (i *videoInteractor) UpdatwExistVideos(
 				return err
 			}
 			updated := uvs.FilterUpdatedVideos(existVs)
+			updated = updated.UpdateCreatorInfo(cs)
 			_, err = i.videoRepository.BatchDeleteInsert(ctx, updated)
 			if err != nil {
 				return err

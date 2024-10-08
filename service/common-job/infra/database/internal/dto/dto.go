@@ -247,6 +247,9 @@ func VideoModelToCreateVideoParams(m *model.Video) db_sqlc.CreateVideoParams {
 		Tags:         strings.Join(m.Tags, ","),
 		ThumbnailUrl: string(m.ThumbnailURL),
 		IsDeleted:    m.IsDeleted,
+		PublishedAt: utime.TimeToTimestamptz(
+			utime.Utc.Now(),
+		),
 	}
 	if m.PublishedAt != nil {
 		p.PublishedAt = utime.TimeToTimestamptz(*m.PublishedAt)
@@ -379,16 +382,27 @@ func ChannelModelToCreateChannelParams(m *model.Channel) db_sqlc.CreateChannelPa
 func VideoModelsToCreateStreamStatusParams(m model.Videos) []db_sqlc.CreateStreamStatusParams {
 	ps := []db_sqlc.CreateStreamStatusParams{}
 	for _, v := range m {
-		ps = append(ps, db_sqlc.CreateStreamStatusParams{
+		t := utime.TimeToTimestamptz(utime.Utc.Now())
+		p := db_sqlc.CreateStreamStatusParams{
 			ID:        uuid.UUID(),
 			VideoID:   v.ID,
 			CreatorID: v.CreatorInfo.ID,
 			Status:    v.Status.String(),
-			UpdatedAt: utime.TimeToTimestamptz(utime.Utc.Now()),
+			UpdatedAt: t,
 			ViewCount: int32(v.ViewCount),
-			StartedAt: utime.TimeToTimestamptz(*v.StartedAt),
-			EndedAt:   utime.TimeToTimestamptz(*v.EndedAt),
-		})
+			StartedAt: t,
+			EndedAt:   t,
+		}
+		if v.StartedAt != nil {
+			p.StartedAt = utime.TimeToTimestamptz(*v.StartedAt)
+		}
+
+		if v.EndedAt != nil {
+			p.EndedAt = utime.TimeToTimestamptz(*v.EndedAt)
+		}
+
+		ps = append(ps, p)
+
 	}
 	return ps
 }

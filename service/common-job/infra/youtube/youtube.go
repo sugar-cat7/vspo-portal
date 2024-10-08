@@ -54,11 +54,18 @@ func (y *youtubeServiceImpl) SearchVideos(ctx context.Context, param domain_yout
 	if err != nil {
 		return nil, fmt.Errorf("error making Search.List call: %v", err)
 	}
-	v, err := dto.YtSearchResultToVideos(response)
+	videoIDs := make([]string, len(response.Items))
+	for i, item := range response.Items {
+		if item.Id.VideoId != "" {
+			videoIDs[i] = item.Id.VideoId
+		}
+	}
+	videos, err := y.GetVideos(ctx, domain_youtube.VideosParam{VideoIDs: videoIDs})
+
 	if err != nil {
 		return nil, err
 	}
-	return v, nil
+	return videos, nil
 }
 
 // Channels returns a list of channels by their IDs.
