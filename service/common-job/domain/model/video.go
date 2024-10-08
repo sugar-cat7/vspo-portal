@@ -155,7 +155,6 @@ func (vs Videos) FilterUpdatedVideos(comparedVideos Videos) Videos {
 			(v.StartedAt != nil && comparedVideo.StartedAt != nil && v.StartedAt.Truncate(time.Second).Equal(comparedVideo.StartedAt.Truncate(time.Second)))
 		endedAtEqual := (v.EndedAt == nil && comparedVideo.EndedAt == nil) ||
 			(v.EndedAt != nil && comparedVideo.EndedAt != nil && v.EndedAt.Truncate(time.Second).Equal(comparedVideo.EndedAt.Truncate(time.Second)))
-
 		// If the video exists but its properties differ, add it to updatedVideos
 		if v.Title != comparedVideo.Title ||
 			v.ThumbnailURL != comparedVideo.ThumbnailURL ||

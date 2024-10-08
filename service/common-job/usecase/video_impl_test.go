@@ -3,11 +3,13 @@ package usecase_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	mock_twitcasting "github.com/sugar-cat7/vspo-portal/service/common-job/domain/twitcasting/mock"
 	mock_twitch "github.com/sugar-cat7/vspo-portal/service/common-job/domain/twitch/mock"
 	mock_youtube "github.com/sugar-cat7/vspo-portal/service/common-job/domain/youtube/mock"
+	utime "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/time"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/test/testdata"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/test/testhelpers"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/usecase"
@@ -132,6 +134,8 @@ func Test_UpdatePlatformVideos(t *testing.T) {
 }
 
 func Test_UpdatwExistVideos(t *testing.T) {
+	startedAt := time.Date(1990, time.January, 1, 0, 0, 0, 0, time.UTC)
+	endedAt := utime.Utc.Now()
 	type args struct {
 		ctx   context.Context
 		param *input.UpdateExistVideos
@@ -146,8 +150,11 @@ func Test_UpdatwExistVideos(t *testing.T) {
 		{
 			name: "success_update_exist_videos_no_diff",
 			args: args{
-				ctx:   context.Background(),
-				param: &input.UpdateExistVideos{},
+				ctx: context.Background(),
+				param: &input.UpdateExistVideos{
+					StartedAt: startedAt,
+					EndedAt:   endedAt,
+				},
 			},
 			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
 				r := testhelpers.SetupRepo(ctx)
@@ -168,8 +175,11 @@ func Test_UpdatwExistVideos(t *testing.T) {
 		{
 			name: "success_update_exist_videos_diff",
 			args: args{
-				ctx:   context.Background(),
-				param: &input.UpdateExistVideos{},
+				ctx: context.Background(),
+				param: &input.UpdateExistVideos{
+					StartedAt: startedAt,
+					EndedAt:   endedAt,
+				},
 			},
 			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
 				r := testhelpers.SetupRepo(ctx)
@@ -191,8 +201,11 @@ func Test_UpdatwExistVideos(t *testing.T) {
 		{
 			name: "success_delete_exist_videos_diff",
 			args: args{
-				ctx:   context.Background(),
-				param: &input.UpdateExistVideos{},
+				ctx: context.Background(),
+				param: &input.UpdateExistVideos{
+					StartedAt: startedAt,
+					EndedAt:   endedAt,
+				},
 			},
 			setup: func(ctx context.Context, ctrl *gomock.Controller) usecase.VideoInteractor {
 				r := testhelpers.SetupRepo(ctx)

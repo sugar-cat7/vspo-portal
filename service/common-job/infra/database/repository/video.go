@@ -10,6 +10,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/database"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/database/internal/dto"
 	db_sqlc "github.com/sugar-cat7/vspo-portal/service/common-job/infra/database/internal/gen"
+	utime "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/time"
 )
 
 type video struct{}
@@ -29,16 +30,6 @@ func (r *video) List(
 	if err != nil {
 		return nil, err
 	}
-
-	// If VideoIDs are specified, search by VideoIDs
-	if len(query.VideoIDs) > 0 {
-		cs, err := c.Queries.GetVideosByIDs(ctx, query.VideoIDs)
-		if err != nil {
-			return nil, err
-		}
-		res := dto.VideosByIDsRowsToModel(cs)
-		return res, nil
-	}
 	// If PlatformType is specified, search by PlatformType
 	cs, err := c.Queries.GetVideosByPlatformsWithStatus(ctx, db_sqlc.GetVideosByPlatformsWithStatusParams{
 		PlatformTypes: query.PlatformTypes,
@@ -51,6 +42,42 @@ func (r *video) List(
 	}
 	res := dto.VideosByParamsRowsToModel(cs)
 	return res, nil
+}
+
+func (r *video) ListByIDs(
+	ctx context.Context,
+	query repository.ListByIDsQuery,
+) (model.Videos, error) {
+	c, err := database.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	cs, err := c.Queries.GetVideosByIDs(ctx, query.VideoIDs)
+	if err != nil {
+		return nil, err
+	}
+	res := dto.VideosByIDsRowsToModel(cs)
+	return res, nil
+}
+
+func (r *video) ListByTimeRange(
+	ctx context.Context,
+	query repository.ListByTimeRangeQuery,
+) (model.Videos, error) {
+	c, err := database.FromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	vs, err := c.Queries.GetVideosByTimeRange(ctx, db_sqlc.GetVideosByTimeRangeParams{
+		StartedAt: utime.TimeToTimestamptz(query.StartedAt),
+		EndedAt:   utime.TimeToTimestamptz(query.EndedAt),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return dto.GetVideosByTimeRangeRowsToModel(vs), nil
 }
 
 func (r *video) Count(

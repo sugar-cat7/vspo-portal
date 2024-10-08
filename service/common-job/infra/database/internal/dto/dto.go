@@ -74,6 +74,27 @@ func VideoToModel(v *db_sqlc.Video) *model.Video {
 	return m
 }
 
+func GetVideosByTimeRangeRowToModel(v *db_sqlc.GetVideosByTimeRangeRow) *model.Video {
+	m := VideoToModel(&v.Video)
+	m.ViewCount = uint64(v.StreamStatus.ViewCount)
+	m.StartedAt = &v.StreamStatus.StartedAt.Time
+	m.EndedAt = &v.StreamStatus.EndedAt.Time
+	m.Status = model.Status(v.StreamStatus.Status)
+	m.CreatorInfo = model.CreatorInfo{
+		ID:        v.StreamStatus.CreatorID,
+		ChannelID: v.Video.ChannelID,
+	}
+	return m
+}
+
+func GetVideosByTimeRangeRowsToModel(vs []db_sqlc.GetVideosByTimeRangeRow) model.Videos {
+	res := make(model.Videos, len(vs))
+	for i, v := range vs {
+		res[i] = GetVideosByTimeRangeRowToModel(&v)
+	}
+	return res
+}
+
 // GetVideosByPlatformsWithStatusRowToModel converts db_sqlc.GetVideosByPlatformsWithStatusRow to model.Video
 func GetVideosByPlatformsWithStatusRowToModel(v *db_sqlc.GetVideosByPlatformsWithStatusRow) *model.Video {
 	m := VideoToModel(&v.Video)
@@ -370,4 +391,12 @@ func VideoModelsToCreateStreamStatusParams(m model.Videos) []db_sqlc.CreateStrea
 		})
 	}
 	return ps
+}
+
+func VideosByTimeRangeRowsToModel(vs []db_sqlc.GetVideosByTimeRangeRow) model.Videos {
+	res := make(model.Videos, 0)
+	for _, v := range vs {
+		res = append(res, VideoToModel(&v.Video))
+	}
+	return res
 }

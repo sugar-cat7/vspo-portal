@@ -44,3 +44,15 @@ FROM
 DELETE FROM video
 WHERE id = ANY(@ids::text[])
 RETURNING *;
+
+
+-- name: GetVideosByTimeRange :many
+SELECT
+     sqlc.embed(v), sqlc.embed(ss)
+FROM
+    video v
+INNER JOIN
+    stream_status ss ON v.id = ss.video_id
+WHERE
+    ss.started_at >= $1
+    AND ss.ended_at <= $2;

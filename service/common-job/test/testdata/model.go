@@ -4,6 +4,7 @@ import (
 	"github.com/go-faker/faker/v4"
 	"github.com/go-faker/faker/v4/pkg/options"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/model"
+	utime "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/time"
 )
 
 // NewVspoFactory is 3 creators, 5 youtube videos, 5 twitch videos, 5 twitcasting videos
@@ -82,6 +83,10 @@ func NewYoutubeVideosWithCreator() model.Videos {
 		videos[i].Platform = model.PlatformYouTube
 		videos[i].Status = model.StatusLive
 		videos[i].VideoType = model.VideoTypeVspoStream
+		startedAt := utime.Utc.Now().AddDate(0, 0, -2)
+		endedAt := utime.Utc.Now().AddDate(0, 0, -1)
+		videos[i].StartedAt = &startedAt
+		videos[i].EndedAt = &endedAt
 	}
 	return videos
 }

@@ -13,7 +13,6 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/twitch"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/youtube"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/usecase/input"
-	"github.com/volatiletech/null/v8"
 )
 
 type videoInteractor struct {
@@ -87,9 +86,9 @@ func (i *videoInteractor) UpdatePlatformVideos(
 				return err
 			}
 
-			existVs, err := i.videoRepository.List(
+			existVs, err := i.videoRepository.ListByIDs(
 				ctx,
-				repository.ListVideosQuery{
+				repository.ListByIDsQuery{
 					VideoIDs: uvs.IDs(),
 				})
 			if err != nil {
@@ -246,21 +245,16 @@ func (i *videoInteractor) UpdatwExistVideos(
 	err := i.transactable.RWTx(
 		ctx,
 		func(ctx context.Context) error {
-			existVs, err := i.videoRepository.List(
+			existVs, err := i.videoRepository.ListByTimeRange(
 				ctx,
-				repository.ListVideosQuery{
-					PlatformTypes: []string{model.PlatformYouTube.String()},
-					VideoType:     model.VideoTypeVspoStream.String(),
-					BaseListOptions: repository.BaseListOptions{
-						Limit: null.Uint64From(100),
-						Page:  null.Uint64From(0),
-					},
+				repository.ListByTimeRangeQuery{
+					StartedAt: param.StartedAt,
+					EndedAt:   param.EndedAt,
 				},
 			)
 			if err != nil {
 				return err
 			}
-			fmt.Println("exist videos: ", existVs.IDs())
 
 			uvs, err := i.youtubeClient.GetVideos(ctx, youtube.VideosParam{
 				VideoIDs: existVs.IDs(),

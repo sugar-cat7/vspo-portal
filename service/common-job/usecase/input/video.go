@@ -25,8 +25,8 @@ func NewUpsertVideoInput(
 }
 
 type UpdateExistVideos struct {
-	startedAt time.Time
-	endedAt   time.Time
+	StartedAt time.Time
+	EndedAt   time.Time
 }
 
 func NewUpdateExistVideos(
@@ -34,14 +34,14 @@ func NewUpdateExistVideos(
 ) *UpdateExistVideos {
 	param := &UpdateExistVideos{}
 	if period == "day" {
-		param.startedAt = utime.Utc.Now().AddDate(0, 0, -1)
+		param.StartedAt = utime.Utc.Now().AddDate(0, 0, -1)
 	}
 	if period == "week" {
-		param.startedAt = utime.Utc.Now().AddDate(0, 0, -7)
+		param.StartedAt = utime.Utc.Now().AddDate(0, 0, -7)
 	}
 	if period == "month" {
-		param.startedAt = utime.Utc.Now().AddDate(0, -1, 0)
+		param.StartedAt = utime.Utc.Now().AddDate(0, -1, 0)
 	}
-	param.endedAt = utime.Utc.Now()
+	param.EndedAt = utime.Utc.Now()
 	return param
 }

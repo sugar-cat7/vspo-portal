@@ -25,14 +25,6 @@ migrate:
 	go run cmd/index.go db-migration
 	@echo "Migrating database...done"
 
-sqlc:
-	@echo "Pulling sqlc/sqlc Docker image..."
-	docker pull sqlc/sqlc
-	@echo "Removing old generated files..."
-	rm -rf ./infra/database/internal/gen
-	@echo "Generating sqlc files..."
-	docker run --rm -v $$(pwd):/src -w /src sqlc/sqlc generate
-
 ddl:
 	@echo "Building Docker image first..."
 	docker build -f ./Dockerfile --target db-migration -t $(MIGRATION_IMAGE_NAME) .

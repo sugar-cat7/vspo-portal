@@ -7,6 +7,8 @@ package db_sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countVideo = `-- name: CountVideo :one
@@ -116,6 +118,67 @@ func (q *Queries) GetVideosByPlatformsWithStatus(ctx context.Context, arg GetVid
 	var items []GetVideosByPlatformsWithStatusRow
 	for rows.Next() {
 		var i GetVideosByPlatformsWithStatusRow
+		if err := rows.Scan(
+			&i.Video.ID,
+			&i.Video.ChannelID,
+			&i.Video.PlatformType,
+			&i.Video.Title,
+			&i.Video.Description,
+			&i.Video.VideoType,
+			&i.Video.PublishedAt,
+			&i.Video.Tags,
+			&i.Video.ThumbnailUrl,
+			&i.Video.IsDeleted,
+			&i.StreamStatus.ID,
+			&i.StreamStatus.VideoID,
+			&i.StreamStatus.CreatorID,
+			&i.StreamStatus.Status,
+			&i.StreamStatus.StartedAt,
+			&i.StreamStatus.EndedAt,
+			&i.StreamStatus.ViewCount,
+			&i.StreamStatus.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getVideosByTimeRange = `-- name: GetVideosByTimeRange :many
+SELECT
+     v.id, v.channel_id, v.platform_type, v.title, v.description, v.video_type, v.published_at, v.tags, v.thumbnail_url, v.is_deleted, ss.id, ss.video_id, ss.creator_id, ss.status, ss.started_at, ss.ended_at, ss.view_count, ss.updated_at
+FROM
+    video v
+INNER JOIN
+    stream_status ss ON v.id = ss.video_id
+WHERE
+    ss.started_at >= $1
+    AND ss.ended_at <= $2
+`
+
+type GetVideosByTimeRangeParams struct {
+	StartedAt pgtype.Timestamptz
+	EndedAt   pgtype.Timestamptz
+}
+
+type GetVideosByTimeRangeRow struct {
+	Video        Video
+	StreamStatus StreamStatus
+}
+
+func (q *Queries) GetVideosByTimeRange(ctx context.Context, arg GetVideosByTimeRangeParams) ([]GetVideosByTimeRangeRow, error) {
+	rows, err := q.db.Query(ctx, getVideosByTimeRange, arg.StartedAt, arg.EndedAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetVideosByTimeRangeRow
+	for rows.Next() {
+		var i GetVideosByTimeRangeRow
 		if err := rows.Scan(
 			&i.Video.ID,
 			&i.Video.ChannelID,
