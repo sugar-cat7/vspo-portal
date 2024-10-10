@@ -102,6 +102,8 @@ func ytSearchResultToVideo(ytSearchResult *youtube.SearchResult) (*model.Video, 
 	case "none":
 	case "completed":
 		m.Status = model.StatusEnded
+	default:
+		m.Status = model.StatusEnded
 	}
 	if ytSearchResult.Snippet.PublishedAt == "" {
 		publishedAt, err := utime.Utc.ISOStringToTime(ytSearchResult.Snippet.PublishedAt)

@@ -10,7 +10,7 @@ Vspo Portal is a repository for providing fan-made services related to Vspo. ([X
 
 | Service Name                                          | Description                                                                                                | Repository                                |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [Spodule](https://www.vspo-schedule.com/schedule/all) | A site where you can check the broadcasts (YouTube/Twitch/Twitcasting/Niconico) and clips of Vspo members. | [vspo-schedule](./service/vspo-schedule/) |
+| [Spodule](https://www.vspo-schedule.com/schedule/all) | A site where you can check the streams (YouTube/Twitch/Twitcasting/Niconico) and clips of Vspo members. | [vspo-schedule](./service/vspo-schedule/) |
 | Common API                                            |                                                                                                            | [vspo-schedule-api](./service/common-job/)      |
 
 

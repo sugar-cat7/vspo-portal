@@ -4,11 +4,11 @@ import (
 	api "github.com/sugar-cat7/vspo-portal/service/common-job/infra/http/cron/internal/gen"
 )
 
-func ConvertPlatFormTypeOgenToReq(p api.APICronVideosGetPlatformTypeItem) string {
+func ConvertPlatFormTypeOgenToReq(p api.APICronSearchVideosGetPlatformTypeItem) string {
 	return string(p)
 }
 
-func ConvertPlatFormTypeOgenToReqSlice(p []api.APICronVideosGetPlatformTypeItem) []string {
+func ConvertPlatFormTypeOgenToReqSlice(p []api.APICronSearchVideosGetPlatformTypeItem) []string {
 	var result []string
 	for _, v := range p {
 		result = append(result, string(v))

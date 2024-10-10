@@ -1,4 +1,4 @@
-DIR ?= ./infra/database/internal/schema/migration
+DIR ?= infra/database/schema/migration
 DRIVER ?= postgres
 MIGRATION_IMAGE_NAME ?= migration-image
 DBSTRING ?= host=vspo-db user=user password=password dbname=vspo sslmode=disable
@@ -25,19 +25,11 @@ migrate:
 	go run cmd/index.go db-migration
 	@echo "Migrating database...done"
 
-sqlc:
-	@echo "Pulling sqlc/sqlc Docker image..."
-	docker pull sqlc/sqlc
-	@echo "Removing old generated files..."
-	rm -rf ./infra/database/internal/gen
-	@echo "Generating sqlc files..."
-	docker run --rm -v $$(pwd):/src -w /src sqlc/sqlc generate
-
 ddl:
 	@echo "Building Docker image first..."
-	docker build -f ./Dockerfile.migration -t $(MIGRATION_IMAGE_NAME) .
+	docker build -f ./Dockerfile --target db-migration -t $(MIGRATION_IMAGE_NAME) .
 	@echo "Creating new migration..."
-	docker run --rm -v ${PWD}/${DIR}:/migrations $(MIGRATION_IMAGE_NAME) goose -dir=/migrations create $(name) sql
+	docker run --rm -v ${PWD}/${DIR}:/migrations $(MIGRATION_IMAGE_NAME) goose -dir=/migrations create add sql
 	@echo "Creating new migration done."
 
 gen.mock:

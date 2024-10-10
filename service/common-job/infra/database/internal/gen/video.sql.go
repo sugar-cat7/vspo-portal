@@ -7,6 +7,8 @@ package db_sqlc
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const countVideo = `-- name: CountVideo :one
@@ -25,7 +27,7 @@ func (q *Queries) CountVideo(ctx context.Context) (int64, error) {
 const deleteVideosByIDs = `-- name: DeleteVideosByIDs :exec
 DELETE FROM video
 WHERE id = ANY($1::text[])
-RETURNING id, channel_id, platform_type, title, description, video_type, published_at, started_at, ended_at, tags, view_count, thumbnail_url, is_deleted
+RETURNING id, channel_id, platform_type, title, description, video_type, published_at, tags, thumbnail_url, is_deleted
 `
 
 func (q *Queries) DeleteVideosByIDs(ctx context.Context, ids []string) error {
@@ -35,7 +37,7 @@ func (q *Queries) DeleteVideosByIDs(ctx context.Context, ids []string) error {
 
 const getVideosByIDs = `-- name: GetVideosByIDs :many
 SELECT
-     v.id, v.channel_id, v.platform_type, v.title, v.description, v.video_type, v.published_at, v.started_at, v.ended_at, v.tags, v.view_count, v.thumbnail_url, v.is_deleted
+     v.id, v.channel_id, v.platform_type, v.title, v.description, v.video_type, v.published_at, v.tags, v.thumbnail_url, v.is_deleted
 FROM
     video v
 WHERE
@@ -63,10 +65,7 @@ func (q *Queries) GetVideosByIDs(ctx context.Context, ids []string) ([]GetVideos
 			&i.Video.Description,
 			&i.Video.VideoType,
 			&i.Video.PublishedAt,
-			&i.Video.StartedAt,
-			&i.Video.EndedAt,
 			&i.Video.Tags,
-			&i.Video.ViewCount,
 			&i.Video.ThumbnailUrl,
 			&i.Video.IsDeleted,
 		); err != nil {
@@ -82,11 +81,11 @@ func (q *Queries) GetVideosByIDs(ctx context.Context, ids []string) ([]GetVideos
 
 const getVideosByPlatformsWithStatus = `-- name: GetVideosByPlatformsWithStatus :many
 SELECT
-     v.id, v.channel_id, v.platform_type, v.title, v.description, v.video_type, v.published_at, v.started_at, v.ended_at, v.tags, v.view_count, v.thumbnail_url, v.is_deleted, bs.id, bs.video_id, bs.creator_id, bs.status, bs.updated_at
+     v.id, v.channel_id, v.platform_type, v.title, v.description, v.video_type, v.published_at, v.tags, v.thumbnail_url, v.is_deleted, ss.id, ss.video_id, ss.creator_id, ss.status, ss.started_at, ss.ended_at, ss.view_count, ss.updated_at
 FROM
     video v
 INNER JOIN
-    broadcast_status bs ON v.id = bs.video_id
+    stream_status ss ON v.id = ss.video_id
 WHERE
     platform_type = ANY($4::text[])
     AND video_type = $1
@@ -101,8 +100,8 @@ type GetVideosByPlatformsWithStatusParams struct {
 }
 
 type GetVideosByPlatformsWithStatusRow struct {
-	Video           Video
-	BroadcastStatus BroadcastStatus
+	Video        Video
+	StreamStatus StreamStatus
 }
 
 func (q *Queries) GetVideosByPlatformsWithStatus(ctx context.Context, arg GetVideosByPlatformsWithStatusParams) ([]GetVideosByPlatformsWithStatusRow, error) {
@@ -127,17 +126,78 @@ func (q *Queries) GetVideosByPlatformsWithStatus(ctx context.Context, arg GetVid
 			&i.Video.Description,
 			&i.Video.VideoType,
 			&i.Video.PublishedAt,
-			&i.Video.StartedAt,
-			&i.Video.EndedAt,
 			&i.Video.Tags,
-			&i.Video.ViewCount,
 			&i.Video.ThumbnailUrl,
 			&i.Video.IsDeleted,
-			&i.BroadcastStatus.ID,
-			&i.BroadcastStatus.VideoID,
-			&i.BroadcastStatus.CreatorID,
-			&i.BroadcastStatus.Status,
-			&i.BroadcastStatus.UpdatedAt,
+			&i.StreamStatus.ID,
+			&i.StreamStatus.VideoID,
+			&i.StreamStatus.CreatorID,
+			&i.StreamStatus.Status,
+			&i.StreamStatus.StartedAt,
+			&i.StreamStatus.EndedAt,
+			&i.StreamStatus.ViewCount,
+			&i.StreamStatus.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getVideosByTimeRange = `-- name: GetVideosByTimeRange :many
+SELECT
+     v.id, v.channel_id, v.platform_type, v.title, v.description, v.video_type, v.published_at, v.tags, v.thumbnail_url, v.is_deleted, ss.id, ss.video_id, ss.creator_id, ss.status, ss.started_at, ss.ended_at, ss.view_count, ss.updated_at
+FROM
+    video v
+INNER JOIN
+    stream_status ss ON v.id = ss.video_id
+WHERE
+    ss.started_at >= $1
+    AND ss.ended_at <= $2
+`
+
+type GetVideosByTimeRangeParams struct {
+	StartedAt pgtype.Timestamptz
+	EndedAt   pgtype.Timestamptz
+}
+
+type GetVideosByTimeRangeRow struct {
+	Video        Video
+	StreamStatus StreamStatus
+}
+
+func (q *Queries) GetVideosByTimeRange(ctx context.Context, arg GetVideosByTimeRangeParams) ([]GetVideosByTimeRangeRow, error) {
+	rows, err := q.db.Query(ctx, getVideosByTimeRange, arg.StartedAt, arg.EndedAt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetVideosByTimeRangeRow
+	for rows.Next() {
+		var i GetVideosByTimeRangeRow
+		if err := rows.Scan(
+			&i.Video.ID,
+			&i.Video.ChannelID,
+			&i.Video.PlatformType,
+			&i.Video.Title,
+			&i.Video.Description,
+			&i.Video.VideoType,
+			&i.Video.PublishedAt,
+			&i.Video.Tags,
+			&i.Video.ThumbnailUrl,
+			&i.Video.IsDeleted,
+			&i.StreamStatus.ID,
+			&i.StreamStatus.VideoID,
+			&i.StreamStatus.CreatorID,
+			&i.StreamStatus.Status,
+			&i.StreamStatus.StartedAt,
+			&i.StreamStatus.EndedAt,
+			&i.StreamStatus.ViewCount,
+			&i.StreamStatus.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

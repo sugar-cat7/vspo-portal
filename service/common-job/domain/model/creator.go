@@ -64,7 +64,7 @@ func NewMemberType(s string) (MemberType, error) {
 // VideoTypeToMemberTypes represents the type of video.
 func VideoTypeToMemberTypes(vt VideoType) []string {
 	switch vt {
-	case VideoTypeVspoBroadcast, VideoTypeFreechat:
+	case VideoTypeVspoStream, VideoTypeFreechat:
 		return []string{MemberTypeVspoJP.String(), MemberTypeVspoEN.String()}
 	case VideoTypeClip:
 		return []string{MemberTypeGeneral.String()}

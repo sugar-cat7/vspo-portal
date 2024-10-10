@@ -27,7 +27,7 @@ $ curl --location 'http://localhost:8080/cron/videos' \
     "youtube"
   ],
   "period": "month",
-  "video_type": "vspo_broadcast"
+  "video_type": "vspo_stream"
 }'
 ```
 

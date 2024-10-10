@@ -15,7 +15,7 @@ type CMD struct {
 
 func (c *CMD) Run(cmd *cobra.Command) error {
 	// FIXME: add Logger
-	_, err := c.staffInteractor.BatchDeleteInsert(c.ctx, &input.UpsertVideos{})
+	_, err := c.staffInteractor.UpdatePlatformVideos(c.ctx, &input.UpdatePlatformVideos{})
 	if err != nil {
 		return err
 	}

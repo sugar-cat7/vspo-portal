@@ -1,6 +1,6 @@
 ## [Spodule](https://www.vspo-schedule.com/schedule/all)
 
-A site where you can check the broadcasts (YouTube/Twitch/Twitcasting/Niconico) and clips of Vspo members. Follow us on [X](https://twitter.com/vspodule) for updates.
+A site where you can check the streams (YouTube/Twitch/Twitcasting/Niconico) and clips of Vspo members. Follow us on [X](https://twitter.com/vspodule) for updates.
 
 ### Quick Start
 

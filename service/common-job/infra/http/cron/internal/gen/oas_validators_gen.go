@@ -62,7 +62,7 @@ func (s APICronCreatorsGetPlatformTypeItem) Validate() error {
 	}
 }
 
-func (s APICronVideosGetPeriod) Validate() error {
+func (s APICronExistVideosGetPeriod) Validate() error {
 	switch s {
 	case "day":
 		return nil
@@ -75,7 +75,7 @@ func (s APICronVideosGetPeriod) Validate() error {
 	}
 }
 
-func (s APICronVideosGetPlatformTypeItem) Validate() error {
+func (s APICronSearchVideosGetPlatformTypeItem) Validate() error {
 	switch s {
 	case "youtube":
 		return nil
@@ -90,9 +90,9 @@ func (s APICronVideosGetPlatformTypeItem) Validate() error {
 	}
 }
 
-func (s APICronVideosGetVideoType) Validate() error {
+func (s APICronSearchVideosGetVideoType) Validate() error {
 	switch s {
-	case "vspo_broadcast":
+	case "vspo_stream":
 		return nil
 	case "clip":
 		return nil
