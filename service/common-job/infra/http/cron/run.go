@@ -12,8 +12,14 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/dependency"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/environment"
 	cron "github.com/sugar-cat7/vspo-portal/service/common-job/infra/http/cron/internal/gen"
-
 	"github.com/sugar-cat7/vspo-portal/service/common-job/pkg/logger"
+	app_trace "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/otel"
+)
+
+type OtelKey string
+
+const (
+	OTelTracer = OtelKey("tracer")
 )
 
 // Run starts the server.
@@ -24,7 +30,8 @@ func Run(w http.ResponseWriter, r *http.Request) {
 	}
 	logger := logger.New()
 
-	ctx := context.Background()
+	ctx, traceProvider := app_trace.SetTracerInContext(context.Background(), "vspo-cron", e.ServerEnvironment.ENV)
+	defer traceProvider.Shutdown()
 	d := &dependency.Dependency{}
 	d.Inject(ctx, e)
 	logger.Info(fmt.Sprintf("%s %s", r.Method, r.URL.Path))
@@ -37,6 +44,7 @@ func Run(w http.ResponseWriter, r *http.Request) {
 		),
 		NewSecurityHandler(e),
 		cron.WithMiddleware(),
+		cron.WithTracerProvider(traceProvider),
 	)
 
 	if err != nil {
@@ -54,7 +62,7 @@ func StartServer() {
 	})
 
 	server := &http.Server{
-		Addr:    ":8080", // Change the port number as needed
+		Addr:    ":8080",
 		Handler: nil,
 	}
 
