@@ -8,7 +8,6 @@ import (
 
 // UpdatePlatformVideos is the input for UpsertVideo
 type UpdatePlatformVideos struct {
-	VideoIDs      []string
 	PlatformTypes []string
 	VideoType     string
 }

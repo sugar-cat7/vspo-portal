@@ -68,3 +68,9 @@ resource "google_project_iam_member" "cloud_run_admin" {
   role    = "roles/run.admin"
   member  = "serviceAccount:${google_service_account.cloud_scheduler.email}"
 }
+
+// Cloud Run
+resource "google_service_account" "cloud_run" {
+  account_id   = "${local.env}vspocroncloudrun"
+  display_name = "Cloud Run Account"
+}

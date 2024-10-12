@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/dependency"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/environment"
-	"github.com/sugar-cat7/vspo-portal/service/common-job/pkg/logger"
 )
 
 // NewVideoCmd is a function to create video command
@@ -19,23 +18,49 @@ func NewVideoCmd() *cobra.Command {
 			if len(args) == 0 {
 				cmd.HelpFunc()(cmd, args)
 			}
-			e := &environment.Environment{}
-			if err := env.Parse(e); err != nil {
-				panic(err)
-			}
-			logger := logger.New()
-			logger.Info("fetching livestream")
-			ctx := context.Background()
-			d := &dependency.Dependency{}
-			d.Inject(ctx, e)
-			c := &CMD{
-				ctx,
-				d.VideosInteractor,
-			}
-			if err := c.Run(cmd); err != nil {
-				panic(err)
-			}
 		},
 	}
+	cmd.AddCommand(
+		&cobra.Command{
+			Use:   "search",
+			Short: "search livestream",
+			Run: func(cmd *cobra.Command, args []string) {
+				e := &environment.Environment{}
+				if err := env.Parse(e); err != nil {
+					panic(err)
+				}
+				ctx := context.Background()
+				d := &dependency.Dependency{}
+				d.Inject(ctx, e)
+				c := &CMD{
+					ctx,
+					d.VideosInteractor,
+				}
+				if err := c.UpdatePlatformVideosRun(cmd); err != nil {
+					panic(err)
+				}
+			},
+		},
+	)
+	cmd.AddCommand(
+		&cobra.Command{
+			Use:   "exist",
+			Short: "update exist livestream",
+			Run: func(cmd *cobra.Command, args []string) {
+				e := &environment.Environment{}
+				if err := env.Parse(e); err != nil {
+					panic(err)
+				}
+				ctx := context.Background()
+				d := &dependency.Dependency{}
+				d.Inject(ctx, e)
+				c := &CMD{
+					ctx,
+					d.VideosInteractor,
+				}
+				if err := c.UpdatwExistVideosRun(cmd); err != nil {
+					panic(err)
+				}
+			}})
 	return cmd
 }
