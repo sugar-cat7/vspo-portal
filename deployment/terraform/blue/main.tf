@@ -122,10 +122,9 @@ module "cloud_scheduler_job_search" {
     {
       name     = "vspo-portal-job-search"
       schedule = "*/30 * * * *",
-    },
-    {
-      name     = "vspo-portal-job-update-exist-stream"
-      schedule = "*/30 * * * *",
+      headers = {
+        "Content-Type" = "application/json"
+      }
     }
   ]
 }
@@ -139,12 +138,11 @@ module "cloud_scheduler_job_update_exist_stream" {
   cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
   schedules = [
     {
-      name     = "vspo-portal-job-search"
+      name     = "vspo-portal-job-update-exist-stream"
       schedule = "*/30 * * * *",
       headers = {
         "Content-Type" = "application/json"
       }
-      body = {}
     }
   ]
 }
