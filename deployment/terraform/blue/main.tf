@@ -116,7 +116,7 @@ module "cloud_scheduler_job" {
   location                 = local.location
   env                      = local.env
   project                  = var.GOOGLE_PROJECT_ID
-  cloud_run_service_url    = module.cloud_run.cloud_run_service_url
+  cloud_run_service_url    = module.cloud_run_job_search.cloud_run_service_url
   cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
   schedules = [
     {
@@ -125,6 +125,7 @@ module "cloud_scheduler_job" {
       headers = {
         "Content-Type" = "application/json"
       }
+      body = {}
     },
     {
       name     = "vspo-portal-job-update-exist-stream"
@@ -132,6 +133,26 @@ module "cloud_scheduler_job" {
       headers = {
         "Content-Type" = "application/json"
       }
+      body = {}
+    }
+  ]
+}
+
+module "cloud_scheduler_job" {
+  source                   = "../modules/cloud_scheduler_job"
+  location                 = local.location
+  env                      = local.env
+  project                  = var.GOOGLE_PROJECT_ID
+  cloud_run_service_url    = module.cloud_run_job_update_exist_stream.cloud_run_service_url
+  cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
+  schedules = [
+    {
+      name     = "vspo-portal-job-search"
+      schedule = "*/30 * * * *",
+      headers = {
+        "Content-Type" = "application/json"
+      }
+      body = {}
     }
   ]
 }
