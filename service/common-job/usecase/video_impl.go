@@ -54,10 +54,8 @@ func (i *videoInteractor) UpdatePlatformVideos(
 	ctx context.Context,
 	param *input.UpdatePlatformVideos,
 ) (int, error) {
-	tracer, err := trace.GetTracerFromContext(ctx)
-	if err != nil {
-		return 0, err
-	}
+	tracer := trace.GetGlobalTracer()
+
 	ctx, span := tracer.Start(ctx, "Usecase#UpdatePlatformVideos")
 	defer span.End()
 
@@ -165,10 +163,7 @@ func (i *videoInteractor) ytVideos(
 	ctx context.Context,
 	vt model.VideoType,
 ) (model.Videos, error) {
-	tracer, err := trace.GetTracerFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+	tracer := trace.GetGlobalTracer()
 	ctx, span := tracer.Start(ctx, "Usecase#ytVideos")
 	defer span.End()
 
@@ -203,10 +198,7 @@ func (i *videoInteractor) twitchVideos(
 	ctx context.Context,
 	twitchUserIDs []string,
 ) (model.Videos, error) {
-	tracer, err := trace.GetTracerFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+	tracer := trace.GetGlobalTracer()
 	ctx, span := tracer.Start(ctx, "Usecase#twitchVideos")
 	defer span.End()
 
@@ -228,10 +220,7 @@ func (i *videoInteractor) twitCastingVideos(
 	ctx context.Context,
 	twitCastingUserIDs []string,
 ) (model.Videos, error) {
-	tracer, err := trace.GetTracerFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+	tracer := trace.GetGlobalTracer()
 	ctx, span := tracer.Start(ctx, "Usecase#twitCastingVideos")
 	defer span.End()
 
@@ -255,10 +244,7 @@ func (i *videoInteractor) updateVideosByPlatformTypes(
 	pts model.Platforms,
 	vt model.VideoType,
 ) (model.Videos, error) {
-	tracer, err := trace.GetTracerFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+	tracer := trace.GetGlobalTracer()
 	ctx, span := tracer.Start(ctx, "Usecase#updateVideosByPlatformTypes")
 	defer span.End()
 
@@ -327,15 +313,12 @@ func (i *videoInteractor) UpdatwExistVideos(
 	ctx context.Context,
 	param *input.UpdateExistVideos,
 ) (int, error) {
-	tracer, err := trace.GetTracerFromContext(ctx)
-	if err != nil {
-		return 0, err
-	}
+	tracer := trace.GetGlobalTracer()
 	ctx, span := tracer.Start(ctx, "Usecase#UpdatwExistVideos")
 	defer span.End()
 
 	var updatedCount int
-	err = i.transactable.RWTx(
+	err := i.transactable.RWTx(
 		ctx,
 		func(ctx context.Context) error {
 			ctx, subSpan := tracer.Start(ctx, "RetrieveCreators")

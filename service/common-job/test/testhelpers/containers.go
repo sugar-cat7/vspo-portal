@@ -12,6 +12,7 @@ import (
 	repo "github.com/sugar-cat7/vspo-portal/service/common-job/infra/database/repository"
 	migration "github.com/sugar-cat7/vspo-portal/service/common-job/infra/database/schema"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/environment"
+	trace "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/otel"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -56,6 +57,7 @@ func SetupRepo(ctx context.Context) setupTx {
 	if err != nil {
 		panic(err)
 	}
+	trace.SetTracerProvider("test-vspo-cron", e.ServerEnvironment.ENV)
 	port, err := c.MappedPort(ctx, "5432")
 	if err != nil {
 		panic(err)

@@ -14,6 +14,7 @@ import (
 	cron "github.com/sugar-cat7/vspo-portal/service/common-job/infra/http/cron/internal/gen"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/pkg/logger"
 	app_trace "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/otel"
+	"go.opentelemetry.io/otel"
 )
 
 type OtelKey string
@@ -24,14 +25,16 @@ const (
 
 // Run starts the server.
 func Run(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
 	e := &environment.Environment{}
 	if err := env.Parse(e); err != nil {
 		panic(err)
 	}
 	logger := logger.New()
 
-	ctx, traceProvider := app_trace.SetTracerInContext(context.Background(), "vspo-cron", e.ServerEnvironment.ENV)
+	traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV)
 	defer traceProvider.Shutdown()
+	otel.SetTracerProvider(traceProvider)
 	d := &dependency.Dependency{}
 	d.Inject(ctx, e)
 	logger.Info(fmt.Sprintf("%s %s", r.Method, r.URL.Path))
