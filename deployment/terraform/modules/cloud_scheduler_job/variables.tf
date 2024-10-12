@@ -23,7 +23,7 @@ variable "schedules" {
     name     = string
     schedule = string
     headers  = map(string)
-    body     = string
+    body     = optional(string)
   }))
 }
 

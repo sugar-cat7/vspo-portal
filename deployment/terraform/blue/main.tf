@@ -122,18 +122,10 @@ module "cloud_scheduler_job_search" {
     {
       name     = "vspo-portal-job-search"
       schedule = "*/30 * * * *",
-      headers = {
-        "Content-Type" = "application/json"
-      }
-      body = {}
     },
     {
       name     = "vspo-portal-job-update-exist-stream"
       schedule = "*/30 * * * *",
-      headers = {
-        "Content-Type" = "application/json"
-      }
-      body = {}
     }
   ]
 }
