@@ -111,7 +111,7 @@ module "cloud_run_job_update_exist_stream" {
   cloud_run_job_env_vars          = local.cloud_run_job_env_vars
 }
 
-module "cloud_scheduler_job" {
+module "cloud_scheduler_job_search" {
   source                   = "../modules/cloud_scheduler_job"
   location                 = local.location
   env                      = local.env
@@ -138,7 +138,7 @@ module "cloud_scheduler_job" {
   ]
 }
 
-module "cloud_scheduler_job" {
+module "cloud_scheduler_job_update_exist_stream" {
   source                   = "../modules/cloud_scheduler_job"
   location                 = local.location
   env                      = local.env
