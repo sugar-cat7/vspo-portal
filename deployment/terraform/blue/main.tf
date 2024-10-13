@@ -102,8 +102,10 @@ locals {
     }
   }
 
+  combined_env_vars = merge(local.cloud_run_service_env_vars, local.datadog_env_vars)
+
   secret_manager_secrets = [
-    for k, v in concat([local.cloud_run_service_env_vars, local.datadog_env_vars]) : {
+    for k, v in combined_env_vars : {
       secret_name = v.secret_name
       version     = lookup(v, "version", "latest")
     } if contains(keys(v), "secret_name")
