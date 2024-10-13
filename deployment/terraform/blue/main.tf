@@ -126,7 +126,7 @@ module "cloud_scheduler_job" {
       }
       body = jsonencode({
         platform_type = ["youtube", "twitch", "twitcasting"]
-        video_type = "vspo_stream"
+        video_type    = "vspo_stream"
       })
     },
     {
