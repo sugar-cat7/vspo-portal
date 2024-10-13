@@ -32,7 +32,8 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
     }
     containers {
       name  = "datadog-agent"
-      image = "gcr.io/datadoghq/agent:latest"
+      // https://github.com/DataDog/datadog-agent/issues/28911
+      image = "gcr.io/datadoghq/agent:6"
 
       dynamic "env" {
         for_each = var.datadog_env_vars
