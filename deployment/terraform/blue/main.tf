@@ -38,11 +38,6 @@ module "iam" {
   project = var.GOOGLE_PROJECT_ID
 }
 
-module "secret_manager" {
-  source           = "../modules/secret_manager"
-  sa_account_email = module.iam.cloud_run_sa_email
-}
-
 locals {
   cloud_run_service_env_vars = {
     "DB_HOST" = {
@@ -87,6 +82,13 @@ locals {
       value = "info"
     }
   }
+
+  secret_manager_secrets = [
+    for k, v in local.cloud_run_service_env_vars : {
+      secret_name = v.secret_name
+      version     = lookup(v, "version", "latest")
+    } if contains(keys(v), "secret_name")
+  ]
 }
 
 module "cloud_run_service" {
@@ -116,4 +118,12 @@ module "cloud_scheduler_job" {
       body = jsonencode({})
     }
   ]
+}
+
+module "secret_manager" {
+  source = "../modules/secret_manager"
+
+  project_id             = var.GOOGLE_PROJECT_ID
+  sa_account_email       = module.iam.cloud_run_sa_email
+  secret_manager_secrets = local.secret_manager_secrets
 }
