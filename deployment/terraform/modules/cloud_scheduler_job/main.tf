@@ -10,7 +10,7 @@ resource "google_cloud_scheduler_job" "scheduler" {
     uri         = each.value.target_url
     http_method = "POST"
     headers     = each.value.headers
-    body        = each.value.body
+    body        = base64encode(each.value.body)
     oauth_token {
       scope                 = "https://www.googleapis.com/auth/cloud-platform"
       service_account_email = var.cloud_scheduler_sa_email
