@@ -109,7 +109,7 @@ module "cloud_scheduler_job" {
     {
       name       = "job1"
       schedule   = "*/5 * * * *"
-      target_url = "${module.cloud_run_service.url}/ping"
+      target_url = "${module.cloud_run_service.cloud_run_service_url}/ping"
       headers = {
         "Content-Type" = "application/json"
       }

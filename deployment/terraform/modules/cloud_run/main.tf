@@ -1,4 +1,4 @@
-resource "google_cloud_run_v2_service" "vspo_portal_cloud_run_v2_service" {
+resource "google_cloud_run_v2_service" "vspo_portal_cron" {
   name     = local.cloud_run_v2_service.name
   location = local.cloud_run_v2_service.location
   ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
