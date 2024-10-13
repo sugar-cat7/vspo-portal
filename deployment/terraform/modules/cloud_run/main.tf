@@ -35,10 +35,6 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
       // https://github.com/DataDog/datadog-agent/issues/28911
       image = "gcr.io/datadoghq/agent:6"
 
-      ports {
-        container_port = 8126
-      }
-
       dynamic "env" {
         for_each = var.datadog_env_vars
         content {
