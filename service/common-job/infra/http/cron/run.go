@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -33,7 +34,11 @@ func Run(w http.ResponseWriter, r *http.Request) {
 	logger := logger.New()
 
 	traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV)
-	defer traceProvider.Shutdown()
+	defer func() {
+		if err := traceProvider.Shutdown(); err != nil {
+			log.Println(err)
+		}
+	}()
 	otel.SetTracerProvider(traceProvider)
 	d := &dependency.Dependency{}
 	d.Inject(ctx, e)

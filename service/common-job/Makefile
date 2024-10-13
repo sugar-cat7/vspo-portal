@@ -39,5 +39,5 @@ gen.mock:
 
 lint:
 	@echo "Linting..."
-	docker run -t --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.58.0 golangci-lint run -v
+	docker run -t --rm -v $(PWD):/app -w /app golangci/golangci-lint:v1.61.0 golangci-lint run -v
 	@echo "Linting...done"

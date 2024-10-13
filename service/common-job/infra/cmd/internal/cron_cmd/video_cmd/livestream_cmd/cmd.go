@@ -2,6 +2,7 @@ package livestream_cmd
 
 import (
 	"context"
+	"log"
 
 	"github.com/caarlos0/env/v10"
 	"github.com/spf13/cobra"
@@ -33,7 +34,11 @@ func NewVideoCmd() *cobra.Command {
 				}
 				ctx := context.Background()
 				traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV)
-				defer traceProvider.Shutdown()
+				defer func() {
+					if err := traceProvider.Shutdown(); err != nil {
+						log.Println(err)
+					}
+				}()
 				otel.SetTracerProvider(traceProvider)
 				d := &dependency.Dependency{}
 				d.Inject(ctx, e)
@@ -58,7 +63,11 @@ func NewVideoCmd() *cobra.Command {
 				}
 				ctx := context.Background()
 				traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV)
-				defer traceProvider.Shutdown()
+				defer func() {
+					if err := traceProvider.Shutdown(); err != nil {
+						log.Println(err)
+					}
+				}()
 				d := &dependency.Dependency{}
 				d.Inject(ctx, e)
 				c := &CMD{
