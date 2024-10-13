@@ -49,3 +49,10 @@ jobs:
           docker build --target http-serve -t $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG -f $DOCKERFILE .
           docker tag $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
           docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG && docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
+      - id: deploy
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: 'blue-vspo-portal'
+          image: $ARTIFACT_REPOSITORY/$GCP_PROJECT/$IMAGE_NAME:$IMAGE_TAG
+          region: $REGION
+          no_traffic: false
