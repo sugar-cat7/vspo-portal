@@ -100,6 +100,9 @@ locals {
     "DD_VERSION" = {
       value = "1.0.0"
     }
+    "DD_HOSTNAME" = {
+      value = "blue-vspo-portal"
+    }
   }
 
   combined_env_vars = merge(local.cloud_run_service_env_vars, local.datadog_env_vars)
