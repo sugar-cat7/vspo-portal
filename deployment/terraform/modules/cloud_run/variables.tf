@@ -31,3 +31,13 @@ variable "cloud_run_service_env_vars" {
   }))
   description = "Environment variables for the Cloud Run job, including both literal values and secrets."
 }
+
+variable "datadog_env_vars" {
+  type = map(object({
+    value       = optional(string)
+    secret_name = optional(string)
+    version     = optional(string)
+  }))
+  description = "Environment variables for the Datadog agent, including both literal values and secrets."
+
+}
