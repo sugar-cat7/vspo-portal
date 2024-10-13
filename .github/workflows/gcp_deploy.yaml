@@ -54,6 +54,6 @@ jobs:
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: 'blue-vspo-portal'
-          image: ${{ env.ARTIFACT_REPOSITORY }}/${{ env.GCP_PROJECT }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+          image: ${{ env.ARTIFACT_REPOSITORY }}/${{ env.GCP_PROJECT }}/${{ env.REPOSITORY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           region: ${{ env.REGION }}
           no_traffic: false
