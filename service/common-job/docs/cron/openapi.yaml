@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: VSPO Common Cron
   description: This is the Cron documentation for VSPO Common services.
@@ -86,14 +86,14 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/schemas/CronResponse'
-      security:
-        - bearerAuth: []
-  /api/cron/videos:
+      # security:
+      #   - bearerAuth: []
+  /api/cron/search_videos:
     get:
       tags:
         - Videos
       summary: Upsert videos
-      description: Update videos related to a specific creator based on provided cronType
+      description: Update videos related to a specific creator based on provided
       parameters:
         - name: platform_type
           in: query
@@ -106,19 +106,12 @@ paths:
           style: form
           explode: false
           description: Comma-separated list of video platform types.
-        - name: period
-          in: query
-          required: true
-          schema:
-            type: string
-            enum: [day, month, week]
-          description: Period for performing updates.
         - name: video_type
           in: query
           required: true
           schema:
             type: string
-            enum: [vspo_broadcast, clip, freechat]
+            enum: [vspo_stream, clip, freechat]
           description: Type of the cron
       responses:
         "200":
@@ -163,8 +156,67 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/schemas/CronResponse'
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
+  /api/cron/exist_videos:
+    get:
+      tags:
+        - Videos
+      summary: update exist videos
+      description: Update exist videos
+      parameters:
+        - name: period
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [day, month, week]
+          description: Period for performing updates.
+      responses:
+        "200":
+          description: Videos updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+      # security:
+      #   - bearerAuth: []       
   /api/cron/channels:
     get:
       tags:
@@ -221,8 +273,8 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/schemas/CronResponse'
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
   /api/ping:
     get:
       summary: Ping endpoint
@@ -238,14 +290,31 @@ paths:
                   message:
                     type: string
                     example: Pong
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
+  /ping:
+    post:
+      summary: Ping endpoint
+      description: Returns a 200 status code if successful, or an error.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Pong
+      # security:
+      #   - bearerAuth: []
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: Bearer
+  # securitySchemes:
+  #   bearerAuth:
+  #     type: http
+  #     scheme: bearer
+  #     bearerFormat: Bearer
   schemas:
     CronResponse:
       type: object
@@ -253,8 +322,8 @@ components:
         message:
           type: string
           example: success
-security:
-  - bearerAuth: []
+# security:
+#   - bearerAuth: []
 
 tags:
   - name: Channels

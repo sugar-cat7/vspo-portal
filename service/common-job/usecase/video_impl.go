@@ -2,20 +2,21 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
 
-	mapset "github.com/deckarep/golang-set/v2"
 	"github.com/samber/lo"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/model"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/repository"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/twitcasting"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/twitch"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/youtube"
-	"github.com/sugar-cat7/vspo-portal/service/common-job/pkg/uuid"
+	trace "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/otel"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/usecase/input"
-	"github.com/volatiletech/null/v8"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 )
 
 type videoInteractor struct {
@@ -49,27 +50,37 @@ func NewVideoInteractor(
 	}
 }
 
-func (i *videoInteractor) BatchDeleteInsert(
+func (i *videoInteractor) UpdatePlatformVideos(
 	ctx context.Context,
-	param *input.UpsertVideos,
-) (model.Videos, error) {
+	param *input.UpdatePlatformVideos,
+) (int, error) {
+	tracer := trace.GetGlobalTracer()
+
+	ctx, span := tracer.Start(ctx, "Usecase#UpdatePlatformVideos")
+	defer span.End()
+
 	// validate input
 	videoType, err := model.NewVideoType(param.VideoType)
 	if err != nil {
-		return nil, err
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Invalid video type")
+		return 0, err
 	}
-	// startedAt, endedAt, err := model.NewPeriod(param.Period)
-	// if err != nil {
-	// 	return nil, err
-	// }
+
 	platformTypes, err := model.NewPlatforms(param.PlatformTypes)
 	if err != nil {
-		return nil, err
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Invalid platform types")
+		return 0, err
 	}
-	var v model.Videos
+
+	var updatedCount int
 	err = i.transactable.RWTx(
 		ctx,
 		func(ctx context.Context) error {
+			ctx, subSpan := tracer.Start(ctx, "RetrieveCreators")
+			defer subSpan.End()
+
 			// Retrieve creators
 			cs, err := i.creatorRepository.List(
 				ctx,
@@ -77,10 +88,14 @@ func (i *videoInteractor) BatchDeleteInsert(
 					MemberTypes: model.VideoTypeToMemberTypes(videoType),
 				},
 			)
-
 			if err != nil {
+				subSpan.RecordError(err)
+				subSpan.SetStatus(codes.Error, "Failed to list creators")
 				return err
 			}
+
+			ctx, updateSpan := tracer.Start(ctx, "UpdateVideosByPlatformTypes")
+			defer updateSpan.End()
 
 			// Update videos by platform types
 			uvs, err := i.updateVideosByPlatformTypes(
@@ -90,130 +105,71 @@ func (i *videoInteractor) BatchDeleteInsert(
 				videoType,
 			)
 			if err != nil {
+				updateSpan.RecordError(err)
+				updateSpan.SetStatus(codes.Error, "Failed to update videos by platform types")
 				return err
 			}
 
-			// Algorithm for detecting differences
-			// 1. Retrieve existing video information
-			existingVideos, err := i.videoRepository.List(
+			ctx, existSpan := tracer.Start(ctx, "ListExistingVideos")
+			defer existSpan.End()
+
+			existVs, err := i.videoRepository.ListByIDs(
 				ctx,
-				repository.ListVideosQuery{
-					PlatformTypes:   platformTypes.String(),
-					VideoType:       videoType.String(),
-					BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String(), model.StatusEnded.String()},
-					BaseListOptions: repository.BaseListOptions{
-						Limit: null.NewUint64(100, true),
-						Page:  null.NewUint64(0, true),
-					},
+				repository.ListByIDsQuery{
+					VideoIDs: uvs.IDs(),
 				},
 			)
 			if err != nil {
+				existSpan.RecordError(err)
+				existSpan.SetStatus(codes.Error, "Failed to list existing videos")
 				return err
 			}
 
-			targetVideo := existingVideos.UpdateVideos(uvs, videoType)
+			// Update logic
+			uvs = uvs.FilterByChannels(cs.RetrieveChannels())
+			uvs = uvs.FilterUpdatedVideos(existVs)
 
-			if len(targetVideo) == 0 {
-				return nil
-			}
+			// Creator info update
+			uvs = uvs.UpdateCreatorInfo(cs)
 
-			// Create creators and channels if they do not exist
-			var crs model.Creators
-			var chs model.Channels
-			for _, uv := range targetVideo {
-				b, err := i.channelRepository.Exist(
-					ctx,
-					repository.GetChannelQuery{
-						ID: uv.CreatorInfo.ChannelID,
-					},
-				)
-				if err != nil {
-					return err
-				}
-				if !b {
-					uuidCr := uuid.UUID()
-					uuidCh := uuid.UUID()
-					ch := &model.Channel{
-						ID:        uuidCh,
-						CreatorID: uuidCr,
-					}
-					cs := model.ChannelSnippet{
-						ID: uv.CreatorInfo.ChannelID,
-					}
-					if uv.Platform == model.PlatformYouTube {
-						ch.Youtube = cs
-					} else if uv.Platform == model.PlatformTwitch {
-						ch.Twitch = cs
-					} else if uv.Platform == model.PlatformTwitCasting {
-						ch.TwitCasting = cs
-					}
-					cr := model.NewCreator(
-						uuidCr,
-						"unknown",
-						model.MemberTypeGeneral,
-						model.ThumbnailURL(""),
-						*ch,
-					)
-					chs = append(chs, ch)
-					crs = append(crs, cr)
-				}
-			}
-			if len(crs) != 0 {
-				_, err = i.creatorRepository.BatchCreate(
-					ctx,
-					crs,
-				)
+			ctx, batchSpan := tracer.Start(ctx, "BatchDeleteInsertVideos")
+			defer batchSpan.End()
 
-				if err != nil {
-					return err
-				}
-
-				_, err = i.channelRepository.BatchCreate(
-					ctx,
-					chs,
-				)
-
-				if err != nil {
-					return err
-				}
-			}
-
-			// Update existing videos
-			_, err = i.videoRepository.BatchDeleteInsert(ctx, targetVideo)
+			_, err = i.videoRepository.BatchDeleteInsert(ctx, uvs)
 			if err != nil {
+				batchSpan.RecordError(err)
+				batchSpan.SetStatus(codes.Error, "Failed to batch insert videos")
 				return err
 			}
 
-			v, err = i.videoRepository.List(
-				ctx,
-				repository.ListVideosQuery{
-					VideoIDs: lo.Map(uvs, func(v *model.Video, _ int) string {
-						return v.ID
-					}),
-				})
-
-			if err != nil {
-				return err
-			}
-
+			updatedCount = len(uvs)
 			return nil
 		},
 	)
+
 	if err != nil {
-		return nil, err
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Transaction failed")
+		return 0, err
 	}
-	return v, nil
+
+	span.SetStatus(codes.Ok, "Success")
+	span.SetAttributes(attribute.Int("updatedCount", updatedCount))
+
+	return updatedCount, nil
 }
 
 func (i *videoInteractor) ytVideos(
 	ctx context.Context,
-	cs model.Creators,
 	vt model.VideoType,
 ) (model.Videos, error) {
+	tracer := trace.GetGlobalTracer()
+	ctx, span := tracer.Start(ctx, "Usecase#ytVideos")
+	defer span.End()
+
 	var vs model.Videos
-	var freeChats model.Videos
 	switch vt {
-	case model.VideoTypeVspoBroadcast:
+	case model.VideoTypeVspoStream:
 		queries := []youtube.SearchQuery{youtube.SearchQueryVspoJp, youtube.SearchQueryVspoEn}
 		eventTypes := []youtube.EventType{youtube.EventTypeLive, youtube.EventTypeUpcoming, youtube.EventTypeCompleted}
 		for _, query := range queries {
@@ -223,134 +179,62 @@ func (i *videoInteractor) ytVideos(
 					EventType:   eventType,
 				})
 				if err != nil {
+					span.RecordError(err)
+					span.SetStatus(codes.Error, "Failed to search YouTube videos")
 					return nil, err
 				}
+				result.SetVideoType(model.VideoTypeVspoStream)
 				vs = append(vs, result...)
 			}
-		}
-
-		err := i.transactable.RWTx(
-			ctx,
-			func(ctx context.Context) error {
-				existVideos, err := i.videoRepository.List(
-					ctx,
-					repository.ListVideosQuery{
-						PlatformTypes:   []string{model.PlatformYouTube.String()},
-						BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String()},
-						VideoType:       model.VideoTypeVspoBroadcast.String(),
-						BaseListOptions: repository.BaseListOptions{
-							Limit: null.NewUint64(100, true),
-							Page:  null.NewUint64(0, true),
-						},
-					},
-				)
-				if err != nil {
-					return err
-				}
-				vs = append(vs, existVideos...)
-
-				freeChats, err = i.videoRepository.List(
-					ctx,
-					repository.ListVideosQuery{
-						PlatformTypes:   []string{model.PlatformYouTube.String()},
-						BroadcastStatus: []string{model.StatusLive.String(), model.StatusUpcoming.String()},
-						VideoType:       model.VideoTypeFreechat.String(),
-						BaseListOptions: repository.BaseListOptions{
-							Limit: null.NewUint64(50, true),
-							Page:  null.NewUint64(0, true),
-						},
-					},
-				)
-				if err != nil {
-					return err
-				}
-				return nil
-			},
-		)
-		if err != nil {
-			return nil, err
 		}
 	case model.VideoTypeClip:
 		// TODO: Implement
 	}
-
-	m := mapset.NewSet[string]()
-	// Non freechat videos
-	for _, v := range vs {
-		flag := false
-		for _, f := range freeChats {
-			if v.ID == f.ID {
-				flag = true
-				break
-			}
-		}
-		if flag {
-			continue
-		}
-		m.Add(v.ID)
-	}
-
-	// Retrieve video details via youtube api
-	ytVideos, err := i.youtubeClient.GetVideos(
-		ctx,
-		youtube.VideosParam{
-			VideoIDs: m.ToSlice(),
-		},
-	)
-
-	if err != nil {
-		return nil, err
-	}
-	if vt == model.VideoTypeVspoBroadcast || vt == model.VideoTypeFreechat {
-		ytVideos = ytVideos.FilterCreator(cs)
-	}
-	switch vt {
-	case model.VideoTypeVspoBroadcast:
-		// All new videos are VspoBroadcast
-		ytVideos.SetVideoType(model.VideoTypeVspoBroadcast)
-	case model.VideoTypeClip:
-		ytVideos.SetVideoType(model.VideoTypeClip)
-	}
-	return ytVideos, nil
+	span.SetStatus(codes.Ok, "Success")
+	return vs, nil
 }
 
 func (i *videoInteractor) twitchVideos(
 	ctx context.Context,
-	cs model.Creators,
+	twitchUserIDs []string,
 ) (model.Videos, error) {
-	twitchUserIDs := lo.FilterMap(cs, func(c *model.Creator, _ int) (string, bool) {
-		if c.Channel.Twitch.ID != "" {
-			return c.Channel.Twitch.ID, true
-		}
-		return "", false
-	})
+	tracer := trace.GetGlobalTracer()
+	ctx, span := tracer.Start(ctx, "Usecase#twitchVideos")
+	defer span.End()
+
 	newTwitchVideos, err := i.twitchClient.GetVideos(ctx, twitch.TwitchVideosParam{
 		UserIDs: twitchUserIDs,
 	})
 
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Failed to get Twitch videos")
 		return nil, err
 	}
+	newTwitchVideos.SetVideoType(model.VideoTypeVspoStream)
+	span.SetStatus(codes.Ok, "Success")
 	return newTwitchVideos, nil
 }
 
 func (i *videoInteractor) twitCastingVideos(
 	ctx context.Context,
-	cs model.Creators,
+	twitCastingUserIDs []string,
 ) (model.Videos, error) {
-	twitCastingUserIDs := lo.FilterMap(cs, func(c *model.Creator, _ int) (string, bool) {
-		if c.Channel.TwitCasting.ID != "" {
-			return c.Channel.TwitCasting.ID, true
-		}
-		return "", false
-	})
+	tracer := trace.GetGlobalTracer()
+	ctx, span := tracer.Start(ctx, "Usecase#twitCastingVideos")
+	defer span.End()
+
 	newTwitcastingVideos, err := i.twitcastingClient.GetVideos(ctx, twitcasting.TwitcastingVideosParam{
 		UserIDs: twitCastingUserIDs,
 	})
 
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Failed to get TwitCasting videos")
 		return nil, err
 	}
+	newTwitcastingVideos.SetVideoType(model.VideoTypeVspoStream)
+	span.SetStatus(codes.Ok, "Success")
 	return newTwitcastingVideos, nil
 }
 
@@ -360,10 +244,28 @@ func (i *videoInteractor) updateVideosByPlatformTypes(
 	pts model.Platforms,
 	vt model.VideoType,
 ) (model.Videos, error) {
+	tracer := trace.GetGlobalTracer()
+	ctx, span := tracer.Start(ctx, "Usecase#updateVideosByPlatformTypes")
+	defer span.End()
+
 	var updatedVideos model.Videos
 	var mu sync.Mutex
 	var wg sync.WaitGroup
 	var errs []error
+
+	twitchUserIDs := lo.FilterMap(cs, func(c *model.Creator, _ int) (string, bool) {
+		if c.Channel.Twitch.ID != "" {
+			return c.Channel.Twitch.ID, true
+		}
+		return "", false
+	})
+
+	twitCastingUserIDs := lo.FilterMap(cs, func(c *model.Creator, _ int) (string, bool) {
+		if c.Channel.TwitCasting.ID != "" {
+			return c.Channel.TwitCasting.ID, true
+		}
+		return "", false
+	})
 
 	for _, platformType := range pts.String() {
 		wg.Add(1)
@@ -374,11 +276,11 @@ func (i *videoInteractor) updateVideosByPlatformTypes(
 
 			switch platformType {
 			case model.PlatformYouTube.String():
-				newVideos, err = i.ytVideos(ctx, cs, vt)
+				newVideos, err = i.ytVideos(ctx, vt)
 			case model.PlatformTwitch.String():
-				newVideos, err = i.twitchVideos(ctx, cs)
+				newVideos, err = i.twitchVideos(ctx, twitchUserIDs)
 			case model.PlatformTwitCasting.String():
-				newVideos, err = i.twitCastingVideos(ctx, cs)
+				newVideos, err = i.twitCastingVideos(ctx, twitCastingUserIDs)
 			}
 
 			mu.Lock()
@@ -398,8 +300,112 @@ func (i *videoInteractor) updateVideosByPlatformTypes(
 		for i, err := range errs {
 			errMessages[i] = err.Error()
 		}
+		span.RecordError(errors.New(strings.Join(errMessages, "; ")))
+		span.SetStatus(codes.Error, "Errors occurred while updating videos")
 		return nil, fmt.Errorf("errors occurred: %v", strings.Join(errMessages, "; "))
 	}
 
+	span.SetStatus(codes.Ok, "Success")
 	return updatedVideos, nil
+}
+
+func (i *videoInteractor) UpdatwExistVideos(
+	ctx context.Context,
+	param *input.UpdateExistVideos,
+) (int, error) {
+	tracer := trace.GetGlobalTracer()
+	ctx, span := tracer.Start(ctx, "Usecase#UpdatwExistVideos")
+	defer span.End()
+
+	var updatedCount int
+	err := i.transactable.RWTx(
+		ctx,
+		func(ctx context.Context) error {
+			ctx, subSpan := tracer.Start(ctx, "RetrieveCreators")
+			defer subSpan.End()
+
+			// Retrieve creators
+			cs, err := i.creatorRepository.List(
+				ctx,
+				repository.ListCreatorsQuery{
+					MemberTypes: model.VideoTypeToMemberTypes(model.VideoTypeVspoStream),
+				},
+			)
+			if err != nil {
+				subSpan.RecordError(err)
+				subSpan.SetStatus(codes.Error, "Failed to list creators")
+				return err
+			}
+
+			ctx, existSpan := tracer.Start(ctx, "ListExistingVideos")
+			defer existSpan.End()
+
+			// Retrieve existing videos in the specified time range
+			existVs, err := i.videoRepository.ListByTimeRange(
+				ctx,
+				repository.ListByTimeRangeQuery{
+					StartedAt: param.StartedAt,
+					EndedAt:   param.EndedAt,
+				},
+			)
+			if err != nil {
+				existSpan.RecordError(err)
+				existSpan.SetStatus(codes.Error, "Failed to list existing videos")
+				return err
+			}
+
+			ctx, ytSpan := tracer.Start(ctx, "RetrieveYouTubeVideos")
+			defer ytSpan.End()
+
+			// Retrieve YouTube videos by existing video IDs
+			uvs, err := i.youtubeClient.GetVideos(ctx, youtube.VideosParam{
+				VideoIDs: existVs.IDs(),
+			})
+			if err != nil {
+				ytSpan.RecordError(err)
+				ytSpan.SetStatus(codes.Error, "Failed to retrieve YouTube videos")
+				return err
+			}
+
+			ctx, deleteSpan := tracer.Start(ctx, "DeleteDeletedVideos")
+			defer deleteSpan.End()
+
+			// Identify and delete videos that no longer exist
+			deleted := existVs.FilterDeletedVideos(uvs)
+			err = i.videoRepository.BatchDelete(ctx, deleted)
+			if err != nil {
+				deleteSpan.RecordError(err)
+				deleteSpan.SetStatus(codes.Error, "Failed to delete videos")
+				return err
+			}
+
+			ctx, updateSpan := tracer.Start(ctx, "InsertUpdatedVideos")
+			defer updateSpan.End()
+
+			// Update the creator information for the videos and filter the updated ones
+			updated := uvs.FilterUpdatedVideos(existVs)
+			updated = updated.UpdateCreatorInfo(cs)
+
+			_, err = i.videoRepository.BatchDeleteInsert(ctx, updated)
+			if err != nil {
+				updateSpan.RecordError(err)
+				updateSpan.SetStatus(codes.Error, "Failed to update videos")
+				return err
+			}
+
+			updatedCount = len(updated) + len(deleted)
+
+			return nil
+		},
+	)
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "Transaction failed")
+		return 0, err
+	}
+
+	span.SetStatus(codes.Ok, "Success")
+	span.SetAttributes(attribute.Int("updatedCount", updatedCount))
+
+	return updatedCount, nil
 }

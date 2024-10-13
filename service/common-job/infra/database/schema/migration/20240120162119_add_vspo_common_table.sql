@@ -33,24 +33,24 @@ CREATE TABLE video (
     platform_type text NOT NULL,                   -- Name of the platform (e.g. YouTube, Twitch)
     title text NOT NULL,                           -- Title of the video
     description text NOT NULL,                     -- Description of the video
-    video_type text NOT NULL,                      -- Type of stream (e.g. vspo_broadcast, freechat, clip)
-    published_at timestamp with time zone,  -- The date and time the video was published
-    started_at timestamp with time zone,    -- The date and time the video started
-    ended_at timestamp with time zone,      -- The date and time the video ended
+    video_type text NOT NULL,                      -- Type of stream (e.g. vspo_stream, freechat, clip)
+    published_at timestamp with time zone NOT NULL,  -- The date and time the video was published
     tags text NOT NULL,                            -- Tags associated with the video
-    view_count integer NOT NULL,                   -- Number of views of the video
     thumbnail_url text NOT NULL,                   -- URL of the video's thumbnail image
     is_deleted boolean NOT NULL,                   -- Flag indicating if the video has been deleted
     FOREIGN KEY (channel_id) REFERENCES channel(platform_channel_id) ON DELETE CASCADE
 );
 
 
--- Create a table to store the status of video broadcasts
-CREATE TABLE broadcast_status (
+-- Create a table to store the status of video streams
+CREATE TABLE stream_status (
     id text PRIMARY KEY,            -- Unique identifier for the status
     video_id text NOT NULL,           -- Identifier for the video
     creator_id text NOT NULL,         -- Identifier for the creator
     status text NOT NULL,             -- Status of the video or creator (e.g. live, upcoming)
+    started_at timestamp with time zone NOT NULL,    -- The date and time the video started
+    ended_at timestamp with time zone NOT NULL,      -- The date and time the video ended
+    view_count integer NOT NULL,                   -- Number of views of the video
     updated_at timestamp with time zone NOT NULL DEFAULT now(), -- When the status was last updated
     FOREIGN KEY (video_id) REFERENCES video(id) ON DELETE CASCADE,
     FOREIGN KEY (creator_id) REFERENCES creator(id) ON DELETE CASCADE
@@ -65,6 +65,6 @@ CREATE TABLE broadcast_status (
 DROP TABLE IF EXISTS video;
 DROP TABLE IF EXISTS channel;
 DROP TABLE IF EXISTS creator;
-DROP TABLE IF EXISTS broadcast_status;
+DROP TABLE IF EXISTS stream_status;
 
 -- +goose StatementEnd

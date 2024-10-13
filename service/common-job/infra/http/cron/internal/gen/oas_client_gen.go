@@ -12,12 +12,11 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/metric"
-	semconv "go.opentelemetry.io/otel/semconv/v1.19.0"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
-	"github.com/ogen-go/ogen/ogenerrors"
 	"github.com/ogen-go/ogen/uri"
 )
 
@@ -35,24 +34,35 @@ type Invoker interface {
 	//
 	// GET /api/cron/creators
 	APICronCreatorsGet(ctx context.Context, params APICronCreatorsGetParams) (APICronCreatorsGetRes, error)
-	// APICronVideosGet invokes GET /api/cron/videos operation.
+	// APICronExistVideosGet invokes GET /api/cron/exist_videos operation.
 	//
-	// Update videos related to a specific creator based on provided cronType.
+	// Update exist videos.
 	//
-	// GET /api/cron/videos
-	APICronVideosGet(ctx context.Context, params APICronVideosGetParams) (APICronVideosGetRes, error)
+	// GET /api/cron/exist_videos
+	APICronExistVideosGet(ctx context.Context, params APICronExistVideosGetParams) (APICronExistVideosGetRes, error)
+	// APICronSearchVideosGet invokes GET /api/cron/search_videos operation.
+	//
+	// Update videos related to a specific creator based on provided.
+	//
+	// GET /api/cron/search_videos
+	APICronSearchVideosGet(ctx context.Context, params APICronSearchVideosGetParams) (APICronSearchVideosGetRes, error)
 	// APIPingGet invokes GET /api/ping operation.
 	//
 	// Returns a 200 status code if successful, or an error.
 	//
 	// GET /api/ping
 	APIPingGet(ctx context.Context) (*APIPingGetOK, error)
+	// PingPost invokes POST /ping operation.
+	//
+	// Returns a 200 status code if successful, or an error.
+	//
+	// POST /ping
+	PingPost(ctx context.Context) (*PingPostOK, error)
 }
 
 // Client implements OAS client.
 type Client struct {
 	serverURL *url.URL
-	sec       SecuritySource
 	baseClient
 }
 
@@ -66,7 +76,7 @@ func trimTrailingSlashes(u *url.URL) {
 }
 
 // NewClient initializes new Client defined by OAS.
-func NewClient(serverURL string, sec SecuritySource, opts ...ClientOption) (*Client, error) {
+func NewClient(serverURL string, opts ...ClientOption) (*Client, error) {
 	u, err := url.Parse(serverURL)
 	if err != nil {
 		return nil, err
@@ -79,7 +89,6 @@ func NewClient(serverURL string, sec SecuritySource, opts ...ClientOption) (*Cli
 	}
 	return &Client{
 		serverURL:  u,
-		sec:        sec,
 		baseClient: c,
 	}, nil
 }
@@ -111,7 +120,7 @@ func (c *Client) APICronChannelsGet(ctx context.Context, params APICronChannelsG
 
 func (c *Client) sendAPICronChannelsGet(ctx context.Context, params APICronChannelsGetParams) (res APICronChannelsGetRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/api/cron/channels"),
 	}
 
@@ -172,39 +181,6 @@ func (c *Client) sendAPICronChannelsGet(ctx context.Context, params APICronChann
 		return res, errors.Wrap(err, "create request")
 	}
 
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:BearerAuth"
-			switch err := c.securityBearerAuth(ctx, "APICronChannelsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"BearerAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -233,7 +209,7 @@ func (c *Client) APICronCreatorsGet(ctx context.Context, params APICronCreatorsG
 
 func (c *Client) sendAPICronCreatorsGet(ctx context.Context, params APICronCreatorsGetParams) (res APICronCreatorsGetRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/api/cron/creators"),
 	}
 
@@ -340,39 +316,6 @@ func (c *Client) sendAPICronCreatorsGet(ctx context.Context, params APICronCreat
 		return res, errors.Wrap(err, "create request")
 	}
 
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:BearerAuth"
-			switch err := c.securityBearerAuth(ctx, "APICronCreatorsGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"BearerAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -389,20 +332,20 @@ func (c *Client) sendAPICronCreatorsGet(ctx context.Context, params APICronCreat
 	return result, nil
 }
 
-// APICronVideosGet invokes GET /api/cron/videos operation.
+// APICronExistVideosGet invokes GET /api/cron/exist_videos operation.
 //
-// Update videos related to a specific creator based on provided cronType.
+// Update exist videos.
 //
-// GET /api/cron/videos
-func (c *Client) APICronVideosGet(ctx context.Context, params APICronVideosGetParams) (APICronVideosGetRes, error) {
-	res, err := c.sendAPICronVideosGet(ctx, params)
+// GET /api/cron/exist_videos
+func (c *Client) APICronExistVideosGet(ctx context.Context, params APICronExistVideosGetParams) (APICronExistVideosGetRes, error) {
+	res, err := c.sendAPICronExistVideosGet(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendAPICronVideosGet(ctx context.Context, params APICronVideosGetParams) (res APICronVideosGetRes, err error) {
+func (c *Client) sendAPICronExistVideosGet(ctx context.Context, params APICronExistVideosGetParams) (res APICronExistVideosGetRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/api/cron/videos"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/cron/exist_videos"),
 	}
 
 	// Run stopwatch.
@@ -417,7 +360,7 @@ func (c *Client) sendAPICronVideosGet(ctx context.Context, params APICronVideosG
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "APICronVideosGet",
+	ctx, span := c.cfg.Tracer.Start(ctx, "APICronExistVideosGet",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -435,7 +378,96 @@ func (c *Client) sendAPICronVideosGet(ctx context.Context, params APICronVideosG
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/api/cron/videos"
+	pathParts[0] = "/api/cron/exist_videos"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "period" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			return e.EncodeValue(conv.StringToString(string(params.Period)))
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeAPICronExistVideosGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// APICronSearchVideosGet invokes GET /api/cron/search_videos operation.
+//
+// Update videos related to a specific creator based on provided.
+//
+// GET /api/cron/search_videos
+func (c *Client) APICronSearchVideosGet(ctx context.Context, params APICronSearchVideosGetParams) (APICronSearchVideosGetRes, error) {
+	res, err := c.sendAPICronSearchVideosGet(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendAPICronSearchVideosGet(ctx context.Context, params APICronSearchVideosGetParams) (res APICronSearchVideosGetRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/api/cron/search_videos"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "APICronSearchVideosGet",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/api/cron/search_videos"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
@@ -464,20 +496,6 @@ func (c *Client) sendAPICronVideosGet(ctx context.Context, params APICronVideosG
 		}
 	}
 	{
-		// Encode "period" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "period",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			return e.EncodeValue(conv.StringToString(string(params.Period)))
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
 		// Encode "video_type" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "video_type",
@@ -499,39 +517,6 @@ func (c *Client) sendAPICronVideosGet(ctx context.Context, params APICronVideosG
 		return res, errors.Wrap(err, "create request")
 	}
 
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:BearerAuth"
-			switch err := c.securityBearerAuth(ctx, "APICronVideosGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"BearerAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
 	stage = "SendRequest"
 	resp, err := c.cfg.Client.Do(r)
 	if err != nil {
@@ -540,7 +525,7 @@ func (c *Client) sendAPICronVideosGet(ctx context.Context, params APICronVideosG
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeAPICronVideosGetResponse(resp)
+	result, err := decodeAPICronSearchVideosGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -560,7 +545,7 @@ func (c *Client) APIPingGet(ctx context.Context) (*APIPingGetOK, error) {
 
 func (c *Client) sendAPIPingGet(ctx context.Context) (res *APIPingGetOK, err error) {
 	otelAttrs := []attribute.KeyValue{
-		semconv.HTTPMethodKey.String("GET"),
+		semconv.HTTPRequestMethodKey.String("GET"),
 		semconv.HTTPRouteKey.String("/api/ping"),
 	}
 
@@ -603,37 +588,75 @@ func (c *Client) sendAPIPingGet(ctx context.Context) (res *APIPingGetOK, err err
 		return res, errors.Wrap(err, "create request")
 	}
 
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			stage = "Security:BearerAuth"
-			switch err := c.securityBearerAuth(ctx, "APIPingGet", r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"BearerAuth\"")
-			}
-		}
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
 
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+	stage = "DecodeResponse"
+	result, err := decodeAPIPingGetResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// PingPost invokes POST /ping operation.
+//
+// Returns a 200 status code if successful, or an error.
+//
+// POST /ping
+func (c *Client) PingPost(ctx context.Context) (*PingPostOK, error) {
+	res, err := c.sendPingPost(ctx)
+	return res, err
+}
+
+func (c *Client) sendPingPost(ctx context.Context) (res *PingPostOK, err error) {
+	otelAttrs := []attribute.KeyValue{
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/ping"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "PingPost",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/ping"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
 	}
 
 	stage = "SendRequest"
@@ -644,7 +667,7 @@ func (c *Client) sendAPIPingGet(ctx context.Context) (res *APIPingGetOK, err err
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeAPIPingGetResponse(resp)
+	result, err := decodePingPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

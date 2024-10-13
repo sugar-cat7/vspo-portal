@@ -4,6 +4,7 @@ import (
 	"github.com/go-faker/faker/v4"
 	"github.com/go-faker/faker/v4/pkg/options"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/domain/model"
+	utime "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/time"
 )
 
 // NewVspoFactory is 3 creators, 5 youtube videos, 5 twitch videos, 5 twitcasting videos
@@ -42,17 +43,17 @@ func NewVspoFactory() struct {
 	for i := 0; i < 5; i++ {
 		c := creators[i%2]
 		ytVs[i].CreatorInfo = model.CreatorInfo{
-			ID:        c.ID,
 			ChannelID: c.Channel.Youtube.ID,
 		}
+		ytVs[i].Platform = model.PlatformYouTube
 		twVs[i].CreatorInfo = model.CreatorInfo{
-			ID:        c.ID,
 			ChannelID: c.Channel.Twitch.ID,
 		}
+		twVs[i].Platform = model.PlatformTwitch
 		twiVs[i].CreatorInfo = model.CreatorInfo{
-			ID:        c.ID,
 			ChannelID: c.Channel.TwitCasting.ID,
 		}
+		twiVs[i].Platform = model.PlatformTwitCasting
 	}
 
 	return struct {
@@ -66,4 +67,26 @@ func NewVspoFactory() struct {
 		VspoTwitchVs:      twVs,
 		VspoTwitcastingVs: twiVs,
 	}
+}
+
+// NewYoutubeVideosWithCreator is 3 youtube videos with creator
+func NewYoutubeVideosWithCreator() model.Videos {
+	videos := make(model.Videos, 3)
+	if err := faker.FakeData(&videos, options.WithRandomMapAndSliceMaxSize(3), options.WithRandomMapAndSliceMinSize(3)); err != nil {
+		panic(err)
+	}
+	for i := 0; i < 3; i++ {
+		videos[i].CreatorInfo = model.CreatorInfo{
+			ID:        VspoInfoMap[i].CreatorID,
+			ChannelID: VspoInfoMap[i].YoutubeChannelID,
+		}
+		videos[i].Platform = model.PlatformYouTube
+		videos[i].Status = model.StatusLive
+		videos[i].VideoType = model.VideoTypeVspoStream
+		startedAt := utime.Utc.Now().AddDate(0, 0, -2)
+		endedAt := utime.Utc.Now().AddDate(0, 0, -1)
+		videos[i].StartedAt = &startedAt
+		videos[i].EndedAt = &endedAt
+	}
+	return videos
 }

@@ -21,7 +21,7 @@ interface LogObject {
 
 const createLoggerConfig = (env: Env) =>
     ({
-        name: 'template-api',
+        name: 'common-api-server',
         type: env.LOG_TYPE,
         minLevel: env.LOG_MINLEVEL,
         hideLogPositionForProduction: env.LOG_HIDE_POSITION,

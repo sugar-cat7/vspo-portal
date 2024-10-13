@@ -181,9 +181,9 @@ func encodeAPICronCreatorsGetResponse(response APICronCreatorsGetRes, w http.Res
 	}
 }
 
-func encodeAPICronVideosGetResponse(response APICronVideosGetRes, w http.ResponseWriter, span trace.Span) error {
+func encodeAPICronExistVideosGetResponse(response APICronExistVideosGetRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *APICronVideosGetOK:
+	case *APICronExistVideosGetOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -196,7 +196,7 @@ func encodeAPICronVideosGetResponse(response APICronVideosGetRes, w http.Respons
 
 		return nil
 
-	case *APICronVideosGetBadRequest:
+	case *APICronExistVideosGetBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -209,7 +209,7 @@ func encodeAPICronVideosGetResponse(response APICronVideosGetRes, w http.Respons
 
 		return nil
 
-	case *APICronVideosGetUnauthorized:
+	case *APICronExistVideosGetUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
@@ -222,7 +222,7 @@ func encodeAPICronVideosGetResponse(response APICronVideosGetRes, w http.Respons
 
 		return nil
 
-	case *APICronVideosGetForbidden:
+	case *APICronExistVideosGetForbidden:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
@@ -235,7 +235,7 @@ func encodeAPICronVideosGetResponse(response APICronVideosGetRes, w http.Respons
 
 		return nil
 
-	case *APICronVideosGetNotFound:
+	case *APICronExistVideosGetNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
@@ -248,7 +248,92 @@ func encodeAPICronVideosGetResponse(response APICronVideosGetRes, w http.Respons
 
 		return nil
 
-	case *APICronVideosGetInternalServerError:
+	case *APICronExistVideosGetInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+		span.SetStatus(codes.Error, http.StatusText(500))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeAPICronSearchVideosGetResponse(response APICronSearchVideosGetRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *APICronSearchVideosGetOK:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *APICronSearchVideosGetBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+		span.SetStatus(codes.Error, http.StatusText(400))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *APICronSearchVideosGetUnauthorized:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(401)
+		span.SetStatus(codes.Error, http.StatusText(401))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *APICronSearchVideosGetForbidden:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(403)
+		span.SetStatus(codes.Error, http.StatusText(403))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *APICronSearchVideosGetNotFound:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *APICronSearchVideosGetInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -267,6 +352,20 @@ func encodeAPICronVideosGetResponse(response APICronVideosGetRes, w http.Respons
 }
 
 func encodeAPIPingGetResponse(response *APIPingGetOK, w http.ResponseWriter, span trace.Span) error {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(200)
+	span.SetStatus(codes.Ok, http.StatusText(200))
+
+	e := new(jx.Encoder)
+	response.Encode(e)
+	if _, err := e.WriteTo(w); err != nil {
+		return errors.Wrap(err, "write")
+	}
+
+	return nil
+}
+
+func encodePingPostResponse(response *PingPostOK, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))

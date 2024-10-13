@@ -260,51 +260,51 @@ type APICronCreatorsGetUnauthorized CronResponse
 
 func (*APICronCreatorsGetUnauthorized) aPICronCreatorsGetRes() {}
 
-type APICronVideosGetBadRequest CronResponse
+type APICronExistVideosGetBadRequest CronResponse
 
-func (*APICronVideosGetBadRequest) aPICronVideosGetRes() {}
+func (*APICronExistVideosGetBadRequest) aPICronExistVideosGetRes() {}
 
-type APICronVideosGetForbidden CronResponse
+type APICronExistVideosGetForbidden CronResponse
 
-func (*APICronVideosGetForbidden) aPICronVideosGetRes() {}
+func (*APICronExistVideosGetForbidden) aPICronExistVideosGetRes() {}
 
-type APICronVideosGetInternalServerError CronResponse
+type APICronExistVideosGetInternalServerError CronResponse
 
-func (*APICronVideosGetInternalServerError) aPICronVideosGetRes() {}
+func (*APICronExistVideosGetInternalServerError) aPICronExistVideosGetRes() {}
 
-type APICronVideosGetNotFound CronResponse
+type APICronExistVideosGetNotFound CronResponse
 
-func (*APICronVideosGetNotFound) aPICronVideosGetRes() {}
+func (*APICronExistVideosGetNotFound) aPICronExistVideosGetRes() {}
 
-type APICronVideosGetOK CronResponse
+type APICronExistVideosGetOK CronResponse
 
-func (*APICronVideosGetOK) aPICronVideosGetRes() {}
+func (*APICronExistVideosGetOK) aPICronExistVideosGetRes() {}
 
-type APICronVideosGetPeriod string
+type APICronExistVideosGetPeriod string
 
 const (
-	APICronVideosGetPeriodDay   APICronVideosGetPeriod = "day"
-	APICronVideosGetPeriodMonth APICronVideosGetPeriod = "month"
-	APICronVideosGetPeriodWeek  APICronVideosGetPeriod = "week"
+	APICronExistVideosGetPeriodDay   APICronExistVideosGetPeriod = "day"
+	APICronExistVideosGetPeriodMonth APICronExistVideosGetPeriod = "month"
+	APICronExistVideosGetPeriodWeek  APICronExistVideosGetPeriod = "week"
 )
 
-// AllValues returns all APICronVideosGetPeriod values.
-func (APICronVideosGetPeriod) AllValues() []APICronVideosGetPeriod {
-	return []APICronVideosGetPeriod{
-		APICronVideosGetPeriodDay,
-		APICronVideosGetPeriodMonth,
-		APICronVideosGetPeriodWeek,
+// AllValues returns all APICronExistVideosGetPeriod values.
+func (APICronExistVideosGetPeriod) AllValues() []APICronExistVideosGetPeriod {
+	return []APICronExistVideosGetPeriod{
+		APICronExistVideosGetPeriodDay,
+		APICronExistVideosGetPeriodMonth,
+		APICronExistVideosGetPeriodWeek,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s APICronVideosGetPeriod) MarshalText() ([]byte, error) {
+func (s APICronExistVideosGetPeriod) MarshalText() ([]byte, error) {
 	switch s {
-	case APICronVideosGetPeriodDay:
+	case APICronExistVideosGetPeriodDay:
 		return []byte(s), nil
-	case APICronVideosGetPeriodMonth:
+	case APICronExistVideosGetPeriodMonth:
 		return []byte(s), nil
-	case APICronVideosGetPeriodWeek:
+	case APICronExistVideosGetPeriodWeek:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -312,51 +312,75 @@ func (s APICronVideosGetPeriod) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *APICronVideosGetPeriod) UnmarshalText(data []byte) error {
-	switch APICronVideosGetPeriod(data) {
-	case APICronVideosGetPeriodDay:
-		*s = APICronVideosGetPeriodDay
+func (s *APICronExistVideosGetPeriod) UnmarshalText(data []byte) error {
+	switch APICronExistVideosGetPeriod(data) {
+	case APICronExistVideosGetPeriodDay:
+		*s = APICronExistVideosGetPeriodDay
 		return nil
-	case APICronVideosGetPeriodMonth:
-		*s = APICronVideosGetPeriodMonth
+	case APICronExistVideosGetPeriodMonth:
+		*s = APICronExistVideosGetPeriodMonth
 		return nil
-	case APICronVideosGetPeriodWeek:
-		*s = APICronVideosGetPeriodWeek
+	case APICronExistVideosGetPeriodWeek:
+		*s = APICronExistVideosGetPeriodWeek
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
 
-type APICronVideosGetPlatformTypeItem string
+type APICronExistVideosGetUnauthorized CronResponse
+
+func (*APICronExistVideosGetUnauthorized) aPICronExistVideosGetRes() {}
+
+type APICronSearchVideosGetBadRequest CronResponse
+
+func (*APICronSearchVideosGetBadRequest) aPICronSearchVideosGetRes() {}
+
+type APICronSearchVideosGetForbidden CronResponse
+
+func (*APICronSearchVideosGetForbidden) aPICronSearchVideosGetRes() {}
+
+type APICronSearchVideosGetInternalServerError CronResponse
+
+func (*APICronSearchVideosGetInternalServerError) aPICronSearchVideosGetRes() {}
+
+type APICronSearchVideosGetNotFound CronResponse
+
+func (*APICronSearchVideosGetNotFound) aPICronSearchVideosGetRes() {}
+
+type APICronSearchVideosGetOK CronResponse
+
+func (*APICronSearchVideosGetOK) aPICronSearchVideosGetRes() {}
+
+type APICronSearchVideosGetPlatformTypeItem string
 
 const (
-	APICronVideosGetPlatformTypeItemYoutube     APICronVideosGetPlatformTypeItem = "youtube"
-	APICronVideosGetPlatformTypeItemTwitch      APICronVideosGetPlatformTypeItem = "twitch"
-	APICronVideosGetPlatformTypeItemTwitcasting APICronVideosGetPlatformTypeItem = "twitcasting"
-	APICronVideosGetPlatformTypeItemNiconico    APICronVideosGetPlatformTypeItem = "niconico"
+	APICronSearchVideosGetPlatformTypeItemYoutube     APICronSearchVideosGetPlatformTypeItem = "youtube"
+	APICronSearchVideosGetPlatformTypeItemTwitch      APICronSearchVideosGetPlatformTypeItem = "twitch"
+	APICronSearchVideosGetPlatformTypeItemTwitcasting APICronSearchVideosGetPlatformTypeItem = "twitcasting"
+	APICronSearchVideosGetPlatformTypeItemNiconico    APICronSearchVideosGetPlatformTypeItem = "niconico"
 )
 
-// AllValues returns all APICronVideosGetPlatformTypeItem values.
-func (APICronVideosGetPlatformTypeItem) AllValues() []APICronVideosGetPlatformTypeItem {
-	return []APICronVideosGetPlatformTypeItem{
-		APICronVideosGetPlatformTypeItemYoutube,
-		APICronVideosGetPlatformTypeItemTwitch,
-		APICronVideosGetPlatformTypeItemTwitcasting,
-		APICronVideosGetPlatformTypeItemNiconico,
+// AllValues returns all APICronSearchVideosGetPlatformTypeItem values.
+func (APICronSearchVideosGetPlatformTypeItem) AllValues() []APICronSearchVideosGetPlatformTypeItem {
+	return []APICronSearchVideosGetPlatformTypeItem{
+		APICronSearchVideosGetPlatformTypeItemYoutube,
+		APICronSearchVideosGetPlatformTypeItemTwitch,
+		APICronSearchVideosGetPlatformTypeItemTwitcasting,
+		APICronSearchVideosGetPlatformTypeItemNiconico,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s APICronVideosGetPlatformTypeItem) MarshalText() ([]byte, error) {
+func (s APICronSearchVideosGetPlatformTypeItem) MarshalText() ([]byte, error) {
 	switch s {
-	case APICronVideosGetPlatformTypeItemYoutube:
+	case APICronSearchVideosGetPlatformTypeItemYoutube:
 		return []byte(s), nil
-	case APICronVideosGetPlatformTypeItemTwitch:
+	case APICronSearchVideosGetPlatformTypeItemTwitch:
 		return []byte(s), nil
-	case APICronVideosGetPlatformTypeItemTwitcasting:
+	case APICronSearchVideosGetPlatformTypeItemTwitcasting:
 		return []byte(s), nil
-	case APICronVideosGetPlatformTypeItemNiconico:
+	case APICronSearchVideosGetPlatformTypeItemNiconico:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -364,54 +388,54 @@ func (s APICronVideosGetPlatformTypeItem) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *APICronVideosGetPlatformTypeItem) UnmarshalText(data []byte) error {
-	switch APICronVideosGetPlatformTypeItem(data) {
-	case APICronVideosGetPlatformTypeItemYoutube:
-		*s = APICronVideosGetPlatformTypeItemYoutube
+func (s *APICronSearchVideosGetPlatformTypeItem) UnmarshalText(data []byte) error {
+	switch APICronSearchVideosGetPlatformTypeItem(data) {
+	case APICronSearchVideosGetPlatformTypeItemYoutube:
+		*s = APICronSearchVideosGetPlatformTypeItemYoutube
 		return nil
-	case APICronVideosGetPlatformTypeItemTwitch:
-		*s = APICronVideosGetPlatformTypeItemTwitch
+	case APICronSearchVideosGetPlatformTypeItemTwitch:
+		*s = APICronSearchVideosGetPlatformTypeItemTwitch
 		return nil
-	case APICronVideosGetPlatformTypeItemTwitcasting:
-		*s = APICronVideosGetPlatformTypeItemTwitcasting
+	case APICronSearchVideosGetPlatformTypeItemTwitcasting:
+		*s = APICronSearchVideosGetPlatformTypeItemTwitcasting
 		return nil
-	case APICronVideosGetPlatformTypeItemNiconico:
-		*s = APICronVideosGetPlatformTypeItemNiconico
+	case APICronSearchVideosGetPlatformTypeItemNiconico:
+		*s = APICronSearchVideosGetPlatformTypeItemNiconico
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
 
-type APICronVideosGetUnauthorized CronResponse
+type APICronSearchVideosGetUnauthorized CronResponse
 
-func (*APICronVideosGetUnauthorized) aPICronVideosGetRes() {}
+func (*APICronSearchVideosGetUnauthorized) aPICronSearchVideosGetRes() {}
 
-type APICronVideosGetVideoType string
+type APICronSearchVideosGetVideoType string
 
 const (
-	APICronVideosGetVideoTypeVspoBroadcast APICronVideosGetVideoType = "vspo_broadcast"
-	APICronVideosGetVideoTypeClip          APICronVideosGetVideoType = "clip"
-	APICronVideosGetVideoTypeFreechat      APICronVideosGetVideoType = "freechat"
+	APICronSearchVideosGetVideoTypeVspoStream APICronSearchVideosGetVideoType = "vspo_stream"
+	APICronSearchVideosGetVideoTypeClip       APICronSearchVideosGetVideoType = "clip"
+	APICronSearchVideosGetVideoTypeFreechat   APICronSearchVideosGetVideoType = "freechat"
 )
 
-// AllValues returns all APICronVideosGetVideoType values.
-func (APICronVideosGetVideoType) AllValues() []APICronVideosGetVideoType {
-	return []APICronVideosGetVideoType{
-		APICronVideosGetVideoTypeVspoBroadcast,
-		APICronVideosGetVideoTypeClip,
-		APICronVideosGetVideoTypeFreechat,
+// AllValues returns all APICronSearchVideosGetVideoType values.
+func (APICronSearchVideosGetVideoType) AllValues() []APICronSearchVideosGetVideoType {
+	return []APICronSearchVideosGetVideoType{
+		APICronSearchVideosGetVideoTypeVspoStream,
+		APICronSearchVideosGetVideoTypeClip,
+		APICronSearchVideosGetVideoTypeFreechat,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s APICronVideosGetVideoType) MarshalText() ([]byte, error) {
+func (s APICronSearchVideosGetVideoType) MarshalText() ([]byte, error) {
 	switch s {
-	case APICronVideosGetVideoTypeVspoBroadcast:
+	case APICronSearchVideosGetVideoTypeVspoStream:
 		return []byte(s), nil
-	case APICronVideosGetVideoTypeClip:
+	case APICronSearchVideosGetVideoTypeClip:
 		return []byte(s), nil
-	case APICronVideosGetVideoTypeFreechat:
+	case APICronSearchVideosGetVideoTypeFreechat:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -419,16 +443,16 @@ func (s APICronVideosGetVideoType) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *APICronVideosGetVideoType) UnmarshalText(data []byte) error {
-	switch APICronVideosGetVideoType(data) {
-	case APICronVideosGetVideoTypeVspoBroadcast:
-		*s = APICronVideosGetVideoTypeVspoBroadcast
+func (s *APICronSearchVideosGetVideoType) UnmarshalText(data []byte) error {
+	switch APICronSearchVideosGetVideoType(data) {
+	case APICronSearchVideosGetVideoTypeVspoStream:
+		*s = APICronSearchVideosGetVideoTypeVspoStream
 		return nil
-	case APICronVideosGetVideoTypeClip:
-		*s = APICronVideosGetVideoTypeClip
+	case APICronSearchVideosGetVideoTypeClip:
+		*s = APICronSearchVideosGetVideoTypeClip
 		return nil
-	case APICronVideosGetVideoTypeFreechat:
-		*s = APICronVideosGetVideoTypeFreechat
+	case APICronSearchVideosGetVideoTypeFreechat:
+		*s = APICronSearchVideosGetVideoTypeFreechat
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -447,20 +471,6 @@ func (s *APIPingGetOK) GetMessage() OptString {
 // SetMessage sets the value of Message.
 func (s *APIPingGetOK) SetMessage(val OptString) {
 	s.Message = val
-}
-
-type BearerAuth struct {
-	Token string
-}
-
-// GetToken returns the value of Token.
-func (s *BearerAuth) GetToken() string {
-	return s.Token
-}
-
-// SetToken sets the value of Token.
-func (s *BearerAuth) SetToken(val string) {
-	s.Token = val
 }
 
 // Ref: #/components/schemas/CronResponse
@@ -522,4 +532,18 @@ func (o OptString) Or(d string) string {
 		return v
 	}
 	return d
+}
+
+type PingPostOK struct {
+	Message OptString `json:"message"`
+}
+
+// GetMessage returns the value of Message.
+func (s *PingPostOK) GetMessage() OptString {
+	return s.Message
+}
+
+// SetMessage sets the value of Message.
+func (s *PingPostOK) SetMessage(val OptString) {
+	s.Message = val
 }

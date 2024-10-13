@@ -38,13 +38,65 @@ module "iam" {
   project = var.GOOGLE_PROJECT_ID
 }
 
-module "cloud_run" {
+module "secret_manager" {
+  source           = "../modules/secret_manager"
+  sa_account_email = module.iam.cloud_run_sa_email
+}
+
+locals {
+  cloud_run_service_env_vars = {
+    "DB_HOST" = {
+      secret_name = "db-host"
+      version     = "latest"
+    },
+    "DB_PASSWORD" = {
+      secret_name = "db-password"
+      version     = "latest"
+    },
+    "DB_USER" = {
+      secret_name = "db-user"
+      version     = "latest"
+    },
+    "DB_DATABASE" = {
+      secret_name = "db-database"
+      version     = "latest"
+    },
+    "DB_SSL_MODE" = {
+      value = "require"
+    },
+    "TWITCASTING_ACCESS_TOKEN" = {
+      secret_name = "twitcasting-access-token"
+      version     = "latest"
+    },
+    "TWITCH_CLIENT_SECRET" = {
+      secret_name = "twitch-client-secret"
+      version     = "latest"
+    },
+    "TWITCH_CLIENT_ID" = {
+      secret_name = "twitch-client-id"
+      version     = "latest"
+    },
+    "YOUTUBE_API_KEY" = {
+      secret_name = "youtube-api-key"
+      version     = "latest"
+    },
+    "ENV" = {
+      value = "production"
+    },
+    "LOG_LEVEL" = {
+      value = "info"
+    }
+  }
+}
+
+module "cloud_run_service" {
   source                          = "../modules/cloud_run"
   location                        = local.location
   env                             = local.env
   project                         = var.GOOGLE_PROJECT_ID
   artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
-  cloud_scheduler_sa_email        = module.iam.cloud_scheduler_sa_email
+  cloud_run_sa_email              = module.iam.cloud_run_sa_email
+  cloud_run_service_env_vars      = local.cloud_run_service_env_vars
 }
 
 module "cloud_scheduler_job" {
@@ -52,16 +104,16 @@ module "cloud_scheduler_job" {
   location                 = local.location
   env                      = local.env
   project                  = var.GOOGLE_PROJECT_ID
-  cloud_run_service_url    = module.cloud_run.cloud_run_service_url
   cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
   schedules = [
     {
-      name     = "vspo-portal"
-      schedule = "*/30 * * * *",
+      name       = "job1"
+      schedule   = "*/5 * * * *"
+      target_url = "${module.cloud_run_service.cloud_run_service_url}/ping"
       headers = {
         "Content-Type" = "application/json"
       }
-      body = base64encode("{\"overrides\":{\"containerOverrides\":[{\"name\":\"blue-vspo-portal\",\"args\":[\"/main\",\"ping\"]}]}}")
+      body = jsonencode({})
     }
   ]
 }

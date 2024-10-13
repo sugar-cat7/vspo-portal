@@ -1,0 +1,12 @@
+name = "common-api-server"
+compatibility_date = "2024-09-23"
+send_metrics = false
+compatibility_flags = [ "nodejs_compat_v2" ]
+main = "cmd/server/index.ts"
+tail_consumers = [{ service = "api-tail" }]
+logpush = true
+
+[[hyperdrive]]
+binding = "HYPERDRIVE"
+id = "c60c2d5eed6c4ea988554b12e43c4a08"
+localConnectionString = "postgres://user:password@localhost:5432/vspo"

@@ -20,37 +20,47 @@ type Handler interface {
 	//
 	// GET /api/cron/creators
 	APICronCreatorsGet(ctx context.Context, params APICronCreatorsGetParams) (APICronCreatorsGetRes, error)
-	// APICronVideosGet implements GET /api/cron/videos operation.
+	// APICronExistVideosGet implements GET /api/cron/exist_videos operation.
 	//
-	// Update videos related to a specific creator based on provided cronType.
+	// Update exist videos.
 	//
-	// GET /api/cron/videos
-	APICronVideosGet(ctx context.Context, params APICronVideosGetParams) (APICronVideosGetRes, error)
+	// GET /api/cron/exist_videos
+	APICronExistVideosGet(ctx context.Context, params APICronExistVideosGetParams) (APICronExistVideosGetRes, error)
+	// APICronSearchVideosGet implements GET /api/cron/search_videos operation.
+	//
+	// Update videos related to a specific creator based on provided.
+	//
+	// GET /api/cron/search_videos
+	APICronSearchVideosGet(ctx context.Context, params APICronSearchVideosGetParams) (APICronSearchVideosGetRes, error)
 	// APIPingGet implements GET /api/ping operation.
 	//
 	// Returns a 200 status code if successful, or an error.
 	//
 	// GET /api/ping
 	APIPingGet(ctx context.Context) (*APIPingGetOK, error)
+	// PingPost implements POST /ping operation.
+	//
+	// Returns a 200 status code if successful, or an error.
+	//
+	// POST /ping
+	PingPost(ctx context.Context) (*PingPostOK, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and
 // calls Handler to handle requests.
 type Server struct {
-	h   Handler
-	sec SecurityHandler
+	h Handler
 	baseServer
 }
 
 // NewServer creates new Server.
-func NewServer(h Handler, sec SecurityHandler, opts ...ServerOption) (*Server, error) {
+func NewServer(h Handler, opts ...ServerOption) (*Server, error) {
 	s, err := newServerConfig(opts...).baseServer()
 	if err != nil {
 		return nil, err
 	}
 	return &Server{
 		h:          h,
-		sec:        sec,
 		baseServer: s,
 	}, nil
 }

@@ -10,8 +10,12 @@
             "schedule": "*/10 * * * *"
         },
         {
-            "path": "/api/cron/videos?platform_type=twitcasting,twitch,youtube&period=week&video_type=vspo_broadcast",
+            "path": "/api/cron/search_videos?platform_type=twitcasting,twitch,youtube&video_type=vspo_stream",
             "schedule": "*/5 * * * *"
+        },
+        {
+            "path": "/api/cron/exist_videos?period=week",
+            "schedule": "*/10 * * * *"
         },
         {
             "path": "/api/cron/channels?platform_type=youtube",

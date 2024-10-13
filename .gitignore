@@ -56,3 +56,6 @@ next-env.d.ts
 **/store_icon.png
 **/twa-manifest.json
 .vercel
+
+
+.wrangler
