@@ -50,7 +50,7 @@ func Run(w http.ResponseWriter, r *http.Request) {
 			d.VideosInteractor,
 			d.ChannelInteractor,
 		),
-		NewSecurityHandler(e),
+		// NewSecurityHandler(e),
 		cron.WithMiddleware(),
 		cron.WithTracerProvider(traceProvider),
 	)

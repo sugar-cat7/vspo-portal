@@ -86,8 +86,8 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/schemas/CronResponse'
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
   /api/cron/search_videos:
     get:
       tags:
@@ -156,8 +156,8 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/schemas/CronResponse'
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
   /api/cron/exist_videos:
     get:
       tags:
@@ -215,8 +215,8 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/schemas/CronResponse'
-      security:
-        - bearerAuth: []       
+      # security:
+      #   - bearerAuth: []       
   /api/cron/channels:
     get:
       tags:
@@ -273,8 +273,8 @@ paths:
               schema:
                 type: object
                 $ref: '#/components/schemas/CronResponse'
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
   /api/ping:
     get:
       summary: Ping endpoint
@@ -290,14 +290,31 @@ paths:
                   message:
                     type: string
                     example: Pong
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
+  /ping:
+    post:
+      summary: Ping endpoint
+      description: Returns a 200 status code if successful, or an error.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Pong
+      # security:
+      #   - bearerAuth: []
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: Bearer
+  # securitySchemes:
+  #   bearerAuth:
+  #     type: http
+  #     scheme: bearer
+  #     bearerFormat: Bearer
   schemas:
     CronResponse:
       type: object
@@ -305,8 +322,8 @@ components:
         message:
           type: string
           example: success
-security:
-  - bearerAuth: []
+# security:
+#   - bearerAuth: []
 
 tags:
   - name: Channels

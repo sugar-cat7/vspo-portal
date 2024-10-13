@@ -44,7 +44,7 @@ module "secret_manager" {
 }
 
 locals {
-  cloud_run_job_env_vars = {
+  cloud_run_service_env_vars = {
     "DB_HOST" = {
       secret_name = "db-host"
       version     = "latest"
@@ -89,60 +89,31 @@ locals {
   }
 }
 
-module "cloud_run_job_search" {
+module "cloud_run_service" {
   source                          = "../modules/cloud_run"
   location                        = local.location
   env                             = local.env
   project                         = var.GOOGLE_PROJECT_ID
   artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
   cloud_run_sa_email              = module.iam.cloud_run_sa_email
-  cloud_run_job_args              = ["cron", "fetch-video", "livestream", "search"]
-  cloud_run_job_env_vars          = local.cloud_run_job_env_vars
+  cloud_run_service_env_vars          = local.cloud_run_service_env_vars
 }
 
-module "cloud_run_job_update_exist_stream" {
-  source                          = "../modules/cloud_run"
-  location                        = local.location
-  env                             = local.env
-  project                         = var.GOOGLE_PROJECT_ID
-  artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
-  cloud_run_sa_email              = module.iam.cloud_run_sa_email
-  cloud_run_job_args              = ["cron", "fetch-video", "livestream", "exist"]
-  cloud_run_job_env_vars          = local.cloud_run_job_env_vars
-}
-
-module "cloud_scheduler_job_search" {
+module "cloud_scheduler_job" {
   source                   = "../modules/cloud_scheduler_job"
   location                 = local.location
   env                      = local.env
   project                  = var.GOOGLE_PROJECT_ID
-  cloud_run_service_url    = module.cloud_run_job_search.cloud_run_service_url
   cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
   schedules = [
     {
-      name     = "vspo-portal-job-search"
-      schedule = "*/30 * * * *",
-      headers = {
+      name       = "job1"
+      schedule   = "*/5 * * * *"
+      target_url = "${module.cloud_run_service.url}/ping"
+      headers    = {
         "Content-Type" = "application/json"
       }
-    }
-  ]
-}
-
-module "cloud_scheduler_job_update_exist_stream" {
-  source                   = "../modules/cloud_scheduler_job"
-  location                 = local.location
-  env                      = local.env
-  project                  = var.GOOGLE_PROJECT_ID
-  cloud_run_service_url    = module.cloud_run_job_update_exist_stream.cloud_run_service_url
-  cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
-  schedules = [
-    {
-      name     = "vspo-portal-job-update-exist-stream"
-      schedule = "*/30 * * * *",
-      headers = {
-        "Content-Type" = "application/json"
-      }
+      body       = jsonencode({})
     }
   ]
 }

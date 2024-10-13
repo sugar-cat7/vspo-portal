@@ -8,6 +8,8 @@ services:
       - "4318:4318"
     environment:
       - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - vspo-network
   vspo-db:
     container_name: vspo-db
     image: postgres:latest
@@ -22,6 +24,8 @@ services:
       interval: 2s
       timeout: 1s
       retries: 5
+    networks:
+      - vspo-network
   vspo-db-migration:
     container_name: vspo-db-migration
     build:
@@ -35,3 +39,41 @@ services:
     depends_on:
       vspo-db:
         condition: service_healthy
+    networks:
+      - vspo-network
+  vspo-portal-cron:
+    container_name: vspo-portal-cron
+    build:
+      context: ../service/common-job
+      dockerfile: Dockerfile
+      target: http-serve
+    environment:
+      DB_HOST: vspo-db
+    depends_on:
+      vspo-db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - vspo-network
+  datadog-agent:
+    container_name: datadog-agent
+    image: gcr.io/datadoghq/agent:latest
+    environment:
+      - DD_API_KEY=xxx
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
+      - DD_DOGSTATSD_SOCKET=/var/run/datadog/dsd.socket
+      - DD_TRACE_AGENT_PORT=8126
+      - DD_SITE=ap1.datadoghq.com 
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc:/host/proc:ro
+      - /sys/fs/cgroup:/host/sys/fs/cgroup:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    networks:
+      - vspo-network
+networks:
+  vspo-network:
+    driver: bridge

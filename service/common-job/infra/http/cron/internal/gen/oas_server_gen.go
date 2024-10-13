@@ -38,25 +38,29 @@ type Handler interface {
 	//
 	// GET /api/ping
 	APIPingGet(ctx context.Context) (*APIPingGetOK, error)
+	// PingPost implements POST /ping operation.
+	//
+	// Returns a 200 status code if successful, or an error.
+	//
+	// POST /ping
+	PingPost(ctx context.Context) (*PingPostOK, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and
 // calls Handler to handle requests.
 type Server struct {
-	h   Handler
-	sec SecurityHandler
+	h Handler
 	baseServer
 }
 
 // NewServer creates new Server.
-func NewServer(h Handler, sec SecurityHandler, opts ...ServerOption) (*Server, error) {
+func NewServer(h Handler, opts ...ServerOption) (*Server, error) {
 	s, err := newServerConfig(opts...).baseServer()
 	if err != nil {
 		return nil, err
 	}
 	return &Server{
 		h:          h,
-		sec:        sec,
 		baseServer: s,
 	}, nil
 }

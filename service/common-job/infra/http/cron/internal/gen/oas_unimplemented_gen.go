@@ -57,3 +57,12 @@ func (UnimplementedHandler) APICronSearchVideosGet(ctx context.Context, params A
 func (UnimplementedHandler) APIPingGet(ctx context.Context) (r *APIPingGetOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
+
+// PingPost implements POST /ping operation.
+//
+// Returns a 200 status code if successful, or an error.
+//
+// POST /ping
+func (UnimplementedHandler) PingPost(ctx context.Context) (r *PingPostOK, _ error) {
+	return r, ht.ErrNotImplemented
+}

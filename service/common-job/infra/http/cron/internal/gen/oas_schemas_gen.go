@@ -473,20 +473,6 @@ func (s *APIPingGetOK) SetMessage(val OptString) {
 	s.Message = val
 }
 
-type BearerAuth struct {
-	Token string
-}
-
-// GetToken returns the value of Token.
-func (s *BearerAuth) GetToken() string {
-	return s.Token
-}
-
-// SetToken sets the value of Token.
-func (s *BearerAuth) SetToken(val string) {
-	s.Token = val
-}
-
 // Ref: #/components/schemas/CronResponse
 type CronResponse struct {
 	Message OptString `json:"message"`
@@ -546,4 +532,18 @@ func (o OptString) Or(d string) string {
 		return v
 	}
 	return d
+}
+
+type PingPostOK struct {
+	Message OptString `json:"message"`
+}
+
+// GetMessage returns the value of Message.
+func (s *PingPostOK) GetMessage() OptString {
+	return s.Message
+}
+
+// SetMessage sets the value of Message.
+func (s *PingPostOK) SetMessage(val OptString) {
+	s.Message = val
 }

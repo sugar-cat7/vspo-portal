@@ -1,5 +1,5 @@
 resource "google_cloud_scheduler_job" "scheduler" {
-  for_each = { for idx, val in local.schedules : val.name => val }
+  for_each = { for idx, val in var.schedules : val.name => val }
 
   name        = each.value.name
   description = "Trigger Cloud Run"
@@ -7,7 +7,7 @@ resource "google_cloud_scheduler_job" "scheduler" {
   time_zone   = "Asia/Tokyo"
 
   http_target {
-    uri         = local.target_url
+    uri         = each.value.target_url
     http_method = "POST"
     headers     = each.value.headers
     body        = each.value.body
