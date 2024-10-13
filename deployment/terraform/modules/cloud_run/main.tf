@@ -30,5 +30,26 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
         }
       }
     }
+    containers {
+      name  = "datadog-agent"
+      image = "gcr.io/datadoghq/agent:latest"
+
+      dynamic "env" {
+        for_each = var.datadog_env_vars
+        content {
+          name = env.key
+          dynamic "value_source" {
+            for_each = env.value.secret_name != null ? [1] : []
+            content {
+              secret_key_ref {
+                secret  = env.value.secret_name
+                version = lookup(env.value, "version", "latest")
+              }
+            }
+          }
+          value = env.value.secret_name == null ? env.value.value : null
+        }
+      }
+    }
   }
 }

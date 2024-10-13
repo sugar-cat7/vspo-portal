@@ -83,8 +83,27 @@ locals {
     }
   }
 
+  datadog_env_vars = {
+    "DD_API_KEY" = {
+      secret_name = "datadog-api-key"
+      version     = "latest"
+    },
+    "DD_SITE" = {
+      value = "ap1.datadoghq.com "
+    },
+    "DD_ENV" = {
+      value = local.env
+    },
+    "DD_SERVICE" = {
+      value = "vspo-portal-cron"
+    },
+    "DD_VERSION" = {
+      value = "1.0.0"
+    }
+  }
+
   secret_manager_secrets = [
-    for k, v in local.cloud_run_service_env_vars : {
+    for k, v in concat([local.cloud_run_service_env_vars, local.datadog_env_vars]) : {
       secret_name = v.secret_name
       version     = lookup(v, "version", "latest")
     } if contains(keys(v), "secret_name")
@@ -99,6 +118,7 @@ module "cloud_run_service" {
   artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
   cloud_run_sa_email              = module.iam.cloud_run_sa_email
   cloud_run_service_env_vars      = local.cloud_run_service_env_vars
+  datadog_env_vars                = local.datadog_env_vars
 }
 
 module "cloud_scheduler_job" {
