@@ -96,7 +96,7 @@ module "cloud_run_service" {
   project                         = var.GOOGLE_PROJECT_ID
   artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
   cloud_run_sa_email              = module.iam.cloud_run_sa_email
-  cloud_run_service_env_vars          = local.cloud_run_service_env_vars
+  cloud_run_service_env_vars      = local.cloud_run_service_env_vars
 }
 
 module "cloud_scheduler_job" {
@@ -110,10 +110,10 @@ module "cloud_scheduler_job" {
       name       = "job1"
       schedule   = "*/5 * * * *"
       target_url = "${module.cloud_run_service.url}/ping"
-      headers    = {
+      headers = {
         "Content-Type" = "application/json"
       }
-      body       = jsonencode({})
+      body = jsonencode({})
     }
   ]
 }

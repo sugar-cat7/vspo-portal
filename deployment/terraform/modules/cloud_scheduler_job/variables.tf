@@ -16,11 +16,11 @@ variable "cloud_scheduler_sa_email" {
 
 variable "schedules" {
   type = list(object({
-    name        = string
-    schedule    = string
-    target_url  = string
-    headers     = map(string)
-    body        = string
+    name       = string
+    schedule   = string
+    target_url = string
+    headers    = map(string)
+    body       = string
   }))
 }
 
