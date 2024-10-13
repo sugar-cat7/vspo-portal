@@ -52,12 +52,24 @@ type Invoker interface {
 	//
 	// GET /api/ping
 	APIPingGet(ctx context.Context) (*APIPingGetOK, error)
+	// ExistVideosPost invokes POST /exist_videos operation.
+	//
+	// Update exist videos based on the provided period.
+	//
+	// POST /exist_videos
+	ExistVideosPost(ctx context.Context, request *ExistVideosPostReq) (ExistVideosPostRes, error)
 	// PingPost invokes POST /ping operation.
 	//
 	// Returns a 200 status code if successful, or an error.
 	//
 	// POST /ping
 	PingPost(ctx context.Context) (*PingPostOK, error)
+	// SearchVideosPost invokes POST /search_videos operation.
+	//
+	// Update videos related to a specific creator based on provided.
+	//
+	// POST /search_videos
+	SearchVideosPost(ctx context.Context, request *SearchVideosPostReq) (SearchVideosPostRes, error)
 }
 
 // Client implements OAS client.
@@ -604,6 +616,80 @@ func (c *Client) sendAPIPingGet(ctx context.Context) (res *APIPingGetOK, err err
 	return result, nil
 }
 
+// ExistVideosPost invokes POST /exist_videos operation.
+//
+// Update exist videos based on the provided period.
+//
+// POST /exist_videos
+func (c *Client) ExistVideosPost(ctx context.Context, request *ExistVideosPostReq) (ExistVideosPostRes, error) {
+	res, err := c.sendExistVideosPost(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendExistVideosPost(ctx context.Context, request *ExistVideosPostReq) (res ExistVideosPostRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/exist_videos"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "ExistVideosPost",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/exist_videos"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeExistVideosPostRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeExistVideosPostResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // PingPost invokes POST /ping operation.
 //
 // Returns a 200 status code if successful, or an error.
@@ -668,6 +754,80 @@ func (c *Client) sendPingPost(ctx context.Context) (res *PingPostOK, err error) 
 
 	stage = "DecodeResponse"
 	result, err := decodePingPostResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// SearchVideosPost invokes POST /search_videos operation.
+//
+// Update videos related to a specific creator based on provided.
+//
+// POST /search_videos
+func (c *Client) SearchVideosPost(ctx context.Context, request *SearchVideosPostReq) (SearchVideosPostRes, error) {
+	res, err := c.sendSearchVideosPost(ctx, request)
+	return res, err
+}
+
+func (c *Client) sendSearchVideosPost(ctx context.Context, request *SearchVideosPostReq) (res SearchVideosPostRes, err error) {
+	otelAttrs := []attribute.KeyValue{
+		semconv.HTTPRequestMethodKey.String("POST"),
+		semconv.HTTPRouteKey.String("/search_videos"),
+	}
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(float64(elapsedDuration)/float64(time.Millisecond)), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, "SearchVideosPost",
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/search_videos"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeSearchVideosPostRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	defer resp.Body.Close()
+
+	stage = "DecodeResponse"
+	result, err := decodeSearchVideosPostResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

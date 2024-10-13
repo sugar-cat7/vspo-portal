@@ -488,6 +488,186 @@ func (s *CronResponse) SetMessage(val OptString) {
 	s.Message = val
 }
 
+type ExistVideosPostBadRequest CronResponse
+
+func (*ExistVideosPostBadRequest) existVideosPostRes() {}
+
+type ExistVideosPostForbidden CronResponse
+
+func (*ExistVideosPostForbidden) existVideosPostRes() {}
+
+type ExistVideosPostInternalServerError CronResponse
+
+func (*ExistVideosPostInternalServerError) existVideosPostRes() {}
+
+type ExistVideosPostNotFound CronResponse
+
+func (*ExistVideosPostNotFound) existVideosPostRes() {}
+
+type ExistVideosPostOK CronResponse
+
+func (*ExistVideosPostOK) existVideosPostRes() {}
+
+type ExistVideosPostReq struct {
+	// Period for performing updates.
+	Period OptExistVideosPostReqPeriod `json:"period"`
+}
+
+// GetPeriod returns the value of Period.
+func (s *ExistVideosPostReq) GetPeriod() OptExistVideosPostReqPeriod {
+	return s.Period
+}
+
+// SetPeriod sets the value of Period.
+func (s *ExistVideosPostReq) SetPeriod(val OptExistVideosPostReqPeriod) {
+	s.Period = val
+}
+
+// Period for performing updates.
+type ExistVideosPostReqPeriod string
+
+const (
+	ExistVideosPostReqPeriodDay   ExistVideosPostReqPeriod = "day"
+	ExistVideosPostReqPeriodMonth ExistVideosPostReqPeriod = "month"
+	ExistVideosPostReqPeriodWeek  ExistVideosPostReqPeriod = "week"
+)
+
+// AllValues returns all ExistVideosPostReqPeriod values.
+func (ExistVideosPostReqPeriod) AllValues() []ExistVideosPostReqPeriod {
+	return []ExistVideosPostReqPeriod{
+		ExistVideosPostReqPeriodDay,
+		ExistVideosPostReqPeriodMonth,
+		ExistVideosPostReqPeriodWeek,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ExistVideosPostReqPeriod) MarshalText() ([]byte, error) {
+	switch s {
+	case ExistVideosPostReqPeriodDay:
+		return []byte(s), nil
+	case ExistVideosPostReqPeriodMonth:
+		return []byte(s), nil
+	case ExistVideosPostReqPeriodWeek:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ExistVideosPostReqPeriod) UnmarshalText(data []byte) error {
+	switch ExistVideosPostReqPeriod(data) {
+	case ExistVideosPostReqPeriodDay:
+		*s = ExistVideosPostReqPeriodDay
+		return nil
+	case ExistVideosPostReqPeriodMonth:
+		*s = ExistVideosPostReqPeriodMonth
+		return nil
+	case ExistVideosPostReqPeriodWeek:
+		*s = ExistVideosPostReqPeriodWeek
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type ExistVideosPostUnauthorized CronResponse
+
+func (*ExistVideosPostUnauthorized) existVideosPostRes() {}
+
+// NewOptExistVideosPostReqPeriod returns new OptExistVideosPostReqPeriod with value set to v.
+func NewOptExistVideosPostReqPeriod(v ExistVideosPostReqPeriod) OptExistVideosPostReqPeriod {
+	return OptExistVideosPostReqPeriod{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptExistVideosPostReqPeriod is optional ExistVideosPostReqPeriod.
+type OptExistVideosPostReqPeriod struct {
+	Value ExistVideosPostReqPeriod
+	Set   bool
+}
+
+// IsSet returns true if OptExistVideosPostReqPeriod was set.
+func (o OptExistVideosPostReqPeriod) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptExistVideosPostReqPeriod) Reset() {
+	var v ExistVideosPostReqPeriod
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptExistVideosPostReqPeriod) SetTo(v ExistVideosPostReqPeriod) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptExistVideosPostReqPeriod) Get() (v ExistVideosPostReqPeriod, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptExistVideosPostReqPeriod) Or(d ExistVideosPostReqPeriod) ExistVideosPostReqPeriod {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptSearchVideosPostReqVideoType returns new OptSearchVideosPostReqVideoType with value set to v.
+func NewOptSearchVideosPostReqVideoType(v SearchVideosPostReqVideoType) OptSearchVideosPostReqVideoType {
+	return OptSearchVideosPostReqVideoType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptSearchVideosPostReqVideoType is optional SearchVideosPostReqVideoType.
+type OptSearchVideosPostReqVideoType struct {
+	Value SearchVideosPostReqVideoType
+	Set   bool
+}
+
+// IsSet returns true if OptSearchVideosPostReqVideoType was set.
+func (o OptSearchVideosPostReqVideoType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptSearchVideosPostReqVideoType) Reset() {
+	var v SearchVideosPostReqVideoType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptSearchVideosPostReqVideoType) SetTo(v SearchVideosPostReqVideoType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptSearchVideosPostReqVideoType) Get() (v SearchVideosPostReqVideoType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptSearchVideosPostReqVideoType) Or(d SearchVideosPostReqVideoType) SearchVideosPostReqVideoType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -547,3 +727,158 @@ func (s *PingPostOK) GetMessage() OptString {
 func (s *PingPostOK) SetMessage(val OptString) {
 	s.Message = val
 }
+
+type SearchVideosPostBadRequest CronResponse
+
+func (*SearchVideosPostBadRequest) searchVideosPostRes() {}
+
+type SearchVideosPostForbidden CronResponse
+
+func (*SearchVideosPostForbidden) searchVideosPostRes() {}
+
+type SearchVideosPostInternalServerError CronResponse
+
+func (*SearchVideosPostInternalServerError) searchVideosPostRes() {}
+
+type SearchVideosPostNotFound CronResponse
+
+func (*SearchVideosPostNotFound) searchVideosPostRes() {}
+
+type SearchVideosPostOK CronResponse
+
+func (*SearchVideosPostOK) searchVideosPostRes() {}
+
+type SearchVideosPostReq struct {
+	// List of video platform types.
+	PlatformType []SearchVideosPostReqPlatformTypeItem `json:"platform_type"`
+	// Type of the cron.
+	VideoType OptSearchVideosPostReqVideoType `json:"video_type"`
+}
+
+// GetPlatformType returns the value of PlatformType.
+func (s *SearchVideosPostReq) GetPlatformType() []SearchVideosPostReqPlatformTypeItem {
+	return s.PlatformType
+}
+
+// GetVideoType returns the value of VideoType.
+func (s *SearchVideosPostReq) GetVideoType() OptSearchVideosPostReqVideoType {
+	return s.VideoType
+}
+
+// SetPlatformType sets the value of PlatformType.
+func (s *SearchVideosPostReq) SetPlatformType(val []SearchVideosPostReqPlatformTypeItem) {
+	s.PlatformType = val
+}
+
+// SetVideoType sets the value of VideoType.
+func (s *SearchVideosPostReq) SetVideoType(val OptSearchVideosPostReqVideoType) {
+	s.VideoType = val
+}
+
+type SearchVideosPostReqPlatformTypeItem string
+
+const (
+	SearchVideosPostReqPlatformTypeItemYoutube     SearchVideosPostReqPlatformTypeItem = "youtube"
+	SearchVideosPostReqPlatformTypeItemTwitch      SearchVideosPostReqPlatformTypeItem = "twitch"
+	SearchVideosPostReqPlatformTypeItemTwitcasting SearchVideosPostReqPlatformTypeItem = "twitcasting"
+	SearchVideosPostReqPlatformTypeItemNiconico    SearchVideosPostReqPlatformTypeItem = "niconico"
+)
+
+// AllValues returns all SearchVideosPostReqPlatformTypeItem values.
+func (SearchVideosPostReqPlatformTypeItem) AllValues() []SearchVideosPostReqPlatformTypeItem {
+	return []SearchVideosPostReqPlatformTypeItem{
+		SearchVideosPostReqPlatformTypeItemYoutube,
+		SearchVideosPostReqPlatformTypeItemTwitch,
+		SearchVideosPostReqPlatformTypeItemTwitcasting,
+		SearchVideosPostReqPlatformTypeItemNiconico,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SearchVideosPostReqPlatformTypeItem) MarshalText() ([]byte, error) {
+	switch s {
+	case SearchVideosPostReqPlatformTypeItemYoutube:
+		return []byte(s), nil
+	case SearchVideosPostReqPlatformTypeItemTwitch:
+		return []byte(s), nil
+	case SearchVideosPostReqPlatformTypeItemTwitcasting:
+		return []byte(s), nil
+	case SearchVideosPostReqPlatformTypeItemNiconico:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SearchVideosPostReqPlatformTypeItem) UnmarshalText(data []byte) error {
+	switch SearchVideosPostReqPlatformTypeItem(data) {
+	case SearchVideosPostReqPlatformTypeItemYoutube:
+		*s = SearchVideosPostReqPlatformTypeItemYoutube
+		return nil
+	case SearchVideosPostReqPlatformTypeItemTwitch:
+		*s = SearchVideosPostReqPlatformTypeItemTwitch
+		return nil
+	case SearchVideosPostReqPlatformTypeItemTwitcasting:
+		*s = SearchVideosPostReqPlatformTypeItemTwitcasting
+		return nil
+	case SearchVideosPostReqPlatformTypeItemNiconico:
+		*s = SearchVideosPostReqPlatformTypeItemNiconico
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Type of the cron.
+type SearchVideosPostReqVideoType string
+
+const (
+	SearchVideosPostReqVideoTypeVspoStream SearchVideosPostReqVideoType = "vspo_stream"
+	SearchVideosPostReqVideoTypeClip       SearchVideosPostReqVideoType = "clip"
+	SearchVideosPostReqVideoTypeFreechat   SearchVideosPostReqVideoType = "freechat"
+)
+
+// AllValues returns all SearchVideosPostReqVideoType values.
+func (SearchVideosPostReqVideoType) AllValues() []SearchVideosPostReqVideoType {
+	return []SearchVideosPostReqVideoType{
+		SearchVideosPostReqVideoTypeVspoStream,
+		SearchVideosPostReqVideoTypeClip,
+		SearchVideosPostReqVideoTypeFreechat,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s SearchVideosPostReqVideoType) MarshalText() ([]byte, error) {
+	switch s {
+	case SearchVideosPostReqVideoTypeVspoStream:
+		return []byte(s), nil
+	case SearchVideosPostReqVideoTypeClip:
+		return []byte(s), nil
+	case SearchVideosPostReqVideoTypeFreechat:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *SearchVideosPostReqVideoType) UnmarshalText(data []byte) error {
+	switch SearchVideosPostReqVideoType(data) {
+	case SearchVideosPostReqVideoTypeVspoStream:
+		*s = SearchVideosPostReqVideoTypeVspoStream
+		return nil
+	case SearchVideosPostReqVideoTypeClip:
+		*s = SearchVideosPostReqVideoTypeClip
+		return nil
+	case SearchVideosPostReqVideoTypeFreechat:
+		*s = SearchVideosPostReqVideoTypeFreechat
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type SearchVideosPostUnauthorized CronResponse
+
+func (*SearchVideosPostUnauthorized) searchVideosPostRes() {}

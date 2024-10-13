@@ -210,6 +210,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 
 				elem = origElem
+			case 'e': // Prefix: "exist_videos"
+				origElem := elem
+				if l := len("exist_videos"); len(elem) >= l && elem[0:l] == "exist_videos" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "POST":
+						s.handleExistVideosPostRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "POST")
+					}
+
+					return
+				}
+
+				elem = origElem
 			case 'p': // Prefix: "ping"
 				origElem := elem
 				if l := len("ping"); len(elem) >= l && elem[0:l] == "ping" {
@@ -223,6 +244,27 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					switch r.Method {
 					case "POST":
 						s.handlePingPostRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, "POST")
+					}
+
+					return
+				}
+
+				elem = origElem
+			case 's': // Prefix: "search_videos"
+				origElem := elem
+				if l := len("search_videos"); len(elem) >= l && elem[0:l] == "search_videos" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "POST":
+						s.handleSearchVideosPostRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "POST")
 					}
@@ -496,6 +538,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				}
 
 				elem = origElem
+			case 'e': // Prefix: "exist_videos"
+				origElem := elem
+				if l := len("exist_videos"); len(elem) >= l && elem[0:l] == "exist_videos" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "POST":
+						r.name = "ExistVideosPost"
+						r.summary = "Update exist videos"
+						r.operationID = ""
+						r.pathPattern = "/exist_videos"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
 			case 'p': // Prefix: "ping"
 				origElem := elem
 				if l := len("ping"); len(elem) >= l && elem[0:l] == "ping" {
@@ -512,6 +579,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.summary = "Ping endpoint"
 						r.operationID = ""
 						r.pathPattern = "/ping"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
+				elem = origElem
+			case 's': // Prefix: "search_videos"
+				origElem := elem
+				if l := len("search_videos"); len(elem) >= l && elem[0:l] == "search_videos" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "POST":
+						r.name = "SearchVideosPost"
+						r.summary = "Upsert videos"
+						r.operationID = ""
+						r.pathPattern = "/search_videos"
 						r.args = args
 						r.count = 0
 						return r, true

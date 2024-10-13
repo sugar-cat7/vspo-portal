@@ -15,3 +15,11 @@ func ConvertPlatFormTypeOgenToReqSlice(p []api.APICronSearchVideosGetPlatformTyp
 	}
 	return result
 }
+
+func ConvertPostPlatFormTypeOgenToReqSlice(p []api.SearchVideosPostReqPlatformTypeItem) []string {
+	var result []string
+	for _, v := range p {
+		result = append(result, string(v))
+	}
+	return result
+}

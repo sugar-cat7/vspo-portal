@@ -16,3 +16,11 @@ type APICronExistVideosGetRes interface {
 type APICronSearchVideosGetRes interface {
 	aPICronSearchVideosGetRes()
 }
+
+type ExistVideosPostRes interface {
+	existVideosPostRes()
+}
+
+type SearchVideosPostRes interface {
+	searchVideosPostRes()
+}

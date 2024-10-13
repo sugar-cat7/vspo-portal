@@ -3,7 +3,11 @@
 package api
 
 import (
+	"fmt"
+
 	"github.com/go-faster/errors"
+
+	"github.com/ogen-go/ogen/validate"
 )
 
 func (s APICronChannelsGetPlatformType) Validate() error {
@@ -91,6 +95,132 @@ func (s APICronSearchVideosGetPlatformTypeItem) Validate() error {
 }
 
 func (s APICronSearchVideosGetVideoType) Validate() error {
+	switch s {
+	case "vspo_stream":
+		return nil
+	case "clip":
+		return nil
+	case "freechat":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *ExistVideosPostReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Period.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "period",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ExistVideosPostReqPeriod) Validate() error {
+	switch s {
+	case "day":
+		return nil
+	case "month":
+		return nil
+	case "week":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *SearchVideosPostReq) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		var failures []validate.FieldError
+		for i, elem := range s.PlatformType {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "platform_type",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.VideoType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "video_type",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s SearchVideosPostReqPlatformTypeItem) Validate() error {
+	switch s {
+	case "youtube":
+		return nil
+	case "twitch":
+		return nil
+	case "twitcasting":
+		return nil
+	case "niconico":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s SearchVideosPostReqVideoType) Validate() error {
 	switch s {
 	case "vspo_stream":
 		return nil
