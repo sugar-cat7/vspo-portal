@@ -1,14 +1,17 @@
 resource "google_secret_manager_secret" "secret" {
-  secret_id = "vspo-portal"
+  for_each = { for secret in var.secret_manager_secrets : secret.secret_name => secret }
+
+  secret_id = each.value.secret_name
   replication {
     auto {}
   }
 }
 
 resource "google_secret_manager_secret_iam_member" "secret_access_for_cloud_run" {
-  secret_id = google_secret_manager_secret.secret.id
-  role      = "roles/secretmanager.secretAccessor"
-  member    = "serviceAccount:${var.sa_account_email}"
+  for_each = { for secret in var.secret_manager_secrets : secret.secret_name => secret }
 
-  depends_on = [google_secret_manager_secret.secret]
+  secret_id = "projects/${var.project_id}/secrets/${each.value.secret_name}"
+
+  role   = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${var.sa_account_email}"
 }
