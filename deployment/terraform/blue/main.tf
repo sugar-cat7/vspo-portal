@@ -116,6 +116,29 @@ module "cloud_scheduler_job" {
         "Content-Type" = "application/json"
       }
       body = jsonencode({})
+    },
+    {
+      name       = "job2"
+      schedule   = "*/5 * * * *"
+      target_url = "${module.cloud_run_service.cloud_run_service_url}/search_videos"
+      headers = {
+        "Content-Type" = "application/json"
+      }
+      body = jsonencode({
+        platform_type = ["youtube", "twitch", "twitcasting"]
+        video_type = "vspo_stream"
+      })
+    },
+    {
+      name       = "job3"
+      schedule   = "*/5 * * * *"
+      target_url = "${module.cloud_run_service.cloud_run_service_url}/exist_videos"
+      headers = {
+        "Content-Type" = "application/json"
+      }
+      body = jsonencode({
+        period = "week"
+      })
     }
   ]
 }

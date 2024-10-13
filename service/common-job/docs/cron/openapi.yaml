@@ -309,6 +309,134 @@ paths:
                     example: Pong
       # security:
       #   - bearerAuth: []
+  /search_videos:
+    post:
+      tags:
+        - Videos
+      summary: Upsert videos
+      description: Update videos related to a specific creator based on provided
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                platform_type:
+                  type: array
+                  items:
+                    type: string
+                    enum: [youtube, twitch, twitcasting, niconico]
+                  description: List of video platform types.
+                video_type:
+                  type: string
+                  enum: [vspo_stream, clip, freechat]
+                  description: Type of the cron
+      responses:
+        "200":
+          description: Videos updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+  /exist_videos:
+    post:
+      tags:
+        - Videos
+      summary: Update exist videos
+      description: Update exist videos based on the provided period.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                period:
+                  type: string
+                  enum: [day, month, week]
+                  description: Period for performing updates.
+      responses:
+        "200":
+          description: Videos updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/CronResponse'
+
+
 components:
   # securitySchemes:
   #   bearerAuth:
