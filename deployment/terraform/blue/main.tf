@@ -108,7 +108,7 @@ locals {
     for k, v in local.combined_env_vars : {
       secret_name = v.secret_name
       version     = lookup(v, "version", "latest")
-    } if v.secret_name != null
+    } if contains(keys(v), "secret_name")
   ]
 }
 
