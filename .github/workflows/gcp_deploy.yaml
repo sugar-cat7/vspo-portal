@@ -46,6 +46,7 @@ jobs:
       - name: Build and push Docker image to Artifact Registry for cron
         run: |
           IMAGE_TAG=$(git rev-parse --short "$GITHUB_SHA")
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
           docker build --target http-serve -t $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG -f $DOCKERFILE .
           docker tag $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
           docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:$IMAGE_TAG && docker push $ARTIFACT_REPOSITORY/$GCP_PROJECT/$REPOSITORY_NAME/$IMAGE_NAME:latest
