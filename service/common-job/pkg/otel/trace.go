@@ -13,7 +13,6 @@ func SetTracerProvider(serviceName, env string) *ddotel.TracerProvider {
 	traceProvider := ddotel.NewTracerProvider(
 		ddtrace.WithService(serviceName),
 		ddtrace.WithEnv(env),
-		ddtrace.WithAgentAddr("datadog-agent:8126"),
 	)
 	tracer = traceProvider.Tracer(serviceName)
 
