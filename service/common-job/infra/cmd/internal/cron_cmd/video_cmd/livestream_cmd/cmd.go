@@ -33,7 +33,7 @@ func NewVideoCmd() *cobra.Command {
 					panic(err)
 				}
 				ctx := context.Background()
-				traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV)
+				traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
 				defer func() {
 					if err := traceProvider.Shutdown(); err != nil {
 						log.Println(err)
@@ -62,7 +62,7 @@ func NewVideoCmd() *cobra.Command {
 					panic(err)
 				}
 				ctx := context.Background()
-				traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV)
+				traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
 				defer func() {
 					if err := traceProvider.Shutdown(); err != nil {
 						log.Println(err)
