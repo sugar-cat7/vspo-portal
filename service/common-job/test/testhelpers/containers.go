@@ -57,7 +57,7 @@ func SetupRepo(ctx context.Context) setupTx {
 	if err != nil {
 		panic(err)
 	}
-	trace.SetTracerProvider("test-vspo-cron", e.ServerEnvironment.ENV)
+	trace.SetTracerProvider("test-vspo-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
 	port, err := c.MappedPort(ctx, "5432")
 	if err != nil {
 		panic(err)
