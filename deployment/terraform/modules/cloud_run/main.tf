@@ -17,7 +17,7 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
           path = "/ping"
           port = 8080
         }
-        initial_delay_seconds = 0
+        initial_delay_seconds = 1
         timeout_seconds       = 1
         period_seconds        = 3
         failure_threshold     = 3
@@ -48,7 +48,7 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
           path = "/info"
           port = 8126
         }
-        initial_delay_seconds = 0
+        initial_delay_seconds = 1
         timeout_seconds       = 1
         period_seconds        = 3
         failure_threshold     = 3
