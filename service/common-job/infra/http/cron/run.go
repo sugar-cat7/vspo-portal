@@ -33,7 +33,7 @@ func Run(w http.ResponseWriter, r *http.Request) {
 	}
 	logger := logger.New()
 
-	traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV)
+	traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
 	defer func() {
 		if err := traceProvider.Shutdown(); err != nil {
 			log.Println(err)

@@ -80,7 +80,13 @@ locals {
     },
     "LOG_LEVEL" = {
       value = "info"
-    }
+    },
+    "DD_AGENT_HOST" = {
+      value = "localhost"
+    },
+    "DD_TRACE_AGENT_PORT" = {
+      value = "8126"
+    },
   }
 
   datadog_env_vars = {
@@ -89,7 +95,7 @@ locals {
       version     = "latest"
     },
     "DD_SITE" = {
-      value = "ap1.datadoghq.com "
+      value = "ap1.datadoghq.com"
     },
     "DD_ENV" = {
       value = local.env
@@ -104,10 +110,10 @@ locals {
       value = "true"
     },
     "DD_APM_NON_LOCAL_TRAFFIC" = {
-      value = "false"
+      value = "true"
     },
     "DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_HTTP_ENDPOINT" = {
-      value = "http://localhost:4318"
+      value = "0.0.0.0:4318"
     },
     "DD_OTLP_CONFIG_METRICS_RESOURCE_ATTRIBUTES_AS_TAGS" = {
       value = "true"

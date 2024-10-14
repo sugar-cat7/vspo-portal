@@ -9,11 +9,11 @@ import (
 var tracer oteltrace.Tracer
 
 // SetTracerProvider
-func SetTracerProvider(serviceName, env string) *ddotel.TracerProvider {
+func SetTracerProvider(serviceName, env, ddAgent, ddPort string) *ddotel.TracerProvider {
 	traceProvider := ddotel.NewTracerProvider(
 		ddtrace.WithService(serviceName),
 		ddtrace.WithEnv(env),
-		ddtrace.WithAgentAddr("localhost:8126"),
+		ddtrace.WithAgentAddr(ddAgent+":"+ddPort),
 	)
 	tracer = traceProvider.Tracer(serviceName)
 

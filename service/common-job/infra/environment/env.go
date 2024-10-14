@@ -12,6 +12,8 @@ type ServerEnvironment struct {
 	ENV         string `env:"ENV,required" envDefault:"local"`
 	LogLevel    string `env:"LOG_LEVEL,required" envDefault:"debug"`
 	CRON_SECRET string `env:"CRON_SECRET,required" envDefault:"xxx"`
+	DD_AGENT    string `env:"DD_AGENT,required" envDefault:"datadog-agent"`
+	DD_PORT     string `env:"DD_PORT,required" envDefault:"8126"`
 }
 
 type DatabaseEnvironment struct {
