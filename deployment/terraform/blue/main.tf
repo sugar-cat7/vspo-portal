@@ -81,10 +81,10 @@ locals {
     "LOG_LEVEL" = {
       value = "info"
     },
-    "DD_AGENT_HOST" = {
+    "DD_AGENT" = {
       value = "localhost"
     },
-    "DD_TRACE_AGENT_PORT" = {
+    "DD_PORT" = {
       value = "8126"
     },
   }
