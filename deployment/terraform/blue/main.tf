@@ -110,13 +110,7 @@ locals {
       value = "true"
     },
     "DD_APM_NON_LOCAL_TRAFFIC" = {
-      value = "true"
-    },
-    "DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_HTTP_ENDPOINT" = {
-      value = "0.0.0.0:4318"
-    },
-    "DD_OTLP_CONFIG_METRICS_RESOURCE_ATTRIBUTES_AS_TAGS" = {
-      value = "true"
+      value = "false"
     }
   }
 
