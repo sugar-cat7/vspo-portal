@@ -99,11 +99,17 @@ locals {
     },
     "DD_VERSION" = {
       value = "1.0.0"
-    }
-    "DD_HOSTNAME" = {
-      value = "blue-vspo-portal"
-    }
+    },
     "DD_APM_ENABLED" = {
+      value = "true"
+    },
+    "DD_APM_NON_LOCAL_TRAFFIC" = {
+      value = "false"
+    },
+    "DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_HTTP_ENDPOINT" = {
+      value = "http://localhost:4318"
+    },
+    "DD_OTLP_CONFIG_METRICS_RESOURCE_ATTRIBUTES_AS_TAGS" = {
       value = "true"
     }
   }
