@@ -24,6 +24,7 @@ func (p *P) PingPost(ctx context.Context) (*api.PingPostOK, error) {
 	_, span := tracer.Start(ctx, "Handler#PingPost")
 	defer span.End()
 	span.AddEvent("PingPost")
+	span.SetName("PingPost")
 
 	return &api.PingPostOK{
 		Message: api.OptString{
