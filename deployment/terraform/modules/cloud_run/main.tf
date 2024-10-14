@@ -48,8 +48,8 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
           path = "/info"
           port = 8126
         }
-        initial_delay_seconds = 1
-        timeout_seconds       = 1
+        initial_delay_seconds = 5 
+        timeout_seconds       = 3
         period_seconds        = 3
         failure_threshold     = 3
       }
