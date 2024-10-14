@@ -33,7 +33,16 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
     containers {
       name  = "datadog-agent"
       image = "${var.location}-docker.pkg.dev/${var.project}/${var.artifact_registry_repository_id}/datadog-agent:latest"
-
+      startup_probe {
+        http_get {
+          path = "/info"
+          port = 8126
+        }
+        initial_delay_seconds = 0
+        timeout_seconds       = 1
+        period_seconds        = 3
+        failure_threshold     = 3
+      }
       dynamic "env" {
         for_each = var.datadog_env_vars
         content {
