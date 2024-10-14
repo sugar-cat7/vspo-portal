@@ -1,15 +1,4 @@
 services:
-  jaeger:
-    container_name: jaeger
-    image: jaegertracing/all-in-one:1.54
-    ports:
-      - "16686:16686"
-      - "4317:4317"
-      - "4318:4318"
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-    networks:
-      - vspo-network
   vspo-db:
     container_name: vspo-db
     image: postgres:latest
@@ -58,7 +47,10 @@ services:
       - vspo-network
   datadog-agent:
     container_name: datadog-agent
-    image: gcr.io/datadoghq/agent:latest
+    build:
+      context: ../service/common-job
+      dockerfile: Dockerfile
+      target: datadog-agent
     environment:
       - DD_API_KEY=xxx
       - DD_APM_ENABLED=true
@@ -66,7 +58,7 @@ services:
       - DD_APM_RECEIVER_SOCKET=/var/run/datadog/apm.socket
       - DD_DOGSTATSD_SOCKET=/var/run/datadog/dsd.socket
       - DD_TRACE_AGENT_PORT=8126
-      - DD_SITE=ap1.datadoghq.com 
+      - DD_SITE=ap1.datadoghq.com
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /proc:/host/proc:ro

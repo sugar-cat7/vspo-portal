@@ -1,7 +1,7 @@
 resource "google_cloud_run_v2_service" "vspo_portal_cron" {
   name     = local.cloud_run_v2_service.name
   location = local.cloud_run_v2_service.location
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  ingress  = "INGRESS_TRAFFIC_ALL"
   template {
     service_account = var.cloud_run_sa_email
     containers {
@@ -31,9 +31,8 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
       }
     }
     containers {
-      name = "datadog-agent"
-      // https://github.com/DataDog/datadog-agent/issues/28911
-      image = "gcr.io/datadoghq/agent:6"
+      name  = "datadog-agent"
+      image = "${var.location}-docker.pkg.dev/${var.project}/${var.artifact_registry_repository_id}/datadog-agent:latest"
 
       dynamic "env" {
         for_each = var.datadog_env_vars
