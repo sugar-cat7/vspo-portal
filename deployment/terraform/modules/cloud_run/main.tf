@@ -12,6 +12,16 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
       ports {
         container_port = 8080
       }
+      startup_probe {
+        http_get {
+          path = "/ping"
+          port = 8080
+        }
+        initial_delay_seconds = 0
+        timeout_seconds       = 1
+        period_seconds        = 3
+        failure_threshold     = 3
+      }
 
       dynamic "env" {
         for_each = var.cloud_run_service_env_vars
