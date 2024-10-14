@@ -5,9 +5,9 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
   template {
     service_account = var.cloud_run_sa_email
     containers {
-      name  = local.cloud_run_v2_service.container.name
-      image = local.cloud_run_v2_service.container.image
-
+      name       = local.cloud_run_v2_service.container.name
+      image      = local.cloud_run_v2_service.container.image
+      depends_on = ["datadog-agent"]
       # args = var.cloud_run_service_args
       ports {
         container_port = 8080
