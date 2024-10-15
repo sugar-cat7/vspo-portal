@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/exaring/otelpgx"
 	"github.com/jackc/pgx/v5/pgxpool"
 	db_sqlc "github.com/sugar-cat7/vspo-portal/service/common-job/infra/database/internal/gen"
+	"go.opentelemetry.io/otel"
 )
 
 // ClientKey is the key for the database connection used within the context.
@@ -27,7 +29,7 @@ func NewClientPool(ctx context.Context, host, user, password, dbname, sslMode st
 		fmt.Println("Failed to parse pool config:", err)
 		os.Exit(1)
 	}
-
+	config.ConnConfig.Tracer = otelpgx.NewTracer(otelpgx.WithTracerProvider(otel.GetTracerProvider()))
 	pool, err := pgxpool.NewWithConfig(ctx, config)
 	if err != nil {
 		fmt.Println("Failed to create pool:", err)

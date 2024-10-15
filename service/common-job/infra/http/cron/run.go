@@ -70,7 +70,7 @@ func StartServer() {
 	}
 	logger := logger.New()
 
-	traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
+	traceProvider := app_trace.SetTracerProvider("vspo-portal-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
 	defer func() {
 		if err := traceProvider.Shutdown(); err != nil {
 			logger.Error(fmt.Sprintf("Failed to shutdown trace provider: %v", err))
