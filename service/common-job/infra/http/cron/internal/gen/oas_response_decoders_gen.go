@@ -919,7 +919,7 @@ func decodeAPIPingGetResponse(resp *http.Response) (res *APIPingGetOK, _ error) 
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeExistVideosPostResponse(resp *http.Response) (res ExistVideosPostRes, _ error) {
+func decodeExistVideosResponse(resp *http.Response) (res ExistVideosRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -935,7 +935,7 @@ func decodeExistVideosPostResponse(resp *http.Response) (res ExistVideosPostRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ExistVideosPostOK
+			var response ExistVideosOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -970,7 +970,7 @@ func decodeExistVideosPostResponse(resp *http.Response) (res ExistVideosPostRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ExistVideosPostBadRequest
+			var response ExistVideosBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1005,7 +1005,7 @@ func decodeExistVideosPostResponse(resp *http.Response) (res ExistVideosPostRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ExistVideosPostUnauthorized
+			var response ExistVideosUnauthorized
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1040,7 +1040,7 @@ func decodeExistVideosPostResponse(resp *http.Response) (res ExistVideosPostRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ExistVideosPostForbidden
+			var response ExistVideosForbidden
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1075,7 +1075,7 @@ func decodeExistVideosPostResponse(resp *http.Response) (res ExistVideosPostRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ExistVideosPostNotFound
+			var response ExistVideosNotFound
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1110,7 +1110,7 @@ func decodeExistVideosPostResponse(resp *http.Response) (res ExistVideosPostRes,
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ExistVideosPostInternalServerError
+			var response ExistVideosInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1135,7 +1135,7 @@ func decodeExistVideosPostResponse(resp *http.Response) (res ExistVideosPostRes,
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodePingPostResponse(resp *http.Response) (res *PingPostOK, _ error) {
+func decodePingResponse(resp *http.Response) (res *PingOK, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1151,7 +1151,7 @@ func decodePingPostResponse(resp *http.Response) (res *PingPostOK, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response PingPostOK
+			var response PingOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1176,7 +1176,7 @@ func decodePingPostResponse(resp *http.Response) (res *PingPostOK, _ error) {
 	return res, validate.UnexpectedStatusCode(resp.StatusCode)
 }
 
-func decodeSearchVideosPostResponse(resp *http.Response) (res SearchVideosPostRes, _ error) {
+func decodeSearchVideosResponse(resp *http.Response) (res SearchVideosRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1192,7 +1192,7 @@ func decodeSearchVideosPostResponse(resp *http.Response) (res SearchVideosPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SearchVideosPostOK
+			var response SearchVideosOK
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1227,7 +1227,7 @@ func decodeSearchVideosPostResponse(resp *http.Response) (res SearchVideosPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SearchVideosPostBadRequest
+			var response SearchVideosBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1262,7 +1262,7 @@ func decodeSearchVideosPostResponse(resp *http.Response) (res SearchVideosPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SearchVideosPostUnauthorized
+			var response SearchVideosUnauthorized
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1297,7 +1297,7 @@ func decodeSearchVideosPostResponse(resp *http.Response) (res SearchVideosPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SearchVideosPostForbidden
+			var response SearchVideosForbidden
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1332,7 +1332,7 @@ func decodeSearchVideosPostResponse(resp *http.Response) (res SearchVideosPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SearchVideosPostNotFound
+			var response SearchVideosNotFound
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1367,7 +1367,7 @@ func decodeSearchVideosPostResponse(resp *http.Response) (res SearchVideosPostRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response SearchVideosPostInternalServerError
+			var response SearchVideosInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

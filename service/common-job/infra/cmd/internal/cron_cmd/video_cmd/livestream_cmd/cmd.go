@@ -9,7 +9,6 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/dependency"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/environment"
 	app_trace "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/otel"
-	"go.opentelemetry.io/otel"
 )
 
 // NewVideoCmd is a function to create video command
@@ -39,7 +38,6 @@ func NewVideoCmd() *cobra.Command {
 						log.Println(err)
 					}
 				}()
-				otel.SetTracerProvider(traceProvider)
 				d := &dependency.Dependency{}
 				d.Inject(ctx, e)
 				c := &CMD{

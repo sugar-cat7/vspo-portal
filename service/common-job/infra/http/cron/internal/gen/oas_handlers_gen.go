@@ -17,6 +17,7 @@ import (
 	ht "github.com/ogen-go/ogen/http"
 	"github.com/ogen-go/ogen/middleware"
 	"github.com/ogen-go/ogen/ogenerrors"
+	"github.com/ogen-go/ogen/otelogen"
 )
 
 // handleAPICronChannelsGetRequest handles GET /api/cron/channels operation.
@@ -567,19 +568,20 @@ func (s *Server) handleAPIPingGetRequest(args [0]string, argsEscaped bool, w htt
 	}
 }
 
-// handleExistVideosPostRequest handles POST /exist_videos operation.
+// handleExistVideosRequest handles exist_videos operation.
 //
 // Update exist videos based on the provided period.
 //
 // POST /exist_videos
-func (s *Server) handleExistVideosPostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleExistVideosRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("exist_videos"),
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/exist_videos"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "ExistVideosPost",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "ExistVideos",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -610,11 +612,11 @@ func (s *Server) handleExistVideosPostRequest(args [0]string, argsEscaped bool, 
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "ExistVideosPost",
-			ID:   "",
+			Name: "ExistVideos",
+			ID:   "exist_videos",
 		}
 	)
-	request, close, err := s.decodeExistVideosPostRequest(r)
+	request, close, err := s.decodeExistVideosRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -630,22 +632,22 @@ func (s *Server) handleExistVideosPostRequest(args [0]string, argsEscaped bool, 
 		}
 	}()
 
-	var response ExistVideosPostRes
+	var response ExistVideosRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "ExistVideosPost",
+			OperationName:    "ExistVideos",
 			OperationSummary: "Update exist videos",
-			OperationID:      "",
+			OperationID:      "exist_videos",
 			Body:             request,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
 
 		type (
-			Request  = *ExistVideosPostReq
+			Request  = *ExistVideosReq
 			Params   = struct{}
-			Response = ExistVideosPostRes
+			Response = ExistVideosRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -656,12 +658,12 @@ func (s *Server) handleExistVideosPostRequest(args [0]string, argsEscaped bool, 
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ExistVideosPost(ctx, request)
+				response, err = s.h.ExistVideos(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ExistVideosPost(ctx, request)
+		response, err = s.h.ExistVideos(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -669,7 +671,7 @@ func (s *Server) handleExistVideosPostRequest(args [0]string, argsEscaped bool, 
 		return
 	}
 
-	if err := encodeExistVideosPostResponse(response, w, span); err != nil {
+	if err := encodeExistVideosResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -678,19 +680,20 @@ func (s *Server) handleExistVideosPostRequest(args [0]string, argsEscaped bool, 
 	}
 }
 
-// handlePingPostRequest handles POST /ping operation.
+// handlePingRequest handles ping operation.
 //
 // Returns a 200 status code if successful, or an error.
 //
 // POST /ping
-func (s *Server) handlePingPostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handlePingRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ping"),
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/ping"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "PingPost",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "Ping",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -722,13 +725,13 @@ func (s *Server) handlePingPostRequest(args [0]string, argsEscaped bool, w http.
 		err error
 	)
 
-	var response *PingPostOK
+	var response *PingOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "PingPost",
+			OperationName:    "Ping",
 			OperationSummary: "Ping endpoint",
-			OperationID:      "",
+			OperationID:      "ping",
 			Body:             nil,
 			Params:           middleware.Parameters{},
 			Raw:              r,
@@ -737,7 +740,7 @@ func (s *Server) handlePingPostRequest(args [0]string, argsEscaped bool, w http.
 		type (
 			Request  = struct{}
 			Params   = struct{}
-			Response = *PingPostOK
+			Response = *PingOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -748,12 +751,12 @@ func (s *Server) handlePingPostRequest(args [0]string, argsEscaped bool, w http.
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.PingPost(ctx)
+				response, err = s.h.Ping(ctx)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.PingPost(ctx)
+		response, err = s.h.Ping(ctx)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -761,7 +764,7 @@ func (s *Server) handlePingPostRequest(args [0]string, argsEscaped bool, w http.
 		return
 	}
 
-	if err := encodePingPostResponse(response, w, span); err != nil {
+	if err := encodePingResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -770,19 +773,20 @@ func (s *Server) handlePingPostRequest(args [0]string, argsEscaped bool, w http.
 	}
 }
 
-// handleSearchVideosPostRequest handles POST /search_videos operation.
+// handleSearchVideosRequest handles search_videos operation.
 //
 // Update videos related to a specific creator based on provided.
 //
 // POST /search_videos
-func (s *Server) handleSearchVideosPostRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleSearchVideosRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("search_videos"),
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/search_videos"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), "SearchVideosPost",
+	ctx, span := s.cfg.Tracer.Start(r.Context(), "SearchVideos",
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -813,11 +817,11 @@ func (s *Server) handleSearchVideosPostRequest(args [0]string, argsEscaped bool,
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: "SearchVideosPost",
-			ID:   "",
+			Name: "SearchVideos",
+			ID:   "search_videos",
 		}
 	)
-	request, close, err := s.decodeSearchVideosPostRequest(r)
+	request, close, err := s.decodeSearchVideosRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -833,22 +837,22 @@ func (s *Server) handleSearchVideosPostRequest(args [0]string, argsEscaped bool,
 		}
 	}()
 
-	var response SearchVideosPostRes
+	var response SearchVideosRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    "SearchVideosPost",
+			OperationName:    "SearchVideos",
 			OperationSummary: "Upsert videos",
-			OperationID:      "",
+			OperationID:      "search_videos",
 			Body:             request,
 			Params:           middleware.Parameters{},
 			Raw:              r,
 		}
 
 		type (
-			Request  = *SearchVideosPostReq
+			Request  = *SearchVideosReq
 			Params   = struct{}
-			Response = SearchVideosPostRes
+			Response = SearchVideosRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -859,12 +863,12 @@ func (s *Server) handleSearchVideosPostRequest(args [0]string, argsEscaped bool,
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.SearchVideosPost(ctx, request)
+				response, err = s.h.SearchVideos(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.SearchVideosPost(ctx, request)
+		response, err = s.h.SearchVideos(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -872,7 +876,7 @@ func (s *Server) handleSearchVideosPostRequest(args [0]string, argsEscaped bool,
 		return
 	}
 
-	if err := encodeSearchVideosPostResponse(response, w, span); err != nil {
+	if err := encodeSearchVideosResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

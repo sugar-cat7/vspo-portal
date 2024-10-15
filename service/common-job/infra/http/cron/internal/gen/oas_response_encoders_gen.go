@@ -365,9 +365,9 @@ func encodeAPIPingGetResponse(response *APIPingGetOK, w http.ResponseWriter, spa
 	return nil
 }
 
-func encodeExistVideosPostResponse(response ExistVideosPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeExistVideosResponse(response ExistVideosRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *ExistVideosPostOK:
+	case *ExistVideosOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -380,7 +380,7 @@ func encodeExistVideosPostResponse(response ExistVideosPostRes, w http.ResponseW
 
 		return nil
 
-	case *ExistVideosPostBadRequest:
+	case *ExistVideosBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -393,7 +393,7 @@ func encodeExistVideosPostResponse(response ExistVideosPostRes, w http.ResponseW
 
 		return nil
 
-	case *ExistVideosPostUnauthorized:
+	case *ExistVideosUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
@@ -406,7 +406,7 @@ func encodeExistVideosPostResponse(response ExistVideosPostRes, w http.ResponseW
 
 		return nil
 
-	case *ExistVideosPostForbidden:
+	case *ExistVideosForbidden:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
@@ -419,7 +419,7 @@ func encodeExistVideosPostResponse(response ExistVideosPostRes, w http.ResponseW
 
 		return nil
 
-	case *ExistVideosPostNotFound:
+	case *ExistVideosNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
@@ -432,7 +432,7 @@ func encodeExistVideosPostResponse(response ExistVideosPostRes, w http.ResponseW
 
 		return nil
 
-	case *ExistVideosPostInternalServerError:
+	case *ExistVideosInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))
@@ -450,7 +450,7 @@ func encodeExistVideosPostResponse(response ExistVideosPostRes, w http.ResponseW
 	}
 }
 
-func encodePingPostResponse(response *PingPostOK, w http.ResponseWriter, span trace.Span) error {
+func encodePingResponse(response *PingOK, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))
@@ -464,9 +464,9 @@ func encodePingPostResponse(response *PingPostOK, w http.ResponseWriter, span tr
 	return nil
 }
 
-func encodeSearchVideosPostResponse(response SearchVideosPostRes, w http.ResponseWriter, span trace.Span) error {
+func encodeSearchVideosResponse(response SearchVideosRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *SearchVideosPostOK:
+	case *SearchVideosOK:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -479,7 +479,7 @@ func encodeSearchVideosPostResponse(response SearchVideosPostRes, w http.Respons
 
 		return nil
 
-	case *SearchVideosPostBadRequest:
+	case *SearchVideosBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 		span.SetStatus(codes.Error, http.StatusText(400))
@@ -492,7 +492,7 @@ func encodeSearchVideosPostResponse(response SearchVideosPostRes, w http.Respons
 
 		return nil
 
-	case *SearchVideosPostUnauthorized:
+	case *SearchVideosUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 		span.SetStatus(codes.Error, http.StatusText(401))
@@ -505,7 +505,7 @@ func encodeSearchVideosPostResponse(response SearchVideosPostRes, w http.Respons
 
 		return nil
 
-	case *SearchVideosPostForbidden:
+	case *SearchVideosForbidden:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(403)
 		span.SetStatus(codes.Error, http.StatusText(403))
@@ -518,7 +518,7 @@ func encodeSearchVideosPostResponse(response SearchVideosPostRes, w http.Respons
 
 		return nil
 
-	case *SearchVideosPostNotFound:
+	case *SearchVideosNotFound:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
@@ -531,7 +531,7 @@ func encodeSearchVideosPostResponse(response SearchVideosPostRes, w http.Respons
 
 		return nil
 
-	case *SearchVideosPostInternalServerError:
+	case *SearchVideosInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 		span.SetStatus(codes.Error, http.StatusText(500))

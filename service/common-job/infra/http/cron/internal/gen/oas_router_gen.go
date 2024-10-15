@@ -222,7 +222,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					// Leaf node.
 					switch r.Method {
 					case "POST":
-						s.handleExistVideosPostRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleExistVideosRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "POST")
 					}
@@ -243,7 +243,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					// Leaf node.
 					switch r.Method {
 					case "POST":
-						s.handlePingPostRequest([0]string{}, elemIsEscaped, w, r)
+						s.handlePingRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "POST")
 					}
@@ -264,7 +264,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					// Leaf node.
 					switch r.Method {
 					case "POST":
-						s.handleSearchVideosPostRequest([0]string{}, elemIsEscaped, w, r)
+						s.handleSearchVideosRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, "POST")
 					}
@@ -550,9 +550,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					// Leaf node.
 					switch method {
 					case "POST":
-						r.name = "ExistVideosPost"
+						r.name = "ExistVideos"
 						r.summary = "Update exist videos"
-						r.operationID = ""
+						r.operationID = "exist_videos"
 						r.pathPattern = "/exist_videos"
 						r.args = args
 						r.count = 0
@@ -575,9 +575,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					// Leaf node.
 					switch method {
 					case "POST":
-						r.name = "PingPost"
+						r.name = "Ping"
 						r.summary = "Ping endpoint"
-						r.operationID = ""
+						r.operationID = "ping"
 						r.pathPattern = "/ping"
 						r.args = args
 						r.count = 0
@@ -600,9 +600,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					// Leaf node.
 					switch method {
 					case "POST":
-						r.name = "SearchVideosPost"
+						r.name = "SearchVideos"
 						r.summary = "Upsert videos"
-						r.operationID = ""
+						r.operationID = "search_videos"
 						r.pathPattern = "/search_videos"
 						r.args = args
 						r.count = 0

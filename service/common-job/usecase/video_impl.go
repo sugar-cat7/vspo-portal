@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -62,14 +61,12 @@ func (i *videoInteractor) UpdatePlatformVideos(
 	// validate input
 	videoType, err := model.NewVideoType(param.VideoType)
 	if err != nil {
-		span.RecordError(err)
 		span.SetStatus(codes.Error, "Invalid video type")
 		return 0, err
 	}
 
 	platformTypes, err := model.NewPlatforms(param.PlatformTypes)
 	if err != nil {
-		span.RecordError(err)
 		span.SetStatus(codes.Error, "Invalid platform types")
 		return 0, err
 	}
@@ -89,7 +86,6 @@ func (i *videoInteractor) UpdatePlatformVideos(
 				},
 			)
 			if err != nil {
-				subSpan.RecordError(err)
 				subSpan.SetStatus(codes.Error, "Failed to list creators")
 				return err
 			}
@@ -105,7 +101,6 @@ func (i *videoInteractor) UpdatePlatformVideos(
 				videoType,
 			)
 			if err != nil {
-				updateSpan.RecordError(err)
 				updateSpan.SetStatus(codes.Error, "Failed to update videos by platform types")
 				return err
 			}
@@ -120,7 +115,6 @@ func (i *videoInteractor) UpdatePlatformVideos(
 				},
 			)
 			if err != nil {
-				existSpan.RecordError(err)
 				existSpan.SetStatus(codes.Error, "Failed to list existing videos")
 				return err
 			}
@@ -137,7 +131,6 @@ func (i *videoInteractor) UpdatePlatformVideos(
 
 			_, err = i.videoRepository.BatchDeleteInsert(ctx, uvs)
 			if err != nil {
-				batchSpan.RecordError(err)
 				batchSpan.SetStatus(codes.Error, "Failed to batch insert videos")
 				return err
 			}
@@ -148,7 +141,6 @@ func (i *videoInteractor) UpdatePlatformVideos(
 	)
 
 	if err != nil {
-		span.RecordError(err)
 		span.SetStatus(codes.Error, "Transaction failed")
 		return 0, err
 	}
@@ -179,7 +171,6 @@ func (i *videoInteractor) ytVideos(
 					EventType:   eventType,
 				})
 				if err != nil {
-					span.RecordError(err)
 					span.SetStatus(codes.Error, "Failed to search YouTube videos")
 					return nil, err
 				}
@@ -207,7 +198,6 @@ func (i *videoInteractor) twitchVideos(
 	})
 
 	if err != nil {
-		span.RecordError(err)
 		span.SetStatus(codes.Error, "Failed to get Twitch videos")
 		return nil, err
 	}
@@ -229,7 +219,6 @@ func (i *videoInteractor) twitCastingVideos(
 	})
 
 	if err != nil {
-		span.RecordError(err)
 		span.SetStatus(codes.Error, "Failed to get TwitCasting videos")
 		return nil, err
 	}
@@ -300,7 +289,6 @@ func (i *videoInteractor) updateVideosByPlatformTypes(
 		for i, err := range errs {
 			errMessages[i] = err.Error()
 		}
-		span.RecordError(errors.New(strings.Join(errMessages, "; ")))
 		span.SetStatus(codes.Error, "Errors occurred while updating videos")
 		return nil, fmt.Errorf("errors occurred: %v", strings.Join(errMessages, "; "))
 	}
@@ -332,7 +320,6 @@ func (i *videoInteractor) UpdatwExistVideos(
 				},
 			)
 			if err != nil {
-				subSpan.RecordError(err)
 				subSpan.SetStatus(codes.Error, "Failed to list creators")
 				return err
 			}
@@ -349,7 +336,6 @@ func (i *videoInteractor) UpdatwExistVideos(
 				},
 			)
 			if err != nil {
-				existSpan.RecordError(err)
 				existSpan.SetStatus(codes.Error, "Failed to list existing videos")
 				return err
 			}
@@ -362,7 +348,6 @@ func (i *videoInteractor) UpdatwExistVideos(
 				VideoIDs: existVs.IDs(),
 			})
 			if err != nil {
-				ytSpan.RecordError(err)
 				ytSpan.SetStatus(codes.Error, "Failed to retrieve YouTube videos")
 				return err
 			}
@@ -374,7 +359,6 @@ func (i *videoInteractor) UpdatwExistVideos(
 			deleted := existVs.FilterDeletedVideos(uvs)
 			err = i.videoRepository.BatchDelete(ctx, deleted)
 			if err != nil {
-				deleteSpan.RecordError(err)
 				deleteSpan.SetStatus(codes.Error, "Failed to delete videos")
 				return err
 			}
@@ -388,7 +372,6 @@ func (i *videoInteractor) UpdatwExistVideos(
 
 			_, err = i.videoRepository.BatchDeleteInsert(ctx, updated)
 			if err != nil {
-				updateSpan.RecordError(err)
 				updateSpan.SetStatus(codes.Error, "Failed to update videos")
 				return err
 			}
@@ -399,7 +382,6 @@ func (i *videoInteractor) UpdatwExistVideos(
 		},
 	)
 	if err != nil {
-		span.RecordError(err)
 		span.SetStatus(codes.Error, "Transaction failed")
 		return 0, err
 	}

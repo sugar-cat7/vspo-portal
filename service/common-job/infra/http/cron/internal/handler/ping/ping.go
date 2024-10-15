@@ -17,16 +17,14 @@ func (p *P) APIPingGet(ctx context.Context) (*api.APIPingGetOK, error) {
 	}, nil
 }
 
-// PingPost handles the request.
-func (p *P) PingPost(ctx context.Context) (*api.PingPostOK, error) {
+// Ping handles the request.
+func (p *P) Ping(ctx context.Context) (*api.PingOK, error) {
 	tracer := trace.GetGlobalTracer()
 
-	_, span := tracer.Start(ctx, "Handler#PingPost")
+	_, span := tracer.Start(ctx, "Handler#Ping")
 	defer span.End()
-	span.AddEvent("PingPost")
-	span.SetName("PingPost")
 
-	return &api.PingPostOK{
+	return &api.PingOK{
 		Message: api.OptString{
 			Value: "success",
 			Set:   true,

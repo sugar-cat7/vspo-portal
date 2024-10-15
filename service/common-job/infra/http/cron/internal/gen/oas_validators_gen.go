@@ -107,7 +107,7 @@ func (s APICronSearchVideosGetVideoType) Validate() error {
 	}
 }
 
-func (s *ExistVideosPostReq) Validate() error {
+func (s *ExistVideosReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -137,7 +137,7 @@ func (s *ExistVideosPostReq) Validate() error {
 	return nil
 }
 
-func (s ExistVideosPostReqPeriod) Validate() error {
+func (s ExistVideosReqPeriod) Validate() error {
 	switch s {
 	case "day":
 		return nil
@@ -150,7 +150,7 @@ func (s ExistVideosPostReqPeriod) Validate() error {
 	}
 }
 
-func (s *SearchVideosPostReq) Validate() error {
+func (s *SearchVideosReq) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -205,7 +205,7 @@ func (s *SearchVideosPostReq) Validate() error {
 	return nil
 }
 
-func (s SearchVideosPostReqPlatformTypeItem) Validate() error {
+func (s SearchVideosReqPlatformTypeItem) Validate() error {
 	switch s {
 	case "youtube":
 		return nil
@@ -220,7 +220,7 @@ func (s SearchVideosPostReqPlatformTypeItem) Validate() error {
 	}
 }
 
-func (s SearchVideosPostReqVideoType) Validate() error {
+func (s SearchVideosReqVideoType) Validate() error {
 	switch s {
 	case "vspo_stream":
 		return nil

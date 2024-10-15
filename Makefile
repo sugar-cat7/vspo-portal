@@ -9,7 +9,7 @@ sqlc:
 	@echo "Generating sqlc files..."
 	docker run --rm -v $$(pwd):/src -w /src sqlc/sqlc generate
 
-local-db:
+local-dev:
 	@echo "Setting up local database..."
 	docker-compose -f ./docker/compose.local.yml up --build
 	@echo "Setting up local database...done"

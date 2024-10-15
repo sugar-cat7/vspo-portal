@@ -296,6 +296,7 @@ paths:
     post:
       summary: Ping endpoint
       description: Returns a 200 status code if successful, or an error.
+      operationId: ping
       responses:
         '200':
           description: Successful response
@@ -315,6 +316,7 @@ paths:
         - Videos
       summary: Upsert videos
       description: Update videos related to a specific creator based on provided
+      operationId: search_videos
       requestBody:
         required: true
         content:
@@ -381,6 +383,7 @@ paths:
         - Videos
       summary: Update exist videos
       description: Update exist videos based on the provided period.
+      operationId: exist_videos
       requestBody:
         required: true
         content:

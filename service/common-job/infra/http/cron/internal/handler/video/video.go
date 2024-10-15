@@ -8,10 +8,12 @@ import (
 	dto "github.com/sugar-cat7/vspo-portal/service/common-job/infra/http/cron/internal/handler/video/internal"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/pkg/logger"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/usecase/input"
+	"go.opentelemetry.io/otel/trace"
 )
 
 // APICronSearchVideosGet implements the POST /channels/{channel_id}/videos endpoint.
 func (h *VH) APICronSearchVideosGet(ctx context.Context, req api.APICronSearchVideosGetParams) (api.APICronSearchVideosGetRes, error) {
+	logger := logger.GetLogger(ctx)
 	v, err := h.videoInteractor.UpdatePlatformVideos(
 		ctx,
 		input.NewUpsertVideoInput(
@@ -21,7 +23,9 @@ func (h *VH) APICronSearchVideosGet(ctx context.Context, req api.APICronSearchVi
 	)
 
 	if err != nil {
-		logger.New().Error(err.Error())
+		span := trace.SpanFromContext(ctx)
+		span.RecordError(err)
+		logger.Error(err.Error())
 		return nil, err
 	}
 	return &api.APICronSearchVideosGetOK{
@@ -34,6 +38,7 @@ func (h *VH) APICronSearchVideosGet(ctx context.Context, req api.APICronSearchVi
 
 // APICronExistVideosGet implements the POST /channels/{channel_id}/videos endpoint.
 func (h *VH) APICronExistVideosGet(ctx context.Context, req api.APICronExistVideosGetParams) (api.APICronExistVideosGetRes, error) {
+	logger := logger.GetLogger(ctx)
 	v, err := h.videoInteractor.UpdatwExistVideos(
 		ctx,
 		input.NewUpdateExistVideos(
@@ -42,7 +47,9 @@ func (h *VH) APICronExistVideosGet(ctx context.Context, req api.APICronExistVide
 	)
 
 	if err != nil {
-		logger.New().Error(err.Error())
+		span := trace.SpanFromContext(ctx)
+		span.RecordError(err)
+		logger.Error(err.Error())
 		return nil, err
 	}
 	return &api.APICronExistVideosGetOK{
@@ -54,7 +61,8 @@ func (h *VH) APICronExistVideosGet(ctx context.Context, req api.APICronExistVide
 }
 
 // APICronSearchVideosGet implements the POST /channels/{channel_id}/videos endpoint.
-func (h *VH) SearchVideosPost(ctx context.Context, req *api.SearchVideosPostReq) (api.SearchVideosPostRes, error) {
+func (h *VH) SearchVideos(ctx context.Context, req *api.SearchVideosReq) (api.SearchVideosRes, error) {
+	logger := logger.GetLogger(ctx)
 	v, err := h.videoInteractor.UpdatePlatformVideos(
 		ctx,
 		input.NewUpsertVideoInput(
@@ -64,10 +72,12 @@ func (h *VH) SearchVideosPost(ctx context.Context, req *api.SearchVideosPostReq)
 	)
 
 	if err != nil {
-		logger.New().Error(err.Error())
+		span := trace.SpanFromContext(ctx)
+		span.RecordError(err)
+		logger.Error(err.Error())
 		return nil, err
 	}
-	return &api.SearchVideosPostOK{
+	return &api.SearchVideosOK{
 		Message: api.OptString{
 			Value: fmt.Sprintf("Updated videos Count: %v", v),
 			Set:   true,
@@ -76,7 +86,8 @@ func (h *VH) SearchVideosPost(ctx context.Context, req *api.SearchVideosPostReq)
 }
 
 // APICronExistVideosGet implements the POST /channels/{channel_id}/videos endpoint.
-func (h *VH) ExistVideosPost(ctx context.Context, req *api.ExistVideosPostReq) (api.ExistVideosPostRes, error) {
+func (h *VH) ExistVideos(ctx context.Context, req *api.ExistVideosReq) (api.ExistVideosRes, error) {
+	logger := logger.GetLogger(ctx)
 	v, err := h.videoInteractor.UpdatwExistVideos(
 		ctx,
 		input.NewUpdateExistVideos(
@@ -85,10 +96,12 @@ func (h *VH) ExistVideosPost(ctx context.Context, req *api.ExistVideosPostReq) (
 	)
 
 	if err != nil {
-		logger.New().Error(err.Error())
+		span := trace.SpanFromContext(ctx)
+		span.RecordError(err)
+		logger.Error(err.Error())
 		return nil, err
 	}
-	return &api.ExistVideosPostOK{
+	return &api.ExistVideosOK{
 		Message: api.OptString{
 			Value: fmt.Sprintf("Updated videos Count: %v", v),
 			Set:   true,
