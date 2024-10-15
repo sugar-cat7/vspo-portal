@@ -17,6 +17,7 @@ import (
 
 	"github.com/ogen-go/ogen/conv"
 	ht "github.com/ogen-go/ogen/http"
+	"github.com/ogen-go/ogen/otelogen"
 	"github.com/ogen-go/ogen/uri"
 )
 
@@ -52,24 +53,24 @@ type Invoker interface {
 	//
 	// GET /api/ping
 	APIPingGet(ctx context.Context) (*APIPingGetOK, error)
-	// ExistVideosPost invokes POST /exist_videos operation.
+	// ExistVideos invokes exist_videos operation.
 	//
 	// Update exist videos based on the provided period.
 	//
 	// POST /exist_videos
-	ExistVideosPost(ctx context.Context, request *ExistVideosPostReq) (ExistVideosPostRes, error)
-	// PingPost invokes POST /ping operation.
+	ExistVideos(ctx context.Context, request *ExistVideosReq) (ExistVideosRes, error)
+	// Ping invokes ping operation.
 	//
 	// Returns a 200 status code if successful, or an error.
 	//
 	// POST /ping
-	PingPost(ctx context.Context) (*PingPostOK, error)
-	// SearchVideosPost invokes POST /search_videos operation.
+	Ping(ctx context.Context) (*PingOK, error)
+	// SearchVideos invokes search_videos operation.
 	//
 	// Update videos related to a specific creator based on provided.
 	//
 	// POST /search_videos
-	SearchVideosPost(ctx context.Context, request *SearchVideosPostReq) (SearchVideosPostRes, error)
+	SearchVideos(ctx context.Context, request *SearchVideosReq) (SearchVideosRes, error)
 }
 
 // Client implements OAS client.
@@ -616,18 +617,19 @@ func (c *Client) sendAPIPingGet(ctx context.Context) (res *APIPingGetOK, err err
 	return result, nil
 }
 
-// ExistVideosPost invokes POST /exist_videos operation.
+// ExistVideos invokes exist_videos operation.
 //
 // Update exist videos based on the provided period.
 //
 // POST /exist_videos
-func (c *Client) ExistVideosPost(ctx context.Context, request *ExistVideosPostReq) (ExistVideosPostRes, error) {
-	res, err := c.sendExistVideosPost(ctx, request)
+func (c *Client) ExistVideos(ctx context.Context, request *ExistVideosReq) (ExistVideosRes, error) {
+	res, err := c.sendExistVideos(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendExistVideosPost(ctx context.Context, request *ExistVideosPostReq) (res ExistVideosPostRes, err error) {
+func (c *Client) sendExistVideos(ctx context.Context, request *ExistVideosReq) (res ExistVideosRes, err error) {
 	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("exist_videos"),
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/exist_videos"),
 	}
@@ -644,7 +646,7 @@ func (c *Client) sendExistVideosPost(ctx context.Context, request *ExistVideosPo
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "ExistVideosPost",
+	ctx, span := c.cfg.Tracer.Start(ctx, "ExistVideos",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -670,7 +672,7 @@ func (c *Client) sendExistVideosPost(ctx context.Context, request *ExistVideosPo
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeExistVideosPostRequest(request, r); err != nil {
+	if err := encodeExistVideosRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -682,7 +684,7 @@ func (c *Client) sendExistVideosPost(ctx context.Context, request *ExistVideosPo
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeExistVideosPostResponse(resp)
+	result, err := decodeExistVideosResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -690,18 +692,19 @@ func (c *Client) sendExistVideosPost(ctx context.Context, request *ExistVideosPo
 	return result, nil
 }
 
-// PingPost invokes POST /ping operation.
+// Ping invokes ping operation.
 //
 // Returns a 200 status code if successful, or an error.
 //
 // POST /ping
-func (c *Client) PingPost(ctx context.Context) (*PingPostOK, error) {
-	res, err := c.sendPingPost(ctx)
+func (c *Client) Ping(ctx context.Context) (*PingOK, error) {
+	res, err := c.sendPing(ctx)
 	return res, err
 }
 
-func (c *Client) sendPingPost(ctx context.Context) (res *PingPostOK, err error) {
+func (c *Client) sendPing(ctx context.Context) (res *PingOK, err error) {
 	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("ping"),
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/ping"),
 	}
@@ -718,7 +721,7 @@ func (c *Client) sendPingPost(ctx context.Context) (res *PingPostOK, err error) 
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "PingPost",
+	ctx, span := c.cfg.Tracer.Start(ctx, "Ping",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -753,7 +756,7 @@ func (c *Client) sendPingPost(ctx context.Context) (res *PingPostOK, err error) 
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodePingPostResponse(resp)
+	result, err := decodePingResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -761,18 +764,19 @@ func (c *Client) sendPingPost(ctx context.Context) (res *PingPostOK, err error) 
 	return result, nil
 }
 
-// SearchVideosPost invokes POST /search_videos operation.
+// SearchVideos invokes search_videos operation.
 //
 // Update videos related to a specific creator based on provided.
 //
 // POST /search_videos
-func (c *Client) SearchVideosPost(ctx context.Context, request *SearchVideosPostReq) (SearchVideosPostRes, error) {
-	res, err := c.sendSearchVideosPost(ctx, request)
+func (c *Client) SearchVideos(ctx context.Context, request *SearchVideosReq) (SearchVideosRes, error) {
+	res, err := c.sendSearchVideos(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendSearchVideosPost(ctx context.Context, request *SearchVideosPostReq) (res SearchVideosPostRes, err error) {
+func (c *Client) sendSearchVideos(ctx context.Context, request *SearchVideosReq) (res SearchVideosRes, err error) {
 	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("search_videos"),
 		semconv.HTTPRequestMethodKey.String("POST"),
 		semconv.HTTPRouteKey.String("/search_videos"),
 	}
@@ -789,7 +793,7 @@ func (c *Client) sendSearchVideosPost(ctx context.Context, request *SearchVideos
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, "SearchVideosPost",
+	ctx, span := c.cfg.Tracer.Start(ctx, "SearchVideos",
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -815,7 +819,7 @@ func (c *Client) sendSearchVideosPost(ctx context.Context, request *SearchVideos
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeSearchVideosPostRequest(request, r); err != nil {
+	if err := encodeSearchVideosRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -827,7 +831,7 @@ func (c *Client) sendSearchVideosPost(ctx context.Context, request *SearchVideos
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeSearchVideosPostResponse(resp)
+	result, err := decodeSearchVideosResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

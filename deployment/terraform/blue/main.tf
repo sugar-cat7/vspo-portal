@@ -111,7 +111,10 @@ locals {
     },
     "DD_APM_NON_LOCAL_TRAFFIC" = {
       value = "false"
-    }
+    },
+    "DD_HOSTNAME" = {
+      value = "vspo-portal-cron"
+    },
   }
 
   combined_env_vars = merge(local.cloud_run_service_env_vars, local.datadog_env_vars)

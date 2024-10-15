@@ -15,8 +15,8 @@ import (
 	"github.com/ogen-go/ogen/validate"
 )
 
-func (s *Server) decodeExistVideosPostRequest(r *http.Request) (
-	req *ExistVideosPostReq,
+func (s *Server) decodeExistVideosRequest(r *http.Request) (
+	req *ExistVideosReq,
 	close func() error,
 	rerr error,
 ) {
@@ -55,7 +55,7 @@ func (s *Server) decodeExistVideosPostRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request ExistVideosPostReq
+		var request ExistVideosReq
 		if err := func() error {
 			if err := request.Decode(d); err != nil {
 				return err
@@ -86,8 +86,8 @@ func (s *Server) decodeExistVideosPostRequest(r *http.Request) (
 	}
 }
 
-func (s *Server) decodeSearchVideosPostRequest(r *http.Request) (
-	req *SearchVideosPostReq,
+func (s *Server) decodeSearchVideosRequest(r *http.Request) (
+	req *SearchVideosReq,
 	close func() error,
 	rerr error,
 ) {
@@ -126,7 +126,7 @@ func (s *Server) decodeSearchVideosPostRequest(r *http.Request) (
 
 		d := jx.DecodeBytes(buf)
 
-		var request SearchVideosPostReq
+		var request SearchVideosReq
 		if err := func() error {
 			if err := request.Decode(d); err != nil {
 				return err

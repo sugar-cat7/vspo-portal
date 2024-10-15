@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -13,6 +12,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/dependency"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/environment"
 	cron "github.com/sugar-cat7/vspo-portal/service/common-job/infra/http/cron/internal/gen"
+	"github.com/sugar-cat7/vspo-portal/service/common-job/infra/http/middleware"
 	"github.com/sugar-cat7/vspo-portal/service/common-job/pkg/logger"
 	app_trace "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/otel"
 	"go.opentelemetry.io/otel"
@@ -36,10 +36,9 @@ func Run(w http.ResponseWriter, r *http.Request) {
 	traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
 	defer func() {
 		if err := traceProvider.Shutdown(); err != nil {
-			log.Println(err)
+			logger.Error(fmt.Sprintf("Failed to shutdown trace provider: %v", err))
 		}
 	}()
-	otel.SetTracerProvider(traceProvider)
 	d := &dependency.Dependency{}
 	d.Inject(ctx, e)
 	logger.Info(fmt.Sprintf("%s %s", r.Method, r.URL.Path))
@@ -51,7 +50,7 @@ func Run(w http.ResponseWriter, r *http.Request) {
 			d.ChannelInteractor,
 		),
 		// NewSecurityHandler(e),
-		cron.WithMiddleware(),
+		cron.WithMeterProvider(otel.GetMeterProvider()),
 		cron.WithTracerProvider(traceProvider),
 	)
 
@@ -64,14 +63,51 @@ func Run(w http.ResponseWriter, r *http.Request) {
 
 // StartServer for Debug
 func StartServer() {
+	ctx := context.Background()
+	e := &environment.Environment{}
+	if err := env.Parse(e); err != nil {
+		panic(err)
+	}
 	logger := logger.New()
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		Run(w, r)
-	})
 
+	traceProvider := app_trace.SetTracerProvider("vspo-portal-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
+	defer func() {
+		if err := traceProvider.Shutdown(); err != nil {
+			logger.Error(fmt.Sprintf("Failed to shutdown trace provider: %v", err))
+		}
+	}()
+	meterProvider := otel.GetMeterProvider()
+	d := &dependency.Dependency{}
+	d.Inject(ctx, e)
+
+	// Cron
+	cs, err := cron.NewServer(
+		NewHandler(
+			d.CreatorInteractor,
+			d.VideosInteractor,
+			d.ChannelInteractor,
+		),
+		cron.WithMeterProvider(meterProvider),
+		cron.WithTracerProvider(traceProvider),
+	)
+
+	if err != nil {
+		panic(fmt.Sprintf("failed to create cron server: %v", err))
+	}
+
+	routeFinder := middleware.MakeRouteFinder(cs)
 	server := &http.Server{
-		Addr:    ":8080",
-		Handler: nil,
+		Addr: ":8080",
+		Handler: middleware.Wrap(cs,
+			middleware.InjectLogger(logger),
+			middleware.Instrument("vspo-portal-cron", routeFinder, middleware.MetricsProvider{
+				TracerProvider:    traceProvider,
+				MeterProvider:     meterProvider,
+				TextMapPropagator: otel.GetTextMapPropagator(),
+			}),
+			middleware.LogRequests(routeFinder),
+			middleware.Labeler(routeFinder),
+		),
 	}
 
 	// Graceful shutdown

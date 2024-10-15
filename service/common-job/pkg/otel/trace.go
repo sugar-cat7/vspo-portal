@@ -1,6 +1,8 @@
 package trace
 
 import (
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	oteltrace "go.opentelemetry.io/otel/trace"
 	ddotel "gopkg.in/DataDog/dd-trace-go.v1/ddtrace/opentelemetry"
 	ddtrace "gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
@@ -16,7 +18,8 @@ func SetTracerProvider(serviceName, env, ddAgent, ddPort string) *ddotel.TracerP
 		ddtrace.WithAgentAddr(ddAgent+":"+ddPort),
 	)
 	tracer = traceProvider.Tracer(serviceName)
-
+	otel.SetTracerProvider(traceProvider)
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
 	return traceProvider
 }
 

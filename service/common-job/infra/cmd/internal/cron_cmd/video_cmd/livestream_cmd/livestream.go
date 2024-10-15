@@ -15,7 +15,7 @@ type CMD struct {
 }
 
 func (c *CMD) UpdatePlatformVideosRun(cmd *cobra.Command) error {
-	v, err := c.videoInteractor.UpdatePlatformVideos(
+	_, err := c.videoInteractor.UpdatePlatformVideos(
 		c.ctx,
 		input.NewUpsertVideoInput(
 			[]string{"youtube", "twitch", "twitcasting"},
@@ -28,12 +28,11 @@ func (c *CMD) UpdatePlatformVideosRun(cmd *cobra.Command) error {
 		return err
 	}
 
-	l.Info("Updated videos Count: %v", v)
 	return nil
 }
 
 func (c *CMD) UpdatwExistVideosRun(cmd *cobra.Command) error {
-	v, err := c.videoInteractor.UpdatwExistVideos(
+	_, err := c.videoInteractor.UpdatwExistVideos(
 		c.ctx,
 		input.NewUpdateExistVideos(
 			"week",
@@ -44,7 +43,5 @@ func (c *CMD) UpdatwExistVideosRun(cmd *cobra.Command) error {
 		l.Error(err.Error())
 		return err
 	}
-
-	l.Info("Updated videos Count: %v", v)
 	return nil
 }

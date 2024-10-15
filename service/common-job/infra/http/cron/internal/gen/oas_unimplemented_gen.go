@@ -58,29 +58,29 @@ func (UnimplementedHandler) APIPingGet(ctx context.Context) (r *APIPingGetOK, _ 
 	return r, ht.ErrNotImplemented
 }
 
-// ExistVideosPost implements POST /exist_videos operation.
+// ExistVideos implements exist_videos operation.
 //
 // Update exist videos based on the provided period.
 //
 // POST /exist_videos
-func (UnimplementedHandler) ExistVideosPost(ctx context.Context, req *ExistVideosPostReq) (r ExistVideosPostRes, _ error) {
+func (UnimplementedHandler) ExistVideos(ctx context.Context, req *ExistVideosReq) (r ExistVideosRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// PingPost implements POST /ping operation.
+// Ping implements ping operation.
 //
 // Returns a 200 status code if successful, or an error.
 //
 // POST /ping
-func (UnimplementedHandler) PingPost(ctx context.Context) (r *PingPostOK, _ error) {
+func (UnimplementedHandler) Ping(ctx context.Context) (r *PingOK, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// SearchVideosPost implements POST /search_videos operation.
+// SearchVideos implements search_videos operation.
 //
 // Update videos related to a specific creator based on provided.
 //
 // POST /search_videos
-func (UnimplementedHandler) SearchVideosPost(ctx context.Context, req *SearchVideosPostReq) (r SearchVideosPostRes, _ error) {
+func (UnimplementedHandler) SearchVideos(ctx context.Context, req *SearchVideosReq) (r SearchVideosRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

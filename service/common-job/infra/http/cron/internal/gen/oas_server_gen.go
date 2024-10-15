@@ -38,24 +38,24 @@ type Handler interface {
 	//
 	// GET /api/ping
 	APIPingGet(ctx context.Context) (*APIPingGetOK, error)
-	// ExistVideosPost implements POST /exist_videos operation.
+	// ExistVideos implements exist_videos operation.
 	//
 	// Update exist videos based on the provided period.
 	//
 	// POST /exist_videos
-	ExistVideosPost(ctx context.Context, req *ExistVideosPostReq) (ExistVideosPostRes, error)
-	// PingPost implements POST /ping operation.
+	ExistVideos(ctx context.Context, req *ExistVideosReq) (ExistVideosRes, error)
+	// Ping implements ping operation.
 	//
 	// Returns a 200 status code if successful, or an error.
 	//
 	// POST /ping
-	PingPost(ctx context.Context) (*PingPostOK, error)
-	// SearchVideosPost implements POST /search_videos operation.
+	Ping(ctx context.Context) (*PingOK, error)
+	// SearchVideos implements search_videos operation.
 	//
 	// Update videos related to a specific creator based on provided.
 	//
 	// POST /search_videos
-	SearchVideosPost(ctx context.Context, req *SearchVideosPostReq) (SearchVideosPostRes, error)
+	SearchVideos(ctx context.Context, req *SearchVideosReq) (SearchVideosRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

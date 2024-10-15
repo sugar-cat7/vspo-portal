@@ -47,10 +47,7 @@ services:
       - vspo-network
   datadog-agent:
     container_name: datadog-agent
-    build:
-      context: ../service/common-job
-      dockerfile: Dockerfile
-      target: datadog-agent
+    image: gcr.io/datadoghq/agent:latest
     environment:
       - DD_API_KEY=xxx
       - DD_APM_ENABLED=true
