@@ -30,9 +30,3 @@ COPY . .
 COPY ./local/seed/ ./infra/database/schema/migration/
 RUN go build -o /tmp/app ./cmd/index.go
 CMD ["/tmp/app", "db-migration"]
-
-# Datadog Agent
-FROM gcr.io/datadoghq/agent:latest AS datadog-agent
-COPY datadog.yaml /etc/datadog-agent/datadog.yaml
-
-EXPOSE 8126
