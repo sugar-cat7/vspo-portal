@@ -1,11 +1,13 @@
 resource "google_cloud_run_v2_service" "vspo_portal_cron" {
   name     = local.cloud_run_v2_service.name
   location = local.cloud_run_v2_service.location
-  ingress  = "INGRESS_TRAFFIC_INTERNAL_ONLY"
+  ingress  = "INGRESS_TRAFFIC_ALL"
   template {
     service_account = var.cloud_run_sa_email
     annotations = {
-      "container-dependencies" = "{\"${var.env}-vspo-portal\":[\"datadog-agent\"]}"
+      "container-dependencies"                   = "{\"${var.env}-vspo-portal\":[\"datadog-agent\"]}"
+      "run.googleapis.com/execution-environment" = "gen2"
+      "run.googleapis.com/cpu-throttling"        = "false"
     }
     containers {
       name  = local.cloud_run_v2_service.container.name
@@ -34,10 +36,10 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
     }
     containers {
       name  = "datadog-agent"
-      image = "${var.location}-docker.pkg.dev/${var.project}/${var.artifact_registry_repository_id}/datadog-agent:latest"
+      image = "gcr.io/datadoghq/agent:latest"
       env {
         name  = "PORT"
-        value = "8126"
+        value = 8126
       }
 
       dynamic "env" {
