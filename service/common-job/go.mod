@@ -28,7 +28,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.31.0
 	go.uber.org/mock v0.5.0
 	go.uber.org/multierr v1.11.0
-	google.golang.org/api v0.200.0
+	google.golang.org/api v0.201.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.69.0
 )
 
