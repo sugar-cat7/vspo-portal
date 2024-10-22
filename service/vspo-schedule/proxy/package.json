@@ -13,7 +13,7 @@
     "@opentelemetry/api": "1.6.0",
     "@tsndr/cloudflare-worker-jwt": "2.5.3",
     "dayjs": "^1.11.11",
-    "hono": "^4.5.8",
+    "hono": "^4.6.5",
     "miniflare": "3.20240524.1",
     "openai": "^4.55.4",
     "pg": "^8.11.5",
