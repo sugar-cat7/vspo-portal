@@ -16,6 +16,7 @@ import (
 	"github.com/sugar-cat7/vspo-portal/service/common-job/pkg/logger"
 	app_trace "github.com/sugar-cat7/vspo-portal/service/common-job/pkg/otel"
 	"go.opentelemetry.io/otel"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 type OtelKey string
@@ -35,6 +36,7 @@ func Run(w http.ResponseWriter, r *http.Request) {
 
 	traceProvider := app_trace.SetTracerProvider("vspo-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
 	defer func() {
+		tracer.Stop()
 		if err := traceProvider.Shutdown(); err != nil {
 			logger.Error(fmt.Sprintf("Failed to shutdown trace provider: %v", err))
 		}
@@ -72,6 +74,7 @@ func StartServer() {
 
 	traceProvider := app_trace.SetTracerProvider("vspo-portal-cron", e.ServerEnvironment.ENV, e.ServerEnvironment.DD_AGENT, e.ServerEnvironment.DD_PORT)
 	defer func() {
+		tracer.Stop()
 		if err := traceProvider.Shutdown(); err != nil {
 			logger.Error(fmt.Sprintf("Failed to shutdown trace provider: %v", err))
 		}
