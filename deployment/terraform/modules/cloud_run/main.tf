@@ -8,6 +8,9 @@ resource "google_cloud_run_v2_service" "vspo_portal_cron" {
       "container-dependencies"                   = "{\"${var.env}-vspo-portal\":[\"datadog-agent\"]}"
       "run.googleapis.com/execution-environment" = "gen2"
       "run.googleapis.com/cpu-throttling"        = "false"
+      "autoscaling.knative.dev/minScale"         = "0"
+      "autoscaling.knative.dev/maxScale"         = "1"
+
     }
     containers {
       name  = local.cloud_run_v2_service.container.name
