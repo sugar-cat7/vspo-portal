@@ -127,58 +127,58 @@ locals {
   ]
 }
 
-module "cloud_run_service" {
-  source                          = "../modules/cloud_run"
-  location                        = local.location
-  env                             = local.env
-  project                         = var.GOOGLE_PROJECT_ID
-  artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
-  cloud_run_sa_email              = module.iam.cloud_run_sa_email
-  cloud_run_service_env_vars      = local.cloud_run_service_env_vars
-  datadog_env_vars                = local.datadog_env_vars
-}
+# module "cloud_run_service" {
+#   source                          = "../modules/cloud_run"
+#   location                        = local.location
+#   env                             = local.env
+#   project                         = var.GOOGLE_PROJECT_ID
+#   artifact_registry_repository_id = module.artifact_registry.artifact_registry_repository_id
+#   cloud_run_sa_email              = module.iam.cloud_run_sa_email
+#   cloud_run_service_env_vars      = local.cloud_run_service_env_vars
+#   datadog_env_vars                = local.datadog_env_vars
+# }
 
-module "cloud_scheduler_job" {
-  source                   = "../modules/cloud_scheduler_job"
-  location                 = local.location
-  env                      = local.env
-  project                  = var.GOOGLE_PROJECT_ID
-  cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
-  schedules = [
-    {
-      name       = "job1"
-      schedule   = "*/5 * * * *"
-      target_url = "${module.cloud_run_service.cloud_run_service_url}/ping"
-      headers = {
-        "Content-Type" = "application/json"
-      }
-      body = jsonencode({})
-    },
-    {
-      name       = "job2"
-      schedule   = "*/5 * * * *"
-      target_url = "${module.cloud_run_service.cloud_run_service_url}/search_videos"
-      headers = {
-        "Content-Type" = "application/json"
-      }
-      body = jsonencode({
-        platform_type = ["youtube", "twitch", "twitcasting"]
-        video_type    = "vspo_stream"
-      })
-    },
-    {
-      name       = "job3"
-      schedule   = "*/5 * * * *"
-      target_url = "${module.cloud_run_service.cloud_run_service_url}/exist_videos"
-      headers = {
-        "Content-Type" = "application/json"
-      }
-      body = jsonencode({
-        period = "week"
-      })
-    }
-  ]
-}
+# module "cloud_scheduler_job" {
+#   source                   = "../modules/cloud_scheduler_job"
+#   location                 = local.location
+#   env                      = local.env
+#   project                  = var.GOOGLE_PROJECT_ID
+#   cloud_scheduler_sa_email = module.iam.cloud_scheduler_sa_email
+#   schedules = [
+#     {
+#       name       = "job1"
+#       schedule   = "*/5 * * * *"
+#       target_url = "${module.cloud_run_service.cloud_run_service_url}/ping"
+#       headers = {
+#         "Content-Type" = "application/json"
+#       }
+#       body = jsonencode({})
+#     },
+#     {
+#       name       = "job2"
+#       schedule   = "*/5 * * * *"
+#       target_url = "${module.cloud_run_service.cloud_run_service_url}/search_videos"
+#       headers = {
+#         "Content-Type" = "application/json"
+#       }
+#       body = jsonencode({
+#         platform_type = ["youtube", "twitch", "twitcasting"]
+#         video_type    = "vspo_stream"
+#       })
+#     },
+#     {
+#       name       = "job3"
+#       schedule   = "*/5 * * * *"
+#       target_url = "${module.cloud_run_service.cloud_run_service_url}/exist_videos"
+#       headers = {
+#         "Content-Type" = "application/json"
+#       }
+#       body = jsonencode({
+#         period = "week"
+#       })
+#     }
+#   ]
+# }
 
 module "secret_manager" {
   source = "../modules/secret_manager"
