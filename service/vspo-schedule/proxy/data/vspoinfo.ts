@@ -162,6 +162,18 @@ export const vspo = {
             youtubeChannelId: "UC7Xglp1fske9zmRe7Oj8YyA",
             searchKeywords: ["Riko Solari", "Riko", "Solari", "ソラリリコ", "ソラリ リコ"],
         },
+        {
+            jpName: "蝶屋はなび",
+            enName: "Choya Hanabi",
+            youtubeChannelId: "UCL9hJsdk9eQa0IlWbFB2oRg",
+            searchKeywords: ["蝶屋はなび", "蝶屋 はなび", "Choya Hanabi", "Hanabi Choya"],
+        },
+        {
+            jpName: "甘結もか",
+            enName: "Amayui Moka",
+            youtubeChannelId: "UC8vKBjGY2HVfbW9GAmgikWw",
+            searchKeywords: ["甘結もか", "甘結 もか", "Amayui Moka", "Moka Amayui"],
+        },
     ],
 } as const
 

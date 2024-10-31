@@ -298,4 +298,20 @@ export const members: Member[] = [
       "https://yt3.ggpht.com/NOzYOqi7WSPcuVTEmNDr_VK4uMo3j-MsSLE6LL4LR4NjFENWnW-Z8tJ8g6-a8h8sXbaN9dUp6g=s88-c-k-c0x00ffffff-no-rj",
     keywords: ["Riko Solari", "Riko", "Solari", "ソラリリコ", "ソラリ リコ"],
   },
+  {
+    id: 28,
+    name: "蝶屋はなび",
+    channelId: "UCL9hJsdk9eQa0IlWbFB2oRg",
+    iconUrl:
+    "https://yt3.ggpht.com/YaWMa3WrQaECXExUNK10s-Nr41cuW0s5T6xxaUVOi051NILISbIOh173YsJ5g5r7moRJ-AOr=s88-c-k-c0x00ffffff-no-rj",
+    keywords: ["蝶屋はなび", "蝶屋 はなび", "Choya Hanabi", "Hanabi Choya"],
+  },
+  {
+    id: 29,
+    name: "甘結もか",
+    channelId: "UC8vKBjGY2HVfbW9GAmgikWw",
+    iconUrl:
+    "https://yt3.ggpht.com/m7ztm9uUEQTPrWUp8BdL938qGAnsExnz15B5BqaODhBx5ubmlu_hHiHJzXZ5olQSg-FskcGMqzc=s88-c-k-c0x00ffffff-no-rj",
+    keywords: ["甘結もか", "甘結 もか", "Amayui Moka", "Moka Amayui"],
+  },
 ];
