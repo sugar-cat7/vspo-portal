@@ -185,25 +185,27 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
           <TypographySmallOnMobile variant="h5">
             {video.title}
           </TypographySmallOnMobile>
-          <Box
-            display="flex"
-            justifyContent="flex-start"
-            sx={{ marginTop: "10px" }}
-          >
-            <TypographySmallOnMobile sx={{ marginRight: "10px" }}>
-              {formattedStartTime}
-            </TypographySmallOnMobile>
-            {(liveStatus === "live" || liveStatus === "upcoming") && (
-              <HighlightedVideoChip
-                highlightColor={
-                  theme.vars.palette.customColors.videoHighlight[liveStatus]
-                }
-                bold
-              >
-                {t(`liveStatus.${liveStatus}`)}
-              </HighlightedVideoChip>
-            )}
-          </Box>
+          {liveStatus !== undefined && liveStatus !== "freechat" && (
+            <Box
+              display="flex"
+              justifyContent="flex-start"
+              sx={{ marginTop: "10px" }}
+            >
+              <TypographySmallOnMobile sx={{ marginRight: "10px" }}>
+                {formattedStartTime}
+              </TypographySmallOnMobile>
+              {(liveStatus === "live" || liveStatus === "upcoming") && (
+                <HighlightedVideoChip
+                  highlightColor={
+                    theme.vars.palette.customColors.videoHighlight[liveStatus]
+                  }
+                  bold
+                >
+                  {t(`liveStatus.${liveStatus}`)}
+                </HighlightedVideoChip>
+              )}
+            </Box>
+          )}
         </Box>
         <Box>
           <Box display="flex" alignItems="center" mt={2} mb={2}>
