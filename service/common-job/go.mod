@@ -29,7 +29,7 @@ require (
 	go.uber.org/mock v0.5.0
 	go.uber.org/multierr v1.11.0
 	google.golang.org/api v0.204.0
-	gopkg.in/DataDog/dd-trace-go.v1 v1.69.0
+	gopkg.in/DataDog/dd-trace-go.v1 v1.69.1
 )
 
 require (
