@@ -17,7 +17,6 @@ import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
 import { convertToUTCDate } from "@/lib/dayjs";
-import { useTimeZoneContext } from "@/hooks";
 
 type Params = {
   id: string;
@@ -103,7 +102,6 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
   const router = useRouter();
   const { t } = useTranslation(["common"]);
   const locale = router.locale ?? DEFAULT_LOCALE;
-  const { timeZone } = useTimeZoneContext();
 
   if (!event) {
     return null;
@@ -132,7 +130,7 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
             {formatDate(
               convertToUTCDate(event.startedAt.split("T")[0] || TEMP_TIMESTAMP),
               "MM/dd (E)",
-              { localeCode: locale, timeZone },
+              { localeCode: locale },
             )}
           </Typography>
           {getRelevantMembers(event.contentSummary).map((member, index) => (
