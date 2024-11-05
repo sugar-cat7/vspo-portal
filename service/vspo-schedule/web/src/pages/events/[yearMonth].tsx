@@ -301,10 +301,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
                       width: matches ? "130px" : "100px",
                     }}
                   >
-                    {formatDate(date, "MM/dd (E)", {
-                      localeCode: locale,
-                      timeZone,
-                    })}
+                    {formatDate(date, "MM/dd (E)", { localeCode: locale })}
                   </Typography>
                 </TimelineOppositeContent>
                 <TimelineSeparator>
@@ -315,13 +312,12 @@ const IndexPage: NextPageWithLayout<Props> = ({
                 </TimelineSeparator>
                 <TimelineContent sx={{ py: matches ? "40px" : "20px", px: 2 }}>
                   {eventsOnDate.map((event, eventIndex) => {
-                    const eventDate = event.startedAt.split("T")[0]; // Get the date part of the ISO string
                     const today = formatDate(
                       getCurrentUTCDate(),
                       "yyyy-MM-dd",
                       { timeZone },
                     );
-                    const isEventToday = eventDate === today;
+                    const isEventToday = date === today;
                     const eventMembers = getRelevantMembers(
                       event.contentSummary,
                     );
