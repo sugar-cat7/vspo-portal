@@ -15,7 +15,11 @@ import { TabContext } from "@mui/lab";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { NextPageWithLayout } from "../_app";
 import { LivestreamCards } from "@/components/Templates";
-import { fetchEvents, fetchLivestreams } from "@/lib/api";
+import {
+  fetchEvents,
+  fetchLivestreamForTab,
+  fetchLivestreams,
+} from "@/lib/api";
 import { VspoEvent } from "@/types/events";
 import { useRouter } from "next/router";
 import { Link, Loading } from "@/components/Elements";
@@ -248,29 +252,14 @@ export const getServerSideProps: GetServerSideProps<
       const fiveDaysLater = convertToUTCDate(
         now.getTime() + fiveDaysInMilliseconds,
       );
-
-      const fetchList = [];
-      for (
-        let d = fiveDaysAgo;
-        d <= fiveDaysLater;
-        d.setDate(d.getDate() + 1)
-      ) {
-        fetchList.push(
-          fetchLivestreams({
-            limit: 1,
-            lang: locale,
-            status: formatDate(d, "yyyy-MM-dd"),
-            order: "asc",
-            startedDate: formatDate(d, "yyyy-MM-dd"),
-            endedDate: formatDate(
-              d.getTime() + 24 * 60 * 60 * 1000,
-              "yyyy-MM-dd",
-            ),
-            timezone: timeZone,
-          }),
-        );
-      }
-      const results = await Promise.all(fetchList);
+      const results = await fetchLivestreamForTab({
+        startedDate: formatDate(fiveDaysAgo, "yyyy-MM-dd"),
+        endedDate: formatDate(
+          fiveDaysLater.getTime() + 24 * 60 * 60 * 1000,
+          "yyyy-MM-dd",
+        ),
+        timezone: timeZone,
+      });
       const allDates: DateObject[] = results
         .flat()
         .map((livestream: Livestream) => {

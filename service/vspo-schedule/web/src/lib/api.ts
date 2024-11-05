@@ -89,6 +89,40 @@ export const fetchLivestreams = async ({
   }
 };
 
+export const fetchLivestreamForTab = async ({
+  startedDate,
+  endedDate,
+  timezone = "UTC",
+}: {
+  startedDate: string;
+  endedDate: string;
+  timezone?: string;
+}): Promise<Livestream[]> => {
+  try {
+    if (ENVIRONMENT === "production") {
+      const response = await axios.get<Livestream[]>(
+        `${API_ROOT}/api/livestreams/tab`,
+        {
+          headers: {
+            "x-api-key": process.env.API_KEY,
+          },
+          params: {
+            started_at: startedDate,
+            ended_at: endedDate,
+            timezone: timezone,
+          },
+        },
+      );
+      return convertThumbnailQualityInObjects(response.data);
+    } else {
+      return convertThumbnailQualityInObjects(mockLivestreams);
+    }
+  } catch (error) {
+    console.warn("Failed to fetch livestreams:", error);
+    throw error;
+  }
+};
+
 export const fetchFreechats = async ({
   lang = "ja",
 }: {
