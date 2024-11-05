@@ -102,6 +102,6 @@ const setCookie = (res: NextResponse, name: string, value: string) => {
 const createUrlWithLocale = (req: NextRequest, locale: string) => {
   return new URL(
     `/${locale}${req.nextUrl.pathname}${req.nextUrl.search}`,
-    req.url
+    req.url,
   );
 };
