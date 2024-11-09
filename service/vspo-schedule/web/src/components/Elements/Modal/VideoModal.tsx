@@ -8,6 +8,7 @@ import {
   Avatar,
   Button,
   IconButton,
+  Link as MuiLink,
   Tab,
   Tabs,
   BottomNavigation,
@@ -270,14 +271,14 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
               return <React.Fragment key={index}>{text}</React.Fragment>;
             }
             return (
-              <Link
+              <MuiLink
                 href={text}
                 target="_blank"
                 rel="noopener noreferrer"
                 key={index}
               >
                 {text}
-              </Link>
+              </MuiLink>
             );
           })}
         </TypographySmallOnMobileDescription>
