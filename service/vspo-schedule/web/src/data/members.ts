@@ -228,6 +228,7 @@ export const members: Member[] = [
     id: 21,
     name: "紡木こかげ",
     channelId: "UC-WX1CXssCtCtc2TNIRnJzg",
+    twitchChannelId: "1184405770",
     iconUrl:
       "https://yt3.googleusercontent.com/uBemMrpiQtcdsbmAkxsCfyqr6lVkxa9FGwrs4URjOZgm97CbPDbilJBLcAy9SQYGfh8-__x7tw0=s176-c-k-c0x00ffffff-no-rj",
     keywords: ["紡木こかげ", "紡木 こかげ", "Kokage Tsumugi", "Tsumugi Kokage"],
@@ -303,7 +304,7 @@ export const members: Member[] = [
     name: "蝶屋はなび",
     channelId: "UCL9hJsdk9eQa0IlWbFB2oRg",
     iconUrl:
-    "https://yt3.ggpht.com/YaWMa3WrQaECXExUNK10s-Nr41cuW0s5T6xxaUVOi051NILISbIOh173YsJ5g5r7moRJ-AOr=s88-c-k-c0x00ffffff-no-rj",
+      "https://yt3.ggpht.com/YaWMa3WrQaECXExUNK10s-Nr41cuW0s5T6xxaUVOi051NILISbIOh173YsJ5g5r7moRJ-AOr=s88-c-k-c0x00ffffff-no-rj",
     keywords: ["蝶屋はなび", "蝶屋 はなび", "Choya Hanabi", "Hanabi Choya"],
   },
   {
@@ -311,7 +312,7 @@ export const members: Member[] = [
     name: "甘結もか",
     channelId: "UC8vKBjGY2HVfbW9GAmgikWw",
     iconUrl:
-    "https://yt3.ggpht.com/m7ztm9uUEQTPrWUp8BdL938qGAnsExnz15B5BqaODhBx5ubmlu_hHiHJzXZ5olQSg-FskcGMqzc=s88-c-k-c0x00ffffff-no-rj",
+      "https://yt3.ggpht.com/m7ztm9uUEQTPrWUp8BdL938qGAnsExnz15B5BqaODhBx5ubmlu_hHiHJzXZ5olQSg-FskcGMqzc=s88-c-k-c0x00ffffff-no-rj",
     keywords: ["甘結もか", "甘結 もか", "Amayui Moka", "Moka Amayui"],
   },
 ];
