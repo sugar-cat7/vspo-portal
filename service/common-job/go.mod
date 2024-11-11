@@ -28,12 +28,12 @@ require (
 	go.opentelemetry.io/otel/trace v1.31.0
 	go.uber.org/mock v0.5.0
 	go.uber.org/multierr v1.11.0
-	google.golang.org/api v0.204.0
+	google.golang.org/api v0.205.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.69.1
 )
 
 require (
-	cloud.google.com/go/auth v0.10.0 // indirect
+	cloud.google.com/go/auth v0.10.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.5 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	dario.cat/mergo v1.0.0 // indirect
