@@ -95,9 +95,9 @@ const HomePage: NextPageWithLayout<LivestreamsProps> = ({
   }, [livestreams, timeZone]);
   const eventsByDate = useMemo(() => {
     return groupBy(events, (event) => {
-      return formatDate(event.startedAt, "yyyy-MM-dd", { timeZone });
+      return formatDate(event.startedAt, "yyyy-MM-dd");
     });
-  }, [events, timeZone]);
+  }, [events]);
 
   if (router.isFallback) {
     return <Loading />;
