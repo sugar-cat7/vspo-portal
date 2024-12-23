@@ -28,7 +28,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.33.0
 	go.uber.org/mock v0.5.0
 	go.uber.org/multierr v1.11.0
-	google.golang.org/api v0.212.0
+	google.golang.org/api v0.214.0
 	gopkg.in/DataDog/dd-trace-go.v1 v1.70.1
 )
 
@@ -139,7 +139,7 @@ require (
 	golang.org/x/crypto v0.31.0 // indirect
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
 	golang.org/x/mod v0.22.0 // indirect
-	golang.org/x/net v0.32.0 // indirect
+	golang.org/x/net v0.33.0 // indirect
 	golang.org/x/oauth2 v0.24.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
@@ -147,7 +147,7 @@ require (
 	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241113202542-65e8d215514f // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241206012308-a4fef0638583 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
 	google.golang.org/grpc v1.67.1 // indirect
 	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
