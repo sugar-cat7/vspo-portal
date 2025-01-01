@@ -1,0 +1,61 @@
+name = "template-api"
+compatibility_date = "2024-06-03"
+send_metrics = false
+compatibility_flags = ["nodejs_als"]
+node_compat = true
+main = "cmd/server/index.ts"
+tail_consumers = [{ service = "api-tail" }]
+logpush = true
+
+
+# Preview environmentで必要なものはリソースの作成が必要
+# https://developers.cloudflare.com/workers/wrangler/configuration
+
+# dev --remoteの場合Queue Bindingをするとエラーになる
+# https://github.com/cloudflare/workerd/issues/855
+[queues]
+consumers = [
+    { queue = "log-queue", max_batch_size = 10, max_retries = 10 },
+    { queue = "app-queue", max_batch_size = 10, max_retries = 10 },
+]
+producers = [
+    { queue = "log-queue", binding = "LOG_QUEUE" },
+    { queue = "app-queue", binding = "APP_QUEUE" },
+]
+
+[[r2_buckets]]
+bucket_name = "app-bucket"
+binding = "APP_BUCKET"
+preview_bucket_name = 'app-preview-bucket'
+
+[[d1_databases]]
+binding = "APP_DB"
+database_name = "app-db"
+database_id = "xxx"
+migrations_dir = "pkg/db/sqlite/gen/ddl"
+preview_database_id = "xxx"
+
+# wrangler vectorize create langchain-test --dimensions=768 --metric=cosine
+[[vectorize]]
+binding = "APP_VECTORIZE_INDEX"
+index_name = "app-index"
+
+[ai]
+binding = "APP_AI"
+
+[[kv_namespaces]]
+binding = "APP_KV"
+id = "xxx"
+
+
+######## PREVIEW environment config ########
+
+[[env.preview.kv_namespaces]]
+binding = "APP_KV"
+id = "xxx"
+
+######## PRODUCTION environment config ########
+
+[[env.production.kv_namespaces]]
+binding = "APP_KV"
+id = "xxx"
