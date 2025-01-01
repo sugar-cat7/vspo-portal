@@ -1,0 +1,51 @@
+{
+    "name": "vspo-portal-server",
+    "targets": {
+      "dev-all": {
+        "executor": "nx:run-commands",
+        "options": {
+          "commands": [
+            "wrangler dev --config api-gateway.wrangler.toml",
+            "wrangler dev --config internal-app.wrangler.toml",
+            "wrangler dev --test-scheduled --config cron.wrangler.toml",
+            "drizzle-kit studio --port=3004"
+          ],
+          "parallel": true
+        }
+      },
+      "deploy-all": {
+        "executor": "nx:run-commands",
+        "options": {
+          "commands": [
+            "wrangler deploy --config api-gateway.wrangler.toml",
+            "wrangler deploy --config internal-app.wrangler.toml",
+            "wrangler deploy --config cron.wrangler.toml"
+          ],
+          "parallel": false
+        }
+      },
+      "build-dryrun": {
+        "executor": "nx:run-commands",
+        "options": {
+          "commands": [
+            "wrangler deploy --config api-gateway.wrangler.toml --dry-run",
+            "wrangler deploy --config internal-app.wrangler.toml --dry-run",
+            "wrangler deploy --config cron.wrangler.toml --dry-run"
+          ],
+          "parallel": false
+        }
+      },
+      "ci": {
+        "executor": "nx:run-commands",
+        "options": {
+          "commands": [
+            "pnpm tsc",
+            "pnpm run biome:check",
+            "nx run vspo-portal-server:build-dryrun"
+          ],
+          "parallel": false
+        }
+      }
+    }
+  }
+  

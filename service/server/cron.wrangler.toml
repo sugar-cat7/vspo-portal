@@ -1,0 +1,27 @@
+name = "vspo-portal-cron"
+compatibility_date = "2024-10-22"
+send_metrics = false
+compatibility_flags = ["nodejs_compat", "nodejs_als"]
+main = "cmd/cron/index.ts"
+tail_consumers = [{ service = "api-tail" }]
+logpush = true
+[dev]
+port = 3002
+
+[[services]]
+binding = "APP_WORKER"
+service = "app_worker"
+entrypoint = "ApplicationService"
+
+[triggers]
+crons = [ "0 0 * * *" ]
+
+[[workflows]]
+name = "search-videos-workflow"
+binding = "SEARCH_VIDEOS_WORKFLOW"
+class_name = "SearchVideosWorkflow"
+
+[[workflows]]
+name = "search-channels-workflow"
+binding = "SEARCH_CHANNELS_WORKFLOW"
+class_name = "SearchChannelsWorkflow"
