@@ -1,6 +1,6 @@
 import { swaggerUI } from '@hono/swagger-ui'
 import { OpenAPIHono } from '@hono/zod-openapi'
-import type { Context, Input } from 'hono'
+import type { Context } from 'hono'
 import { contextStorage } from 'hono/context-storage'
 import { prettyJSON } from 'hono/pretty-json'
 import { handleError, handleZodError } from '../errors'

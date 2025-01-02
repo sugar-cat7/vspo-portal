@@ -4,10 +4,7 @@ import { newApp } from '../../pkg/hono/app'
 import { init } from '../../pkg/middleware'
 import { createHandler } from '../../pkg/otel'
 import {
-  registerExampleAIEmbeddingsPostApi,
-  registerExampleAIRetrievePostApi,
-  registerExamplePostApi,
-  registerStreamPostApi,
+  registerVideoPostApi
 } from '../../routes'
 
 const app = newApp()
@@ -27,9 +24,5 @@ app.use(
   init()
 )
 
-registerExamplePostApi(app)
-registerExampleAIEmbeddingsPostApi(app)
-registerExampleAIRetrievePostApi(app)
-registerStreamPostApi(app)
-
+registerVideoPostApi(app)
 export default createHandler(app)
