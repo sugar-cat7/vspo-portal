@@ -1,7 +1,7 @@
 import { type ResolveConfigFn, instrument } from '@microlabs/otel-cf-workers'
 import { trace } from '@opentelemetry/api'
-import type { Env } from '../env'
-import type { App } from '../hono'
+import type{ Env } from '../../../../pkg/env'
+import type{ App } from '../../../../pkg/hono'
 
 const config: ResolveConfigFn = (env: Env, _trigger) => {
   return {

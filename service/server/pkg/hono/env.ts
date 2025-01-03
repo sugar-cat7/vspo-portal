@@ -1,13 +1,13 @@
-import type { OpenAIProvider } from '@ai-sdk/openai'
-import type { Tracer } from '@opentelemetry/api'
+// import type { Tracer } from '@opentelemetry/api'
 import type { RequestIdVariables } from 'hono/request-id'
 import type { Env } from '../env'
 import type { AppLogger } from '../logging'
+import type { Dependency } from '../../infra/dependency'
 
 export type ServiceContext = {
   logger: AppLogger
-  tracer: Tracer
-  openai: OpenAIProvider
+  // tracer: Tracer
+  di: Dependency
 }
 
 export type HonoEnv = {

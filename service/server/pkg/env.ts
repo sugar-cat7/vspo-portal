@@ -31,6 +31,18 @@ export const zEnv = z.object({
   APP_KV: z.custom<KVNamespace>(),
   APP_VECTORIZE_INDEX: z.custom<VectorizeIndex>(),
   APP_AI: z.custom<Fetcher>(),
+
+  /**
+   * Database
+   */
+  DB_CONNECTION_STRING: z.string(),
+  /**
+   * API Key
+   */
+  YOUTUBE_API_KEY: z.string(),
+  TWITCH_CLIENT_ID: z.string(),
+  TWITCH_CLIENT_SECRET: z.string(),
+  TWITCASTING_ACCESS_TOKEN: z.string(),
 })
 
 export type Env = z.infer<typeof zEnv>

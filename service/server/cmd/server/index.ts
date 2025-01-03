@@ -1,11 +1,11 @@
 import { cors } from 'hono/cors'
 import { requestId } from 'hono/request-id'
 import { newApp } from '../../pkg/hono/app'
-import { init } from '../../pkg/middleware'
-import { createHandler } from '../../pkg/otel'
+import { init } from '../../infra/http/hono/middleware'
 import {
   registerVideoPostApi
 } from '../../routes'
+import { createHandler } from '../../infra/http/hono/otel'
 
 const app = newApp()
 app.notFound((c) => {
@@ -21,8 +21,7 @@ app.use(
     maxAge: 600,
   }),
   requestId(),
-  init()
+  init,
 )
-
 registerVideoPostApi(app)
 export default createHandler(app)
