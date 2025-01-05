@@ -1,0 +1,45 @@
+{
+  "name": "template-api",
+  "version": "0.0.0",
+  "main": "cmd/server/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "docker compose -f docker/compose.yaml up -d & wrangler dev",
+    "dev:remote": "wrangler dev --remote",
+    "deploy": "wrangler deploy",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^0.0.58",
+    "@hono/swagger-ui": "^0.4.1",
+    "@hono/zod-openapi": "^0.16.4",
+    "@langchain/cloudflare": "^0.0.7",
+    "@microlabs/otel-cf-workers": "1.0.0-rc.45",
+    "@neondatabase/serverless": "^0.10.1",
+    "@opentelemetry/api": "1.9.0",
+    "@tsndr/cloudflare-worker-jwt": "2.5.3",
+    "@twurple/api": "^7.2.0",
+    "@twurple/auth": "^7.2.0",
+    "ai": "^3.4.33",
+    "dayjs": "^1.11.13",
+    "drizzle-orm": "^0.36.0",
+    "drizzle-zod": "^0.5.1",
+    "googleapis": "^144.0.0",
+    "hono": "^4.6.9",
+    "miniflare": "3.20240821.1",
+    "pg": "^8.13.1",
+    "postgres": "^3.4.5",
+    "tslog": "^4.9.3",
+    "uuid": "^10.0.0",
+    "valibot": "^0.41.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241022.0",
+    "@types/pg": "^8.11.10",
+    "@types/uuid": "^10.0.0",
+    "drizzle-kit": "^0.27.1",
+    "typescript": "^5.6.3",
+    "wrangler": "^3.84.1"
+  }
+}
