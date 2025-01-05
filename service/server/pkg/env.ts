@@ -23,7 +23,7 @@ export const zEnv = z.object({
   /**
    * Cloudflare Services
    */
-  // HYPERDRIVE: z.custom<Hyperdrive>(),
+  HYPERDRIVE: z.custom<Hyperdrive>(),
   LOG_QUEUE: z.custom<Queue>(),
   APP_QUEUE: z.custom<Queue>(),
   APP_BUCKET: z.custom<R2Bucket>(),
@@ -31,6 +31,7 @@ export const zEnv = z.object({
   APP_KV: z.custom<KVNamespace>(),
   APP_VECTORIZE_INDEX: z.custom<VectorizeIndex>(),
   APP_AI: z.custom<Fetcher>(),
+  UPDATE_VIDEOS_WORKFLOW: z.custom<Workflow>(),
 
   /**
    * Database
