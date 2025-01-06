@@ -12,8 +12,8 @@ github.com/Adeithe/go-twitch v0.2.3 h1:Sq2njo4rJe94g0t5i5cttSBNNvTzY+TeBqEZhT1iN
 github.com/Adeithe/go-twitch v0.2.3/go.mod h1:k77+ghwLBpq1Ze1DgBSE9XHyUdGodnZiAQPe2VrnS0w=
 github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 h1:UQHMgLO+TxOElx5B5HZ4hJQsoJ/PvUvKRhJHDQXO8P8=
 github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1/go.mod h1:xomTg63KZ2rFqZQzSB4Vz2SUXa1BpHTVz9L5PTmPC4E=
-github.com/Code-Hex/synchro v0.5.2 h1:xBk/EIsqfu+yiuX9XC39xLXWm9mcLJ3zegem9itybz8=
-github.com/Code-Hex/synchro v0.5.2/go.mod h1:F9Z4Uf1SP7V5K1xPM17h19sS8DmuH6OFt8LI917ZpQ4=
+github.com/Code-Hex/synchro v0.5.3 h1:BRpfrQUBXDShRnF9JodEnbezlTopUOy5qcy6u1D5700=
+github.com/Code-Hex/synchro v0.5.3/go.mod h1:USpQ++dx1+FbEeaDWiTAwOQVALdTel2y6Hy61knSJ6c=
 github.com/DataDog/appsec-internal-go v1.9.0 h1:cGOneFsg0JTRzWl5U2+og5dbtyW3N8XaYwc5nXe39Vw=
 github.com/DataDog/appsec-internal-go v1.9.0/go.mod h1:wW0cRfWBo4C044jHGwYiyh5moQV2x0AhnwqMuiX7O/g=
 github.com/DataDog/datadog-agent/pkg/obfuscate v0.58.0 h1:nOrRNCHyriM/EjptMrttFOQhRSmvfagESdpyknb5VPg=
@@ -163,8 +163,8 @@ github.com/hashicorp/golang-lru/v2 v2.0.7 h1:a+bsQ5rvGLjzHuww6tVxozPZFVghXaHOwFs
 github.com/hashicorp/golang-lru/v2 v2.0.7/go.mod h1:QeFd9opnmA6QUJc5vARoKUSoFhyfM2/ZepoAG6RGpeM=
 github.com/inconshreveable/mousetrap v1.1.0 h1:wN+x4NVGpMsO7ErUn/mUI3vEoE6Jt13X2s0bqwp9tc8=
 github.com/inconshreveable/mousetrap v1.1.0/go.mod h1:vpF70FUmC8bwa3OWnCshd2FqLfsEA9PFc4w1p2J65bw=
-github.com/itchyny/timefmt-go v0.1.5 h1:G0INE2la8S6ru/ZI5JecgyzbbJNs5lG1RcBqa7Jm6GE=
-github.com/itchyny/timefmt-go v0.1.5/go.mod h1:nEP7L+2YmAbT2kZ2HfSs1d8Xtw9LY8D2stDBckWakZ8=
+github.com/itchyny/timefmt-go v0.1.6 h1:ia3s54iciXDdzWzwaVKXZPbiXzxxnv1SPGFfM/myJ5Q=
+github.com/itchyny/timefmt-go v0.1.6/go.mod h1:RRDZYC5s9ErkjQvTvvU7keJjxUYzIISJGxm9/mAERQg=
 github.com/jackc/pgpassfile v1.0.0 h1:/6Hmqy13Ss2zCq62VdNG8tM1wchn8zjSGOBJ6icpsIM=
 github.com/jackc/pgpassfile v1.0.0/go.mod h1:CEx0iS5ambNFdcRtxPj5JhEz+xB6uRky5eyVu/W2HEg=
 github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 h1:iCEnooe7UlwOQYpKFhBabPMi4aNAfoODPEFNiAnClxo=

@@ -1,12 +1,9 @@
 module github.com/sugar-cat7/vspo-portal/service/common-job
 
 go 1.22.0
-
-toolchain go1.23.1
-
 require (
 	github.com/Adeithe/go-twitch v0.2.3
-	github.com/Code-Hex/synchro v0.5.2
+	github.com/Code-Hex/synchro v0.5.3
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/exaring/otelpgx v0.7.0
 	github.com/go-faker/faker/v4 v4.5.0
@@ -87,7 +84,7 @@ require (
 	github.com/hashicorp/go-secure-stdlib/strutil v0.1.2 // indirect
 	github.com/hashicorp/go-sockaddr v1.0.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/itchyny/timefmt-go v0.1.5 // indirect
+	github.com/itchyny/timefmt-go v0.1.6 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
