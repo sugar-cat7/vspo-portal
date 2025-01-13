@@ -16,7 +16,7 @@ require (
 	github.com/samber/lo v1.47.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
-	github.com/testcontainers/testcontainers-go v0.34.0
+	github.com/testcontainers/testcontainers-go v0.35.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.34.0
 	github.com/volatiletech/null/v8 v8.1.2
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.58.0
