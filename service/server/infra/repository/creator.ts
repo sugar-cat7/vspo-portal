@@ -1,4 +1,4 @@
-import { eq, and, SQL, count } from "drizzle-orm";
+import { eq, and, SQL, count, inArray } from "drizzle-orm";
 import { AppError, Ok, Result, Err, wrap } from "../../pkg/errors";
 import { creatorTable, channelTable, InsertChannel, InsertCreator } from "./schema";
 import { createChannel, createCreators, Creators, getPlatformDetail, MemberTypeSchema } from "../../domain";
@@ -16,6 +16,7 @@ export interface ICreatorRepository {
     list(query: ListQuery): Promise<Result<Creators, AppError>>;
     count(query: ListQuery): Promise<Result<number, AppError>>;
     batchUpsert(creators: Creators): Promise<Result<Creators, AppError>>;
+    batchDelete(creatorIds: string[]): Promise<Result<void, AppError>>;
 }
 
 export class CreatorRepository implements ICreatorRepository {
@@ -200,5 +201,23 @@ export class CreatorRepository implements ICreatorRepository {
             thumbnailURL: r.representativeThumbnailUrl,
             channel: null,
         }))));
+    }
+
+    async batchDelete(creatorIds: string[]): Promise<Result<void, AppError>> {
+        const creatorResult = await wrap(
+            this.db.delete(creatorTable)
+                .where(inArray(creatorTable.id, creatorIds))
+                .execute(),
+            (err) => new AppError({
+                message: `Database error during creator batch delete: ${err.message}`,
+                code: 'INTERNAL_SERVER_ERROR'
+            })
+        );
+
+        if (creatorResult.err) {
+            return Err(creatorResult.err);
+        }
+
+        return Ok();
     }
 }

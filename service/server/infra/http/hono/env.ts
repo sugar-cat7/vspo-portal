@@ -21,5 +21,5 @@ export type HonoEnv = {
 
 
 export const getLogger = () => {
-  return getContext<HonoEnv>().var.services.logger
+  return getContext<HonoEnv>()?.var?.services?.logger
 }

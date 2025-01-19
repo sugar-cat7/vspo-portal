@@ -1,6 +1,5 @@
 import { ExtractTablesWithRelations } from "drizzle-orm";
 import { PgTransaction, PgTransactionConfig } from "drizzle-orm/pg-core";
-// import { Client } from "pg";
 import {
   AppError,
   BaseError,
@@ -10,8 +9,7 @@ import {
 } from "../../pkg/errors";
 import { drizzle, NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import { AppLogger } from "../../pkg/logging";
-import { getContext } from "hono/context-storage";
-import { getLogger, HonoEnv } from "../http/hono";
+import { getLogger } from "../http/hono";
 
 export interface IDbConfig {
   connectionString: string; 
@@ -45,7 +43,7 @@ export class TxManager implements ITxManager {
       db.transaction(async (tx) => {
         const op = await operation(tx);
         if (op.err) {
-          const logger = getLogger();
+          const logger = getLogger() ?? new AppLogger();
           logger.error(`Failed to execute transaction: ${op.err}`);
           tx.rollback();
         }

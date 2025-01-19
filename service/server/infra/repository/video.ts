@@ -1,4 +1,4 @@
-import { eq, and, SQL, asc, count } from "drizzle-orm";
+import { eq, and, SQL, asc, count, inArray } from "drizzle-orm";
 import { PlatformSchema, StatusSchema, VideoTypeSchema, Videos, createVideos } from "../../domain/video";
 import { AppError, Ok, Result, Err, wrap } from "../../pkg/errors";
 import { createUUID } from "../../pkg/uuid";
@@ -20,6 +20,7 @@ export interface IVideoRepository {
     list(query: ListQuery): Promise<Result<Videos, AppError>>;
     batchUpsert(videos: Videos): Promise<Result<Videos, AppError>>;
     count(query: ListQuery): Promise<Result<number, AppError>>;
+    batchDelete(videoIds: string[]): Promise<Result<void, AppError>>;
 }
 
 export class VideoRepository implements IVideoRepository {  
@@ -202,5 +203,23 @@ export class VideoRepository implements IVideoRepository {
             thumbnailURL: r.thumbnailUrl,
             videoType: VideoTypeSchema.parse(r.videoType),
         }))));
+    }
+
+    async batchDelete(videoIds: string[]): Promise<Result<void, AppError>> {
+        const result = await wrap(
+            this.db.delete(videoTable)
+                .where(inArray(videoTable.id, videoIds))
+                .execute(),
+            (err) => new AppError({
+                message: `Database error during video batch delete: ${err.message}`,
+                code: 'INTERNAL_SERVER_ERROR'
+            })
+        );
+
+        if (result.err) {
+            return Err(result.err);
+        }
+
+        return Ok();
     }
 }

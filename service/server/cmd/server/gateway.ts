@@ -4,6 +4,7 @@ import { newApp } from '../../infra/http/hono/app'
 import { init } from '../../infra/http/hono/middleware'
 import {
   registerCreatorListApi,
+  registerCreatorPostApi,
   registerVideoListApi,
   registerVideoPostApi
 } from '../../routes'
@@ -32,4 +33,5 @@ app.use(
 registerVideoPostApi(app)
 registerVideoListApi(app)
 registerCreatorListApi(app)
+registerCreatorPostApi(app)
 export default createHandler(app)

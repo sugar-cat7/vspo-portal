@@ -2,13 +2,13 @@ import { z } from '@hono/zod-openapi'
 import { PaginationQuerySchema, PaginationResponseSchema } from './common';
 
 const CreateVideoRequestSchema = z.object({
-  youtubeVideoIds: z.string().openapi({
-    description: 'Youtube Video ID',
-    example: '123456',
+  youtubeVideoIds: z.array(z.string()).openapi({
+    description: 'YouTube Video ID',
+    example: ['123456'],
   }),
-  twitchVideoIds: z.string().openapi({
+  twitchVideoIds: z.array(z.string()).openapi({
     description: 'Twitch Video ID',
-    example: '123456',
+    example: ['123456'],
   }),
 })
 

@@ -10,6 +10,7 @@ export interface IVideoService {
     searchAllLiveVideos(): Promise<Result<Videos, AppError>>;
     searchExistVideos(): Promise<Result<Videos, AppError>>;
     getVideosByIDs({ youtubeVideoIds, twitchVideoIds }: { youtubeVideoIds: string[], twitchVideoIds: string[] }): Promise<Result<Videos, AppError>>;
+    searchDeletedVideoIds(): Promise<Result<{ videoIds: string[] }, AppError>>;
 }
 
 export class VideoService implements IVideoService {
@@ -126,6 +127,33 @@ export class VideoService implements IVideoService {
 
     return Ok(this.getVideoDifferences(fetchedVideos.val, existingVideos));
 }
+
+  async searchDeletedVideoIds(): Promise<Result<{ videoIds: string[] }, AppError>> {
+    const existingVideos = await this.deps.videoRepository.list({ limit: 100, page: 0 });
+    if (existingVideos.err) {
+        return existingVideos;
+    }
+
+    const youtubeVideoIds = existingVideos.val
+        .filter(v => v.platform === PlatformSchema.Enum.youtube)
+        .map(v => v.id);
+
+    const twitchVideoIds = existingVideos.val
+        .filter(v => v.platform === PlatformSchema.Enum.twitch)
+        .map(v => v.id);
+
+    const fetchedVideos = await this.getVideosByIDs({ youtubeVideoIds, twitchVideoIds });
+
+    if (fetchedVideos.err) {
+        return fetchedVideos;
+    }
+
+    const deletedVideoIds = existingVideos.val
+        .filter(v => !fetchedVideos.val.find(fetchedVideo => fetchedVideo.id === v.id))
+        .map(v => v.id);
+
+    return Ok({ videoIds: deletedVideoIds });
+  }
 
    async getVideosByIDs({ youtubeVideoIds, twitchVideoIds }: { youtubeVideoIds: string[], twitchVideoIds: string[] }): Promise<Result<Videos, AppError>> {
     const results: PromiseSettledResult<Result<Videos, AppError>>[] = await Promise.allSettled([

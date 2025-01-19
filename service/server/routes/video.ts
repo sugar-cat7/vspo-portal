@@ -62,7 +62,13 @@ const postVideosRoute = createRoute({
 
 export const registerVideoPostApi = (app: App) =>
   app.openapi(postVideosRoute, async (c) => {
-    return c.json({ message: "Hello, World!" }) as any;
+    const { di } = c.get("services");
+    const p = CreateVideoRequestSchema.parse(await c.req.json());
+    const r = await di.videoInteractor.batchUpsertByIds(p)
+    if (r.err) {
+      throw r.err;
+    }
+    return c.json(CreateVideoResponseSchema.parse(r.val), 200);
   });
 
 export const registerVideoListApi = (app: App) =>

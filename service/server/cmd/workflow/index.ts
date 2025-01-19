@@ -21,8 +21,8 @@ export class UpdateVideoWorkflow extends WorkflowEntrypoint<WorkflowEnv, Params>
 			async () => {
 			// https://developers.cloudflare.com/workers/runtime-apis/rpc/#promise-pipelining
 			using vu = await this.env.APPLICATION_SERVICE.newVideoUsecase()
-			const r1 = await vu.batchUpsertBySearchLive({})
-			const r2 = await vu.batchUpsertBySearchExist({})
+			const r1 = await vu.searchLive({})
+			const r2 = await vu.searchExist({})
 
 			if (r1.err) {
 				throw r1.err

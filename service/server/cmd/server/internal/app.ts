@@ -1,6 +1,7 @@
-import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
+import { WorkerEntrypoint } from "cloudflare:workers";
 import { Env, zEnv } from "../../../config/env";
-import { Dependency } from "../../../infra/dependency";
+import { Container } from "../../../infra/dependency";
+
 
 export class ApplicationService extends WorkerEntrypoint<Env> {
 
@@ -19,7 +20,7 @@ export class ApplicationService extends WorkerEntrypoint<Env> {
     if (!envResult.success) {
       throw new Error("Failed to parse environment variables");
     }
-    return new Dependency(this.env);
+    return new Container(envResult.data);
   }
 }
 
