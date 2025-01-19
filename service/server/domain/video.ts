@@ -22,6 +22,7 @@ const VideoSchema = z.object({
     viewCount: z.number().int().nonnegative(),
     thumbnailURL: ThumbnailURLSchema,
     videoType: VideoTypeSchema,
+    creatorThumbnailURL: ThumbnailURLSchema.optional(),
   });
 
   const VideosSchema = z.array(VideoSchema);

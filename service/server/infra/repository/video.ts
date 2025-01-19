@@ -1,45 +1,56 @@
-import { eq, and, SQL, asc } from "drizzle-orm";
+import { eq, and, SQL, asc, count } from "drizzle-orm";
 import { PlatformSchema, StatusSchema, VideoTypeSchema, Videos, createVideos } from "../../domain/video";
 import { AppError, Ok, Result, Err, wrap } from "../../pkg/errors";
 import { createUUID } from "../../pkg/uuid";
 import { buildConflictUpdateColumns } from "./helper";
-import { Database } from "./provider";
-import { createInsertStreamStatus, createInsertVideo, videoTable, streamStatusTable, InsertVideo, InsertStreamStatus } from "./schema";
+import { createInsertStreamStatus, createInsertVideo, videoTable, streamStatusTable, InsertVideo, InsertStreamStatus, channelTable, creatorTable } from "./schema";
+import { DB } from "./transaction";
 
 type ListQuery = {
     limit: number;
-    offset: number;
+    page: number;
     platform?: string;
     status?: string;
+    videoType?: string;
+    startedAt?: Date;
+    endedAt?: Date;
 }
 
 export interface IVideoRepository {
     list(query: ListQuery): Promise<Result<Videos, AppError>>;
     batchUpsert(videos: Videos): Promise<Result<Videos, AppError>>;
+    count(query: ListQuery): Promise<Result<number, AppError>>;
 }
 
-export class VideoRepository implements IVideoRepository {
-    private db: Database;
-  
-    constructor(db: Database) {
-        this.db = db;
-    }
+export class VideoRepository implements IVideoRepository {  
+    constructor(private readonly db: DB) {}
 
     async list(query: ListQuery): Promise<Result<Videos, AppError>> {
         const filters: SQL[] = [];
         if (query.platform) {
             filters.push(eq(videoTable.platformType, query.platform));
         }
+        if (query.videoType) {
+            filters.push(eq(videoTable.videoType, query.videoType));
+        }
         if (query.status) {
             filters.push(eq(streamStatusTable.status, query.status));
         }
+        if (query.startedAt) {
+            filters.push(eq(streamStatusTable.startedAt, query.startedAt));
+        }
+        if (query.endedAt) {
+            filters.push(eq(streamStatusTable.endedAt, query.endedAt));
+        }
 
         const videoResult = await wrap(
-            this.db.client.select().from(videoTable)
+            this.db.selectDistinctOn([videoTable.id]).from(videoTable)
                 .innerJoin(streamStatusTable, eq(videoTable.id, streamStatusTable.videoId))
+                .innerJoin(channelTable, eq(videoTable.channelId, channelTable.platformChannelId))
+                .innerJoin(creatorTable, eq(channelTable.creatorId, creatorTable.id))
                 .where(and(...filters))
                 .limit(query.limit)
-                .offset(query.offset)
+                .offset(query.page * query.limit)
                 .orderBy(asc(streamStatusTable.startedAt))
                 .execute(),
             (err) => new AppError({
@@ -66,7 +77,35 @@ export class VideoRepository implements IVideoRepository {
             viewCount: r.stream_status.viewCount,
             thumbnailURL: r.video.thumbnailUrl,
             videoType: VideoTypeSchema.parse(r.video.videoType),
+            creatorThumbnailURL: r.creator.representativeThumbnailUrl,
         }))));
+    }
+
+    async count(query: ListQuery): Promise<Result<number, AppError>> {
+        const filters: SQL[] = [];
+        if (query.platform) {
+            filters.push(eq(videoTable.platformType, query.platform));
+        }
+        if (query.status) {
+            filters.push(eq(streamStatusTable.status, query.status));
+        }
+
+        const videoResult = await wrap(
+            this.db.select({ count: count() }).from(videoTable)
+                .innerJoin(streamStatusTable, eq(videoTable.id, streamStatusTable.videoId))
+                .where(and(...filters))
+                .execute(),
+            (err) => new AppError({
+                message: `Database error during video count query: ${err.message}`,
+                code: 'INTERNAL_SERVER_ERROR'
+            })
+        );
+
+        if (videoResult.err) {
+            return Err(videoResult.err);
+        }
+
+        return Ok(videoResult.val.at(0)?.count ?? 0);
     }
   
     async batchUpsert(videos: Videos): Promise<Result<Videos, AppError>> {
@@ -97,7 +136,7 @@ export class VideoRepository implements IVideoRepository {
         }
 
         const videoResult = await wrap(
-            this.db.client.insert(videoTable)
+            this.db.insert(videoTable)
                 .values(dbVideos)
                 .onConflictDoUpdate({
                     target: videoTable.id,
@@ -124,7 +163,7 @@ export class VideoRepository implements IVideoRepository {
 
 
         const streamStatusResult = await wrap(
-            this.db.client.insert(streamStatusTable)
+            this.db.insert(streamStatusTable)
                 .values(dbStreamStatus)
                 .onConflictDoUpdate({
                     target: streamStatusTable.videoId,

@@ -2,8 +2,7 @@ import { z } from 'zod'
 
 export const zEnv = z.object({
   SERVICE_NAME: z.string(),
-  // CLOUDFLARE_API_KEY: z.string(),
-  // CLOUDFLARE_ZONE_ID: z.string(),
+  ENVIRONMENT: z.enum(['production', 'staging', 'development', 'local']),
   LOG_TYPE: z.enum(['pretty', 'json']).default('pretty'),
   LOG_MINLEVEL: z
     .string()
@@ -23,20 +22,19 @@ export const zEnv = z.object({
   /**
    * Cloudflare Services
    */
-  HYPERDRIVE: z.custom<Hyperdrive>(),
+  DB: z.custom<Hyperdrive>(),
   LOG_QUEUE: z.custom<Queue>(),
   APP_QUEUE: z.custom<Queue>(),
   APP_BUCKET: z.custom<R2Bucket>(),
-  APP_DB: z.custom<D1Database>(),
   APP_KV: z.custom<KVNamespace>(),
-  APP_VECTORIZE_INDEX: z.custom<VectorizeIndex>(),
   APP_AI: z.custom<Fetcher>(),
   UPDATE_VIDEOS_WORKFLOW: z.custom<Workflow>(),
 
   /**
-   * Database
+   * Dev
    */
-  DB_CONNECTION_STRING: z.string(),
+  DEV_DB_CONNECTION_STRING: z.string(),
+
   /**
    * API Key
    */

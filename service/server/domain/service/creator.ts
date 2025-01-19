@@ -9,27 +9,21 @@ export interface ICreatorService {
 }
 
 export class CreatorService implements ICreatorService {
-  private youtubeClient: IYoutubeService;
-  private creatorRepository: ICreatorRepository;
+  constructor(
+    private readonly deps: {
+      youtubeClient: IYoutubeService;
+      creatorRepository: ICreatorRepository;
+    }
+  ) {}
 
-  constructor({
-    youtubeClient,
-    creatorRepository,
-  }: {
-    youtubeClient: IYoutubeService;
-    creatorRepository: ICreatorRepository;
-  }) {
-    this.youtubeClient = youtubeClient;
-    this.creatorRepository = creatorRepository;
-  }
 
   async searchCreatorsByMemberType(params: { memberType: "vspo_jp"| "vspo_en"| "vspo_ch"| "general" }): Promise<Result<Creators, AppError>> {
-    const c = await this.creatorRepository.list({ limit: 100, offset: 0, memberType: params.memberType });
+    const c = await this.deps.creatorRepository.list({ limit: 100, page: 0, memberType: params.memberType });
     if (c.err) {
       return c;
     }
 
-    const chs = await this.youtubeClient.getChannels({ channelIds: c.val.map(v => v.channel?.youtube?.rawId).filter(v => v !== undefined) });
+    const chs = await this.deps.youtubeClient.getChannels({ channelIds: c.val.map(v => v.channel?.youtube?.rawId).filter(v => v !== undefined) });
 
 
     if (chs.err) {
@@ -55,7 +49,7 @@ export class CreatorService implements ICreatorService {
   }
 
   async searchCreatorsByChannelIds(params: { channelId: string, memberType: "vspo_jp"| "vspo_en"| "vspo_ch"| "general"  }[]): Promise<Result<Creators, AppError>> {
-    const chs = await this.youtubeClient.getChannels({ channelIds: params.map(v => v.channelId) });
+    const chs = await this.deps.youtubeClient.getChannels({ channelIds: params.map(v => v.channelId) });
 
     if (chs.err) {
       return chs;

@@ -1,28 +1,25 @@
-import { eq, and, SQL } from "drizzle-orm";
+import { eq, and, SQL, count } from "drizzle-orm";
 import { AppError, Ok, Result, Err, wrap } from "../../pkg/errors";
-import { Database } from "./provider";
 import { creatorTable, channelTable, InsertChannel, InsertCreator } from "./schema";
 import { createChannel, createCreators, Creators, getPlatformDetail, MemberTypeSchema } from "../../domain";
 import { getCurrentUTCDate } from "../../pkg/dayjs";
 import { buildConflictUpdateColumns } from "./helper";
+import { DB } from "./transaction";
 
 type ListQuery = {
     limit: number;
-    offset: number;
+    page: number;
     memberType?: string;
 }
 
 export interface ICreatorRepository {
     list(query: ListQuery): Promise<Result<Creators, AppError>>;
+    count(query: ListQuery): Promise<Result<number, AppError>>;
     batchUpsert(creators: Creators): Promise<Result<Creators, AppError>>;
 }
 
 export class CreatorRepository implements ICreatorRepository {
-    private db: Database;
-  
-    constructor(db: Database) {
-        this.db = db;
-    }
+    constructor(private readonly db: DB) {}
 
     async list(query: ListQuery): Promise<Result<Creators, AppError>> {
         const filters: SQL[] = [];
@@ -31,11 +28,11 @@ export class CreatorRepository implements ICreatorRepository {
         }
 
         const creatorResult = await wrap(
-            this.db.client.select().from(creatorTable)
+            this.db.select().from(creatorTable)
                 .innerJoin(channelTable, eq(creatorTable.id, channelTable.creatorId))
                 .where(and(...filters))
                 .limit(query.limit)
-                .offset(query.offset)
+                .offset(query.page * query.limit)
                 .execute(),
             (err) => new AppError({
                 message: `Database error during creator list query: ${err.message}`,
@@ -91,6 +88,30 @@ export class CreatorRepository implements ICreatorRepository {
         }))));
     }
 
+    async count(query: ListQuery): Promise<Result<number, AppError>> {
+        const filters: SQL[] = [];
+        if (query.memberType) {
+            filters.push(eq(creatorTable.memberType, query.memberType));
+        }
+
+        const creatorResult = await wrap(
+            this.db.select({ count: count()}).from(creatorTable)
+                .innerJoin(channelTable, eq(creatorTable.id, channelTable.creatorId))
+                .where(and(...filters))
+                .execute(),
+            (err) => new AppError({
+                message: `Database error during creator count query: ${err.message}`,
+                code: 'INTERNAL_SERVER_ERROR'
+            })
+        );
+
+        if (creatorResult.err) {
+            return Err(creatorResult.err);
+        }
+
+        return Ok(creatorResult.val.at(0)?.count ?? 0);
+    }
+
     async batchUpsert(creators: Creators): Promise<Result<Creators, AppError>> {
         const dbCreatorss: InsertCreator[] = [];
         const dbChannels: InsertChannel[] = [];
@@ -126,7 +147,7 @@ export class CreatorRepository implements ICreatorRepository {
         }
 
         const creatorResult = await wrap(
-            this.db.client.insert(creatorTable)
+            this.db.insert(creatorTable)
                 .values(dbCreatorss)
                 .onConflictDoUpdate({
                     target: creatorTable.id,
@@ -149,7 +170,7 @@ export class CreatorRepository implements ICreatorRepository {
 
 
         const channelResult = await wrap(
-            this.db.client.insert(channelTable)
+            this.db.insert(channelTable)
                 .values(dbChannels)
                 .onConflictDoUpdate({
                     target: creatorTable.id,

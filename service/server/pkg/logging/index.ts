@@ -1,5 +1,5 @@
 import { type ISettingsParam, Logger as TSLogger } from 'tslog'
-import type { Env } from '../env'
+import type { Env } from '../../config/env'
 
 interface Fields {
   [key: string]: unknown

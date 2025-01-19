@@ -3,7 +3,7 @@ import { OpenAPIHono } from '@hono/zod-openapi'
 import type { Context } from 'hono'
 import { contextStorage } from 'hono/context-storage'
 import { prettyJSON } from 'hono/pretty-json'
-import { handleError, handleZodError } from '../errors'
+import { handleError, handleZodError } from '../../../pkg/errors'
 import type { HonoEnv } from './env'
 
 export const newApp = () => {

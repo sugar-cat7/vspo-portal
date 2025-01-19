@@ -1,8 +1,10 @@
 import { cors } from 'hono/cors'
 import { requestId } from 'hono/request-id'
-import { newApp } from '../../pkg/hono/app'
+import { newApp } from '../../infra/http/hono/app'
 import { init } from '../../infra/http/hono/middleware'
 import {
+  registerCreatorListApi,
+  registerVideoListApi,
   registerVideoPostApi
 } from '../../routes'
 import { createHandler } from '../../infra/http/hono/otel'
@@ -11,6 +13,10 @@ const app = newApp()
 app.notFound((c) => {
   return c.text('Not Found', 404)
 })
+app.get('/health', (c) => {
+  return c.text('OK')
+})
+
 app.use(
   '*',
   cors({
@@ -24,4 +30,6 @@ app.use(
   init,
 )
 registerVideoPostApi(app)
+registerVideoListApi(app)
+registerCreatorListApi(app)
 export default createHandler(app)

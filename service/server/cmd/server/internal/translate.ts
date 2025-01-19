@@ -1,5 +1,5 @@
 import { WorkerEntrypoint } from "cloudflare:workers";
-import { Env } from "../../../pkg/env";
+import { Env } from "../../../config/env";
 
 export class TranslateService extends WorkerEntrypoint<Env> {
   

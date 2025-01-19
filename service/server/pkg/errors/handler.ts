@@ -2,13 +2,14 @@ import { z } from '@hono/zod-openapi'
 import type { Context } from 'hono'
 import { env } from 'hono/adapter'
 import { HTTPException } from 'hono/http-exception'
-import type { StatusCode } from 'hono/utils/http-status'
 import type { ZodError } from 'zod'
-import type { Env } from '../env'
-import type { AppContext } from '../hono'
-import type { HonoEnv } from '../hono/env'
+import type { Env } from '../../config/env'
+
+import type { HonoEnv } from '../../infra/http/hono/env'
 import { AppLogger } from '../logging'
 import { AppError } from './error'
+import { AppContext } from '../../infra/http/hono'
+import { ContentfulStatusCode, StatusCode } from 'hono/utils/http-status'
 
 export const ErrorCodeSchema = z.enum([
   'BAD_REQUEST',
@@ -82,7 +83,7 @@ export const ErrorSchema = z.object({
 
 export type ErrorResponse = z.infer<typeof ErrorSchema>
 
-export const codeToStatus = (code: ErrorCode): StatusCode => {
+export const codeToStatus = (code: ErrorCode): ContentfulStatusCode => {
   switch (code) {
     case 'BAD_REQUEST':
       return 400
@@ -103,6 +104,8 @@ export const codeToStatus = (code: ErrorCode): StatusCode => {
     case 'RATE_LIMITED':
       return 429
     case 'INTERNAL_SERVER_ERROR':
+      return 500
+    default:
       return 500
   }
 }
@@ -141,7 +144,7 @@ export const handleZodError = (
   c: Context<HonoEnv>
 ) => {
   if (!result.success) {
-    return c.json<ErrorResponse, StatusCode>(
+    return c.json<ErrorResponse, ContentfulStatusCode>(
       {
         error: {
           code: 'BAD_REQUEST',
@@ -150,7 +153,7 @@ export const handleZodError = (
           requestId: c.get('requestId'),
         },
       },
-      { status: 400 }
+      400
     )
   }
 }
@@ -170,8 +173,7 @@ export const handleError = (err: Error, c: Context<HonoEnv>): Response => {
       retry: err.retry,
       requestId: c.get('requestId'),
     })
-
-    return c.json<ErrorResponse, StatusCode>(
+    return c.json<ErrorResponse, ContentfulStatusCode>(
       {
         error: {
           code: err.code,
@@ -180,7 +182,7 @@ export const handleError = (err: Error, c: Context<HonoEnv>): Response => {
           requestId: c.get('requestId'),
         },
       },
-      { status: err.status }
+      err.status as ContentfulStatusCode
     )
   }
 
@@ -197,7 +199,7 @@ export const handleError = (err: Error, c: Context<HonoEnv>): Response => {
       })
     }
     const code = statusToCode(err.status)
-    return c.json<ErrorResponse, StatusCode>(
+    return c.json<ErrorResponse, ContentfulStatusCode>(
       {
         error: {
           code,
@@ -206,7 +208,7 @@ export const handleError = (err: Error, c: Context<HonoEnv>): Response => {
           requestId: c.get('requestId'),
         },
       },
-      { status: err.status }
+      { status: err.status as ContentfulStatusCode }
     )
   }
 
@@ -217,7 +219,7 @@ export const handleError = (err: Error, c: Context<HonoEnv>): Response => {
     stack: err.stack,
     requestId: c.get('requestId'),
   })
-  return c.json<ErrorResponse, StatusCode>(
+  return c.json<ErrorResponse, ContentfulStatusCode>(
     {
       error: {
         code: 'INTERNAL_SERVER_ERROR',
@@ -226,12 +228,12 @@ export const handleError = (err: Error, c: Context<HonoEnv>): Response => {
         requestId: c.get('requestId'),
       },
     },
-    { status: 500 }
+    { status: 500 as ContentfulStatusCode }
   )
 }
 
 export const errorResponse = (c: Context, code: ErrorCode, message: string) => {
-  return c.json<ErrorResponse, StatusCode>(
+  return c.json<ErrorResponse, ContentfulStatusCode>(
     {
       error: {
         code: code,
@@ -240,6 +242,6 @@ export const errorResponse = (c: Context, code: ErrorCode, message: string) => {
         requestId: c.get('requestId'),
       },
     },
-    { status: codeToStatus(code) }
+    codeToStatus(code)
   )
 }

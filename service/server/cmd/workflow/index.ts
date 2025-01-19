@@ -1,5 +1,5 @@
 import { WorkflowEntrypoint, WorkflowEvent, WorkflowStep } from "cloudflare:workers";
-import { Env } from "../../pkg/env";
+import { Env } from "../../config/env";
 import type { ApplicationService } from "../server/internal/app";
 import { convertToUTCDate } from "../../pkg/dayjs";
 

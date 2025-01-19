@@ -31,7 +31,6 @@ const PaginationQuerySchema = z.object({
   limit: z
     .string()
     .min(1)
-    .optional()
     .openapi({
       description: 'Maximum number of items to retrieve per page',
       example: '10',
@@ -43,7 +42,6 @@ const PaginationQuerySchema = z.object({
   page: z
     .string()
     .min(1)
-    .optional()
     .openapi({
       description: 'Page number to start retrieving items(starts from 1)',
       example: '1',

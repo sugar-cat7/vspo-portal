@@ -1,5 +1,5 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { Env, zEnv } from "../../../pkg/env";
+import { Env, zEnv } from "../../../config/env";
 import { Dependency } from "../../../infra/dependency";
 
 export class ApplicationService extends WorkerEntrypoint<Env> {

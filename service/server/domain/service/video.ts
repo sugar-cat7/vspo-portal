@@ -13,38 +13,22 @@ export interface IVideoService {
 }
 
 export class VideoService implements IVideoService {
-  private youtubeClient: IYoutubeService;
-  private twitchClient: ITwitchService;
-  private twitCastingClient: ITwitcastingService;
-  private creatorRepository: ICreatorRepository;
-  private videoRepository: IVideoRepository;
-
-  constructor({
-    youtubeClient,
-    twitchClient,
-    twitCastingClient,
-    creatorRepository,
-    videoRepository
-  }: {
-    youtubeClient: IYoutubeService;
-    twitchClient: ITwitchService;
-    twitCastingClient: ITwitcastingService;
-    creatorRepository: ICreatorRepository;
-    videoRepository: IVideoRepository;
-  }) {
-    this.youtubeClient = youtubeClient;
-    this.twitchClient = twitchClient;
-    this.twitCastingClient = twitCastingClient;
-    this.creatorRepository = creatorRepository;
-    this.videoRepository = videoRepository;
-  }
+  constructor(
+    private readonly deps: {
+      youtubeClient: IYoutubeService;
+      twitchClient: ITwitchService;
+      twitCastingClient: ITwitcastingService;
+      creatorRepository: ICreatorRepository;
+      videoRepository: IVideoRepository;
+    }
+  ) {}
 
   async searchLiveYoutubeVideos(): Promise<Result<Videos, AppError>> {
     const promises = [
-      this.youtubeClient.searchVideos({ query: query.VSPO_JP, eventType: "live" }),
-      this.youtubeClient.searchVideos({ query: query.VSPO_EN, eventType: "live" }),
-      this.youtubeClient.searchVideos({ query: query.VSPO_JP, eventType: "upcoming" }),
-      this.youtubeClient.searchVideos({ query: query.VSPO_EN, eventType: "upcoming" }),
+      this.deps.youtubeClient.searchVideos({ query: query.VSPO_JP, eventType: "live" }),
+      this.deps.youtubeClient.searchVideos({ query: query.VSPO_EN, eventType: "live" }),
+      this.deps.youtubeClient.searchVideos({ query: query.VSPO_JP, eventType: "upcoming" }),
+      this.deps.youtubeClient.searchVideos({ query: query.VSPO_EN, eventType: "upcoming" }),
     ];
 
     const results = await Promise.allSettled(promises);
@@ -71,7 +55,7 @@ export class VideoService implements IVideoService {
             .concat(c.val.en.map(c => c.channel?.twitch?.rawId))
             .filter(id => id !== undefined)
         
-        const result = await this.twitchClient.getStreams({ userIds: userIds });
+        const result = await this.deps.twitchClient.getStreams({ userIds: userIds });
         if (result.err) {
         return result;
         }
@@ -89,7 +73,7 @@ export class VideoService implements IVideoService {
             .concat(c.val.en.map(c => c.channel?.twitCasting?.rawId))
             .filter(id => id !== undefined)
         
-        const result = await this.twitCastingClient.getVideos({ userIds: userIds });
+        const result = await this.deps.twitCastingClient.getVideos({ userIds: userIds });
         if (result.err) {
         return result;
         }
@@ -114,8 +98,8 @@ export class VideoService implements IVideoService {
 
   // Get videos that have differences from existing videos
   async searchExistVideos(): Promise<Result<Videos, AppError>> {
-    const liveVideos = await this.videoRepository.list({ limit: 30, offset: 0, status: StatusSchema.Enum.live });
-    const upcomingVideos = await this.videoRepository.list({ limit: 30, offset: 0, status: StatusSchema.Enum.upcoming });
+    const liveVideos = await this.deps.videoRepository.list({ limit: 30, page: 0, status: StatusSchema.Enum.live });
+    const upcomingVideos = await this.deps.videoRepository.list({ limit: 30, page: 0, status: StatusSchema.Enum.upcoming });
 
     if (liveVideos.err) {
         return liveVideos;
@@ -146,10 +130,10 @@ export class VideoService implements IVideoService {
    async getVideosByIDs({ youtubeVideoIds, twitchVideoIds }: { youtubeVideoIds: string[], twitchVideoIds: string[] }): Promise<Result<Videos, AppError>> {
     const results: PromiseSettledResult<Result<Videos, AppError>>[] = await Promise.allSettled([
       ...(youtubeVideoIds.length > 0
-        ? [this.youtubeClient.getVideos({ videoIds: youtubeVideoIds })]
+        ? [this.deps.youtubeClient.getVideos({ videoIds: youtubeVideoIds })]
         : []),
       ...(twitchVideoIds.length > 0
-        ? [this.twitchClient.getVideosByIDs({ videoIds: twitchVideoIds })]
+        ? [this.deps.twitchClient.getVideosByIDs({ videoIds: twitchVideoIds })]
         : []),
     ]);
 
@@ -162,12 +146,12 @@ export class VideoService implements IVideoService {
    }
 
     private async masterCreators(): Promise<Result<{ jp: Creator[]; en: Creator[] }, AppError>> {
-      const jpCreators = await this.creatorRepository.list({ limit: 50, offset: 0, memberType: MemberTypeSchema.Enum.vspo_jp });
+      const jpCreators = await this.deps.creatorRepository.list({ limit: 50, page: 0, memberType: MemberTypeSchema.Enum.vspo_jp });
       if (jpCreators.err) {
           return jpCreators;
       }
   
-      const enCreators = await this.creatorRepository.list({ limit: 50, offset: 0, memberType: MemberTypeSchema.Enum.vspo_en });
+      const enCreators = await this.deps.creatorRepository.list({ limit: 50, page: 0, memberType: MemberTypeSchema.Enum.vspo_en });
       if (enCreators.err) {
           return enCreators;
       }

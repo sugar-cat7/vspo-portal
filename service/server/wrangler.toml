@@ -1,17 +1,16 @@
 name = "template-api"
 compatibility_date = "2024-10-22"
 send_metrics = false
-compatibility_flags = ["nodejs_als"]
-node_compat = true
-main = "cmd/server/index.ts"
+compatibility_flags = ["nodejs_compat", "nodejs_als"]
+main = "cmd/server/gateway.ts"
 tail_consumers = [{ service = "api-tail" }]
 logpush = true
 
 
-# Preview environmentで必要なものはリソースの作成が必要
+# Resources need to be created for Preview environment
 # https://developers.cloudflare.com/workers/wrangler/configuration
 
-# dev --remoteの場合Queue Bindingをするとエラーになる
+# Queue Binding causes an error when using dev --remote
 # https://github.com/cloudflare/workerd/issues/855
 [queues]
 consumers = [
@@ -28,17 +27,10 @@ bucket_name = "app-bucket"
 binding = "APP_BUCKET"
 preview_bucket_name = 'app-preview-bucket'
 
-[[d1_databases]]
-binding = "APP_DB"
-database_name = "app-db"
-database_id = "xxx"
-migrations_dir = "pkg/db/sqlite/gen/ddl"
-preview_database_id = "xxx"
-
 # wrangler vectorize create langchain-test --dimensions=768 --metric=cosine
-[[vectorize]]
-binding = "APP_VECTORIZE_INDEX"
-index_name = "app-index"
+# [[vectorize]]
+# binding = "APP_VECTORIZE_INDEX"
+# index_name = "app-index"
 
 [ai]
 binding = "APP_AI"
@@ -62,10 +54,15 @@ id = "xxx"
 
 ######## WORKFLOW ########
 
-[[workflows]]
-# name of your workflow
-name = "workflows-starter"
-# binding name env.MY_WORKFLOW
-binding = "MY_WORKFLOW"
-# this is class that extends the Workflow class in src/index.ts
-class_name = "MyWorkflow"
+# [[workflows]]
+# # name of your workflow
+# name = "workflows-starter"
+# # binding name env.MY_WORKFLOW
+# binding = "MY_WORKFLOW"
+# # this is class that extends the Workflow class in src/index.ts
+# class_name = "UpdateVideoWorkflow"
+
+[[hyperdrive]]
+binding = "DB"
+id = "c020574a-5623-407b-be0c-cd192bab9545"
+localConnectionString = "postgres://user:password@localhost:5432/vspo"
