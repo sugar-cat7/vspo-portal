@@ -1,6 +1,8 @@
 module github.com/sugar-cat7/vspo-portal/service/common-job
 
 go 1.22.0
+toolchain go1.23.5
+
 require (
 	github.com/Adeithe/go-twitch v0.2.3
 	github.com/Code-Hex/synchro v0.5.3
@@ -20,9 +22,9 @@ require (
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
 	github.com/volatiletech/null/v8 v8.1.2
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.58.0
-	go.opentelemetry.io/otel v1.33.0
-	go.opentelemetry.io/otel/metric v1.33.0
-	go.opentelemetry.io/otel/trace v1.33.0
+	go.opentelemetry.io/otel v1.34.0
+	go.opentelemetry.io/otel/metric v1.34.0
+	go.opentelemetry.io/otel/trace v1.34.0
 	go.uber.org/mock v0.5.0
 	go.uber.org/multierr v1.11.0
 	google.golang.org/api v0.216.0
