@@ -7,7 +7,7 @@ require (
 	github.com/Adeithe/go-twitch v0.2.3
 	github.com/Code-Hex/synchro v0.5.3
 	github.com/caarlos0/env/v10 v10.0.0
-	github.com/exaring/otelpgx v0.7.0
+	github.com/exaring/otelpgx v0.8.0
 	github.com/go-faker/faker/v4 v4.5.0
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
