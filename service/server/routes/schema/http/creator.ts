@@ -2,7 +2,7 @@ import { z } from "zod";
 import { PaginationQuerySchema, PaginationResponseSchema } from "./common";
 
 const MemberTypeSchema = z.enum(["vspo_jp", "vspo_en", "vspo_ch", "general"]);
-const ThumbnailURLSchema = z.string().url();
+const ThumbnailURLSchema = z.string();
 
 const ChannelDetailSchema = z
   .object({

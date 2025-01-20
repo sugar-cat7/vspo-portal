@@ -1,0 +1,16 @@
+{
+    "name": "template-api",
+    "targets": {
+      "dev-all": {
+        "executor": "nx:run-commands",
+        "options": {
+          "commands": [
+            "wrangler dev --config api-gateway.wrangler.toml",
+            "wrangler dev --config internal-app.wrangler.toml"
+          ],
+          "parallel": true
+        }
+      }
+    }
+  }
+  

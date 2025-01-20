@@ -1,7 +1,7 @@
 import { eq, and, SQL, count, inArray } from "drizzle-orm";
 import { AppError, Ok, Result, Err, wrap } from "../../pkg/errors";
 import { creatorTable, channelTable, InsertChannel, InsertCreator } from "./schema";
-import { createChannel, createCreators, Creators, getPlatformDetail, MemberTypeSchema } from "../../domain";
+import { Channel, createChannel, createCreators, Creators, getPlatformDetail, MemberTypeSchema } from "../../domain";
 import { getCurrentUTCDate } from "../../pkg/dayjs";
 import { buildConflictUpdateColumns } from "./helper";
 import { DB } from "./transaction";
@@ -27,7 +27,7 @@ export class CreatorRepository implements ICreatorRepository {
         if (query.memberType) {
             filters.push(eq(creatorTable.memberType, query.memberType));
         }
-
+    
         const creatorResult = await wrap(
             this.db.select().from(creatorTable)
                 .innerJoin(channelTable, eq(creatorTable.id, channelTable.creatorId))
@@ -40,54 +40,90 @@ export class CreatorRepository implements ICreatorRepository {
                 code: 'INTERNAL_SERVER_ERROR'
             })
         );
-
+    
         if (creatorResult.err) {
             return Err(creatorResult.err);
         }
-
-        return Ok(createCreators(creatorResult.val.map(r => ({
-            id: r.creator.id,
-            name: r.creator.name,
-            memberType: MemberTypeSchema.parse(r.creator.memberType),
-            thumbnailURL: r.creator.representativeThumbnailUrl,
-            channel: createChannel({
-                id: r.channel.id,
-                creatorID: r.creator.id,
-                youtube: r.channel.platformType === 'youtube' ? {
+    
+        
+        type CreatorMapValue = {
+            id: string;
+            name: string;
+            memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
+            thumbnailURL: string;
+            channel: Channel;
+        };
+    
+        const creatorMap: Map<string, CreatorMapValue> = new Map();
+    
+        for (const r of creatorResult.val) {
+            if (!creatorMap.has(r.creator.id)) {
+                creatorMap.set(r.creator.id, {
+                    id: r.creator.id,
+                    name: r.creator.name,
+                    memberType: MemberTypeSchema.parse(r.creator.memberType),
+                    thumbnailURL: r.creator.representativeThumbnailUrl ?? '',
+                    channel: {
+                        id: r.channel.id,
+                        creatorID: r.creator.id,
+                        youtube: null,
+                        twitch: null,
+                        twitCasting: null,
+                        niconico: null,
+                    },
+                });
+            }
+    
+            const creator = creatorMap.get(r.creator.id)!;
+            if (r.channel.platformType === 'youtube') {
+                creator.channel.youtube = {
                     rawId: r.channel.platformChannelId,
                     name: r.channel.title,
                     description: r.channel.description,
-                    publishedAt: r.channel.publishedAt,
                     thumbnailURL: r.channel.thumbnailUrl,
+                    publishedAt: r.channel.publishedAt,
                     subscriberCount: r.channel.subscriberCount,
-                } : null,
-                twitch: r.channel.platformType === 'twitch' ? {
+                };
+            }
+            if (r.channel.platformType === 'twitch') {
+                creator.channel.twitch = {
                     rawId: r.channel.platformChannelId,
                     name: r.channel.title,
                     description: r.channel.description,
-                    publishedAt: r.channel.publishedAt,
                     thumbnailURL: r.channel.thumbnailUrl,
+                    publishedAt: r.channel.publishedAt,
                     subscriberCount: r.channel.subscriberCount,
-                } : null,
-                twitCasting: r.channel.platformType === 'twitcasting'  ? {
+                };
+            }
+            if (r.channel.platformType === 'twitcasting') {
+                creator.channel.twitCasting = {
                     rawId: r.channel.platformChannelId,
                     name: r.channel.title,
                     description: r.channel.description,
-                    publishedAt: r.channel.publishedAt,
                     thumbnailURL: r.channel.thumbnailUrl,
+                    publishedAt: r.channel.publishedAt,
                     subscriberCount: r.channel.subscriberCount,
-                } : null,
-                niconico: r.channel.platformType === 'niconico' ? {
+                };
+            }
+            if (r.channel.platformType === 'niconico') {
+                creator.channel.niconico = {
                     rawId: r.channel.platformChannelId,
                     name: r.channel.title,
                     description: r.channel.description,
-                    publishedAt: r.channel.publishedAt,
                     thumbnailURL: r.channel.thumbnailUrl,
+                    publishedAt: r.channel.publishedAt,
                     subscriberCount: r.channel.subscriberCount,
-                } : null,
-            })
-        }))));
+                };
+            }
+    
+        }
+    
+        return Ok(createCreators(Array.from(creatorMap.values())));
     }
+    
+    
+    
+    
 
     async count(query: ListQuery): Promise<Result<number, AppError>> {
         const filters: SQL[] = [];
@@ -97,7 +133,6 @@ export class CreatorRepository implements ICreatorRepository {
 
         const creatorResult = await wrap(
             this.db.select({ count: count()}).from(creatorTable)
-                .innerJoin(channelTable, eq(creatorTable.id, channelTable.creatorId))
                 .where(and(...filters))
                 .execute(),
             (err) => new AppError({

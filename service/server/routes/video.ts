@@ -62,9 +62,9 @@ const postVideosRoute = createRoute({
 
 export const registerVideoPostApi = (app: App) =>
   app.openapi(postVideosRoute, async (c) => {
-    const { di } = c.get("services");
+    
     const p = CreateVideoRequestSchema.parse(await c.req.json());
-    const r = await di.videoInteractor.batchUpsertByIds(p)
+    const r = await c.env.APP_WORKER.newVideoUsecase().batchUpsertByIds(p);
     if (r.err) {
       throw r.err;
     }
@@ -73,10 +73,8 @@ export const registerVideoPostApi = (app: App) =>
 
 export const registerVideoListApi = (app: App) =>
   app.openapi(listVideosRoute, async (c) => {
-    const { di } = c.get("services");
     const p = ListVideoRequestSchema.parse(c.req.query());
-
-    const r = await di.videoInteractor.list({
+    const r = await c.env.APP_WORKER.newVideoUsecase().list({
       limit: parseInt(p.limit),
       page: parseInt(p.page),
       platform: p.platform,

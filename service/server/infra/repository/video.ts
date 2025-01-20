@@ -45,7 +45,7 @@ export class VideoRepository implements IVideoRepository {
         }
 
         const videoResult = await wrap(
-            this.db.selectDistinctOn([videoTable.id]).from(videoTable)
+            this.db.select().from(videoTable)
                 .innerJoin(streamStatusTable, eq(videoTable.id, streamStatusTable.videoId))
                 .innerJoin(channelTable, eq(videoTable.channelId, channelTable.platformChannelId))
                 .innerJoin(creatorTable, eq(channelTable.creatorId, creatorTable.id))

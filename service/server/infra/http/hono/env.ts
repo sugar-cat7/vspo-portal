@@ -2,18 +2,21 @@
 import type { RequestIdVariables } from 'hono/request-id'
 import type { Env } from '../../../config/env'
 import type { AppLogger } from '../../../pkg/logging'
-import { Container } from '../../dependency'
 import { getContext } from 'hono/context-storage'
+import { ApplicationService } from '../../../cmd/server/internal/application'
+
 
 
 export type ServiceContext = {
   logger: AppLogger
-  // tracer: Tracer
-  di: Container
+}
+
+type AppEnv = Env & {
+  APP_WORKER: Service<ApplicationService>
 }
 
 export type HonoEnv = {
-  Bindings: Env
+  Bindings: AppEnv
   Variables: {
     services: ServiceContext
   } & RequestIdVariables

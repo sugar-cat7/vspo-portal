@@ -3,14 +3,14 @@ import { Videos } from "../domain/video";
 import { IAppContext } from "../infra/dependency";
 import { AppError, Ok, Result } from "../pkg/errors";
 
-type BatchUpsertParam = Videos;
-type SearchLiveParam = {};
-type SearchExistParam = {};
-type BatchUpsertByIdsParam = {
+export type BatchUpsertParam = Videos;
+export type SearchLiveParam = {};
+export type SearchExistParam = {};
+export type BatchUpsertByIdsParam = {
   youtubeVideoIds: string[];
   twitchVideoIds: string[];
 };
-type ListParam = {
+export type ListParam = {
   limit: number;
   page: number;
   platform?: string;
@@ -20,12 +20,12 @@ type ListParam = {
   endedAt?: Date;
 };
 
-type ListResponse = {
+export type ListResponse = {
   videos: Videos;
   pagination: Page;
 };
 
-interface IVideoInteractor {
+export interface IVideoInteractor {
   batchUpsert(params: BatchUpsertParam): Promise<Result<Videos, AppError>>;
   searchLive(
     params: SearchLiveParam

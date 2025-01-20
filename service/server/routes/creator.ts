@@ -61,10 +61,8 @@ const postCreatorRoute = createRoute({
 
 export const registerCreatorPostApi = (app: App) =>
   app.openapi(postCreatorRoute, async (c) => {
-    const { di } = c.get("services");
     const p = CreateCreatorRequestSchema.parse(await c.req.json());
-
-    const r = await di.creatorInteractor.batchUpsertByChannelIds({
+    const r = await c.env.APP_WORKER.newCreatorUsecase().batchUpsertByChannelIds({
       channel: p.channel,
     });
 
@@ -78,10 +76,9 @@ export const registerCreatorPostApi = (app: App) =>
 
 export const registerCreatorListApi = (app: App) =>
   app.openapi(listCreatorRoute, async (c) => {
-    const { di } = c.get("services");
     const p = ListCreatorRequestSchema.parse(c.req.query());
 
-    const r = await di.creatorInteractor.list({
+    const r = await c.env.APP_WORKER.newCreatorUsecase().list({
       limit: parseInt(p.limit),
       page: parseInt(p.page),
       memberType: p.memberType,

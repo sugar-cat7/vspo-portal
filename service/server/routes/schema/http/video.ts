@@ -24,7 +24,7 @@ const PlatformSchema = z.enum(["youtube", "twitch", "twitcasting", "niconico", "
   description: 'Platform',
   example: 'youtube',
 });
-const ThumbnailURLSchema = z.string().url().openapi({
+const ThumbnailURLSchema = z.string().openapi({
   description: 'Thumbnail URL',
   example: 'https://example.com',
 });

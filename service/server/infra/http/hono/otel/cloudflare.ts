@@ -1,7 +1,9 @@
 import { type ResolveConfigFn, instrument } from '@microlabs/otel-cf-workers'
 import { trace } from '@opentelemetry/api'
-import type{ Env } from '../../../../config/env'
+import{ type Env } from '../../../../config/env'
 import { App } from '..'
+import { ApplicationService } from '../../../../cmd/server/internal/application'
+
 
 
 const config: ResolveConfigFn = (env: Env, _trigger) => {
@@ -14,9 +16,13 @@ const config: ResolveConfigFn = (env: Env, _trigger) => {
   }
 }
 
+type AppEnv = Env & {
+	APPLICATION_SERVICE: Service<ApplicationService>;
+}
+
 export const createHandler = (app: App) => {
   const handler = {
-    fetch: async (req: Request, env: Env, executionCtx: ExecutionContext) => {
+    fetch: async (req: Request, env: AppEnv, executionCtx: ExecutionContext) => {
       const tracer = trace.getTracer('OTelCFWorkers:Fetcher')
       return await tracer.startActiveSpan('Exec', async (span) => {
         try {
@@ -35,7 +41,7 @@ export const createHandler = (app: App) => {
       })
     },
 
-    queue: async (batch: MessageBatch, env: Env, _executionContext: ExecutionContext) => {
+    queue: async (batch: MessageBatch, env: AppEnv, _executionContext: ExecutionContext) => {
       const tracer = trace.getTracer('OTelCFWorkers:Consumer')
       await tracer.startActiveSpan('Consume', async (span) => {
         try {
@@ -64,7 +70,22 @@ export const createHandler = (app: App) => {
         }
       })
     },
-  } satisfies ExportedHandler<Env>
+
+    async scheduled(
+      controller: ScheduledController,
+      env: AppEnv,
+      ctx: ExecutionContext,
+    ) {
+      switch (controller.cron) {
+        case '0 0 * * *':
+          console.log('Midnight cron', controller)
+          break
+        default:
+          console.error('Unknown cron', controller)
+          break
+      }
+    }
+  } satisfies ExportedHandler<AppEnv>
 
   return instrument(handler, config)
 }

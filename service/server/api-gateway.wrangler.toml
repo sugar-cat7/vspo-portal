@@ -5,7 +5,16 @@ compatibility_flags = ["nodejs_compat", "nodejs_als"]
 main = "cmd/server/gateway.ts"
 tail_consumers = [{ service = "api-tail" }]
 logpush = true
+# services = [
+#   { binding = "APP_WORKER", service = "app_worker" }
+# ]
+[dev]
+port = 3000
 
+[[services]]
+binding = "APP_WORKER"
+service = "app_worker"
+entrypoint = "ApplicationService"
 
 # Resources need to be created for Preview environment
 # https://developers.cloudflare.com/workers/wrangler/configuration

@@ -4,13 +4,15 @@
   "main": "cmd/server/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev:api": "wrangler dev --config api-gateway.wrangler.toml --port 3000",
+    "dev:internal": "wrangler dev --config internal-app.wrangler.toml --port 3001",
+    "dev:all": "nx run template-api:dev-all",
     "dev:remote": "wrangler dev --remote",
     "deploy": "wrangler deploy",
     "db:up": "docker compose -f docker/compose.yaml up",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio --port=3001",
+    "db:studio": "drizzle-kit studio --port=3002",
     "db:seed": "npx tsx cmd/local/database/seed.ts"
   },
   "dependencies": {
@@ -44,7 +46,9 @@
     "@types/uuid": "^10.0.0",
     "drizzle-kit": "^0.27.2",
     "drizzle-seed": "^0.3.0",
+    "nx": "20.3.2",
     "typescript": "^5.7.3",
     "wrangler": "^3.103.2"
-  }
+  },
+  "nx": {}
 }

@@ -3,18 +3,18 @@ import { createPage, Page } from "../domain/pagination";
 import { IAppContext } from "../infra/dependency";
 import { AppError, Ok, Result } from "../pkg/errors";
 
-type BatchUpsertByChannelIdsParam = {
+export type BatchUpsertByChannelIdsParam = {
   channel: {
     id: string;
     memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
   }[];
 };
 
-type BatchUpsertBySearchParam = {
+export type BatchUpsertBySearchParam = {
   memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
 };
 
-type ListParam = {
+export type ListByMemberTypeParam = {
   limit: number;
   page: number;
   memberType?: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
@@ -25,14 +25,14 @@ type ListResponse = {
   pagination: Page;
 };
 
-interface ICreatorInteractor {
+export interface ICreatorInteractor {
   batchUpsertByChannelIds(
     params: BatchUpsertByChannelIdsParam
   ): Promise<Result<Creators, AppError>>;
   batchUpsertBySearch(
     params: BatchUpsertBySearchParam
   ): Promise<Result<Creators, AppError>>;
-  list(params: ListParam): Promise<Result<ListResponse, AppError>>;
+  list(params: ListByMemberTypeParam): Promise<Result<ListResponse, AppError>>;
 }
 
 export class CreatorInteractor implements ICreatorInteractor {
@@ -73,7 +73,7 @@ export class CreatorInteractor implements ICreatorInteractor {
     });
   }
 
-  async list(params: ListParam): Promise<Result<ListResponse, AppError>> {
+  async list(params: ListByMemberTypeParam): Promise<Result<ListResponse, AppError>> {
     return this.context.runInTx(async (repos, _services) => {
       const c = await repos.creatorRepository.list(params);
       if (c.err) return c;
