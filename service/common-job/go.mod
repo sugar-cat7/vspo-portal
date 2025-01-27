@@ -15,7 +15,7 @@ require (
 	github.com/jackc/pgx/v5 v5.7.2
 	github.com/ogen-go/ogen v1.9.0
 	github.com/pressly/goose/v3 v3.24.1
-	github.com/samber/lo v1.47.0
+	github.com/samber/lo v1.49.0
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.10.0
 	github.com/testcontainers/testcontainers-go v0.35.0
