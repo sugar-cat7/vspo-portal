@@ -19,7 +19,7 @@ export const searchVideosWorkflow = () => {
             },
             async () => {
               const vu = await env.APP_WORKER.newVideoUsecase();
-              const result = await vu.searchLive({});
+              const result = await vu.searchLive();
               if (result.err) {
                 throw result.err;
               }
@@ -37,7 +37,7 @@ export const searchVideosWorkflow = () => {
             },
             async () => {
               const vu = await env.APP_WORKER.newVideoUsecase();
-              const result = await vu.searchExist({});
+              const result = await vu.searchExist();
               if (result.err) {
                 throw result.err;
               }

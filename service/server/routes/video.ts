@@ -31,44 +31,44 @@ const listVideosRoute = createRoute({
   },
 });
 
-const postVideosRoute = createRoute({
-  tags: ["Video"],
-  operationId: "postVideos",
-  method: "post" as const,
-  path: "/videos",
-  security: [{ bearerAuth: [] }],
-  request: {
-    body: {
-      required: true,
-      content: {
-        "application/json": {
-          schema: CreateVideoRequestSchema,
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      description: "The configuration for an api",
-      content: {
-        "application/json": {
-          schema: CreateVideoResponseSchema,
-        },
-      },
-    },
-    ...openApiErrorResponses,
-  },
-});
+// const postVideosRoute = createRoute({
+//   tags: ["Video"],
+//   operationId: "postVideos",
+//   method: "post" as const,
+//   path: "/videos",
+//   security: [{ bearerAuth: [] }],
+//   request: {
+//     body: {
+//       required: true,
+//       content: {
+//         "application/json": {
+//           schema: CreateVideoRequestSchema,
+//         },
+//       },
+//     },
+//   },
+//   responses: {
+//     200: {
+//       description: "The configuration for an api",
+//       content: {
+//         "application/json": {
+//           schema: CreateVideoResponseSchema,
+//         },
+//       },
+//     },
+//     ...openApiErrorResponses,
+//   },
+// });
 
-export const registerVideoPostApi = (app: App) =>
-  app.openapi(postVideosRoute, async (c) => {
-    const p = CreateVideoRequestSchema.parse(await c.req.json());
-    const r = await c.env.APP_WORKER.newVideoUsecase().batchUpsertByIds(p);
-    if (r.err) {
-      throw r.err;
-    }
-    return c.json(CreateVideoResponseSchema.parse(r.val), 200);
-  });
+// export const registerVideoPostApi = (app: App) =>
+//   app.openapi(postVideosRoute, async (c) => {
+//     const p = CreateVideoRequestSchema.parse(await c.req.json());
+//     const r = await c.env.APP_WORKER.newVideoUsecase().batchUpsertByIds(p);
+//     if (r.err) {
+//       throw r.err;
+//     }
+//     return c.json(CreateVideoResponseSchema.parse(r.val), 200);
+//   });
 
 export const registerVideoListApi = (app: App) =>
   app.openapi(listVideosRoute, async (c) => {

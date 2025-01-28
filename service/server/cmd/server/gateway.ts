@@ -4,12 +4,7 @@ import type { AppEnv } from "../../config/env";
 import { newApp } from "../../infra/http/hono/app";
 import { init } from "../../infra/http/hono/middleware";
 import { createHandler, withTracer } from "../../infra/http/otel";
-import {
-  registerCreatorListApi,
-  registerCreatorPostApi,
-  registerVideoListApi,
-  registerVideoPostApi,
-} from "../../routes";
+import { registerCreatorListApi, registerVideoListApi } from "../../routes";
 
 const app = newApp();
 app.notFound((c) => {
@@ -31,10 +26,8 @@ app.use(
   requestId(),
   init,
 );
-registerVideoPostApi(app);
 registerVideoListApi(app);
 registerCreatorListApi(app);
-registerCreatorPostApi(app);
 
 export default createHandler({
   fetch: async (req: Request, env: AppEnv, executionCtx: ExecutionContext) => {

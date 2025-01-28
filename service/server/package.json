@@ -16,7 +16,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio --port=3004",
     "db:seed": "npx tsx cmd/local/database/seed.ts",
-    "biome:check": "pnpm biome check --write ./**/**"
+    "biome:check": "pnpm biome check --write ./**/**",
+    "tsc": "tsc --noEmit"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.58",
