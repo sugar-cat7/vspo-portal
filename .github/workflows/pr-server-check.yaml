@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - 'service/server/**'
+      - '.github/workflows/pr-server-check.yaml'
 
 jobs:
   deploy:
@@ -10,7 +11,7 @@ jobs:
     timeout-minutes: 60
     defaults:
       run:
-        working-directory: ${{ github.event.inputs.service }}
+        working-directory: service/server
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
