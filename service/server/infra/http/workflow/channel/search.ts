@@ -1,12 +1,12 @@
 import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
-import type { AppEnv } from "../../../../config/env";
+import type { BindingAppWorkerEnv } from "../../../../config/env/worker";
 
 export const searchChannelsWorkflow = () => {
   return {
     handler:
       () =>
       async (
-        env: AppEnv,
+        env: BindingAppWorkerEnv,
         _event: WorkflowEvent<Params>,
         step: WorkflowStep,
       ) => {

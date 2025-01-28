@@ -1,5 +1,5 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import type { AppEnv } from "../../../../config/env";
+import type { AppWorkerEnv } from "../../../../config/env/internal";
 import {
   type Creator,
   CreatorSchema,
@@ -84,7 +84,7 @@ export class CreatorService extends RpcTarget {
   }
 }
 
-export class ApplicationService extends WorkerEntrypoint<AppEnv> {
+export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   newVideoUsecase() {
     const d = this.setup();
     return new VideoService(d.videoInteractor, this.env.WRITE_QUEUE);
@@ -117,16 +117,9 @@ function isCreatorBatch(
 }
 
 export default createHandler({
-  fetch: async (
-    req: Request,
-    env: AppEnv,
-    _executionContext: ExecutionContext,
-  ) => {
-    return new Response("OK");
-  },
   queue: async (
     batch: MessageBatch<MessageParam>,
-    env: AppEnv,
+    env: AppWorkerEnv,
     _executionContext: ExecutionContext,
   ) => {
     return await withTracer(

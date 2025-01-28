@@ -9,7 +9,7 @@
     "dev:all": "nx run vspo-portal-server:dev-all",
     "dev:schedule": "wrangler dev --test-scheduled --config cron.wrangler.toml",
     "dev:queue": "wrangler dev --config queue.wrangler.toml",
-    "dev:remote": "wrangler dev --remote",
+    "deploy:all": "nx run vspo-portal-server:deploy-all",
     "deploy": "wrangler deploy",
     "db:up": "docker compose -f docker/compose.yaml up",
     "db:generate": "drizzle-kit generate",

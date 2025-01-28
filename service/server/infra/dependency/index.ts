@@ -12,7 +12,7 @@ import { type ITwitcastingService, TwitcastingService } from "../twitcasting";
 import { type ITwitchService, TwitchService } from "../twitch";
 import { type IYoutubeService, YoutubeService } from "../youtube";
 
-import type { AppEnv } from "../../config/env";
+import type { AppWorkerEnv } from "../../config/env/internal";
 import { CreatorInteractor, VideoInteractor } from "../../usecase";
 
 export interface IRepositories {
@@ -100,7 +100,7 @@ export class Container {
   creatorInteractor: CreatorInteractor;
   videoInteractor: VideoInteractor;
 
-  constructor(private readonly env: AppEnv) {
+  constructor(private readonly env: AppWorkerEnv) {
     this.youtubeService = new YoutubeService(this.env.YOUTUBE_API_KEY);
     this.twitchService = new TwitchService({
       clientId: this.env.TWITCH_CLIENT_ID,

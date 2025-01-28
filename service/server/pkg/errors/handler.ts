@@ -5,7 +5,8 @@ import { HTTPException } from "hono/http-exception";
 import type { ZodError } from "zod";
 
 import type { ContentfulStatusCode, StatusCode } from "hono/utils/http-status";
-import type { AppEnv } from "../../config/env";
+import { ApiEnv } from "../../config/env/api";
+import type { CommonEnv } from "../../config/env/common";
 import type { AppContext } from "../../infra/http/hono";
 import type { HonoEnv } from "../../infra/http/hono/env";
 import { AppLogger } from "../logging";
@@ -164,7 +165,7 @@ export const handleZodError = (
 };
 
 export const handleError = (err: Error, c: Context<HonoEnv>): Response => {
-  const e = env<AppEnv, AppContext>(c);
+  const e = env<CommonEnv, AppContext>(c);
   const logger = new AppLogger({
     env: e,
     requestId: c.get("requestId"),

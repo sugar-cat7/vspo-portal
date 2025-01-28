@@ -1,6 +1,9 @@
 import { type ResolveConfigFn, instrument } from "@microlabs/otel-cf-workers";
 import { type Span, trace } from "@opentelemetry/api";
-import type { AppEnv } from "../../../config/env";
+import type { ApiEnv } from "../../../config/env/api";
+import type { CommonEnv } from "../../../config/env/common";
+import type { AppWorkerEnv } from "../../../config/env/internal";
+import type { BindingWorkflowEnv } from "../../../config/env/workflow";
 
 export const withTracer = async <T>(
   tracerName: string,
@@ -24,7 +27,7 @@ export const withTracer = async <T>(
   });
 };
 
-const config: ResolveConfigFn = (env: AppEnv, _trigger) => {
+const config: ResolveConfigFn = (env: CommonEnv, _trigger) => {
   return {
     exporter: {
       url: env.OTEL_EXPORTER_URL,
@@ -34,24 +37,24 @@ const config: ResolveConfigFn = (env: AppEnv, _trigger) => {
   };
 };
 
-type Handler<T = unknown> = {
-  fetch?: (
-    req: Request,
-    env: AppEnv,
-    _executionContext: ExecutionContext,
-  ) => Promise<Response>;
+export type UnifiedEnv = CommonEnv & ApiEnv & AppWorkerEnv & BindingWorkflowEnv;
+
+type Handler<T = unknown, E = UnifiedEnv> = {
+  fetch?: (req: Request, env: E, ctx: ExecutionContext) => Promise<Response>;
   queue?: (
     batch: MessageBatch<T>,
-    env: AppEnv,
-    _executionContext: ExecutionContext,
+    env: E,
+    ctx: ExecutionContext,
   ) => Promise<void>;
   scheduled?: (
     controller: ScheduledController,
-    env: AppEnv,
+    env: E,
     ctx: ExecutionContext,
   ) => Promise<void>;
 };
 
-export const createHandler = <T>(handler: Handler<T>) => {
-  return instrument(handler, config);
+export const createHandler = <T, E extends UnifiedEnv = UnifiedEnv>(
+  handler: Handler<T, E>,
+) => {
+  instrument(handler, config);
 };

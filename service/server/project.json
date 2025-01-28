@@ -12,6 +12,17 @@
           ],
           "parallel": true
         }
+      },
+      "deploy-all": {
+        "executor": "nx:run-commands",
+        "options": {
+          "commands": [
+            "wrangler deploy --config api-gateway.wrangler.toml",
+            "wrangler deploy --config internal-app.wrangler.toml",
+            "wrangler deploy --config cron.wrangler.toml"
+          ],
+          "parallel": false
+        }
       }
     }
   }

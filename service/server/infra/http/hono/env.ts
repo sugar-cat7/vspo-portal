@@ -1,7 +1,6 @@
 import { getContext } from "hono/context-storage";
-// import type { Tracer } from '@opentelemetry/api'
 import type { RequestIdVariables } from "hono/request-id";
-import type { AppEnv } from "../../../config/env";
+import type { ApiEnv } from "../../../config/env/api";
 import type { AppLogger } from "../../../pkg/logging";
 
 export type ServiceContext = {
@@ -9,7 +8,7 @@ export type ServiceContext = {
 };
 
 export type HonoEnv = {
-  Bindings: AppEnv;
+  Bindings: ApiEnv;
   Variables: {
     services: ServiceContext;
   } & RequestIdVariables;

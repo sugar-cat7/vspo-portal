@@ -1,6 +1,5 @@
 import { type ISettingsParam, Logger as TSLogger } from "tslog";
-
-import type { AppEnv } from "../../config/env";
+import type { CommonEnv } from "../../config/env/common";
 import { createUUID } from "../uuid";
 
 interface Fields {
@@ -21,7 +20,7 @@ interface LogObject {
   error?: Error;
 }
 
-const createLoggerConfig = (env?: AppEnv) =>
+const createLoggerConfig = (env?: CommonEnv) =>
   ({
     name: "vspo-portal-server",
     type: env?.LOG_TYPE || "json",
@@ -33,7 +32,7 @@ class AppLogger implements CustomLogger {
   private loggerInstance: TSLogger<LogObject>;
   private requestId: string;
 
-  constructor(opts?: { env?: AppEnv; requestId?: string }) {
+  constructor(opts?: { env?: CommonEnv; requestId?: string }) {
     const loggerConfig = createLoggerConfig(opts?.env);
     this.loggerInstance = new TSLogger(loggerConfig);
     this.requestId = opts?.requestId || createUUID();

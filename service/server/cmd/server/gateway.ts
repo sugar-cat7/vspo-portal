@@ -1,6 +1,6 @@
 import { cors } from "hono/cors";
 import { requestId } from "hono/request-id";
-import type { AppEnv } from "../../config/env";
+import type { ApiEnv } from "../../config/env/api";
 import { newApp } from "../../infra/http/hono/app";
 import { init } from "../../infra/http/hono/middleware";
 import { createHandler, withTracer } from "../../infra/http/otel";
@@ -30,7 +30,7 @@ registerVideoListApi(app);
 registerCreatorListApi(app);
 
 export default createHandler({
-  fetch: async (req: Request, env: AppEnv, executionCtx: ExecutionContext) => {
+  fetch: async (req: Request, env: ApiEnv, executionCtx: ExecutionContext) => {
     return await withTracer("OTelCFWorkers:Fetcher", "Exec", async () => {
       return app.fetch(req, env, executionCtx);
     });
