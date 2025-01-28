@@ -1,7 +1,7 @@
-import { Creators } from "../domain/creator";
-import { createPage, Page } from "../domain/pagination";
-import { IAppContext } from "../infra/dependency";
-import { AppError, Ok, Result } from "../pkg/errors";
+import type { Creators } from "../domain/creator";
+import { type Page, createPage } from "../domain/pagination";
+import type { IAppContext } from "../infra/dependency";
+import { type AppError, Ok, type Result } from "../pkg/errors";
 
 export type BatchUpsertCreatorsParam = Creators;
 
@@ -28,9 +28,15 @@ export type SearchByMemberTypeParam = {
 };
 
 export interface ICreatorInteractor {
-  searchByChannelIds(params: SearchByChannelIdsParam): Promise<Result<Creators, AppError>>;
-  searchByMemberType(params: SearchByMemberTypeParam): Promise<Result<Creators, AppError>>;
-  batchUpsert(params: BatchUpsertCreatorsParam): Promise<Result<Creators, AppError>>;
+  searchByChannelIds(
+    params: SearchByChannelIdsParam,
+  ): Promise<Result<Creators, AppError>>;
+  searchByMemberType(
+    params: SearchByMemberTypeParam,
+  ): Promise<Result<Creators, AppError>>;
+  batchUpsert(
+    params: BatchUpsertCreatorsParam,
+  ): Promise<Result<Creators, AppError>>;
   list(params: ListByMemberTypeParam): Promise<Result<ListResponse, AppError>>;
 }
 
@@ -38,14 +44,14 @@ export class CreatorInteractor implements ICreatorInteractor {
   constructor(private readonly context: IAppContext) {}
 
   async searchByChannelIds(
-    params: SearchByChannelIdsParam
+    params: SearchByChannelIdsParam,
   ): Promise<Result<Creators, AppError>> {
     return this.context.runInTx(async (_repos, services) => {
       const sv = await services.creatorService.searchCreatorsByChannelIds(
         params.channel.map((v) => ({
           channelId: v.id,
           memberType: v.memberType,
-        }))
+        })),
       );
       if (sv.err) return sv;
 
@@ -53,7 +59,9 @@ export class CreatorInteractor implements ICreatorInteractor {
     });
   }
 
-  async batchUpsert(params: BatchUpsertCreatorsParam): Promise<Result<Creators, AppError>> {
+  async batchUpsert(
+    params: BatchUpsertCreatorsParam,
+  ): Promise<Result<Creators, AppError>> {
     return this.context.runInTx(async (repos, _services) => {
       const uv = await repos.creatorRepository.batchUpsert(params);
       if (uv.err) return uv;
@@ -62,7 +70,7 @@ export class CreatorInteractor implements ICreatorInteractor {
     });
   }
   async searchByMemberType(
-    params: SearchByMemberTypeParam
+    params: SearchByMemberTypeParam,
   ): Promise<Result<Creators, AppError>> {
     return this.context.runInTx(async (_repos, services) => {
       const sv = await services.creatorService.searchCreatorsByMemberType({
@@ -74,7 +82,9 @@ export class CreatorInteractor implements ICreatorInteractor {
     });
   }
 
-  async list(params: ListByMemberTypeParam): Promise<Result<ListResponse, AppError>> {
+  async list(
+    params: ListByMemberTypeParam,
+  ): Promise<Result<ListResponse, AppError>> {
     return this.context.runInTx(async (repos, _services) => {
       const c = await repos.creatorRepository.list(params);
       if (c.err) return c;

@@ -15,7 +15,8 @@ CREATE TABLE IF NOT EXISTS "creator" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	"member_type" text NOT NULL,
-	"representative_thumbnail_url" text NOT NULL
+	"representative_thumbnail_url" text NOT NULL,
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "stream_status" (
@@ -25,7 +26,8 @@ CREATE TABLE IF NOT EXISTS "stream_status" (
 	"started_at" timestamp with time zone,
 	"ended_at" timestamp with time zone,
 	"view_count" integer NOT NULL,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "stream_status_video_id_unique" UNIQUE("video_id")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "video" (

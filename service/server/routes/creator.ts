@@ -1,6 +1,6 @@
 import { createRoute } from "@hono/zod-openapi";
-import { openApiErrorResponses } from "../pkg/errors";
 import type { App } from "../infra/http/hono/app";
+import { openApiErrorResponses } from "../pkg/errors";
 import {
   CreateCreatorRequestSchema,
   CreateCreatorResponseSchema,
@@ -62,9 +62,10 @@ const postCreatorRoute = createRoute({
 export const registerCreatorPostApi = (app: App) =>
   app.openapi(postCreatorRoute, async (c) => {
     const p = CreateCreatorRequestSchema.parse(await c.req.json());
-    const r = await c.env.APP_WORKER.newCreatorUsecase().batchUpsertByChannelIds({
-      channel: p.channel,
-    });
+    const r =
+      await c.env.APP_WORKER.newCreatorUsecase().batchUpsertByChannelIds({
+        channel: p.channel,
+      });
 
     if (r.err) {
       throw r.err;
@@ -73,14 +74,13 @@ export const registerCreatorPostApi = (app: App) =>
     return c.json(CreateCreatorResponseSchema.parse(r.val), 200);
   });
 
-
 export const registerCreatorListApi = (app: App) =>
   app.openapi(listCreatorRoute, async (c) => {
     const p = ListCreatorRequestSchema.parse(c.req.query());
 
     const r = await c.env.APP_WORKER.newCreatorUsecase().list({
-      limit: parseInt(p.limit),
-      page: parseInt(p.page),
+      limit: Number.parseInt(p.limit),
+      page: Number.parseInt(p.page),
       memberType: p.memberType,
     });
 

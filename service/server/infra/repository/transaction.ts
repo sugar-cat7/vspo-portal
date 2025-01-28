@@ -1,27 +1,31 @@
-import { ExtractTablesWithRelations } from "drizzle-orm";
-import { PgTransaction, PgTransactionConfig } from "drizzle-orm/pg-core";
+import type { ExtractTablesWithRelations } from "drizzle-orm";
+import { type NodePgQueryResultHKT, drizzle } from "drizzle-orm/node-postgres";
+import type { PgTransaction, PgTransactionConfig } from "drizzle-orm/pg-core";
 import {
   AppError,
-  BaseError,
+  type BaseError,
   ErrorCodeSchema,
-  Result,
+  type Result,
   wrap,
 } from "../../pkg/errors";
-import { drizzle, NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import { AppLogger } from "../../pkg/logging";
 import { getLogger } from "../http/hono";
 
 export interface IDbConfig {
-  connectionString: string; 
+  connectionString: string;
   isQueryLoggingEnabled: boolean;
 }
 
-export type DB = PgTransaction<NodePgQueryResultHKT, Record<string, never>, ExtractTablesWithRelations<Record<string, never>>>
+export type DB = PgTransaction<
+  NodePgQueryResultHKT,
+  Record<string, never>,
+  ExtractTablesWithRelations<Record<string, never>>
+>;
 
 export interface ITxManager {
   runTx<T, E extends BaseError>(
     operation: (tx: DB) => Promise<Result<T, E>>,
-    config?: PgTransactionConfig
+    config?: PgTransactionConfig,
   ): Promise<Result<T, E>>;
 }
 
@@ -36,11 +40,11 @@ export class TxManager implements ITxManager {
 
   async runTx<T, E extends BaseError>(
     operation: (tx: DB) => Promise<Result<T, E>>,
-    config?: PgTransactionConfig
+    config?: PgTransactionConfig,
   ): Promise<Result<T, E>> {
     const db = drizzle({
       connection: this.dbConfig.connectionString,
-      logger: this.dbConfig.isQueryLoggingEnabled
+      logger: this.dbConfig.isQueryLoggingEnabled,
     });
 
     const result = await wrap(
@@ -57,7 +61,7 @@ export class TxManager implements ITxManager {
         new AppError({
           message: `Failed to execute transaction: ${e}`,
           code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
-        })
+        }),
     );
     if (result.err) {
       throw result.err;

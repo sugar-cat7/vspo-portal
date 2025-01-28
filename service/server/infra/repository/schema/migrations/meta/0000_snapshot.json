@@ -1,5 +1,5 @@
 {
-  "id": "0c368621-1977-46be-b3b0-fa899a725b59",
+  "id": "6578f627-acf9-4bcc-b6f6-dbd662922394",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -69,12 +69,8 @@
           "name": "channel_creator_id_creator_id_fk",
           "tableFrom": "channel",
           "tableTo": "creator",
-          "columnsFrom": [
-            "creator_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["creator_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -84,9 +80,7 @@
         "channel_platform_channel_id_unique": {
           "name": "channel_platform_channel_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "platform_channel_id"
-          ]
+          "columns": ["platform_channel_id"]
         }
       },
       "policies": {},
@@ -120,6 +114,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -184,18 +185,20 @@
           "name": "stream_status_video_id_video_raw_id_fk",
           "tableFrom": "stream_status",
           "tableTo": "video",
-          "columnsFrom": [
-            "video_id"
-          ],
-          "columnsTo": [
-            "raw_id"
-          ],
+          "columnsFrom": ["video_id"],
+          "columnsTo": ["raw_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "stream_status_video_id_unique": {
+          "name": "stream_status_video_id_unique",
+          "nullsNotDistinct": false,
+          "columns": ["video_id"]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -271,12 +274,8 @@
           "name": "video_channel_id_channel_platform_channel_id_fk",
           "tableFrom": "video",
           "tableTo": "channel",
-          "columnsFrom": [
-            "channel_id"
-          ],
-          "columnsTo": [
-            "platform_channel_id"
-          ],
+          "columnsFrom": ["channel_id"],
+          "columnsTo": ["platform_channel_id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -286,9 +285,7 @@
         "video_raw_id_unique": {
           "name": "video_raw_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "raw_id"
-          ]
+          "columns": ["raw_id"]
         }
       },
       "policies": {},

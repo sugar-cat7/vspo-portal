@@ -1,19 +1,19 @@
-import { z } from 'zod'
-import { ApplicationService } from '../cmd/server/internal/application';
+import { z } from "zod";
+import type { ApplicationService } from "../cmd/server/internal/application";
 
 export const zEnv = z.object({
   SERVICE_NAME: z.string(),
-  ENVIRONMENT: z.enum(['production', 'staging', 'development', 'local']),
-  LOG_TYPE: z.enum(['pretty', 'json']).default('pretty'),
+  ENVIRONMENT: z.enum(["production", "staging", "development", "local"]),
+  LOG_TYPE: z.enum(["pretty", "json"]).default("pretty"),
   LOG_MINLEVEL: z
     .string()
     .regex(/^\d+$/)
     .transform((s) => Number.parseInt(s, 10))
-    .default('0'),
+    .default("0"),
   LOG_HIDE_POSITION: z
     .string()
-    .transform((s) => s === 'true')
-    .default('false'),
+    .transform((s) => s === "true")
+    .default("false"),
   OPENAI_API_KEY: z.string(),
   OPENAI_ORGANIZATION: z.string(),
   OPENAI_PROJECT: z.string(),
@@ -44,10 +44,10 @@ export const zEnv = z.object({
   TWITCH_CLIENT_ID: z.string(),
   TWITCH_CLIENT_SECRET: z.string(),
   TWITCASTING_ACCESS_TOKEN: z.string(),
-})
+});
 
-type Env = z.infer<typeof zEnv>
+type Env = z.infer<typeof zEnv>;
 
 export type AppEnv = Env & {
   APP_WORKER: Service<ApplicationService>;
-}
+};

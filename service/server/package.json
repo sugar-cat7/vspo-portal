@@ -1,6 +1,6 @@
 {
   "name": "vspo-portal-server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "main": "cmd/server/index.ts",
   "type": "module",
   "scripts": {
@@ -15,7 +15,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio --port=3004",
-    "db:seed": "npx tsx cmd/local/database/seed.ts"
+    "db:seed": "npx tsx cmd/local/database/seed.ts",
+    "biome:check": "pnpm biome check --write ./**/**"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.58",
@@ -33,8 +34,7 @@
     "drizzle-orm": "^0.36.4",
     "drizzle-zod": "^0.5.1",
     "googleapis": "^144.0.0",
-    "hono": "^4.6.17",
-    "miniflare": "3.20240821.1",
+    "hono": "^4.6.19",
     "pg": "^8.13.1",
     "postgres": "^3.4.5",
     "tslog": "^4.9.3",
@@ -43,14 +43,16 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250109.0",
-    "@types/pg": "^8.11.10",
+    "@biomejs/biome": "1.9.4",
+    "@cloudflare/workers-types": "^4.20250124.3",
+    "@types/pg": "^8.11.11",
     "@types/uuid": "^10.0.0",
     "drizzle-kit": "^0.27.2",
     "drizzle-seed": "^0.3.0",
+    "miniflare": "3.20240821.1",
     "nx": "20.3.2",
     "typescript": "^5.7.3",
-    "wrangler": "^3.103.2"
+    "wrangler": "^3.106.0"
   },
   "nx": {}
 }

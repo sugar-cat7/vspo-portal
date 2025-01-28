@@ -1,4 +1,4 @@
-import { createOpenAI } from '@ai-sdk/openai'
+import { createOpenAI } from "@ai-sdk/openai";
 
 export const createOpenAIProvider = ({
   organization,
@@ -6,16 +6,16 @@ export const createOpenAIProvider = ({
   apiKey,
   baseURL,
 }: {
-  organization: string
-  project: string
-  apiKey: string
-  baseURL: string
+  organization: string;
+  project: string;
+  apiKey: string;
+  baseURL: string;
 }) => {
   return createOpenAI({
-    compatibility: 'strict',
+    compatibility: "strict",
     organization,
     project,
     apiKey,
     baseURL,
-  })
-}
+  });
+};

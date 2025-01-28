@@ -1,11 +1,9 @@
-import { createPage, Page } from "../domain/pagination";
-import { Videos } from "../domain/video";
-import { IAppContext } from "../infra/dependency";
-import { AppError, Ok, Result } from "../pkg/errors";
+import { type Page, createPage } from "../domain/pagination";
+import type { Videos } from "../domain/video";
+import type { IAppContext } from "../infra/dependency";
+import { type AppError, Ok, type Result } from "../pkg/errors";
 
 export type BatchUpsertVideosParam = Videos;
-export type SearchLiveParam = {};
-export type SearchExistParam = {};
 export type BatchUpsertByIdsParam = {
   youtubeVideoIds: string[];
   twitchVideoIds: string[];
@@ -30,17 +28,15 @@ export type BatchDeleteByVideoIdsParam = {
 };
 
 export interface IVideoInteractor {
-  batchUpsert(params: BatchUpsertVideosParam): Promise<Result<Videos, AppError>>;
-  searchLive(
-    params: SearchLiveParam
+  batchUpsert(
+    params: BatchUpsertVideosParam,
   ): Promise<Result<Videos, AppError>>;
-  searchExist(
-    params: SearchExistParam
-  ): Promise<Result<Videos, AppError>>;
+  searchLive(): Promise<Result<Videos, AppError>>;
+  searchExist(): Promise<Result<Videos, AppError>>;
   list(params: ListParam): Promise<Result<ListResponse, AppError>>;
-  searchDeleted(params: {}): Promise<Result<Videos, AppError>>;
+  searchDeleted(): Promise<Result<Videos, AppError>>;
   batchDeleteByVideoIds(
-    params: BatchDeleteByVideoIdsParam
+    params: BatchDeleteByVideoIdsParam,
   ): Promise<Result<void, AppError>>;
 }
 
@@ -48,9 +44,7 @@ export class VideoInteractor implements IVideoInteractor {
   constructor(private readonly context: IAppContext) {}
 
   // Fetch new videos from external APIs
-  async searchLive(
-    params: SearchLiveParam
-  ): Promise<Result<Videos, AppError>> {
+  async searchLive(): Promise<Result<Videos, AppError>> {
     return this.context.runInTx(async (_repos, services) => {
       const sv = await services.videoService.searchAllLiveVideos();
       if (sv.err) {
@@ -61,9 +55,7 @@ export class VideoInteractor implements IVideoInteractor {
   }
 
   // Fetch videos from database and external APIs
-  async searchExist(
-    params: SearchExistParam
-  ): Promise<Result<Videos, AppError>> {
+  async searchExist(): Promise<Result<Videos, AppError>> {
     return this.context.runInTx(async (_repos, services) => {
       const sv = await services.videoService.searchExistVideos();
       if (sv.err) {
@@ -74,7 +66,7 @@ export class VideoInteractor implements IVideoInteractor {
   }
 
   async batchUpsert(
-    params: BatchUpsertVideosParam
+    params: BatchUpsertVideosParam,
   ): Promise<Result<Videos, AppError>> {
     return this.context.runInTx(async (repos, _services) => {
       const uv = await repos.videoRepository.batchUpsert(params);
@@ -107,7 +99,7 @@ export class VideoInteractor implements IVideoInteractor {
     });
   }
 
-  async searchDeleted(params: {}): Promise<Result<Videos, AppError>> {
+  async searchDeleted(): Promise<Result<Videos, AppError>> {
     return this.context.runInTx(async (repos, services) => {
       const sv = await services.videoService.searchDeletedVideos();
       if (sv.err) {
@@ -119,7 +111,7 @@ export class VideoInteractor implements IVideoInteractor {
   }
 
   async batchDeleteByVideoIds(
-    params: BatchDeleteByVideoIdsParam
+    params: BatchDeleteByVideoIdsParam,
   ): Promise<Result<void, AppError>> {
     return this.context.runInTx(async (repos, _services) => {
       const uv = await repos.videoRepository.batchDelete(params.videoIds);
@@ -129,6 +121,4 @@ export class VideoInteractor implements IVideoInteractor {
       return uv;
     });
   }
-
-  }
-
+}

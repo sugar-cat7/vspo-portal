@@ -1,19 +1,24 @@
 import {
-  Creator,
+  type Creator,
   MemberTypeSchema,
   PlatformSchema,
   StatusSchema,
-  Videos,
+  type Videos,
 } from "..";
 import {
-  IYoutubeService,
-  ITwitchService,
-  ITwitcastingService,
+  type ITwitcastingService,
+  type ITwitchService,
+  type IVideoRepository,
+  type IYoutubeService,
   query,
-  IVideoRepository,
 } from "../../infra";
-import { ICreatorRepository } from "../../infra/repository/creator";
-import { AppError, Result, Ok, OkResult } from "../../pkg/errors";
+import type { ICreatorRepository } from "../../infra/repository/creator";
+import {
+  type AppError,
+  Ok,
+  type OkResult,
+  type Result,
+} from "../../pkg/errors";
 
 export interface IVideoService {
   searchLiveYoutubeVideos(): Promise<Result<Videos, AppError>>;
@@ -39,7 +44,7 @@ export class VideoService implements IVideoService {
       twitCastingClient: ITwitcastingService;
       creatorRepository: ICreatorRepository;
       videoRepository: IVideoRepository;
-    }
+    },
   ) {}
 
   async searchLiveYoutubeVideos(): Promise<Result<Videos, AppError>> {
@@ -61,17 +66,17 @@ export class VideoService implements IVideoService {
     const videos = results
       .filter(
         (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
-          r.status === "fulfilled" && !r.value.err
+          r.status === "fulfilled" && !r.value.err,
       )
       .flatMap((r) => r.value.val);
     const failedResults = results.filter(
-      (r): r is PromiseRejectedResult => r.status === "rejected"
+      (r): r is PromiseRejectedResult => r.status === "rejected",
     );
 
     if (failedResults.length > 0) {
       console.error(
         "Failed to fetch some YouTube videos:",
-        failedResults.map((r) => r.reason)
+        failedResults.map((r) => r.reason),
       );
     }
 
@@ -152,7 +157,7 @@ export class VideoService implements IVideoService {
     const videos = results
       .filter(
         (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
-          r.status === "fulfilled" && !r.value.err
+          r.status === "fulfilled" && !r.value.err,
       )
       .flatMap((r) => r.value.val);
 
@@ -226,7 +231,7 @@ export class VideoService implements IVideoService {
     }
 
     const deletedVideos = existingVideos.val.filter(
-      (v) => !fetchedVideos.val.find((fv) => fv.rawId === v.rawId)
+      (v) => !fetchedVideos.val.find((fv) => fv.rawId === v.rawId),
     );
     return Ok(deletedVideos);
   }
@@ -254,7 +259,7 @@ export class VideoService implements IVideoService {
     const videos = results
       .filter(
         (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
-          r.status === "fulfilled" && !r.value.err
+          r.status === "fulfilled" && !r.value.err,
       )
       .flatMap((r) => r.value.val);
 
@@ -287,11 +292,11 @@ export class VideoService implements IVideoService {
 
   private getVideoDifferences(
     fetchedVideos: Videos,
-    existingVideos: Videos
+    existingVideos: Videos,
   ): Videos {
     return fetchedVideos.filter((fetchedVideo) => {
       const existingVideo = existingVideos.find(
-        (v) => v.rawId === fetchedVideo.rawId
+        (v) => v.rawId === fetchedVideo.rawId,
       );
       if (!existingVideo) return true;
       return (

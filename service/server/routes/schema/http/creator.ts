@@ -34,7 +34,7 @@ const CreatorSchema = z.object({
 const ListCreatorRequestSchema = PaginationQuerySchema.merge(
   z.object({
     memberType: MemberTypeSchema.optional(),
-  })
+  }),
 );
 
 const ListCreatorResponseSchema = z.object({
@@ -56,7 +56,7 @@ const CreateCreatorRequestSchema = z.object({
         description: "Member Type",
         example: "vspo_jp",
       }),
-    })
+    }),
   ),
 });
 
@@ -68,11 +68,11 @@ type CreateCreatorRequest = z.infer<typeof CreateCreatorRequestSchema>;
 export {
   CreatorSchema,
   ListCreatorResponseSchema,
-  ListCreatorResponse,
-  ListCreatorRequest,
+  type ListCreatorResponse,
+  type ListCreatorRequest,
   ListCreatorRequestSchema,
-  CreateCreatorRequest,
+  type CreateCreatorRequest,
   CreateCreatorRequestSchema,
-  CreateCreatorResponse,
+  type CreateCreatorResponse,
   CreateCreatorResponseSchema,
 };
