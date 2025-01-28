@@ -170,4 +170,3 @@ INSERT INTO channel (
     ('6d534e57-f1f2-4027-8d3e-4513924b0a90', '1125216387', '76ccfc57-a6eb-4ebd-9b61-ad48c5f7a7eb', 'twitch', 'Riko Solari', '', '2020-01-01T00:00:00Z', 0, '');
 
 -- freechat
-

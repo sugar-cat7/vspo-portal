@@ -1,6 +1,6 @@
 import { google, youtube_v3 } from 'googleapis';
 import { createVideo, createVideos, Videos } from '../../domain/video';
-import { convertToUTCDate, getCurrentUTCDate } from '../../pkg/dayjs';
+import { convertToUTCDate, getCurrentUTCDate, getCurrentUTCString } from '../../pkg/dayjs';
 import { Channels, createChannel, createChannels } from '../../domain/channel';
 import { Result, AppError, Err, Ok, wrap } from '../../pkg/errors';
 
@@ -45,7 +45,6 @@ export class YoutubeService implements IYoutubeService {
   async getVideos(params: GetVideosParams): Promise<Result<Videos, AppError>> {
     const chunks = this.chunkArray(params.videoIds, 50);
     const videos: youtube_v3.Schema$Video[] = [];
-
     for (const chunk of chunks) {
       const responseResult = await wrap(
         this.youtube.videos.list({
@@ -57,7 +56,6 @@ export class YoutubeService implements IYoutubeService {
           code: 'INTERNAL_SERVER_ERROR'
         })
       );
-
       if (responseResult.err) {
         return Err(responseResult.err);
       }
@@ -67,13 +65,14 @@ export class YoutubeService implements IYoutubeService {
     }
 
     return Ok(createVideos(videos.map((video) => createVideo({
-        id: video.id || '',
+        id: '',
+        rawId: video.id || '',
         rawChannelID: video.snippet?.channelId || '',
         title: video.snippet?.title || '',
         description: video.snippet?.description || '',
-        publishedAt: video.snippet?.publishedAt ? convertToUTCDate(video.snippet.publishedAt) : getCurrentUTCDate(),
-        startedAt: video.liveStreamingDetails?.actualStartTime ? convertToUTCDate(video.liveStreamingDetails.actualStartTime) : null,
-        endedAt: video.liveStreamingDetails?.actualEndTime ? convertToUTCDate(video.liveStreamingDetails.actualEndTime) : null,
+        publishedAt: video.snippet?.publishedAt || getCurrentUTCString(),
+        startedAt: video.liveStreamingDetails?.actualStartTime || null,
+        endedAt: video.liveStreamingDetails?.actualEndTime || null,
         platform: 'youtube',
         status: video.snippet?.liveBroadcastContent === 'live' ? 'live' : 'ended',
         tags: video.snippet?.tags || [],
@@ -90,6 +89,7 @@ export class YoutubeService implements IYoutubeService {
         q: params.query,
         maxResults: 50,
         eventType: params.eventType,
+        type: ['video'],
       }),
       (err) => new AppError({
         message: `Network error while searching videos: ${err.message}`,
@@ -103,11 +103,12 @@ export class YoutubeService implements IYoutubeService {
 
     const response = responseResult.val;
     return Ok(createVideos(response.data.items?.map((video) => createVideo({
-        id: video.id?.videoId || '',
+        id: '',
+        rawId: video.id?.videoId || '',
         title: video.snippet?.title || '',
         description: video.snippet?.description || '',
         rawChannelID: video.snippet?.channelId || '',
-        publishedAt: video.snippet?.publishedAt ? convertToUTCDate(video.snippet.publishedAt) : getCurrentUTCDate(),
+        publishedAt: video.snippet?.publishedAt || getCurrentUTCString(),
         startedAt: null,
         endedAt: null,
         platform: 'youtube',
@@ -151,7 +152,7 @@ export class YoutubeService implements IYoutubeService {
             name: channel.snippet?.title || '',
             description: channel.snippet?.description || '',
             thumbnailURL: channel.snippet?.thumbnails?.default?.url || channel.snippet?.thumbnails?.standard?.url || '',
-            publishedAt: channel.snippet?.publishedAt ? convertToUTCDate(channel.snippet.publishedAt) : null,
+            publishedAt: channel.snippet?.publishedAt || null,
             subscriberCount: 0,
         },
         twitch: null,

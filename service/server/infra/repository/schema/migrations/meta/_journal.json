@@ -5,15 +5,29 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1737203793364,
-      "tag": "0000_superb_puppet_master",
+      "when": 1737988484941,
+      "tag": "0000_new_eternity",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1737204448962,
-      "tag": "0001_members",
+      "when": 1737989324031,
+      "tag": "0001_member",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1737993068771,
+      "tag": "0002_clean_professor_monster",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1737998447034,
+      "tag": "0003_brief_krista_starr",
       "breakpoints": true
     }
   ]

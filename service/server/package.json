@@ -1,18 +1,20 @@
 {
-  "name": "template-api",
+  "name": "vspo-portal-server",
   "version": "0.0.0",
   "main": "cmd/server/index.ts",
   "type": "module",
   "scripts": {
-    "dev:api": "wrangler dev --config api-gateway.wrangler.toml --port 3000",
-    "dev:internal": "wrangler dev --config internal-app.wrangler.toml --port 3001",
-    "dev:all": "nx run template-api:dev-all",
+    "dev:api": "wrangler dev --config api-gateway.wrangler.toml",
+    "dev:internal": "wrangler dev --config internal-app.wrangler.toml",
+    "dev:all": "nx run vspo-portal-server:dev-all",
+    "dev:schedule": "wrangler dev --test-scheduled --config cron.wrangler.toml",
+    "dev:queue": "wrangler dev --config queue.wrangler.toml",
     "dev:remote": "wrangler dev --remote",
     "deploy": "wrangler deploy",
     "db:up": "docker compose -f docker/compose.yaml up",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio --port=3002",
+    "db:studio": "drizzle-kit studio --port=3004",
     "db:seed": "npx tsx cmd/local/database/seed.ts"
   },
   "dependencies": {

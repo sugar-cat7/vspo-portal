@@ -7,7 +7,7 @@ const ChannelDetailSchema = z.object({
     name: z.string(),
     description: z.string().nullable(),
     thumbnailURL: ThumbnailURLSchema,
-    publishedAt: z.date().nullable(),
+    publishedAt: z.string().datetime().nullable(),
     subscriberCount: z.number().int().nullable(),
   }).nullable();
   

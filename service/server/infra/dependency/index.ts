@@ -13,7 +13,7 @@ import { PgTransactionConfig } from "drizzle-orm/pg-core";
 import { AppError, Result } from "../../pkg/errors";
 
 import { VideoInteractor, CreatorInteractor } from "../../usecase";
-import { Env } from "../../config/env";
+import { AppEnv } from "../../config/env";
 
 export interface IRepositories {
   creatorRepository: CreatorRepository;
@@ -100,7 +100,7 @@ export class Container {
   creatorInteractor: CreatorInteractor;
   videoInteractor: VideoInteractor;
 
-  constructor(private readonly env: Env) {
+  constructor(private readonly env: AppEnv) {
     this.youtubeService = new YoutubeService(this.env.YOUTUBE_API_KEY);
     this.twitchService = new TwitchService({
       clientId: this.env.TWITCH_CLIENT_ID,
@@ -114,6 +114,7 @@ export class Container {
         this.env.ENVIRONMENT === "local"
           ? this.env.DEV_DB_CONNECTION_STRING
           : this.env.DB.connectionString,
+      isQueryLoggingEnabled: this.env.ENVIRONMENT === "local"? true : false,
     });
     const context = new AppContext(
       this.txManager,

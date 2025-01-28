@@ -1,13 +1,11 @@
-name = "template-api"
+name = "vspo-portal-gateway"
 compatibility_date = "2024-10-22"
 send_metrics = false
 compatibility_flags = ["nodejs_compat", "nodejs_als"]
 main = "cmd/server/gateway.ts"
 tail_consumers = [{ service = "api-tail" }]
 logpush = true
-# services = [
-#   { binding = "APP_WORKER", service = "app_worker" }
-# ]
+
 [dev]
 port = 3000
 
@@ -15,63 +13,3 @@ port = 3000
 binding = "APP_WORKER"
 service = "app_worker"
 entrypoint = "ApplicationService"
-
-# Resources need to be created for Preview environment
-# https://developers.cloudflare.com/workers/wrangler/configuration
-
-# Queue Binding causes an error when using dev --remote
-# https://github.com/cloudflare/workerd/issues/855
-[queues]
-consumers = [
-    { queue = "log-queue", max_batch_size = 10, max_retries = 10 },
-    { queue = "app-queue", max_batch_size = 10, max_retries = 10 },
-]
-producers = [
-    { queue = "log-queue", binding = "LOG_QUEUE" },
-    { queue = "app-queue", binding = "APP_QUEUE" },
-]
-
-[[r2_buckets]]
-bucket_name = "app-bucket"
-binding = "APP_BUCKET"
-preview_bucket_name = 'app-preview-bucket'
-
-# wrangler vectorize create langchain-test --dimensions=768 --metric=cosine
-# [[vectorize]]
-# binding = "APP_VECTORIZE_INDEX"
-# index_name = "app-index"
-
-[ai]
-binding = "APP_AI"
-
-[[kv_namespaces]]
-binding = "APP_KV"
-id = "xxx"
-
-
-######## PREVIEW environment config ########
-
-[[env.preview.kv_namespaces]]
-binding = "APP_KV"
-id = "xxx"
-
-######## PRODUCTION environment config ########
-
-[[env.production.kv_namespaces]]
-binding = "APP_KV"
-id = "xxx"
-
-######## WORKFLOW ########
-
-# [[workflows]]
-# # name of your workflow
-# name = "workflows-starter"
-# # binding name env.MY_WORKFLOW
-# binding = "MY_WORKFLOW"
-# # this is class that extends the Workflow class in src/index.ts
-# class_name = "UpdateVideoWorkflow"
-
-[[hyperdrive]]
-binding = "DB"
-id = "c020574a-5623-407b-be0c-cd192bab9545"
-localConnectionString = "postgres://user:password@localhost:5432/vspo"

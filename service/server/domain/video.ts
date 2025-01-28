@@ -10,12 +10,13 @@ const PlatformSchema = z.enum(["youtube", "twitch", "twitcasting", "niconico", "
 
 const VideoSchema = z.object({
     id: z.string(),
+    rawId: z.string(),
     title: z.string(),
     rawChannelID: z.string(),
     description: z.string(),
-    publishedAt: z.date(),
-    startedAt: z.date().nullable(),
-    endedAt: z.date().nullable(),
+    publishedAt: z.string().datetime(),
+    startedAt: z.string().datetime().nullable(),
+    endedAt: z.string().datetime().nullable(),
     platform: PlatformSchema,
     status: StatusSchema,
     tags: z.array(z.string()),

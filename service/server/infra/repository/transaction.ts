@@ -13,6 +13,7 @@ import { getLogger } from "../http/hono";
 
 export interface IDbConfig {
   connectionString: string; 
+  isQueryLoggingEnabled: boolean;
 }
 
 export type DB = PgTransaction<NodePgQueryResultHKT, Record<string, never>, ExtractTablesWithRelations<Record<string, never>>>
@@ -37,7 +38,10 @@ export class TxManager implements ITxManager {
     operation: (tx: DB) => Promise<Result<T, E>>,
     config?: PgTransactionConfig
   ): Promise<Result<T, E>> {
-    const db = drizzle(this.dbConfig.connectionString);
+    const db = drizzle({
+      connection: this.dbConfig.connectionString,
+      logger: this.dbConfig.isQueryLoggingEnabled
+    });
 
     const result = await wrap(
       db.transaction(async (tx) => {

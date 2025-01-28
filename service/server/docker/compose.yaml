@@ -18,17 +18,6 @@ services:
       retries: 5
     networks:
       - vspo-network
-  neon-proxy:
-    image: ghcr.io/timowilhelm/local-neon-http-proxy:main
-    environment:
-      - PG_CONNECTION_STRING=postgres://user:password@127.0.0.1:5432/vspo
-    ports:
-      - '4444:4444'
-    depends_on:
-      vspo-db:
-        condition: service_healthy
-    networks:
-      - vspo-network
   jaeger:
     container_name: jaeger
     image: jaegertracing/all-in-one:1.54

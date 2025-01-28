@@ -1,10 +1,11 @@
-import { eq, and, SQL, asc, count, inArray } from "drizzle-orm";
+import { eq, and, SQL, asc, count, inArray, sql } from "drizzle-orm";
 import { PlatformSchema, StatusSchema, VideoTypeSchema, Videos, createVideos } from "../../domain/video";
 import { AppError, Ok, Result, Err, wrap } from "../../pkg/errors";
 import { createUUID } from "../../pkg/uuid";
 import { buildConflictUpdateColumns } from "./helper";
 import { createInsertStreamStatus, createInsertVideo, videoTable, streamStatusTable, InsertVideo, InsertStreamStatus, channelTable, creatorTable } from "./schema";
 import { DB } from "./transaction";
+import { convertToUTC, convertToUTCDate, getCurrentUTCDate } from "../../pkg/dayjs";
 
 type ListQuery = {
     limit: number;
@@ -46,7 +47,7 @@ export class VideoRepository implements IVideoRepository {
 
         const videoResult = await wrap(
             this.db.select().from(videoTable)
-                .innerJoin(streamStatusTable, eq(videoTable.id, streamStatusTable.videoId))
+                .innerJoin(streamStatusTable, eq(videoTable.rawId, streamStatusTable.videoId))
                 .innerJoin(channelTable, eq(videoTable.channelId, channelTable.platformChannelId))
                 .innerJoin(creatorTable, eq(channelTable.creatorId, creatorTable.id))
                 .where(and(...filters))
@@ -66,12 +67,13 @@ export class VideoRepository implements IVideoRepository {
 
         return Ok(createVideos(videoResult.val.map(r => ({
             id: r.video.id,
+            rawId: r.video.rawId,
             rawChannelID: r.video.channelId,
             title: r.video.title,
             description: r.video.description,
-            publishedAt: r.video.publishedAt,
-            startedAt: r.stream_status.startedAt,
-            endedAt: r.stream_status.endedAt,
+            publishedAt: r.video.publishedAt ? convertToUTC(r.video.publishedAt) : '',
+            startedAt: r.stream_status.startedAt ? convertToUTC(r.stream_status.startedAt) : null,
+            endedAt: r.stream_status.endedAt ? convertToUTC(r.stream_status.endedAt) : null,
             platform: PlatformSchema.parse(r.video.platformType),
             status: StatusSchema.parse(r.stream_status.status),
             tags: r.video.tags.split(","),
@@ -114,25 +116,28 @@ export class VideoRepository implements IVideoRepository {
         const dbStreamStatus: InsertStreamStatus[] = [];
         
         for (const v of videos) {
+            const videoId = v.id || createUUID();
             dbVideos.push(createInsertVideo({
-                id: v.id,
+                id: videoId,
+                rawId: v.rawId,
                 channelId: v.rawChannelID,
                 platformType: v.platform,
                 title: v.title,
                 description: v.description,
                 videoType: v.videoType,
-                publishedAt: v.publishedAt,
+                publishedAt: convertToUTCDate(v.publishedAt),
                 tags: v.tags.join(","),
                 thumbnailUrl: v.thumbnailURL,
             }));
         
             dbStreamStatus.push(createInsertStreamStatus({
                 id: createUUID(),
-                videoId: v.id,
+                videoId: v.rawId,
                 status: v.status,
-                startedAt: v.startedAt,
-                endedAt: v.endedAt,
+                startedAt: v.startedAt ? convertToUTCDate(v.startedAt) : null,
+                endedAt: v.endedAt ? convertToUTCDate(v.endedAt) : null,
                 viewCount: v.viewCount,
+                updatedAt: getCurrentUTCDate()
             }));
         }
 
@@ -140,7 +145,7 @@ export class VideoRepository implements IVideoRepository {
             this.db.insert(videoTable)
                 .values(dbVideos)
                 .onConflictDoUpdate({
-                    target: videoTable.id,
+                    target: videoTable.rawId,
                     set: buildConflictUpdateColumns(videoTable, [
                         'title',
                         'description',
@@ -190,10 +195,11 @@ export class VideoRepository implements IVideoRepository {
 
         return Ok(createVideos(videoResult.val.map(r => ({
             id: r.id,
+            rawId: r.rawId,
             rawChannelID: r.channelId,
             title: r.title,
             description: r.description,
-            publishedAt: r.publishedAt,
+            publishedAt: convertToUTC(r.publishedAt),
             startedAt: null,
             endedAt: null,
             platform: PlatformSchema.parse(r.platformType),

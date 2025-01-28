@@ -1,5 +1,5 @@
 {
-  "id": "69ff1857-924c-425e-a741-4597145819bd",
+  "id": "0c368621-1977-46be-b3b0-fa899a725b59",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -180,15 +180,15 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "stream_status_video_id_video_id_fk": {
-          "name": "stream_status_video_id_video_id_fk",
+        "stream_status_video_id_video_raw_id_fk": {
+          "name": "stream_status_video_id_video_raw_id_fk",
           "tableFrom": "stream_status",
           "tableTo": "video",
           "columnsFrom": [
             "video_id"
           ],
           "columnsTo": [
-            "id"
+            "raw_id"
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
@@ -208,6 +208,12 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true
+        },
+        "raw_id": {
+          "name": "raw_id",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true
         },
         "channel_id": {
@@ -276,7 +282,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "video_raw_id_unique": {
+          "name": "video_raw_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "raw_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

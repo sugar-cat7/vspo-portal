@@ -1,4 +1,4 @@
-import { Creators, createCreator } from "..";
+import { Creator, Creators, createCreator } from "..";
 import { IYoutubeService, ICreatorRepository } from "../../infra";
 import { AppError, Result, Ok } from "../../pkg/errors";
 import { createUUID } from "../../pkg/uuid";
@@ -33,17 +33,21 @@ export class CreatorService implements ICreatorService {
     const creators = c.val.map(v => {
       const ch = chs.val.find(ch => ch.id === v.channel?.youtube?.rawId);
       if (!v?.channel || !ch?.youtube) {
-        return v;
+        return null;
       }
-
-      return createCreator({
+      const newCreator = createCreator({
         ...v,
+        thumbnailURL: ch.youtube.thumbnailURL,
         channel: {
           ...v.channel,
           youtube: ch.youtube
         }
       })
-    });
+      if (this.diff(v, newCreator)) {
+        return newCreator;
+      }
+      return null
+    }).filter(v => v !== null)
 
     return Ok(creators);
   }
@@ -80,5 +84,24 @@ export class CreatorService implements ICreatorService {
     }
 
     return Ok(creators);
+  }
+
+  private diff(a: Creator, b: Creator): boolean {
+    if (a.name !== b.name) {
+      return true;
+    }
+    if (a.memberType !== b.memberType) {
+      return true;
+    }
+    if (a.thumbnailURL !== b.thumbnailURL) {
+      return true;
+    }
+    if (a.channel?.youtube?.rawId !== b.channel?.youtube?.rawId) {
+      return true;
+    }
+    if (a.channel?.youtube?.name !== b.channel?.youtube?.name) {
+      return true;
+    }
+    return false;
   }
 }

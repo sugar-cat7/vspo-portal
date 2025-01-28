@@ -22,7 +22,7 @@ interface LogObject {
 
 const createLoggerConfig = (env?: Env) =>
   ({
-    name: 'template-api',
+    name: 'vspo-portal-server',
     type: env?.LOG_TYPE || 'json',
     minLevel: env?.LOG_MINLEVEL || 0,
     hideLogPositionForProduction: env?.LOG_HIDE_POSITION || true,

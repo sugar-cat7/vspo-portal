@@ -16,9 +16,13 @@ const getCurrentUTCDate = () => {
   return dayjs.tz().toDate()
 }
 
+const getCurrentUTCString = () => {
+  return dayjs.tz().format()
+}
+
 const convertToUTCDate = (input: Date | string | number) => {
   return dayjs.tz(input).utc().toDate()
 }
 
-export { convertToUTC, convertToUTCDate, getCurrentUTCDate }
+export { convertToUTC, convertToUTCDate, getCurrentUTCDate, getCurrentUTCString }
 

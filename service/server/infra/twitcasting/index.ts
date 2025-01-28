@@ -1,5 +1,5 @@
 import { Videos, createVideos, createVideo } from "../../domain/video";
-import { convertToUTCDate } from "../../pkg/dayjs";
+import { convertToUTC, convertToUTCDate } from "../../pkg/dayjs";
 import { Result,AppError, Err, Ok, wrap } from "../../pkg/errors";
 
 type GetVideosParams = {
@@ -110,12 +110,13 @@ export class TwitcastingService implements ITwitcastingService {
 
     private createVideoModel(video: TwitCastingVideo) {
         return createVideo({
-            id: video.id,
+            id: '',
+            rawId: video.id,
             rawChannelID: video.userId,
             title: video.title,
             description: video.title,
-            publishedAt: convertToUTCDate(video.startedAt),
-            startedAt: convertToUTCDate(video.startedAt),
+            publishedAt: convertToUTC(video.startedAt),
+            startedAt: convertToUTC(video.startedAt),
             endedAt: null,
             platform: 'twitcasting',
             status: video.isLive ? 'live' : 'ended',

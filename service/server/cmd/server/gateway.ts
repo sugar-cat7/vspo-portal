@@ -8,7 +8,8 @@ import {
   registerVideoListApi,
   registerVideoPostApi
 } from '../../routes'
-import { createHandler } from '../../infra/http/hono/otel'
+import { createHandler, withTracer } from '../../infra/http/otel'
+import { AppEnv } from '../../config/env'
 
 const app = newApp()
 app.notFound((c) => {
@@ -34,4 +35,11 @@ registerVideoPostApi(app)
 registerVideoListApi(app)
 registerCreatorListApi(app)
 registerCreatorPostApi(app)
-export default createHandler(app)
+
+export default createHandler({
+  fetch: async (req: Request, env: AppEnv, executionCtx: ExecutionContext) => {
+    return await withTracer('OTelCFWorkers:Fetcher', 'Exec', async () => {
+      return app.fetch(req, env, executionCtx)
+    })
+  },
+})

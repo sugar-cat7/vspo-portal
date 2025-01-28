@@ -1,0 +1,1 @@
+ALTER TABLE "stream_status" ADD CONSTRAINT "stream_status_video_id_unique" UNIQUE("video_id");

@@ -2,6 +2,7 @@ import { ApiClient } from '@twurple/api';
 import { AppTokenAuthProvider } from '@twurple/auth';
 import { createVideo, createVideos, Videos } from '../../domain/video';
 import { Result, AppError, Err, Ok, wrap } from '../../pkg/errors';
+import { convertToUTC } from '../../pkg/dayjs';
 
 type TwitchServiceConfig = {
     clientId: string;
@@ -26,29 +27,28 @@ export class TwitchService implements ITwitchService {
 
     async getStreams(params: GetStreamsParams): Promise<Result<Videos, AppError>> {
         const streamsResult = await wrap(
-            this.apiClient.streams.getStreams({ userId: params.userIds }),
+            this.apiClient.streams.getStreams({ userId: '858359149' }),
             (err) => new AppError({
                 message: `Network error while fetching streams: ${err.message}`,
                 code: 'INTERNAL_SERVER_ERROR'
             })
         );
-
         if (streamsResult.err) {
             return Err(streamsResult.err);
         }
-
         const streams = streamsResult.val;
         if (!streams.data) {
             return Ok(createVideos([]));
         }
 
         return Ok(createVideos(streams.data.map((video) => createVideo({
-            id: video.id,
+            id: '',
+            rawId: video.id,
             rawChannelID: video.userId,
             title: video.title,
             description: video.title,
-            publishedAt: video.startDate,
-            startedAt: video.startDate,
+            publishedAt: convertToUTC(video.startDate),
+            startedAt: convertToUTC(video.startDate),
             endedAt: null,
             platform: 'twitch',
             status: 'live',
@@ -74,12 +74,13 @@ export class TwitchService implements ITwitchService {
 
         const videos = videosResult.val;
         return Ok(createVideos(videos.map((video) => createVideo({
-            id: video.id,
+            id: '',
+            rawId: video.id,
             rawChannelID: video.userId,
             title: video.title,
             description: video.description,
-            publishedAt: video.publishDate,
-            startedAt: video.creationDate,
+            publishedAt: convertToUTC(video.publishDate),
+            startedAt: convertToUTC(video.creationDate),
             endedAt: null,
             platform: 'twitch',
             status: 'ended',

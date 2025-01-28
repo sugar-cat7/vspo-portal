@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ApplicationService } from '../cmd/server/internal/application';
 
 export const zEnv = z.object({
   SERVICE_NAME: z.string(),
@@ -24,11 +25,12 @@ export const zEnv = z.object({
    */
   DB: z.custom<Hyperdrive>(),
   LOG_QUEUE: z.custom<Queue>(),
-  APP_QUEUE: z.custom<Queue>(),
+  WRITE_QUEUE: z.custom<Queue>(),
   APP_BUCKET: z.custom<R2Bucket>(),
   APP_KV: z.custom<KVNamespace>(),
   APP_AI: z.custom<Fetcher>(),
-  UPDATE_VIDEOS_WORKFLOW: z.custom<Workflow>(),
+  SEARCH_VIDEOS_WORKFLOW: z.custom<Workflow>(),
+  SEARCH_CHANNELS_WORKFLOW: z.custom<Workflow>(),
 
   /**
    * Dev
@@ -44,4 +46,8 @@ export const zEnv = z.object({
   TWITCASTING_ACCESS_TOKEN: z.string(),
 })
 
-export type Env = z.infer<typeof zEnv>
+type Env = z.infer<typeof zEnv>
+
+export type AppEnv = Env & {
+  APP_WORKER: Service<ApplicationService>;
+}

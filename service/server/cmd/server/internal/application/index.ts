@@ -1,17 +1,25 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { Env, zEnv } from "../../../../config/env";
+import { AppEnv } from "../../../../config/env";
 import { Container } from "../../../../infra/dependency";
-import { BatchUpsertByChannelIdsParam, BatchUpsertByIdsParam, BatchUpsertBySearchParam, BatchUpsertParam, ICreatorInteractor, IVideoInteractor, ListByMemberTypeParam, ListParam, SearchExistParam, SearchLiveParam, VideoInteractor } from "../../../../usecase";
+import { BatchDeleteByVideoIdsParam, BatchUpsertCreatorsParam, BatchUpsertVideosParam, ICreatorInteractor, IVideoInteractor, ListByMemberTypeParam, ListParam, SearchByChannelIdsParam, SearchByMemberTypeParam, SearchExistParam, SearchLiveParam } from "../../../../usecase";
+import { Creator, CreatorSchema, Video, VideoSchema } from "../../../../domain";
+import { createHandler, withTracer } from "../../../../infra/http/otel";
 
 
 export class VideoService extends RpcTarget {
   #usecase: IVideoInteractor;
-  constructor(usecase: IVideoInteractor){
+  #queue: Queue<Video>
+  constructor(usecase: IVideoInteractor, queue: Queue){
     super();
     this.#usecase = usecase;
+    this.#queue = queue;
+  }
+
+  async batchUpsertEnqueue(params: BatchUpsertVideosParam) {
+    return this.#queue.sendBatch(params.map(video => ({ body: video })));
   }
   
-  async batchUpsert(params: BatchUpsertParam) {
+  async batchUpsert(params: BatchUpsertVideosParam) {
     return this.#usecase.batchUpsert(params);
   }
 
@@ -23,10 +31,6 @@ export class VideoService extends RpcTarget {
     return this.#usecase.searchExist(params);
   }
 
-  async batchUpsertByIds(params: BatchUpsertByIdsParam) {
-    return this.#usecase.batchUpsertByIds(params);
-  }
-
   async list(params: ListParam) {
     return this.#usecase.list(params);
   }
@@ -35,54 +39,85 @@ export class VideoService extends RpcTarget {
     return this.#usecase.searchDeleted(params);
   }
 
+  async batchDeleteByVideoIds(params: BatchDeleteByVideoIdsParam) {
+    return this.#usecase.batchDeleteByVideoIds(params);
+  }
+
 }
 
 export class CreatorService extends RpcTarget {
   #usecase: ICreatorInteractor
-
-  constructor(usecase: ICreatorInteractor){
+  #queue: Queue<Creator>
+  constructor(usecase: ICreatorInteractor, queue: Queue){
     super();
     this.#usecase = usecase;
+    this.#queue = queue;
   }
 
-  async batchUpsertByChannelIds(params: BatchUpsertByChannelIdsParam) {
-    return this.#usecase.batchUpsertByChannelIds(params);
+  async batchUpsertEnqueue(params: BatchUpsertCreatorsParam) {
+    return this.#queue.sendBatch(params.map(creator => ({ body: creator })));
   }
 
-  async batchUpsertBySearch(params: BatchUpsertBySearchParam) {
-    return this.#usecase.batchUpsertBySearch(params);
+  async searchByChannelIds(params: SearchByChannelIdsParam) {
+    return this.#usecase.searchByChannelIds(params);
+  }
+
+  async searchByMemberType(params: SearchByMemberTypeParam) {
+    return this.#usecase.searchByMemberType(params);
   }
 
   async list(params: ListByMemberTypeParam) {
     return this.#usecase.list(params);
   }
-  
-
 }
 
-export class ApplicationService extends WorkerEntrypoint<Env> {
+export class ApplicationService extends WorkerEntrypoint<AppEnv> {
 
   newVideoUsecase() {
     const d = this.setup();
-    return new VideoService(d.videoInteractor)
+    return new VideoService(d.videoInteractor, this.env.WRITE_QUEUE)
   }
   
   newCreatorUsecase() {
     const d = this.setup();
-    return new CreatorService(d.creatorInteractor)
+    return new CreatorService(d.creatorInteractor, this.env.WRITE_QUEUE)
   }
 
   private setup() {
-    const envResult = zEnv.safeParse(this.env);
-    if (!envResult.success) {
-      throw new Error("Failed to parse environment variables");
-    }
-    return new Container(envResult.data);
+    return new Container(this.env);
   }
 }
 
-export default {
-  async fetch() {
-    return new Response("ok");
+type MessageParam = Video | Creator;
+
+function isVideoBatch(
+  batch: MessageBatch<MessageParam>
+): batch is MessageBatch<Video> {
+  const first = batch.messages.at(0)?.body;
+  return first != null && VideoSchema.safeParse(first).success;
+}
+
+function isCreatorBatch(
+  batch: MessageBatch<MessageParam>
+): batch is MessageBatch<Creator> {
+  const first = batch.messages.at(0)?.body;
+  return first != null && CreatorSchema.safeParse(first).success;
+}
+
+export default createHandler({
+  fetch: async (req: Request, env: AppEnv, _executionContext: ExecutionContext) => {
+    return new Response('OK')
   },
-};
+  queue: async (batch: MessageBatch<MessageParam>, env: AppEnv, _executionContext: ExecutionContext) => {
+      return await withTracer('OTelCFWorkers:Consumer', 'Consume', async (span) => {
+        span.addEvent('Consume', { queue: batch.queue })
+        const c = new Container(env)
+        if (isVideoBatch(batch)) {
+          await c.videoInteractor.batchUpsert(batch.messages.map(m => m.body))
+        }
+        if (isCreatorBatch(batch)) {
+          await c.creatorInteractor.batchUpsert(batch.messages.map((m) => m.body))
+        } 
+      })
+    },
+})

@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS "stream_status" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "video" (
 	"id" text PRIMARY KEY NOT NULL,
+	"raw_id" text NOT NULL,
 	"channel_id" text NOT NULL,
 	"platform_type" text NOT NULL,
 	"title" text NOT NULL,
@@ -37,7 +38,8 @@ CREATE TABLE IF NOT EXISTS "video" (
 	"video_type" text NOT NULL,
 	"published_at" timestamp with time zone NOT NULL,
 	"tags" text NOT NULL,
-	"thumbnail_url" text NOT NULL
+	"thumbnail_url" text NOT NULL,
+	CONSTRAINT "video_raw_id_unique" UNIQUE("raw_id")
 );
 --> statement-breakpoint
 DO $$ BEGIN
@@ -47,7 +49,7 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
- ALTER TABLE "stream_status" ADD CONSTRAINT "stream_status_video_id_video_id_fk" FOREIGN KEY ("video_id") REFERENCES "public"."video"("id") ON DELETE cascade ON UPDATE no action;
+ ALTER TABLE "stream_status" ADD CONSTRAINT "stream_status_video_id_video_raw_id_fk" FOREIGN KEY ("video_id") REFERENCES "public"."video"("raw_id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

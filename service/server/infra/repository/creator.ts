@@ -1,8 +1,8 @@
-import { eq, and, SQL, count, inArray } from "drizzle-orm";
+import { eq, and, SQL, count, inArray, asc } from "drizzle-orm";
 import { AppError, Ok, Result, Err, wrap } from "../../pkg/errors";
 import { creatorTable, channelTable, InsertChannel, InsertCreator } from "./schema";
 import { Channel, createChannel, createCreators, Creators, getPlatformDetail, MemberTypeSchema } from "../../domain";
-import { getCurrentUTCDate } from "../../pkg/dayjs";
+import { convertToUTC, convertToUTCDate, getCurrentUTCDate } from "../../pkg/dayjs";
 import { buildConflictUpdateColumns } from "./helper";
 import { DB } from "./transaction";
 
@@ -34,6 +34,7 @@ export class CreatorRepository implements ICreatorRepository {
                 .where(and(...filters))
                 .limit(query.limit)
                 .offset(query.page * query.limit)
+                .orderBy(asc(creatorTable.updatedAt))
                 .execute(),
             (err) => new AppError({
                 message: `Database error during creator list query: ${err.message}`,
@@ -44,8 +45,6 @@ export class CreatorRepository implements ICreatorRepository {
         if (creatorResult.err) {
             return Err(creatorResult.err);
         }
-    
-        
         type CreatorMapValue = {
             id: string;
             name: string;
@@ -81,7 +80,7 @@ export class CreatorRepository implements ICreatorRepository {
                     name: r.channel.title,
                     description: r.channel.description,
                     thumbnailURL: r.channel.thumbnailUrl,
-                    publishedAt: r.channel.publishedAt,
+                    publishedAt: convertToUTC(r.channel.publishedAt),
                     subscriberCount: r.channel.subscriberCount,
                 };
             }
@@ -91,7 +90,7 @@ export class CreatorRepository implements ICreatorRepository {
                     name: r.channel.title,
                     description: r.channel.description,
                     thumbnailURL: r.channel.thumbnailUrl,
-                    publishedAt: r.channel.publishedAt,
+                    publishedAt: convertToUTC(r.channel.publishedAt),
                     subscriberCount: r.channel.subscriberCount,
                 };
             }
@@ -101,7 +100,7 @@ export class CreatorRepository implements ICreatorRepository {
                     name: r.channel.title,
                     description: r.channel.description,
                     thumbnailURL: r.channel.thumbnailUrl,
-                    publishedAt: r.channel.publishedAt,
+                    publishedAt: convertToUTC(r.channel.publishedAt),
                     subscriberCount: r.channel.subscriberCount,
                 };
             }
@@ -111,7 +110,7 @@ export class CreatorRepository implements ICreatorRepository {
                     name: r.channel.title,
                     description: r.channel.description,
                     thumbnailURL: r.channel.thumbnailUrl,
-                    publishedAt: r.channel.publishedAt,
+                    publishedAt: convertToUTC(r.channel.publishedAt),
                     subscriberCount: r.channel.subscriberCount,
                 };
             }
@@ -120,8 +119,6 @@ export class CreatorRepository implements ICreatorRepository {
     
         return Ok(createCreators(Array.from(creatorMap.values())));
     }
-    
-    
     
     
 
@@ -176,7 +173,7 @@ export class CreatorRepository implements ICreatorRepository {
                 title: d.detail.name,
                 description: d.detail.description ?? '',
                 thumbnailUrl: d.detail.thumbnailURL,
-                publishedAt: d.detail.publishedAt ?? getCurrentUTCDate(),
+                publishedAt: d.detail?.publishedAt ? convertToUTCDate(d.detail.publishedAt) : getCurrentUTCDate(),
                 subscriberCount: d.detail.subscriberCount ?? 0,
             });
 
@@ -209,7 +206,7 @@ export class CreatorRepository implements ICreatorRepository {
             this.db.insert(channelTable)
                 .values(dbChannels)
                 .onConflictDoUpdate({
-                    target: creatorTable.id,
+                    target: channelTable.platformChannelId,
                     set: buildConflictUpdateColumns(channelTable, [
                         'title',
                         'description',

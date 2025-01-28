@@ -46,15 +46,15 @@ const VideoSchema = z.object({
       description: 'Description',
       example: 'Hello, World!',
     }),
-    publishedAt: z.date().openapi({
+    publishedAt: z.string().datetime().openapi({
       description: 'Published At',
       example: '2022-01-01T00:00:00.000Z',
     }),
-    startedAt: z.date().nullable().openapi({
+    startedAt: z.string().datetime().nullable().openapi({
       description: 'Started At',
       example: '2022-01-01T00:00:00.000Z',
     }),
-    endedAt: z.date().nullable().openapi({
+    endedAt: z.string().datetime().nullable().openapi({
       description: 'Ended At',
       example: '2022-01-01T00:00:00.000Z',
     }),

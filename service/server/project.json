@@ -1,12 +1,14 @@
 {
-    "name": "template-api",
+    "name": "vspo-portal-server",
     "targets": {
       "dev-all": {
         "executor": "nx:run-commands",
         "options": {
           "commands": [
             "wrangler dev --config api-gateway.wrangler.toml",
-            "wrangler dev --config internal-app.wrangler.toml"
+            "wrangler dev --config internal-app.wrangler.toml",
+            "wrangler dev --test-scheduled --config cron.wrangler.toml",
+            "drizzle-kit studio --port=3004"
           ],
           "parallel": true
         }

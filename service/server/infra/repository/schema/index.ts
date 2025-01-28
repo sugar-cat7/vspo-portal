@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import { pgTable, text, integer, boolean, timestamp } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
@@ -7,6 +8,7 @@ export const creatorTable = pgTable('creator', {
   name: text('name').notNull(), // Creator's name
   memberType: text('member_type').notNull(), // Member type
   representativeThumbnailUrl: text('representative_thumbnail_url').notNull(), // Thumbnail image URL
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(), // Last updated date and time
 });
 
 // Channel information table
@@ -25,6 +27,7 @@ export const channelTable = pgTable('channel', {
 // Video information table
 export const videoTable = pgTable('video', {
   id: text('id').primaryKey(), // Unique identifier
+  rawId: text('raw_id').notNull().unique(), // Video ID on the platform
   channelId: text('channel_id').notNull().references(() => channelTable.platformChannelId, { onDelete: 'cascade' }), // Channel ID
   platformType: text('platform_type').notNull(), // Platform type
   title: text('title').notNull(), // Video title
@@ -38,7 +41,7 @@ export const videoTable = pgTable('video', {
 // Stream status table
 export const streamStatusTable = pgTable('stream_status', {
   id: text('id').primaryKey(), // Unique identifier
-  videoId: text('video_id').notNull().references(() => videoTable.id, { onDelete: 'cascade' }), // Video ID
+  videoId: text('video_id').notNull().references(() => videoTable.rawId, { onDelete: 'cascade' }).unique(), // Video ID
   status: text('status').notNull(), // Stream status
   startedAt: timestamp('started_at', { withTimezone: true }), // Start date and time
   endedAt: timestamp('ended_at', { withTimezone: true }), // End date and time

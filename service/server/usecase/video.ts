@@ -3,7 +3,7 @@ import { Videos } from "../domain/video";
 import { IAppContext } from "../infra/dependency";
 import { AppError, Ok, Result } from "../pkg/errors";
 
-export type BatchUpsertParam = Videos;
+export type BatchUpsertVideosParam = Videos;
 export type SearchLiveParam = {};
 export type SearchExistParam = {};
 export type BatchUpsertByIdsParam = {
@@ -25,19 +25,23 @@ export type ListResponse = {
   pagination: Page;
 };
 
+export type BatchDeleteByVideoIdsParam = {
+  videoIds: string[];
+};
+
 export interface IVideoInteractor {
-  batchUpsert(params: BatchUpsertParam): Promise<Result<Videos, AppError>>;
+  batchUpsert(params: BatchUpsertVideosParam): Promise<Result<Videos, AppError>>;
   searchLive(
     params: SearchLiveParam
   ): Promise<Result<Videos, AppError>>;
   searchExist(
     params: SearchExistParam
   ): Promise<Result<Videos, AppError>>;
-  batchUpsertByIds(
-    params: BatchUpsertByIdsParam
-  ): Promise<Result<Videos, AppError>>;
   list(params: ListParam): Promise<Result<ListResponse, AppError>>;
-  searchDeleted(params: {}): Promise<Result<{videoIds: string[]}, AppError>>;
+  searchDeleted(params: {}): Promise<Result<Videos, AppError>>;
+  batchDeleteByVideoIds(
+    params: BatchDeleteByVideoIdsParam
+  ): Promise<Result<void, AppError>>;
 }
 
 export class VideoInteractor implements IVideoInteractor {
@@ -52,11 +56,6 @@ export class VideoInteractor implements IVideoInteractor {
       if (sv.err) {
         return sv;
       }
-
-      // const uv = await this.videoRepository.batchUpsert(sv.val)
-      // if (uv.err) {
-      //     return uv
-      // }
       return Ok(sv.val);
     });
   }
@@ -70,37 +69,12 @@ export class VideoInteractor implements IVideoInteractor {
       if (sv.err) {
         return sv;
       }
-
-      // const uv = await this.videoRepository.batchUpsert(sv.val)
-      // if (uv.err) {
-      //     return uv
-      // }
       return Ok(sv.val);
     });
   }
 
-  async batchUpsertByIds(
-    params: BatchUpsertByIdsParam
-  ): Promise<Result<Videos, AppError>> {
-    return this.context.runInTx(async (repos, services) => {
-      const sv = await services.videoService.getVideosByIDs({
-        youtubeVideoIds: params.youtubeVideoIds,
-        twitchVideoIds: params.twitchVideoIds,
-      });
-      if (sv.err) {
-        return sv;
-      }
-
-      const uv = await repos.videoRepository.batchUpsert(sv.val);
-      if (uv.err) {
-        return uv;
-      }
-      return Ok(uv.val);
-    });
-  }
-
   async batchUpsert(
-    params: BatchUpsertParam
+    params: BatchUpsertVideosParam
   ): Promise<Result<Videos, AppError>> {
     return this.context.runInTx(async (repos, _services) => {
       const uv = await repos.videoRepository.batchUpsert(params);
@@ -133,19 +107,28 @@ export class VideoInteractor implements IVideoInteractor {
     });
   }
 
-  async searchDeleted(params: {}): Promise<Result<{videoIds: string[]}, AppError>> {
+  async searchDeleted(params: {}): Promise<Result<Videos, AppError>> {
     return this.context.runInTx(async (repos, services) => {
-      const sv = await services.videoService.searchDeletedVideoIds();
+      const sv = await services.videoService.searchDeletedVideos();
       if (sv.err) {
         return sv;
       }
 
-      const uv = await repos.videoRepository.batchDelete(sv.val.videoIds);
-        if (uv.err) {
-            return uv;
-        }
-
       return Ok(sv.val);
     });
   }
-}
+
+  async batchDeleteByVideoIds(
+    params: BatchDeleteByVideoIdsParam
+  ): Promise<Result<void, AppError>> {
+    return this.context.runInTx(async (repos, _services) => {
+      const uv = await repos.videoRepository.batchDelete(params.videoIds);
+      if (uv.err) {
+        return uv;
+      }
+      return uv;
+    });
+  }
+
+  }
+
