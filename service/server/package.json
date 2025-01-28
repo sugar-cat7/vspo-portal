@@ -11,13 +11,17 @@
     "dev:queue": "wrangler dev --config queue.wrangler.toml",
     "deploy:all": "nx run vspo-portal-server:deploy-all",
     "deploy": "wrangler deploy",
+    "build:dryrun": "nx run vspo-portal-server:build-dryrun",
     "db:up": "docker compose -f docker/compose.yaml up",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio --port=3004",
     "db:seed": "npx tsx cmd/local/database/seed.ts",
-    "biome:check": "pnpm biome check --write ./**/**",
-    "tsc": "tsc --noEmit"
+    "biome:check": "pnpm biome check ./**/**",
+    "biome:check:write": "pnpm biome check --write ./**/**",
+    "tsc": "tsc --noEmit",
+    "ci": "nx run vspo-portal-server:ci",
+    "test": "nx test vspo-portal-server"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.58",

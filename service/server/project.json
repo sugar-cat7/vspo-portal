@@ -23,6 +23,28 @@
           ],
           "parallel": false
         }
+      },
+      "build-dryrun": {
+        "executor": "nx:run-commands",
+        "options": {
+          "commands": [
+            "wrangler deploy --config api-gateway.wrangler.toml --dry-run",
+            "wrangler deploy --config internal-app.wrangler.toml --dry-run",
+            "wrangler deploy --config cron.wrangler.toml --dry-run"
+          ],
+          "parallel": false
+        }
+      },
+      "ci": {
+        "executor": "nx:run-commands",
+        "options": {
+          "commands": [
+            "pnpm tsc",
+            "pnpm run biome:check",
+            "nx run vspo-portal-server:build-dryrun"
+          ],
+          "parallel": false
+        }
       }
     }
   }

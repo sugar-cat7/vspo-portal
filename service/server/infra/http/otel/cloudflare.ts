@@ -4,6 +4,7 @@ import type { ApiEnv } from "../../../config/env/api";
 import type { CommonEnv } from "../../../config/env/common";
 import type { AppWorkerEnv } from "../../../config/env/internal";
 import type { BindingWorkflowEnv } from "../../../config/env/workflow";
+import { AppError } from "../../../pkg/errors";
 
 export const withTracer = async <T>(
   tracerName: string,
@@ -15,6 +16,9 @@ export const withTracer = async <T>(
     try {
       return await callback(span);
     } catch (error) {
+      if (error instanceof AppError) {
+        span.recordException(error);
+      }
       if (error instanceof Error) {
         span.recordException(error);
       } else {
@@ -56,5 +60,5 @@ type Handler<T = unknown, E = UnifiedEnv> = {
 export const createHandler = <T, E extends UnifiedEnv = UnifiedEnv>(
   handler: Handler<T, E>,
 ) => {
-  instrument(handler, config);
+  return instrument(handler, config);
 };
