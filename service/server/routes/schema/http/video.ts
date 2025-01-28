@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { language } from "googleapis/build/src/apis/language";
 import { PaginationQuerySchema, PaginationResponseSchema } from "./common";
 
 const CreateVideoRequestSchema = z.object({
@@ -128,6 +129,17 @@ const ListVideoRequestSchema = PaginationQuerySchema.merge(
         example: "2022-01-01T00:00:00.000Z",
         param: {
           name: "endedAt",
+          in: "query",
+        },
+      }),
+    languageCode: z
+      .string()
+      .default("default")
+      .openapi({
+        description: "Language Code",
+        example: "en",
+        param: {
+          name: "languageCode",
           in: "query",
         },
       }),

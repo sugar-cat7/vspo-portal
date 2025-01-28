@@ -1,4 +1,4 @@
-import { type SQL, and, asc, count, eq, inArray, sql } from "drizzle-orm";
+import { type SQL, and, asc, count, eq, inArray } from "drizzle-orm";
 import {
   PlatformSchema,
   StatusSchema,
@@ -17,12 +17,15 @@ import { buildConflictUpdateColumns } from "./helper";
 import {
   type InsertStreamStatus,
   type InsertVideo,
+  type InsertVideoTranslation,
   channelTable,
   createInsertStreamStatus,
   createInsertVideo,
   creatorTable,
+  creatorTranslationTable,
   streamStatusTable,
   videoTable,
+  videoTranslationTable,
 } from "./schema";
 import type { DB } from "./transaction";
 
@@ -32,8 +35,10 @@ type ListQuery = {
   platform?: string;
   status?: string;
   videoType?: string;
+  memberType?: string;
   startedAt?: Date;
   endedAt?: Date;
+  languageCode: string; // ISO 639-1 language code or [default] explicitly specified to narrow down to 1creator
 };
 
 export interface IVideoRepository {
@@ -63,6 +68,15 @@ export class VideoRepository implements IVideoRepository {
     if (query.endedAt) {
       filters.push(eq(streamStatusTable.endedAt, query.endedAt));
     }
+    if (query.languageCode) {
+      filters.push(eq(videoTranslationTable.languageCode, query.languageCode));
+      filters.push(
+        eq(creatorTranslationTable.languageCode, query.languageCode),
+      );
+    }
+    if (query.memberType) {
+      filters.push(eq(creatorTable.memberType, query.memberType));
+    }
 
     const videoResult = await wrap(
       this.db
@@ -73,10 +87,18 @@ export class VideoRepository implements IVideoRepository {
           eq(videoTable.rawId, streamStatusTable.videoId),
         )
         .innerJoin(
+          videoTranslationTable,
+          eq(videoTable.rawId, videoTranslationTable.videoId),
+        )
+        .innerJoin(
           channelTable,
           eq(videoTable.channelId, channelTable.platformChannelId),
         )
         .innerJoin(creatorTable, eq(channelTable.creatorId, creatorTable.id))
+        .innerJoin(
+          creatorTranslationTable,
+          eq(creatorTable.id, creatorTranslationTable.creatorId),
+        )
         .where(and(...filters))
         .limit(query.limit)
         .offset(query.page * query.limit)
@@ -99,8 +121,9 @@ export class VideoRepository implements IVideoRepository {
           id: r.video.id,
           rawId: r.video.rawId,
           rawChannelID: r.video.channelId,
-          title: r.video.title,
-          description: r.video.description,
+          title: r.video_translation.title,
+          languageCode: r.video_translation.languageCode,
+          description: r.video_translation.description,
           publishedAt: r.video.publishedAt
             ? convertToUTC(r.video.publishedAt)
             : "",
@@ -116,6 +139,7 @@ export class VideoRepository implements IVideoRepository {
           viewCount: r.stream_status.viewCount,
           thumbnailURL: r.video.thumbnailUrl,
           videoType: VideoTypeSchema.parse(r.video.videoType),
+          creatorName: r.creator_translation.name,
           creatorThumbnailURL: r.creator.representativeThumbnailUrl,
         })),
       ),
@@ -158,6 +182,7 @@ export class VideoRepository implements IVideoRepository {
   async batchUpsert(videos: Videos): Promise<Result<Videos, AppError>> {
     const dbVideos: InsertVideo[] = [];
     const dbStreamStatus: InsertStreamStatus[] = [];
+    const dbVideoTranslation: InsertVideoTranslation[] = [];
 
     for (const v of videos) {
       const videoId = v.id || createUUID();
@@ -167,8 +192,6 @@ export class VideoRepository implements IVideoRepository {
           rawId: v.rawId,
           channelId: v.rawChannelID,
           platformType: v.platform,
-          title: v.title,
-          description: v.description,
           videoType: v.videoType,
           publishedAt: convertToUTCDate(v.publishedAt),
           tags: v.tags.join(","),
@@ -187,6 +210,15 @@ export class VideoRepository implements IVideoRepository {
           updatedAt: getCurrentUTCDate(),
         }),
       );
+
+      dbVideoTranslation.push({
+        id: createUUID(),
+        videoId: v.rawId,
+        languageCode: v.languageCode,
+        title: v.title,
+        description: v.description,
+        updatedAt: getCurrentUTCDate(),
+      });
     }
 
     const videoResult = await wrap(
@@ -196,8 +228,6 @@ export class VideoRepository implements IVideoRepository {
         .onConflictDoUpdate({
           target: videoTable.rawId,
           set: buildConflictUpdateColumns(videoTable, [
-            "title",
-            "description",
             "videoType",
             "publishedAt",
             "tags",
@@ -244,24 +274,66 @@ export class VideoRepository implements IVideoRepository {
       return Err(streamStatusResult.err);
     }
 
+    const videoTranslationResult = await wrap(
+      this.db
+        .insert(videoTranslationTable)
+        .values(dbVideoTranslation)
+        .onConflictDoUpdate({
+          target: [
+            videoTranslationTable.videoId,
+            videoTranslationTable.languageCode,
+          ],
+          set: buildConflictUpdateColumns(videoTranslationTable, [
+            "title",
+            "description",
+            "updatedAt",
+          ]),
+        })
+        .returning()
+        .execute(),
+      (err) =>
+        new AppError({
+          message: `Database error during video transaction batch upsert: ${err.message}`,
+          code: "INTERNAL_SERVER_ERROR",
+        }),
+    );
+
+    if (videoTranslationResult.err) {
+      return Err(videoTranslationResult.err);
+    }
+
     return Ok(
       createVideos(
-        videoResult.val.map((r) => ({
-          id: r.id,
-          rawId: r.rawId,
-          rawChannelID: r.channelId,
-          title: r.title,
-          description: r.description,
-          publishedAt: convertToUTC(r.publishedAt),
-          startedAt: null,
-          endedAt: null,
-          platform: PlatformSchema.parse(r.platformType),
-          status: StatusSchema.parse("unknown"),
-          tags: r.tags.split(","),
-          viewCount: 0,
-          thumbnailURL: r.thumbnailUrl,
-          videoType: VideoTypeSchema.parse(r.videoType),
-        })),
+        videoResult.val.map((r) => {
+          const streamStatus = streamStatusResult.val.find(
+            (s) => s.videoId === r.rawId,
+          );
+          const videoTranslation = videoTranslationResult.val.find(
+            (t) => t.videoId === r.rawId,
+          );
+
+          return {
+            id: r.id,
+            rawId: r.rawId,
+            rawChannelID: r.channelId,
+            title: videoTranslation?.title ?? "",
+            description: videoTranslation?.description ?? "",
+            languageCode: videoTranslation?.languageCode ?? "default",
+            publishedAt: convertToUTC(r.publishedAt),
+            startedAt: streamStatus?.startedAt
+              ? convertToUTC(streamStatus.startedAt)
+              : null,
+            endedAt: streamStatus?.endedAt
+              ? convertToUTC(streamStatus.endedAt)
+              : null,
+            platform: PlatformSchema.parse(r.platformType),
+            status: StatusSchema.parse(streamStatus?.status ?? "unknown"),
+            tags: r.tags.split(","),
+            viewCount: streamStatus?.viewCount ?? 0,
+            thumbnailURL: r.thumbnailUrl,
+            videoType: VideoTypeSchema.parse(r.videoType),
+          };
+        }),
       ),
     );
   }

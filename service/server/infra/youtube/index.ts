@@ -5,11 +5,7 @@ import {
   createChannels,
 } from "../../domain/channel";
 import { type Videos, createVideo, createVideos } from "../../domain/video";
-import {
-  convertToUTCDate,
-  getCurrentUTCDate,
-  getCurrentUTCString,
-} from "../../pkg/dayjs";
+import { getCurrentUTCString } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
 
 type GetVideosParams = {
@@ -81,6 +77,7 @@ export class YoutubeService implements IYoutubeService {
             rawId: video.id || "",
             rawChannelID: video.snippet?.channelId || "",
             title: video.snippet?.title || "",
+            languageCode: "default",
             description: video.snippet?.description || "",
             publishedAt: video.snippet?.publishedAt || getCurrentUTCString(),
             startedAt: video.liveStreamingDetails?.actualStartTime || null,
@@ -130,6 +127,7 @@ export class YoutubeService implements IYoutubeService {
           createVideo({
             id: "",
             rawId: video.id?.videoId || "",
+            languageCode: "default",
             title: video.snippet?.title || "",
             description: video.snippet?.description || "",
             rawChannelID: video.snippet?.channelId || "",

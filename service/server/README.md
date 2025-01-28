@@ -1,6 +1,9 @@
 
 ### Cron
 
+`cmd/cron/index.ts`
+```
+
 ```bash
-curl "http://localhost:3002/__scheduled?cron=0+0+*+*+*"
+curl "http://localhost:3002/__scheduled?cron=*/2+*+*+*+*"
 ```

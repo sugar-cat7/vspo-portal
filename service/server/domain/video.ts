@@ -16,6 +16,7 @@ const VideoSchema = z.object({
   id: z.string(),
   rawId: z.string(),
   title: z.string(),
+  languageCode: z.string(),
   rawChannelID: z.string(),
   description: z.string(),
   publishedAt: z.string().datetime(),
@@ -27,6 +28,7 @@ const VideoSchema = z.object({
   viewCount: z.number().int().nonnegative(),
   thumbnailURL: ThumbnailURLSchema,
   videoType: VideoTypeSchema,
+  creatorName: z.string().optional(),
   creatorThumbnailURL: ThumbnailURLSchema.optional(),
 });
 

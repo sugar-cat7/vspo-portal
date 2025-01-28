@@ -12,6 +12,7 @@ import {
   type IYoutubeService,
   query,
 } from "../../infra";
+import type { IAIService } from "../../infra/ai";
 import type { ICreatorRepository } from "../../infra/repository/creator";
 import {
   type AppError,
@@ -34,6 +35,13 @@ export interface IVideoService {
     twitchVideoIds: string[];
   }): Promise<Result<Videos, AppError>>;
   searchDeletedVideos(): Promise<Result<Videos, AppError>>;
+  translateVideos({
+    languageCode,
+    videos,
+  }: {
+    languageCode: string;
+    videos: Videos;
+  }): Promise<Result<Videos, AppError>>;
 }
 
 export class VideoService implements IVideoService {
@@ -44,6 +52,7 @@ export class VideoService implements IVideoService {
       twitCastingClient: ITwitcastingService;
       creatorRepository: ICreatorRepository;
       videoRepository: IVideoRepository;
+      aiService: IAIService;
     },
   ) {}
 
@@ -170,11 +179,13 @@ export class VideoService implements IVideoService {
       limit: 30,
       page: 0,
       status: StatusSchema.Enum.live,
+      languageCode: "default",
     });
     const upcomingVideos = await this.deps.videoRepository.list({
       limit: 30,
       page: 0,
       status: StatusSchema.Enum.upcoming,
+      languageCode: "default",
     });
     if (liveVideos.err) {
       return liveVideos;
@@ -208,6 +219,7 @@ export class VideoService implements IVideoService {
     const existingVideos = await this.deps.videoRepository.list({
       limit: 100,
       page: 0,
+      languageCode: "default",
     });
     if (existingVideos.err) {
       return existingVideos;
@@ -264,6 +276,28 @@ export class VideoService implements IVideoService {
       .flatMap((r) => r.value.val);
 
     return Ok(videos);
+  }
+
+  async translateVideos({
+    languageCode,
+    videos,
+  }: {
+    languageCode: string;
+    videos: Videos;
+  }): Promise<Result<Videos, AppError>> {
+    const translatePromises = videos.map((video) =>
+      this.deps.aiService.translateText(video.title, languageCode),
+    );
+    const translatedResults = await Promise.allSettled(translatePromises);
+    const translatedVideos = videos.map((video, i) => {
+      const translatedText =
+        translatedResults[i].status === "fulfilled"
+          ? (translatedResults[i].value.val?.translatedText ?? video.title)
+          : video.title;
+      return { ...video, title: translatedText, languageCode: languageCode };
+    });
+
+    return Ok(translatedVideos);
   }
 
   private async masterCreators(): Promise<

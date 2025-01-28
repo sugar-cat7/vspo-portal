@@ -1,6 +1,6 @@
 {
-  "id": "084db93b-5911-4329-8705-97c3999e3973",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "4e29a538-dd03-44e0-b5c6-2161a7e3a69f",
+  "prevId": "dde43fd2-dfe0-4e28-8170-8eeebc9d887d",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -68,19 +68,19 @@
         "channel_creator_id_creator_id_fk": {
           "name": "channel_creator_id_creator_id_fk",
           "tableFrom": "channel",
-          "tableTo": "creator",
           "columnsFrom": ["creator_id"],
+          "tableTo": "creator",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "channel_platform_channel_id_unique": {
           "name": "channel_platform_channel_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["platform_channel_id"]
+          "columns": ["platform_channel_id"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -166,19 +166,19 @@
         "creator_translation_creator_id_creator_id_fk": {
           "name": "creator_translation_creator_id_creator_id_fk",
           "tableFrom": "creator_translation",
-          "tableTo": "creator",
           "columnsFrom": ["creator_id"],
+          "tableTo": "creator",
           "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "creator_translation_creator_id_lang_code_unique": {
           "name": "creator_translation_creator_id_lang_code_unique",
-          "nullsNotDistinct": false,
-          "columns": ["creator_id", "lang_code"]
+          "columns": ["creator_id", "lang_code"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -238,19 +238,19 @@
         "stream_status_video_id_video_raw_id_fk": {
           "name": "stream_status_video_id_video_raw_id_fk",
           "tableFrom": "stream_status",
-          "tableTo": "video",
           "columnsFrom": ["video_id"],
+          "tableTo": "video",
           "columnsTo": ["raw_id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "stream_status_video_id_unique": {
           "name": "stream_status_video_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["video_id"]
+          "columns": ["video_id"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -315,19 +315,19 @@
         "video_channel_id_channel_platform_channel_id_fk": {
           "name": "video_channel_id_channel_platform_channel_id_fk",
           "tableFrom": "video",
-          "tableTo": "channel",
           "columnsFrom": ["channel_id"],
+          "tableTo": "channel",
           "columnsTo": ["platform_channel_id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "video_raw_id_unique": {
           "name": "video_raw_id_unique",
-          "nullsNotDistinct": false,
-          "columns": ["raw_id"]
+          "columns": ["raw_id"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -381,19 +381,19 @@
         "video_translation_video_id_video_raw_id_fk": {
           "name": "video_translation_video_id_video_raw_id_fk",
           "tableFrom": "video_translation",
-          "tableTo": "video",
           "columnsFrom": ["video_id"],
+          "tableTo": "video",
           "columnsTo": ["raw_id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "video_translation_video_id_lang_code_unique": {
           "name": "video_translation_video_id_lang_code_unique",
-          "nullsNotDistinct": false,
-          "columns": ["video_id", "lang_code"]
+          "columns": ["video_id", "lang_code"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -403,10 +403,10 @@
   },
   "enums": {},
   "schemas": {},
+  "views": {},
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},

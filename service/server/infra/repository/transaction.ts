@@ -9,7 +9,6 @@ import {
   wrap,
 } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
-import { getLogger } from "../http/hono";
 
 export interface IDbConfig {
   connectionString: string;

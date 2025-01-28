@@ -1,13 +1,17 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import type { AppWorkerEnv } from "../../../../config/env/internal";
+import {
+  type AppWorkerEnv,
+  zAppWorkerEnv,
+} from "../../../../config/env/internal";
 import {
   type Creator,
-  CreatorSchema,
+  CreatorsSchema,
   type Video,
-  VideoSchema,
+  VideosSchema,
 } from "../../../../domain";
 import { Container } from "../../../../infra/dependency";
 import { createHandler, withTracer } from "../../../../infra/http/otel";
+import { AppLogger } from "../../../../pkg/logging";
 import type {
   BatchDeleteByVideoIdsParam,
   BatchUpsertCreatorsParam,
@@ -18,11 +22,13 @@ import type {
   ListParam,
   SearchByChannelIdsParam,
   SearchByMemberTypeParam,
+  TranslateCreatorParam,
+  TranslateVideoParam,
 } from "../../../../usecase";
 
 export class VideoService extends RpcTarget {
   #usecase: IVideoInteractor;
-  #queue: Queue<Video>;
+  #queue: Queue<VideoMessage>;
   constructor(usecase: IVideoInteractor, queue: Queue) {
     super();
     this.#usecase = usecase;
@@ -30,7 +36,9 @@ export class VideoService extends RpcTarget {
   }
 
   async batchUpsertEnqueue(params: BatchUpsertVideosParam) {
-    return this.#queue.sendBatch(params.map((video) => ({ body: video })));
+    return this.#queue.sendBatch(
+      params.map((video) => ({ body: { ...video, kind: "upsert-video" } })),
+    );
   }
 
   async batchUpsert(params: BatchUpsertVideosParam) {
@@ -56,11 +64,23 @@ export class VideoService extends RpcTarget {
   async batchDeleteByVideoIds(params: BatchDeleteByVideoIdsParam) {
     return this.#usecase.batchDeleteByVideoIds(params);
   }
+
+  async translateVideoEnqueue(params: TranslateVideoParam) {
+    return this.#queue.sendBatch(
+      params.videos.map((video) => ({
+        body: {
+          ...video,
+          languageCode: params.languageCode,
+          kind: "translate-video",
+        },
+      })),
+    );
+  }
 }
 
 export class CreatorService extends RpcTarget {
   #usecase: ICreatorInteractor;
-  #queue: Queue<Creator>;
+  #queue: Queue<CreatorMessage>;
   constructor(usecase: ICreatorInteractor, queue: Queue) {
     super();
     this.#usecase = usecase;
@@ -68,7 +88,23 @@ export class CreatorService extends RpcTarget {
   }
 
   async batchUpsertEnqueue(params: BatchUpsertCreatorsParam) {
-    return this.#queue.sendBatch(params.map((creator) => ({ body: creator })));
+    return this.#queue.sendBatch(
+      params.map((creator) => ({
+        body: { ...creator, kind: "upsert-creator" },
+      })),
+    );
+  }
+
+  async translateCreatorEnqueue(params: TranslateCreatorParam) {
+    return this.#queue.sendBatch(
+      params.creators.map((creator) => ({
+        body: {
+          ...creator,
+          languageCode: params.languageCode,
+          kind: "translate-creator",
+        },
+      })),
+    );
   }
 
   async searchByChannelIds(params: SearchByChannelIdsParam) {
@@ -96,25 +132,31 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   }
 
   private setup() {
-    return new Container(this.env);
+    const e = zAppWorkerEnv.safeParse(this.env);
+    if (!e.success) {
+      throw new Error(e.error.message);
+    }
+    return new Container(e.data);
   }
 }
 
-type MessageParam = Video | Creator;
+type Kind =
+  | "translate-video"
+  | "upsert-video"
+  | "upsert-creator"
+  | "translate-creator";
 
-function isVideoBatch(
-  batch: MessageBatch<MessageParam>,
-): batch is MessageBatch<Video> {
-  const first = batch.messages.at(0)?.body;
-  return first != null && VideoSchema.safeParse(first).success;
-}
+type BaseMessageParam<T, K extends Kind> = T & { kind: K };
 
-function isCreatorBatch(
-  batch: MessageBatch<MessageParam>,
-): batch is MessageBatch<Creator> {
-  const first = batch.messages.at(0)?.body;
-  return first != null && CreatorSchema.safeParse(first).success;
-}
+type TranslateVideo = BaseMessageParam<Video, "translate-video">;
+type TranslateCreator = BaseMessageParam<Creator, "translate-creator">;
+type UpsertVideo = BaseMessageParam<Video, "upsert-video">;
+type UpsertCreator = BaseMessageParam<Creator, "upsert-creator">;
+
+type CreatorMessage = TranslateCreator | UpsertCreator;
+type VideoMessage = TranslateVideo | UpsertVideo;
+
+type MessageParam = CreatorMessage | VideoMessage;
 
 export default createHandler({
   queue: async (
@@ -127,16 +169,106 @@ export default createHandler({
       "Consume",
       async (span) => {
         span.addEvent("Consume", { queue: batch.queue });
-        const c = new Container(env);
-        if (isVideoBatch(batch)) {
-          await c.videoInteractor.batchUpsert(
-            batch.messages.map((m) => m.body),
-          );
+        const e = zAppWorkerEnv.safeParse(env);
+        if (!e.success) {
+          throw new Error(e.error.message);
         }
-        if (isCreatorBatch(batch)) {
-          await c.creatorInteractor.batchUpsert(
-            batch.messages.map((m) => m.body),
-          );
+        const c = new Container(e.data);
+        const logger = new AppLogger({
+          env: e.data,
+        });
+        const kind = batch.messages.at(0)?.body?.kind;
+        if (!kind) {
+          logger.error("Invalid kind");
+          return;
+        }
+
+        logger.info(`Consume: ${kind}`);
+        switch (kind) {
+          case "upsert-video": {
+            const videos = VideosSchema.safeParse(
+              batch.messages.map((m) => m.body),
+            );
+            if (!videos.success) {
+              logger.error(`Invalid videos: ${videos.error.message}`);
+              return;
+            }
+            await c.videoInteractor.batchUpsert(videos.data);
+            break;
+          }
+          case "upsert-creator": {
+            const creators = CreatorsSchema.safeParse(
+              batch.messages.map((m) => m.body),
+            );
+            if (!creators.success) {
+              logger.error(`Invalid creators: ${creators.error.message}`);
+              return;
+            }
+            await c.creatorInteractor.batchUpsert(creators.data);
+            break;
+          }
+          case "translate-video": {
+            const v = VideosSchema.safeParse(batch.messages.map((m) => m.body));
+            if (!v.success) {
+              logger.error(`Invalid videos: ${v.error.message}`);
+              return;
+            }
+
+            const tv = await c.videoInteractor.translateVideo({
+              languageCode: v.data[0].languageCode,
+              videos: v.data,
+            });
+
+            if (tv.err) {
+              logger.error(`Failed to translate videos: ${tv.err.message}`);
+              return;
+            }
+
+            if (!tv.val?.length || tv.val.length === 0) {
+              logger.info("No videos to translate");
+              return;
+            }
+
+            await env.WRITE_QUEUE.sendBatch(
+              tv.val.map((video) => ({
+                body: { ...video, kind: "upsert-video" },
+              })),
+            );
+            break;
+          }
+          case "translate-creator": {
+            const cr = CreatorsSchema.safeParse(
+              batch.messages.map((m) => m.body),
+            );
+            if (!cr.success) {
+              logger.error(`Invalid creators: ${cr.error.message}`);
+              return;
+            }
+            const tc = await c.creatorInteractor.translateCreator({
+              languageCode: cr.data[0].languageCode,
+              creators: cr.data,
+            });
+
+            if (tc.err) {
+              logger.error(`Failed to translate creators: ${tc.err.message}`);
+              return;
+            }
+
+            if (!tc.val?.length || tc.val.length === 0) {
+              logger.info("No creators to translate");
+              return;
+            }
+
+            await env.WRITE_QUEUE.sendBatch(
+              tc.val.map((creator) => ({
+                body: { ...creator, kind: "upsert-creator" },
+              })),
+            );
+            break;
+          }
+          default:
+            logger.error(`Invalid kind: ${kind}`);
+            return;
         }
       },
     );

@@ -7,6 +7,7 @@ const MemberTypeSchema = z.enum(["vspo_jp", "vspo_en", "vspo_ch", "general"]);
 const CreatorSchema = z.object({
   id: z.string(),
   name: z.string(),
+  languageCode: z.string(),
   memberType: MemberTypeSchema,
   thumbnailURL: ThumbnailURLSchema,
   channel: ChannelSchema.nullable(),

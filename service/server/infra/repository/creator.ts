@@ -3,7 +3,6 @@ import {
   type Channel,
   type Creators,
   MemberTypeSchema,
-  createChannel,
   createCreators,
   getPlatformDetail,
 } from "../../domain";
@@ -17,8 +16,10 @@ import { buildConflictUpdateColumns } from "./helper";
 import {
   type InsertChannel,
   type InsertCreator,
+  type InsertCreatorTranslation,
   channelTable,
   creatorTable,
+  creatorTranslationTable,
 } from "./schema";
 import type { DB } from "./transaction";
 
@@ -26,6 +27,7 @@ type ListQuery = {
   limit: number;
   page: number;
   memberType?: string;
+  languageCode?: string;
 };
 
 export interface ICreatorRepository {
@@ -43,12 +45,21 @@ export class CreatorRepository implements ICreatorRepository {
     if (query.memberType) {
       filters.push(eq(creatorTable.memberType, query.memberType));
     }
+    if (query.languageCode) {
+      filters.push(
+        eq(creatorTranslationTable.languageCode, query.languageCode),
+      );
+    }
 
     const creatorResult = await wrap(
       this.db
         .select()
         .from(creatorTable)
         .innerJoin(channelTable, eq(creatorTable.id, channelTable.creatorId))
+        .innerJoin(
+          creatorTranslationTable,
+          eq(creatorTable.id, creatorTranslationTable.creatorId),
+        )
         .where(and(...filters))
         .limit(query.limit)
         .offset(query.page * query.limit)
@@ -69,6 +80,7 @@ export class CreatorRepository implements ICreatorRepository {
       name: string;
       memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
       thumbnailURL: string;
+      languageCode: string;
       channel: Channel;
     };
 
@@ -78,7 +90,8 @@ export class CreatorRepository implements ICreatorRepository {
       if (!creatorMap.has(r.creator.id)) {
         creatorMap.set(r.creator.id, {
           id: r.creator.id,
-          name: r.creator.name,
+          name: r.creator_translation.name,
+          languageCode: r.creator_translation.languageCode,
           memberType: MemberTypeSchema.parse(r.creator.memberType),
           thumbnailURL: r.creator.representativeThumbnailUrl ?? "",
           channel: {
@@ -169,14 +182,23 @@ export class CreatorRepository implements ICreatorRepository {
 
   async batchUpsert(creators: Creators): Promise<Result<Creators, AppError>> {
     const dbCreatorss: InsertCreator[] = [];
+    const dbCreatorTranslations: InsertCreatorTranslation[] = [];
     const dbChannels: InsertChannel[] = [];
 
     for (const c of creators) {
       dbCreatorss.push({
         id: c.id,
-        name: c.name,
         memberType: c.memberType,
         representativeThumbnailUrl: c.thumbnailURL,
+        updatedAt: getCurrentUTCDate(),
+      });
+
+      dbCreatorTranslations.push({
+        id: c.id,
+        creatorId: c.id,
+        languageCode: c.languageCode,
+        name: c.name,
+        updatedAt: getCurrentUTCDate(),
       });
 
       if (!c.channel) {
@@ -209,8 +231,8 @@ export class CreatorRepository implements ICreatorRepository {
         .onConflictDoUpdate({
           target: creatorTable.id,
           set: buildConflictUpdateColumns(creatorTable, [
-            "name",
             "representativeThumbnailUrl",
+            "updatedAt",
           ]),
         })
         .returning()
@@ -252,15 +274,48 @@ export class CreatorRepository implements ICreatorRepository {
       return Err(channelResult.err);
     }
 
+    const creatorTranslationResult = await wrap(
+      this.db
+        .insert(creatorTranslationTable)
+        .values(dbCreatorTranslations)
+        .onConflictDoUpdate({
+          target: [
+            creatorTranslationTable.creatorId,
+            creatorTranslationTable.languageCode,
+          ],
+          set: buildConflictUpdateColumns(creatorTranslationTable, [
+            "name",
+            "updatedAt",
+          ]),
+        })
+        .returning()
+        .execute(),
+      (err) =>
+        new AppError({
+          message: `Database error during creator transaction batch upsert: ${err.message}`,
+          code: "INTERNAL_SERVER_ERROR",
+        }),
+    );
+
+    if (creatorTranslationResult.err) {
+      return Err(creatorTranslationResult.err);
+    }
+
     return Ok(
       createCreators(
-        creatorResult.val.map((r) => ({
-          id: r.id,
-          name: r.name,
-          memberType: MemberTypeSchema.parse(r.memberType),
-          thumbnailURL: r.representativeThumbnailUrl,
-          channel: null,
-        })),
+        creatorResult.val.map((r) => {
+          const transaction = creatorTranslationResult?.val?.find(
+            (t) => t.creatorId === r.id,
+          );
+          return {
+            id: r.id,
+            name: transaction?.name ?? "",
+            languageCode: transaction?.languageCode ?? "",
+            memberType: MemberTypeSchema.parse(r.memberType),
+            thumbnailURL: r.representativeThumbnailUrl,
+            channel: null,
+          };
+        }),
       ),
     );
   }

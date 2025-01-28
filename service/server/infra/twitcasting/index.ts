@@ -173,6 +173,7 @@ export class TwitcastingService implements ITwitcastingService {
       id: "",
       rawId: video.id,
       rawChannelID: video.userId,
+      languageCode: "default",
       title: video.title,
       description: video.title,
       publishedAt: convertToUTC(video.startedAt),

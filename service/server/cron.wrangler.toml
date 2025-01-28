@@ -25,3 +25,13 @@ class_name = "SearchVideosWorkflow"
 name = "search-channels-workflow"
 binding = "SEARCH_CHANNELS_WORKFLOW"
 class_name = "SearchChannelsWorkflow"
+
+[[workflows]]
+name = "translate-videos-workflow"
+binding = "TRANSLATE_VIDEOS_WORKFLOW"
+class_name = "TranslateVideosWorkflow"
+
+[[workflows]]
+name = "translate-creators-workflow"
+binding = "TRANSLATE_CREATORS_WORKFLOW"
+class_name = "TranslateCreatorsWorkflow"

@@ -14,8 +14,10 @@ export type ListParam = {
   platform?: string;
   status?: string;
   videoType?: string;
+  memberType?: string;
   startedAt?: Date;
   endedAt?: Date;
+  languageCode: string;
 };
 
 export type ListResponse = {
@@ -25,6 +27,11 @@ export type ListResponse = {
 
 export type BatchDeleteByVideoIdsParam = {
   videoIds: string[];
+};
+
+export type TranslateVideoParam = {
+  languageCode: string;
+  videos: Videos;
 };
 
 export interface IVideoInteractor {
@@ -38,6 +45,9 @@ export interface IVideoInteractor {
   batchDeleteByVideoIds(
     params: BatchDeleteByVideoIdsParam,
   ): Promise<Result<void, AppError>>;
+  translateVideo(
+    params: TranslateVideoParam,
+  ): Promise<Result<Videos, AppError>>;
 }
 
 export class VideoInteractor implements IVideoInteractor {
@@ -119,6 +129,18 @@ export class VideoInteractor implements IVideoInteractor {
         return uv;
       }
       return uv;
+    });
+  }
+
+  async translateVideo(
+    params: TranslateVideoParam,
+  ): Promise<Result<Videos, AppError>> {
+    return this.context.runInTx(async (_repos, services) => {
+      const sv = await services.videoService.translateVideos(params);
+      if (sv.err) {
+        return sv;
+      }
+      return Ok(sv.val);
     });
   }
 }

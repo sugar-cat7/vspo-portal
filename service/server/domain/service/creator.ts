@@ -1,5 +1,6 @@
 import { type Creator, type Creators, createCreator } from "..";
 import type { ICreatorRepository, IYoutubeService } from "../../infra";
+import type { IAIService } from "../../infra/ai";
 import { type AppError, Ok, type Result } from "../../pkg/errors";
 import { createUUID } from "../../pkg/uuid";
 
@@ -13,6 +14,13 @@ export interface ICreatorService {
       memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
     }[],
   ): Promise<Result<Creators, AppError>>;
+  translateCreators({
+    languageCode,
+    creators,
+  }: {
+    languageCode: string;
+    creators: Creators;
+  }): Promise<Result<Creators, AppError>>;
 }
 
 export class CreatorService implements ICreatorService {
@@ -20,6 +28,7 @@ export class CreatorService implements ICreatorService {
     private readonly deps: {
       youtubeClient: IYoutubeService;
       creatorRepository: ICreatorRepository;
+      aiService: IAIService;
     },
   ) {}
 
@@ -53,6 +62,7 @@ export class CreatorService implements ICreatorService {
         }
         const newCreator = createCreator({
           ...v,
+          name: ch.youtube.name,
           thumbnailURL: ch.youtube.thumbnailURL,
           channel: {
             ...v.channel,
@@ -93,6 +103,7 @@ export class CreatorService implements ICreatorService {
       const creator = createCreator({
         id: creatorId,
         name: ch.youtube.name,
+        languageCode: "default",
         memberType:
           params.find((v) => v.channelId === ch.id)?.memberType || "general",
         thumbnailURL: ch.youtube.thumbnailURL,
@@ -109,6 +120,28 @@ export class CreatorService implements ICreatorService {
     }
 
     return Ok(creators);
+  }
+
+  async translateCreators({
+    languageCode,
+    creators,
+  }: {
+    languageCode: string;
+    creators: Creators;
+  }): Promise<Result<Creators, AppError>> {
+    const translatePromises = creators.map((creator) =>
+      this.deps.aiService.translateText(creator.name, languageCode),
+    );
+    const translatedResults = await Promise.allSettled(translatePromises);
+    const translatedCreators = creators.map((creator, i) => {
+      const translatedText =
+        translatedResults[i].status === "fulfilled"
+          ? (translatedResults[i].value.val?.translatedText ?? creator.name)
+          : creator.name;
+      return { ...creator, name: translatedText, languageCode: languageCode };
+    });
+
+    return Ok(translatedCreators);
   }
 
   private diff(a: Creator, b: Creator): boolean {

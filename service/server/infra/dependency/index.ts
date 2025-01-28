@@ -1,5 +1,10 @@
 import type { PgTransactionConfig } from "drizzle-orm/pg-core";
-import { CreatorService, VideoService } from "../../domain";
+import {
+  CreatorService,
+  type ICreatorService,
+  type IVideoService,
+  VideoService,
+} from "../../domain";
 import type { AppError, Result } from "../../pkg/errors";
 import {
   CreatorRepository,
@@ -14,6 +19,7 @@ import { type IYoutubeService, YoutubeService } from "../youtube";
 
 import type { AppWorkerEnv } from "../../config/env/internal";
 import { CreatorInteractor, VideoInteractor } from "../../usecase";
+import { AIService, type IAIService } from "../ai";
 
 export interface IRepositories {
   creatorRepository: CreatorRepository;
@@ -28,8 +34,8 @@ export function createRepositories(tx: DB): IRepositories {
 }
 
 export interface IServices {
-  creatorService: CreatorService;
-  videoService: VideoService;
+  creatorService: ICreatorService;
+  videoService: IVideoService;
 }
 
 export function createServices(
@@ -37,11 +43,13 @@ export function createServices(
   youtubeClient: IYoutubeService,
   twitchClient: ITwitchService,
   twitcastingClient: ITwitcastingService,
+  aiService: IAIService,
 ): IServices {
   return {
     creatorService: new CreatorService({
       youtubeClient,
       creatorRepository: repos.creatorRepository,
+      aiService,
     }),
     videoService: new VideoService({
       youtubeClient,
@@ -49,6 +57,7 @@ export function createServices(
       twitCastingClient: twitcastingClient,
       creatorRepository: repos.creatorRepository,
       videoRepository: repos.videoRepository,
+      aiService,
     }),
   };
 }
@@ -68,6 +77,7 @@ export class AppContext implements IAppContext {
     private readonly youtubeClient: IYoutubeService,
     private readonly twitchClient: ITwitchService,
     private readonly twitcastingClient: ITwitcastingService,
+    private readonly aiService: IAIService,
   ) {}
 
   async runInTx<T>(
@@ -85,6 +95,7 @@ export class AppContext implements IAppContext {
         this.youtubeClient,
         this.twitchClient,
         this.twitcastingClient,
+        this.aiService,
       );
 
       return operation(repos, services);
@@ -93,9 +104,10 @@ export class AppContext implements IAppContext {
 }
 
 export class Container {
-  private readonly youtubeService: YoutubeService;
-  private readonly twitchService: TwitchService;
-  private readonly twitcastingService: TwitcastingService;
+  private readonly youtubeService: IYoutubeService;
+  private readonly twitchService: ITwitchService;
+  private readonly twitcastingService: ITwitcastingService;
+  private readonly aiService: IAIService;
   private readonly txManager: TxManager;
   creatorInteractor: CreatorInteractor;
   videoInteractor: VideoInteractor;
@@ -116,11 +128,18 @@ export class Container {
           : this.env.DB.connectionString,
       isQueryLoggingEnabled: this.env.ENVIRONMENT === "local",
     });
+    this.aiService = new AIService({
+      apiKey: this.env.OPENAI_API_KEY,
+      organization: this.env.OPENAI_ORGANIZATION,
+      project: this.env.OPENAI_PROJECT,
+      baseURL: this.env.OPENAI_BASE_URL,
+    });
     const context = new AppContext(
       this.txManager,
       this.youtubeService,
       this.twitchService,
       this.twitcastingService,
+      this.aiService,
     );
     this.creatorInteractor = new CreatorInteractor(context);
     this.videoInteractor = new VideoInteractor(context);

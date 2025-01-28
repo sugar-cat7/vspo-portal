@@ -1,5 +1,9 @@
 import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
-import type { BindingAppWorkerEnv } from "../../../../config/env/worker";
+import {
+  type BindingAppWorkerEnv,
+  zBindingAppWorkerEnv,
+} from "../../../../config/env/worker";
+import { AppLogger } from "../../../../pkg/logging";
 
 export const searchVideosWorkflow = () => {
   return {
@@ -10,6 +14,11 @@ export const searchVideosWorkflow = () => {
         _event: WorkflowEvent<Params>,
         step: WorkflowStep,
       ) => {
+        const e = zBindingAppWorkerEnv.safeParse(env);
+        if (!e.success) {
+          throw new Error(e.error.message);
+        }
+        const logger = new AppLogger({ env: e.data });
         const results = await Promise.allSettled([
           step.do(
             "fetch and send live videos",
@@ -53,7 +62,7 @@ export const searchVideosWorkflow = () => {
           (result) => result.status === "rejected",
         );
         if (failedSteps.length > 0) {
-          throw new Error(
+          logger.error(
             `${failedSteps.length} step(s) failed. Check logs for details.`,
           );
         }

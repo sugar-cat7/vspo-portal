@@ -5,19 +5,35 @@ import {
   pgTable,
   text,
   timestamp,
+  unique,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 // Creator information table
 export const creatorTable = pgTable("creator", {
   id: text("id").primaryKey(), // Unique identifier for the creator
-  name: text("name").notNull(), // Creator's name
   memberType: text("member_type").notNull(), // Member type
   representativeThumbnailUrl: text("representative_thumbnail_url").notNull(), // Thumbnail image URL
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(), // Last updated date and time
 });
+
+export const creatorTranslationTable = pgTable(
+  "creator_translation",
+  {
+    id: text("id").primaryKey(),
+    creatorId: text("creator_id")
+      .notNull()
+      .references(() => creatorTable.id, { onDelete: "cascade" }),
+    languageCode: text("lang_code").notNull(), // ISO 639-1 language code or [default]
+    name: text("name").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique().on(t.creatorId, t.languageCode)],
+);
 
 // Channel information table
 export const channelTable = pgTable("channel", {
@@ -42,8 +58,6 @@ export const videoTable = pgTable("video", {
     .notNull()
     .references(() => channelTable.platformChannelId, { onDelete: "cascade" }), // Channel ID
   platformType: text("platform_type").notNull(), // Platform type
-  title: text("title").notNull(), // Video title
-  description: text("description").notNull(), // Video description
   videoType: text("video_type").notNull(), // Type of video
   publishedAt: timestamp("published_at", { withTimezone: true }).notNull(), // Publication date and time
   tags: text("tags").notNull(), // Video tags
@@ -66,6 +80,23 @@ export const streamStatusTable = pgTable("stream_status", {
     .defaultNow(), // Last updated date and time
 });
 
+export const videoTranslationTable = pgTable(
+  "video_translation",
+  {
+    id: text("id").primaryKey(),
+    videoId: text("video_id")
+      .notNull()
+      .references(() => videoTable.rawId, { onDelete: "cascade" }),
+    languageCode: text("lang_code").notNull(), // ISO 639-1 language code or [default]
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique().on(t.videoId, t.languageCode)],
+);
+
 export type InsertCreator = typeof creatorTable.$inferInsert;
 export type SelectCreator = typeof creatorTable.$inferSelect;
 
@@ -77,6 +108,14 @@ export type SelectVideo = typeof videoTable.$inferSelect;
 
 export type InsertStreamStatus = typeof streamStatusTable.$inferInsert;
 export type SelectStreamStatus = typeof streamStatusTable.$inferSelect;
+
+export type InsertCreatorTranslation =
+  typeof creatorTranslationTable.$inferInsert;
+export type SelectCreatorTranslation =
+  typeof creatorTranslationTable.$inferSelect;
+
+export type InsertVideoTranslation = typeof videoTranslationTable.$inferInsert;
+export type SelectVideoTranslation = typeof videoTranslationTable.$inferSelect;
 
 export const insertVideoSchema = createInsertSchema(videoTable);
 export const selectVideoSchema = createSelectSchema(videoTable);
@@ -93,3 +132,17 @@ export const insertStreamStatusSchema = createInsertSchema(streamStatusTable);
 export const selectStreamStatusSchema = createSelectSchema(streamStatusTable);
 export const createInsertStreamStatus = (data: InsertStreamStatus) =>
   insertStreamStatusSchema.parse(data);
+
+export const insertCreatorTranslationSchema = createInsertSchema(
+  creatorTranslationTable,
+);
+export const selectCreatorTranslationSchema = createSelectSchema(
+  creatorTranslationTable,
+);
+
+export const insertVideoTranslationSchema = createInsertSchema(
+  videoTranslationTable,
+);
+export const selectVideoTranslationSchema = createSelectSchema(
+  videoTranslationTable,
+);

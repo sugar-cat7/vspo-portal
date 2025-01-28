@@ -16,6 +16,7 @@ export type ListByMemberTypeParam = {
   limit: number;
   page: number;
   memberType?: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
+  languageCode?: string;
 };
 
 type ListResponse = {
@@ -25,6 +26,11 @@ type ListResponse = {
 
 export type SearchByMemberTypeParam = {
   memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
+};
+
+export type TranslateCreatorParam = {
+  languageCode: string;
+  creators: Creators;
 };
 
 export interface ICreatorInteractor {
@@ -38,6 +44,9 @@ export interface ICreatorInteractor {
     params: BatchUpsertCreatorsParam,
   ): Promise<Result<Creators, AppError>>;
   list(params: ListByMemberTypeParam): Promise<Result<ListResponse, AppError>>;
+  translateCreator(
+    params: TranslateCreatorParam,
+  ): Promise<Result<Creators, AppError>>;
 }
 
 export class CreatorInteractor implements ICreatorInteractor {
@@ -65,7 +74,6 @@ export class CreatorInteractor implements ICreatorInteractor {
     return this.context.runInTx(async (repos, _services) => {
       const uv = await repos.creatorRepository.batchUpsert(params);
       if (uv.err) return uv;
-
       return Ok(uv.val);
     });
   }
@@ -100,6 +108,18 @@ export class CreatorInteractor implements ICreatorInteractor {
           totalCount: count.val,
         }),
       });
+    });
+  }
+
+  async translateCreator(
+    params: TranslateCreatorParam,
+  ): Promise<Result<Creators, AppError>> {
+    return this.context.runInTx(async (_repos, services) => {
+      const sv = await services.creatorService.translateCreators(params);
+      if (sv.err) {
+        return sv;
+      }
+      return Ok(sv.val);
     });
   }
 }

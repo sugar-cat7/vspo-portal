@@ -5,7 +5,6 @@ import { HTTPException } from "hono/http-exception";
 import type { ZodError } from "zod";
 
 import type { ContentfulStatusCode, StatusCode } from "hono/utils/http-status";
-import { ApiEnv } from "../../config/env/api";
 import type { CommonEnv } from "../../config/env/common";
 import type { AppContext } from "../../infra/http/hono";
 import type { HonoEnv } from "../../infra/http/hono/env";

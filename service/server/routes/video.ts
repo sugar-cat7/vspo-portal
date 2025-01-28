@@ -81,6 +81,7 @@ export const registerVideoListApi = (app: App) =>
       videoType: p.videoType,
       startedAt: p.startedAt ? convertToUTCDate(p.startedAt) : undefined,
       endedAt: p.endedAt ? convertToUTCDate(p.endedAt) : undefined,
+      languageCode: p.languageCode,
     });
 
     if (r.err) {
