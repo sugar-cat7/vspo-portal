@@ -1,0 +1,20 @@
+import { z } from "zod";
+import { zAIEnv } from "./ai";
+import { zCommonEnv } from "./common";
+
+export const zAppWorkerEnv = z
+  .object({
+    YOUTUBE_API_KEY: z.string(),
+    TWITCH_CLIENT_ID: z.string(),
+    TWITCH_CLIENT_SECRET: z.string(),
+    TWITCASTING_ACCESS_TOKEN: z.string(),
+    DEV_DB_CONNECTION_STRING: z
+      .string()
+      .default("postgres://user:password@localhost:5432/vspo"),
+    DB: z.custom<Hyperdrive>(),
+    WRITE_QUEUE: z.custom<Queue>(),
+  })
+  .merge(zCommonEnv)
+  .merge(zAIEnv);
+
+export type AppWorkerEnv = z.infer<typeof zAppWorkerEnv>;

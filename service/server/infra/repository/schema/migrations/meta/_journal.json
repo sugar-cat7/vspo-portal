@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1738174162658,
+      "tag": "0000_tough_venus",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1738174182638,
+      "tag": "0001_huge_captain_midlands",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1738174184688,
+      "tag": "0002_optimal_living_tribunal",
+      "breakpoints": true
+    }
+  ]
+}

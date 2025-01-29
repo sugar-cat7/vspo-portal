@@ -1,0 +1,62 @@
+name: Deploy Server Worker
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: service/server
+    strategy:
+      matrix:
+        config:
+          - "api-gateway.wrangler.toml"
+          - "internal-app.wrangler.toml"
+          - "cron.wrangler.toml"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build & Deploy Worker
+        uses: cloudflare/wrangler-action@v3.13.1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: service/server
+          environment: production
+          command: deploy --config ${{ matrix.config }}
+          secrets: |
+            SERVICE_NAME
+            ENVIRONMENT
+            LOG_TYPE
+            LOG_MINLEVEL
+            LOG_HIDE_POSITION
+            OPENAI_ORGANIZATION
+            OPENAI_PROJECT
+            OPENAI_API_KEY
+            OPENAI_BASE_URL
+            BASELIME_API_KEY
+            OTEL_EXPORTER_URL
+            YOUTUBE_API_KEY
+            TWITCH_CLIENT_ID
+            TWITCH_CLIENT_SECRET
+            TWITCASTING_ACCESS_TOKEN
+        env:
+          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
+          ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+          LOG_TYPE: ${{ secrets.LOG_TYPE }}
+          LOG_MINLEVEL: ${{ secrets.LOG_MINLEVEL }}
+          LOG_HIDE_POSITION: ${{ secrets.LOG_HIDE_POSITION }}
+          OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
+          OPENAI_PROJECT: ${{ secrets.OPENAI_PROJECT }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          BASELIME_API_KEY: ${{ secrets.BASELIME_API_KEY }}
+          OTEL_EXPORTER_URL: ${{ secrets.OTEL_EXPORTER_URL }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
+          TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
+          TWITCASTING_ACCESS_TOKEN: ${{ secrets.TWITCASTING_ACCESS_TOKEN }}

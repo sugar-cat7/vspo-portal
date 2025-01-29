@@ -1,0 +1,25 @@
+name = "app_worker"
+compatibility_date = "2024-10-22"
+send_metrics = false
+compatibility_flags = ["nodejs_compat", "nodejs_als"]
+main = "cmd/server/internal/application/index.ts"
+tail_consumers = [{ service = "api-tail" }]
+logpush = true
+
+[dev]
+port = 3001
+
+[[hyperdrive]]
+binding = "DB"
+id = "c020574a-5623-407b-be0c-cd192bab9545"
+localConnectionString = "postgres://user:password@localhost:5432/vspo"
+
+[[queues.producers]]
+ queue = "write-queue"
+ binding = "WRITE_QUEUE"
+
+[[queues.consumers]]
+ queue = "write-queue"
+ max_batch_size = 10
+ max_batch_timeout = 5
+    

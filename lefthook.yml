@@ -7,9 +7,3 @@ pre-commit:
       glob: "service/vspo-schedule/web/src/**/*"
       run: pnpm biome format --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
       stage_fixed: true
-    autoformat-tf:
-      root: "deployment/terraform/**"
-      glob: "deployment/terraform/**/*"
-      run: terraform fmt ./deployment/terraform/**/**
-      stage_fixed: true
-
