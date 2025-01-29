@@ -23,14 +23,15 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 10
-          run_install: true
+          run_install: false
+      - name: Install dependencies
+        run: pnpm install
       - name: Build & Deploy Worker
         uses: cloudflare/wrangler-action@v3.13.1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: service/server
-          environment: production
           command: deploy --config ${{ matrix.config }}
           secrets: |
             SERVICE_NAME
