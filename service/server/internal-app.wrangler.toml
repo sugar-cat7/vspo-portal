@@ -22,4 +22,10 @@ localConnectionString = "postgres://user:password@localhost:5432/vspo"
  queue = "write-queue"
  max_batch_size = 10
  max_batch_timeout = 5
-    
+
+[env.production.vars]
+SERVICE_NAME = "vspo-portal-gateway"
+ENVIRONMENT = "production"
+LOG_TYPE = "json"
+LOG_MINLEVEL = 1
+LOG_HIDE_POSITION = true

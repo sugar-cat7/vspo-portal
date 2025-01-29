@@ -35,3 +35,10 @@ class_name = "TranslateVideosWorkflow"
 name = "translate-creators-workflow"
 binding = "TRANSLATE_CREATORS_WORKFLOW"
 class_name = "TranslateCreatorsWorkflow"
+
+[env.production.vars]
+SERVICE_NAME = "vspo-portal-gateway"
+ENVIRONMENT = "production"
+LOG_TYPE = "json"
+LOG_MINLEVEL = 1
+LOG_HIDE_POSITION = true

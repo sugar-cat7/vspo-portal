@@ -13,3 +13,10 @@ port = 3000
 binding = "APP_WORKER"
 service = "app_worker"
 entrypoint = "ApplicationService"
+
+[env.production.vars]
+SERVICE_NAME = "vspo-portal-gateway"
+ENVIRONMENT = "production"
+LOG_TYPE = "json"
+LOG_MINLEVEL = 1
+LOG_HIDE_POSITION = true

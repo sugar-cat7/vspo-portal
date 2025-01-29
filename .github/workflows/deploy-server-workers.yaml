@@ -27,18 +27,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build & Deploy Worker
-        uses: cloudflare/wrangler-action@v3.6.1
+        uses: cloudflare/wrangler-action@v3.13.1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: service/server
           command: deploy --config ${{ matrix.config }}
+          environment: production
           secrets: |
-            SERVICE_NAME
-            ENVIRONMENT
-            LOG_TYPE
-            LOG_MINLEVEL
-            LOG_HIDE_POSITION
             OPENAI_ORGANIZATION
             OPENAI_PROJECT
             OPENAI_API_KEY
@@ -50,11 +46,7 @@ jobs:
             TWITCH_CLIENT_SECRET
             TWITCASTING_ACCESS_TOKEN
         env:
-          SERVICE_NAME: ${{ secrets.SERVICE_NAME }}
           ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
-          LOG_TYPE: ${{ secrets.LOG_TYPE }}
-          LOG_MINLEVEL: ${{ secrets.LOG_MINLEVEL }}
-          LOG_HIDE_POSITION: ${{ secrets.LOG_HIDE_POSITION }}
           OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
           OPENAI_PROJECT: ${{ secrets.OPENAI_PROJECT }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
