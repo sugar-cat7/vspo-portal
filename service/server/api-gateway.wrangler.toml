@@ -14,7 +14,10 @@ binding = "APP_WORKER"
 service = "vspo-portal-app"
 entrypoint = "ApplicationService"
 
-[env.production.vars]
+[env.production]
+name = "vspo-portal-gateway"
+
+[vars]
 SERVICE_NAME = "vspo-portal-gateway"
 ENVIRONMENT = "production"
 LOG_TYPE = "json"

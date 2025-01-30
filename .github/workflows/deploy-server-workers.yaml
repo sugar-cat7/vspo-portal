@@ -37,7 +37,6 @@ jobs:
           packageManager: pnpm
           workingDirectory: service/server
           command: deploy --name ${{ matrix.name }} --config ${{ matrix.config }}
-          environment: production
           secrets: |
             OPENAI_ORGANIZATION
             OPENAI_PROJECT
