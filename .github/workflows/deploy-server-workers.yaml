@@ -26,13 +26,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build & Deploy Worker
-        uses: cloudflare/wrangler-action@v3.12.0
+        uses: cloudflare/wrangler-action@v3.13.1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: pnpm
           workingDirectory: service/server/config/wrangler/${{ matrix.name }}
-          command: deploy --name ${{ matrix.name }} --config wrangler.toml
+          command: deploy
+          preCommands: |
+            cp -R ./ ../../..
           quiet: true
           secrets: |
             OPENAI_ORGANIZATION
