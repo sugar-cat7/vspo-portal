@@ -36,7 +36,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: pnpm
           workingDirectory: service/server
-          command: deploy --config ${{ matrix.config }} --name ${{ matrix.name }}
+          command: deploy --env production --config ${{ matrix.config }} --name ${{ matrix.name }}
           environment: production
           secrets: |
             OPENAI_ORGANIZATION
