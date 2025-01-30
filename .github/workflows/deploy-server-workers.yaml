@@ -15,12 +15,8 @@ jobs:
     strategy:
       matrix:
         include:
-          # - config: "api-gateway.wrangler.toml"
-          #   name: "vspo-portal-api-gateway"
-          - config: "internal-app.wrangler.toml"
-            name: "vspo-portal-internal-app"
-          - config: "cron.wrangler.toml"
-            name: "vspo-portal-cron"
+          - name: "vspo-portal-app"
+          - name: "vspo-portal-cron"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -35,8 +31,9 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: pnpm
-          workingDirectory: service/server
-          command: deploy --name ${{ matrix.name }} --config ${{ matrix.config }}
+          workingDirectory: service/server/config/wrangler/${{ matrix.name }}
+          command: deploy --name ${{ matrix.name }} --config wrangler.toml
+          quiet: true
           secrets: |
             OPENAI_ORGANIZATION
             OPENAI_PROJECT

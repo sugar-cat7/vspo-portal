@@ -2,7 +2,7 @@ name = "vspo-portal-gateway"
 compatibility_date = "2024-10-22"
 send_metrics = false
 compatibility_flags = ["nodejs_compat", "nodejs_als"]
-main = "cmd/server/gateway.ts"
+main = "../../../cmd/server/gateway.ts"
 tail_consumers = [{ service = "api-tail" }]
 logpush = true
 
@@ -13,9 +13,6 @@ port = 3000
 binding = "APP_WORKER"
 service = "vspo-portal-app"
 entrypoint = "ApplicationService"
-
-[env.production]
-name = "vspo-portal-gateway"
 
 [vars]
 SERVICE_NAME = "vspo-portal-gateway"
