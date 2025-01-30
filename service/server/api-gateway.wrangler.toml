@@ -11,7 +11,7 @@ port = 3000
 
 [[services]]
 binding = "APP_WORKER"
-service = "app_worker"
+service = "vspo-portal-app"
 entrypoint = "ApplicationService"
 
 [env.production.vars]

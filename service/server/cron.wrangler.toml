@@ -10,7 +10,7 @@ port = 3002
 
 [[services]]
 binding = "APP_WORKER"
-service = "app_worker"
+service = "vspo-portal-app"
 entrypoint = "ApplicationService"
 
 [triggers]

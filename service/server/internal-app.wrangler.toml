@@ -11,7 +11,7 @@ port = 3001
 
 [[hyperdrive]]
 binding = "DB"
-id = "c020574a-5623-407b-be0c-cd192bab9545"
+id = "ed6ef90c0bdf4ef3bf2c8ab4b1b93b1d"
 localConnectionString = "postgres://user:password@localhost:5432/vspo"
 
 [[queues.producers]]
@@ -20,7 +20,7 @@ localConnectionString = "postgres://user:password@localhost:5432/vspo"
 
 [[queues.consumers]]
  queue = "write-queue"
- max_batch_size = 10
+ max_batch_size = 50
  max_batch_timeout = 5
 
 [env.production.vars]

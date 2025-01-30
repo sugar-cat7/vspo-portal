@@ -15,8 +15,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - config: "api-gateway.wrangler.toml"
-            name: "vspo-portal-api-gateway"
+          # - config: "api-gateway.wrangler.toml"
+          #   name: "vspo-portal-api-gateway"
           - config: "internal-app.wrangler.toml"
             name: "vspo-portal-internal-app"
           - config: "cron.wrangler.toml"
@@ -34,6 +34,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: pnpm
           workingDirectory: service/server
           command: deploy --config ${{ matrix.config }} --name ${{ matrix.name }}
           environment: production
