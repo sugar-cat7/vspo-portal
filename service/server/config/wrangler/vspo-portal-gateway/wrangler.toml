@@ -18,5 +18,5 @@ entrypoint = "ApplicationService"
 SERVICE_NAME = "vspo-portal-gateway"
 ENVIRONMENT = "production"
 LOG_TYPE = "json"
-LOG_MINLEVEL = 1
-LOG_HIDE_POSITION = true
+LOG_MINLEVEL = "1"
+LOG_HIDE_POSITION = "true"

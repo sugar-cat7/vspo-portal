@@ -27,5 +27,5 @@ localConnectionString = "postgres://user:password@localhost:5432/vspo"
 SERVICE_NAME = "vspo-portal-app"
 ENVIRONMENT = "production"
 LOG_TYPE = "json"
-LOG_MINLEVEL = 1
-LOG_HIDE_POSITION = true
+LOG_MINLEVEL = "1"
+LOG_HIDE_POSITION = "true"
