@@ -54,38 +54,35 @@ export default createHandler({
     env: BindingWorkflowEnv,
     ctx: ExecutionContext,
   ) => {
-    return await withTracer(
-      "OTelCFWorkers:Consumer",
-      "Consume",
-      async (_span) => {
-        switch (controller.cron) {
-          // FIXME: Temporarily
-          case "0 0,8,16 * * *":
-            await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
-            break;
-          case "0 0,7,18 * * *":
-            await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
-            await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
-            break;
-          case "0 0,9,17 * * *":
-            await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
-            break;
+    return await withTracer("ScheduledHandler", "scheduled", async (span) => {
+      span.setAttribute("cron", controller.cron);
+      switch (controller.cron) {
+        // FIXME: Temporarily
+        case "0 0,8,16 * * *":
+          await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
+          break;
+        case "0 0,7,18 * * *":
+          await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
+          await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
+          break;
+        case "0 0,9,17 * * *":
+          await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
+          break;
 
-          // case "*/2 * * * *":
-          //   await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
-          //   break;
-          // case "1 * * * *":
-          //   await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
-          //   await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
-          //   break;
-          // case "*/3 * * * *":
-          //   await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
-          //   break;
-          default:
-            console.error("Unknown cron", controller);
-            break;
-        }
-      },
-    );
+        // case "*/2 * * * *":
+        //   await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
+        //   break;
+        // case "1 * * * *":
+        //   await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
+        //   await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
+        //   break;
+        // case "*/3 * * * *":
+        //   await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
+        //   break;
+        default:
+          console.error("Unknown cron", controller.cron);
+          break;
+      }
+    });
   },
 });

@@ -17,7 +17,8 @@ export const translateCreatorsWorkflow = () => {
       ) => {
         const e = zBindingAppWorkerEnv.safeParse(env);
         if (!e.success) {
-          throw new Error(e.error.message);
+          console.error(e.error.message);
+          return;
         }
         const logger = new AppLogger({ env: e.data });
         const lv = await step.do(

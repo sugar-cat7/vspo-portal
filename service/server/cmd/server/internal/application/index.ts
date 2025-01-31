@@ -164,113 +164,113 @@ export default createHandler({
     env: AppWorkerEnv,
     _executionContext: ExecutionContext,
   ) => {
-    return await withTracer(
-      "OTelCFWorkers:Consumer",
-      "Consume",
-      async (span) => {
-        span.addEvent("Consume", { queue: batch.queue });
-        const e = zAppWorkerEnv.safeParse(env);
-        if (!e.success) {
-          throw new Error(e.error.message);
-        }
-        const c = new Container(e.data);
-        const logger = new AppLogger({
-          env: e.data,
-        });
-        const kind = batch.messages.at(0)?.body?.kind;
-        if (!kind) {
-          logger.error("Invalid kind");
-          return;
-        }
+    return await withTracer("QueueHandler", "queue.consumer", async (span) => {
+      const e = zAppWorkerEnv.safeParse(env);
+      if (!e.success) {
+        console.log(e.error.message);
+        return;
+      }
+      const c = new Container(e.data);
+      const logger = new AppLogger({
+        env: e.data,
+      });
+      const kind = batch.messages.at(0)?.body?.kind;
+      if (!kind) {
+        logger.error("Invalid kind");
+        return;
+      }
 
-        logger.info(`Consume: ${kind}`);
-        switch (kind) {
-          case "upsert-video": {
-            const videos = VideosSchema.safeParse(
-              batch.messages.map((m) => m.body),
-            );
-            if (!videos.success) {
-              logger.error(`Invalid videos: ${videos.error.message}`);
-              return;
-            }
-            await c.videoInteractor.batchUpsert(videos.data);
-            break;
-          }
-          case "upsert-creator": {
-            const creators = CreatorsSchema.safeParse(
-              batch.messages.map((m) => m.body),
-            );
-            if (!creators.success) {
-              logger.error(`Invalid creators: ${creators.error.message}`);
-              return;
-            }
-            await c.creatorInteractor.batchUpsert(creators.data);
-            break;
-          }
-          case "translate-video": {
-            const v = VideosSchema.safeParse(batch.messages.map((m) => m.body));
-            if (!v.success) {
-              logger.error(`Invalid videos: ${v.error.message}`);
-              return;
-            }
-
-            const tv = await c.videoInteractor.translateVideo({
-              languageCode: v.data[0].languageCode,
-              videos: v.data,
-            });
-
-            if (tv.err) {
-              logger.error(`Failed to translate videos: ${tv.err.message}`);
-              return;
-            }
-
-            if (!tv.val?.length || tv.val.length === 0) {
-              logger.info("No videos to translate");
-              return;
-            }
-
-            await env.WRITE_QUEUE.sendBatch(
-              tv.val.map((video) => ({
-                body: { ...video, kind: "upsert-video" },
-              })),
-            );
-            break;
-          }
-          case "translate-creator": {
-            const cr = CreatorsSchema.safeParse(
-              batch.messages.map((m) => m.body),
-            );
-            if (!cr.success) {
-              logger.error(`Invalid creators: ${cr.error.message}`);
-              return;
-            }
-            const tc = await c.creatorInteractor.translateCreator({
-              languageCode: cr.data[0].languageCode,
-              creators: cr.data,
-            });
-
-            if (tc.err) {
-              logger.error(`Failed to translate creators: ${tc.err.message}`);
-              return;
-            }
-
-            if (!tc.val?.length || tc.val.length === 0) {
-              logger.info("No creators to translate");
-              return;
-            }
-
-            await env.WRITE_QUEUE.sendBatch(
-              tc.val.map((creator) => ({
-                body: { ...creator, kind: "upsert-creator" },
-              })),
-            );
-            break;
-          }
-          default:
-            logger.error(`Invalid kind: ${kind}`);
+      logger.info(`Consume: ${kind}`);
+      span.setAttributes({
+        queue: batch.queue,
+        kind: kind,
+      });
+      switch (kind) {
+        case "upsert-video": {
+          const videos = VideosSchema.safeParse(
+            batch.messages.map((m) => m.body),
+          );
+          if (!videos.success) {
+            logger.error(`Invalid videos: ${videos.error.message}`);
             return;
+          }
+          await c.videoInteractor.batchUpsert(videos.data);
+          break;
         }
-      },
-    );
+        case "upsert-creator": {
+          const creators = CreatorsSchema.safeParse(
+            batch.messages.map((m) => m.body),
+          );
+          if (!creators.success) {
+            logger.error(`Invalid creators: ${creators.error.message}`);
+            return;
+          }
+          await c.creatorInteractor.batchUpsert(creators.data);
+          break;
+        }
+        case "translate-video": {
+          const v = VideosSchema.safeParse(batch.messages.map((m) => m.body));
+          if (!v.success) {
+            logger.error(`Invalid videos: ${v.error.message}`);
+            return;
+          }
+
+          const tv = await c.videoInteractor.translateVideo({
+            languageCode: v.data[0].languageCode,
+            videos: v.data,
+          });
+
+          if (tv.err) {
+            logger.error(`Failed to translate videos: ${tv.err.message}`);
+            return;
+          }
+
+          if (!tv.val?.length || tv.val.length === 0) {
+            logger.info("No videos to translate");
+            return;
+          }
+
+          await env.WRITE_QUEUE.sendBatch(
+            tv.val.map((video) => ({
+              body: { ...video, kind: "upsert-video" },
+            })),
+          );
+          break;
+        }
+        case "translate-creator": {
+          const cr = CreatorsSchema.safeParse(
+            batch.messages.map((m) => m.body),
+          );
+          if (!cr.success) {
+            logger.error(`Invalid creators: ${cr.error.message}`);
+            return;
+          }
+          const tc = await c.creatorInteractor.translateCreator({
+            languageCode: cr.data[0].languageCode,
+            creators: cr.data,
+          });
+
+          if (tc.err) {
+            logger.error(`Failed to translate creators: ${tc.err.message}`);
+            return;
+          }
+
+          if (!tc.val?.length || tc.val.length === 0) {
+            logger.info("No creators to translate");
+            return;
+          }
+
+          await env.WRITE_QUEUE.sendBatch(
+            tc.val.map((creator) => ({
+              body: { ...creator, kind: "upsert-creator" },
+            })),
+          );
+          break;
+        }
+        default:
+          logger.error(`Invalid kind: ${kind}`);
+          return;
+      }
+    });
   },
 });
