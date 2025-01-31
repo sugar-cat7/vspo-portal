@@ -3,7 +3,7 @@ compatibility_date = "2024-10-22"
 send_metrics = false
 compatibility_flags = ["nodejs_compat", "nodejs_als"]
 main = "cmd/cron/index.ts"
-tail_consumers = [{ service = "api-tail" }]
+tail_consumers = [{service = "vspo-portal-cron-tail"}]
 logpush = true
 [dev]
 port = 3002
