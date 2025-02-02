@@ -1,5 +1,5 @@
 import Document, { Html, Head, Main, NextScript } from "next/document";
-import { getInitColorSchemeScript } from "@mui/material/styles";
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
 import i18nextConfig from "../../next-i18next.config";
 
 class MyDocument extends Document {
@@ -37,7 +37,7 @@ class MyDocument extends Document {
           <meta name="theme-color" content="#fff" />
         </Head>
         <body>
-          {getInitColorSchemeScript({ defaultMode: "system" })}
+          <InitColorSchemeScript attribute="class" defaultMode="system" />
           <Main />
           <NextScript />
         </body>

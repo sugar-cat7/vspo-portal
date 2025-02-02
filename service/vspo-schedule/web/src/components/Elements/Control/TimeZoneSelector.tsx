@@ -32,7 +32,7 @@ export const TimeZoneSelector = () => {
     <Autocomplete
       id="time-zone-select"
       autoHighlight
-      componentsProps={{
+      slotProps={{
         popper: {
           style: { width: "fit-content" },
         },

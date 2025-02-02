@@ -1,11 +1,11 @@
 import {
   ColorSystemOptions,
-  Experimental_CssVarsProvider as CssVarsProvider,
-  experimental_extendTheme as extendTheme,
+  createTheme,
+  ThemeProvider,
 } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-// Module augmentation to enable use of Theme variable with CssVarsProvider
-// https://mui.com/material-ui/experimental-api/css-theme-variables/usage/#typescript
+// Module augmentation to enable type-safe use of Theme variables with ThemeProvider
+// https://mui.com/material-ui/customization/css-theme-variables/usage/#typescript
 import type {} from "@mui/material/themeCssVarsAugmentation";
 
 type ThemeProviderProps = {
@@ -28,7 +28,10 @@ const sharedColorSystemOptions: ColorSystemOptions = {
   },
 };
 
-const theme = extendTheme({
+const theme = createTheme({
+  cssVariables: {
+    colorSchemeSelector: "class",
+  },
   colorSchemes: {
     light: sharedColorSystemOptions,
     dark: sharedColorSystemOptions,
@@ -60,9 +63,9 @@ export const ThemeModeProvider: React.FC<ThemeProviderProps> = ({
   children,
 }) => {
   return (
-    <CssVarsProvider theme={theme} defaultMode="system">
+    <ThemeProvider theme={theme} defaultMode="system">
       <CssBaseline />
       {children}
-    </CssVarsProvider>
+    </ThemeProvider>
   );
 };
