@@ -1,6 +1,4 @@
-import { relations } from "drizzle-orm";
 import {
-  boolean,
   integer,
   pgTable,
   text,
@@ -97,6 +95,93 @@ export const videoTranslationTable = pgTable(
   (t) => [unique().on(t.videoId, t.languageCode)],
 );
 
+/**
+ * Discord server table
+ * - Manages a single Discord server (guild) entry
+ * - The server name can be changed by the user
+ */
+export const discordServerTable = pgTable("discord_server", {
+  id: text("id").primaryKey(),
+  serverId: text("discord_server_id").notNull().unique(), // Actual guild ID in Discord
+  name: text("name").notNull(), // User-customizable server name
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/**
+ * Discord channel table
+ * - Manages multiple channels under a Discord server
+ * - Each server can have multiple channels for sending information
+ */
+export const discordChannelTable = pgTable(
+  "discord_channel",
+  {
+    id: text("id").primaryKey(),
+    channelId: text("discord_channel_id").notNull(), // Actual channel ID in Discord
+    serverId: text("server_id")
+      .notNull()
+      .references(() => discordServerTable.serverId, { onDelete: "cascade" }),
+    name: text("name").notNull(), // Channel display name for internal management
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique().on(t.channelId, t.serverId)],
+);
+
+/**
+ * Discord bot message table
+ * - Manages messages sent by the bot in Discord
+ * - Each message has a unique ID in Discord
+ */
+export const discordBotMessageTable = pgTable(
+  "discord_bot_message",
+  {
+    id: text("id").primaryKey(),
+    botMessageId: text("discord_bot_message_id").notNull(), // Actual message ID in Discord
+    channelId: text("channel_id")
+      .notNull()
+      .references(() => discordChannelTable.channelId, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique().on(t.botMessageId, t.channelId)],
+);
+
+/**
+ * Discord admin message table
+ * - Manages messages sent by Admin
+ * - Each message has a unique ID in Discord
+ */
+export const discordAdminMessageTable = pgTable(
+  "discord_admin_message",
+  {
+    id: text("id").primaryKey(),
+    adminMessageId: text("discord_admin_message_id").notNull(), // Actual message ID in Discord
+    channelId: text("channel_id")
+      .notNull()
+      .references(() => discordChannelTable.channelId, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique().on(t.adminMessageId, t.channelId)],
+);
+
 export type InsertCreator = typeof creatorTable.$inferInsert;
 export type SelectCreator = typeof creatorTable.$inferSelect;
 
@@ -116,6 +201,22 @@ export type SelectCreatorTranslation =
 
 export type InsertVideoTranslation = typeof videoTranslationTable.$inferInsert;
 export type SelectVideoTranslation = typeof videoTranslationTable.$inferSelect;
+
+export type InsertDiscordServer = typeof discordServerTable.$inferInsert;
+export type SelectDiscordServer = typeof discordServerTable.$inferSelect;
+
+export type InsertDiscordChannel = typeof discordChannelTable.$inferInsert;
+export type SelectDiscordChannel = typeof discordChannelTable.$inferSelect;
+
+export type InsertDiscordBotMessage =
+  typeof discordBotMessageTable.$inferInsert;
+export type SelectDiscordBotMessage =
+  typeof discordBotMessageTable.$inferSelect;
+
+export type InsertDiscordAdminMessage =
+  typeof discordAdminMessageTable.$inferInsert;
+export type SelectDiscordAdminMessage =
+  typeof discordAdminMessageTable.$inferSelect;
 
 export const insertVideoSchema = createInsertSchema(videoTable);
 export const selectVideoSchema = createSelectSchema(videoTable);
@@ -146,3 +247,34 @@ export const insertVideoTranslationSchema = createInsertSchema(
 export const selectVideoTranslationSchema = createSelectSchema(
   videoTranslationTable,
 );
+
+export const insertDiscordServerSchema = createInsertSchema(discordServerTable);
+export const selectDiscordServerSchema = createSelectSchema(discordServerTable);
+export const createInsertDiscordServer = (data: InsertDiscordServer) =>
+  insertDiscordServerSchema.parse(data);
+
+export const insertDiscordChannelSchema =
+  createInsertSchema(discordChannelTable);
+export const selectDiscordChannelSchema =
+  createSelectSchema(discordChannelTable);
+export const createInsertDiscordChannel = (data: InsertDiscordChannel) =>
+  insertDiscordChannelSchema.parse(data);
+
+export const insertDiscordBotMessageSchema = createInsertSchema(
+  discordBotMessageTable,
+);
+export const selectDiscordBotMessageSchema = createSelectSchema(
+  discordBotMessageTable,
+);
+export const createInsertDiscordBotMessage = (data: InsertDiscordBotMessage) =>
+  insertDiscordBotMessageSchema.parse(data);
+
+export const insertDiscordAdminMessageSchema = createInsertSchema(
+  discordAdminMessageTable,
+);
+export const selectDiscordAdminMessageSchema = createSelectSchema(
+  discordAdminMessageTable,
+);
+export const createInsertDiscordAdminMessage = (
+  data: InsertDiscordAdminMessage,
+) => insertDiscordAdminMessageSchema.parse(data);
