@@ -10,13 +10,13 @@ export class AppError extends BaseError {
   constructor(opts: {
     message: string;
     code: ErrorCode;
-    cause?: BaseError;
+    cause?: unknown;
     context?: ErrorContext;
     retry?: boolean;
   }) {
     super({
       message: opts.message,
-      cause: opts.cause,
+      cause: opts.cause instanceof Error ? opts.cause : undefined,
       context: opts.context,
     });
     this.retry = opts.retry ?? false;

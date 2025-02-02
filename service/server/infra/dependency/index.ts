@@ -18,8 +18,22 @@ import { type ITwitchService, TwitchService } from "../twitch";
 import { type IYoutubeService, YoutubeService } from "../youtube";
 
 import type { AppWorkerEnv } from "../../config/env/internal";
-import { CreatorInteractor, VideoInteractor } from "../../usecase";
+import {
+  DiscordService,
+  type IDiscordService,
+} from "../../domain/service/discord";
+import {
+  CreatorInteractor,
+  type ICreatorInteractor,
+  type IVideoInteractor,
+  VideoInteractor,
+} from "../../usecase";
+import {
+  DiscordInteractor,
+  type IDiscordInteractor,
+} from "../../usecase/discord";
 import { AIService, type IAIService } from "../ai";
+import { DiscordClinet, type IDiscordClinet } from "../discord";
 
 export interface IRepositories {
   creatorRepository: CreatorRepository;
@@ -36,6 +50,7 @@ export function createRepositories(tx: DB): IRepositories {
 export interface IServices {
   creatorService: ICreatorService;
   videoService: IVideoService;
+  discordService: IDiscordService;
 }
 
 export function createServices(
@@ -44,6 +59,7 @@ export function createServices(
   twitchClient: ITwitchService,
   twitcastingClient: ITwitcastingService,
   aiService: IAIService,
+  discordClinet: IDiscordClinet,
 ): IServices {
   return {
     creatorService: new CreatorService({
@@ -58,6 +74,9 @@ export function createServices(
       creatorRepository: repos.creatorRepository,
       videoRepository: repos.videoRepository,
       aiService,
+    }),
+    discordService: new DiscordService({
+      discordClient: discordClinet,
     }),
   };
 }
@@ -78,6 +97,7 @@ export class AppContext implements IAppContext {
     private readonly twitchClient: ITwitchService,
     private readonly twitcastingClient: ITwitcastingService,
     private readonly aiService: IAIService,
+    private readonly DiscordClinet: IDiscordClinet,
   ) {}
 
   async runInTx<T>(
@@ -96,6 +116,7 @@ export class AppContext implements IAppContext {
         this.twitchClient,
         this.twitcastingClient,
         this.aiService,
+        this.DiscordClinet,
       );
 
       return operation(repos, services);
@@ -107,10 +128,12 @@ export class Container {
   private readonly youtubeService: IYoutubeService;
   private readonly twitchService: ITwitchService;
   private readonly twitcastingService: ITwitcastingService;
+  private readonly DiscordClinet: IDiscordClinet;
   private readonly aiService: IAIService;
   private readonly txManager: TxManager;
-  creatorInteractor: CreatorInteractor;
-  videoInteractor: VideoInteractor;
+  creatorInteractor: ICreatorInteractor;
+  videoInteractor: IVideoInteractor;
+  discordInteractor: IDiscordInteractor;
 
   constructor(private readonly env: AppWorkerEnv) {
     this.youtubeService = new YoutubeService(this.env.YOUTUBE_API_KEY);
@@ -134,14 +157,18 @@ export class Container {
       project: this.env.OPENAI_PROJECT,
       baseURL: this.env.OPENAI_BASE_URL,
     });
+
+    this.DiscordClinet = new DiscordClinet(this.env);
     const context = new AppContext(
       this.txManager,
       this.youtubeService,
       this.twitchService,
       this.twitcastingService,
       this.aiService,
+      this.DiscordClinet,
     );
     this.creatorInteractor = new CreatorInteractor(context);
     this.videoInteractor = new VideoInteractor(context);
+    this.discordInteractor = new DiscordInteractor(context);
   }
 }
