@@ -144,6 +144,7 @@ export const LivestreamCards: React.FC<Props> = ({
                   expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
                 >
                   <Typography
+                    component="span"
                     variant="h5"
                     sx={{
                       width: "100%",
