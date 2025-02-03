@@ -63,7 +63,7 @@ export const ThemeModeProvider: React.FC<ThemeProviderProps> = ({
   children,
 }) => {
   return (
-    <ThemeProvider theme={theme} defaultMode="system">
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       {children}
     </ThemeProvider>
