@@ -1,25 +1,24 @@
 import React from "react";
-import { LinkOwnProps, Link as MuiLink } from "@mui/material";
-import { useRouter } from "next/router";
-import { DEFAULT_LOCALE } from "@/lib/Const";
+import { Link as MuiLink, LinkProps as MuiLinkProps } from "@mui/material";
+import { useLocale } from "@/hooks";
 
-export const Link: React.FC<
-  LinkOwnProps & React.AnchorHTMLAttributes<HTMLAnchorElement>
-> = ({ children, href, sx, ...props }) => {
-  const router = useRouter();
-  const locale = router?.locale ?? DEFAULT_LOCALE;
+export const Link = React.forwardRef<HTMLAnchorElement, MuiLinkProps>(
+  function Link({ children, href, sx, ...props }, ref) {
+    const { locale } = useLocale();
 
-  return (
-    <MuiLink
-      href={`/${locale}${href}`}
-      sx={{
-        color: "inherit",
-        textDecoration: "none",
-        ...sx,
-      }}
-      {...props}
-    >
-      {children}
-    </MuiLink>
-  );
-};
+    return (
+      <MuiLink
+        ref={ref}
+        href={`/${locale}${href}`}
+        sx={{
+          color: "inherit",
+          textDecoration: "none",
+          ...sx,
+        }}
+        {...props}
+      >
+        {children}
+      </MuiLink>
+    );
+  },
+);
