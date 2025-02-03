@@ -136,7 +136,7 @@ const RelatedVideoCard: React.FC<RelatedVideoCardProps> = ({
   return (
     <StyledCard>
       <CardActionArea onClick={onClick}>
-        <Box display="flex">
+        <Box sx={{ display: "flex" }}>
           <Box sx={{ width: "120px" }}>
             <StyledCardMedia
               image={video.thumbnailUrl
@@ -149,10 +149,13 @@ const RelatedVideoCard: React.FC<RelatedVideoCardProps> = ({
           </Box>
           <StyledCardContent>
             <StyledTitle variant="h5">{video.title}</StyledTitle>
-            <StyledChannelTitle variant="body2" color="text.secondary">
+            <StyledChannelTitle
+              variant="body2"
+              sx={{ color: "text.secondary" }}
+            >
               {video.channelTitle}
             </StyledChannelTitle>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
               {formatDate(
                 video.scheduledStartTime || video.createdAt || TEMP_TIMESTAMP,
                 "MM/dd (E)",
@@ -209,7 +212,12 @@ export const RelatedVideos: React.FC<{
 
   return (
     <Box>
-      <Box display="flex" sx={{ flexDirection: "column" }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         {[...relatedVideos.liveStreams, ...relatedVideos.clips].map((video) => (
           <RelatedVideoCard
             key={video.id}

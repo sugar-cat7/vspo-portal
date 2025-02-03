@@ -92,7 +92,11 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = (props) => {
             {title}
           </FontSizeOnTypography>
           <HiddenOnSm>
-            <Typography variant="subtitle1" color="text.secondary" noWrap>
+            <Typography
+              variant="subtitle1"
+              noWrap
+              sx={{ color: "text.secondary" }}
+            >
               {channelTitle}
             </Typography>
           </HiddenOnSm>
@@ -107,8 +111,10 @@ export const LivestreamCard: React.FC<LivestreamCardProps> = (props) => {
           {!isFreechat && (
             <ResponsiveTypography
               variant="subtitle1"
-              color="text.secondary"
-              sx={{ paddingTop: "7px" }}
+              sx={{
+                color: "text.secondary",
+                paddingTop: "7px",
+              }}
             >
               <Typography
                 component="span"

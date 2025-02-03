@@ -188,9 +188,11 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
           </TypographySmallOnMobile>
           {liveStatus !== undefined && liveStatus !== "freechat" && (
             <Box
-              display="flex"
-              justifyContent="flex-start"
-              sx={{ marginTop: "10px" }}
+              sx={{
+                display: "flex",
+                justifyContent: "flex-start",
+                marginTop: "10px",
+              }}
             >
               <TypographySmallOnMobile sx={{ marginRight: "10px" }}>
                 {formattedStartTime}
@@ -209,20 +211,37 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
           )}
         </Box>
         <Box>
-          <Box display="flex" alignItems="center" mt={2} mb={2}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mt: 2,
+              mb: 2,
+            }}
+          >
             <Avatar src={iconUrl} />
             <TypographySmallOnMobile variant="h6" style={{ marginLeft: 8 }}>
               {video.channelTitle}
             </TypographySmallOnMobile>
           </Box>
           <Box
-            display="flex"
-            alignItems="center"
-            mt={2}
-            mb={2}
-            sx={{ borderBottom: 1, borderColor: "divider" }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              mt: 2,
+              mb: 2,
+              borderBottom: 1,
+              borderColor: "divider",
+            }}
           >
-            <Box display="flex" gap={2} alignItems="center" mb={2}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                mb: 2,
+              }}
+            >
               {url && (
                 <Button
                   variant="outlined"
@@ -307,23 +326,28 @@ export const VideoModal: React.FC = () => {
   return (
     <Dialog open={activeVideo !== undefined} fullScreen>
       <StyledDialogTitle>
-        <Box display="flex" alignItems="center">
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
           {/* <NextLink href="/"> */}
           <Box
-            flexGrow={1}
-            display="flex"
-            alignItems="center"
-            sx={{
-              gap: "10px",
-              cursor: "pointer",
-              color: "inherit",
-              textDecoration: "none",
-            }}
             onClick={() => {
               clearVideos();
             }}
             component={Link}
             href={`/schedule/all`}
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              cursor: "pointer",
+              color: "inherit",
+              textDecoration: "none",
+            }}
           >
             <Image
               src="/icon-top_transparent.png"

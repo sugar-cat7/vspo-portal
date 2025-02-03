@@ -210,8 +210,13 @@ export const CustomDrawer: React.FC<DrawerProps> = ({
       }}
     >
       <AppBarOffset />
-
-      <Stack direction="column" justifyContent="space-between" flex="1">
+      <Stack
+        direction="column"
+        sx={{
+          justifyContent: "space-between",
+          flex: "1",
+        }}
+      >
         <DrawerNavigation sections={drawerNavigationSections} />
         <Box
           sx={{
