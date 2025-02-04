@@ -110,7 +110,9 @@ const AboutPage: NextPageWithLayout<Props> = () => {
       {aboutSections.map((section, index) => (
         <Accordion disableGutters key={index}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h5">{section.title}</Typography>
+            <Typography component="span" variant="h5">
+              {section.title}
+            </Typography>
           </AccordionSummary>
           <AccordionDetails>{parseMarkdown(section.content)}</AccordionDetails>
         </Accordion>

@@ -104,7 +104,7 @@ export const LivestreamCards: React.FC<Props> = ({
           margin: "5rem 0",
         }}
       >
-        <DateTypography variant="h5" mb={3}>
+        <DateTypography variant="h5" sx={{ mb: 3 }}>
           {t("noLiveStreams")}
         </DateTypography>
       </Box>
@@ -144,6 +144,7 @@ export const LivestreamCards: React.FC<Props> = ({
                   expandIcon={<ExpandMoreIcon sx={{ color: "white" }} />}
                 >
                   <Typography
+                    component="span"
                     variant="h5"
                     sx={{
                       width: "100%",
@@ -167,13 +168,13 @@ export const LivestreamCards: React.FC<Props> = ({
                     );
                     return (
                       <Box
-                        display="flex"
+                        key={eventIndex}
                         sx={{
+                          display: "flex",
                           gap: "10px",
                           marginBottom: "10px",
                           flexDirection: "column",
                         }}
-                        key={eventIndex}
                       >
                         {event.isNotLink ? (
                           eventTitle
@@ -184,8 +185,8 @@ export const LivestreamCards: React.FC<Props> = ({
                         )}
                         {eventMembers.length > 0 && (
                           <Box
-                            display="flex"
                             sx={{
+                              display: "flex",
                               gap: "10px",
                               marginBottom: "10px",
                             }}
@@ -205,7 +206,7 @@ export const LivestreamCards: React.FC<Props> = ({
                 </AccordionDetails>
               </StyledAccordion>
             )}
-            <DateTypography variant="h5" mb={3}>
+            <DateTypography variant="h5" sx={{ mb: 3 }}>
               {t("streamsOnDate", { date: formattedDate })}
             </DateTypography>
             {livestreamsByTimeRange.map(

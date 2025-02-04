@@ -11,6 +11,7 @@ import { config } from "@fortawesome/fontawesome-svg-core";
 import { TimeZoneContextProvider } from "@/context/TimeZoneContext";
 import { VideoModalContextProvider } from "@/context/VideoModalContext";
 import { appWithTranslation } from "next-i18next";
+import { AppCacheProvider } from "@mui/material-nextjs/v14-pagesRouter";
 
 config.autoAddCss = false;
 
@@ -22,19 +23,21 @@ export type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-function App({ Component, pageProps }: AppPropsWithLayout) {
+function App({ Component, pageProps, ...props }: AppPropsWithLayout) {
   const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
     <>
-      <ThemeModeProvider>
-        <TimeZoneContextProvider>
-          <VideoModalContextProvider>
-            {/* eslint-disable-next-line @typescript-eslint/no-unsafe-argument */}
-            {getLayout(<Component {...pageProps} />, pageProps)}
-          </VideoModalContextProvider>
-        </TimeZoneContextProvider>
-      </ThemeModeProvider>
+      <AppCacheProvider {...props}>
+        <ThemeModeProvider>
+          <TimeZoneContextProvider>
+            <VideoModalContextProvider>
+              {/* eslint-disable-next-line @typescript-eslint/no-unsafe-argument */}
+              {getLayout(<Component {...pageProps} />, pageProps)}
+            </VideoModalContextProvider>
+          </TimeZoneContextProvider>
+        </ThemeModeProvider>
+      </AppCacheProvider>
       <Analytics />
       <GoogleAnalytics />
     </>

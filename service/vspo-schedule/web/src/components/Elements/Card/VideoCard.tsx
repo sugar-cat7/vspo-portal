@@ -67,7 +67,7 @@ export const VideoCard: React.FC<Props> = ({ video, highlight, children }) => {
       )}
       <StyledCard highlightColor={highlight?.color}>
         <CardActionArea onClick={() => pushVideo(video)}>
-          <StyledCardMedia position="relative">
+          <StyledCardMedia sx={{ position: "relative" }}>
             <Image
               src={video.thumbnailUrl}
               alt={video.title}

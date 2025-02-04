@@ -66,7 +66,7 @@ const SiteNewsItemPage: NextPageWithLayout<Props> = ({ siteNewsItem }) => {
             />
           ))}
         </Typography>
-        <Typography variant="body1" paragraph>
+        <Typography variant="body1" sx={{ marginBottom: "16px" }}>
           {siteNewsItem.content}
         </Typography>
         {siteNewsItem.tweetLink && (

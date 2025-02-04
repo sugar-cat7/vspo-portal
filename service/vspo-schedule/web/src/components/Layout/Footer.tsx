@@ -19,14 +19,20 @@ export const Footer: React.FC<Props> = ({
   const { timeZone } = useTimeZoneContext();
 
   return (
-    <Box mt={4} mb={2} textAlign="center">
+    <Box
+      sx={{
+        mt: 4,
+        mb: 2,
+        textAlign: "center",
+      }}
+    >
       {description && (
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {description}
         </Typography>
       )}
       {lastUpdateTimestamp && (
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" sx={{ color: "text.secondary" }}>
           {t("footer.lastUpdated", {
             date: formatDate(lastUpdateTimestamp, "yyyy/MM/dd HH:mm", {
               timeZone,
@@ -34,7 +40,13 @@ export const Footer: React.FC<Props> = ({
           })}
         </Typography>
       )}
-      <Typography variant="body2" color="text.secondary" mt={1}>
+      <Typography
+        variant="body2"
+        sx={{
+          color: "text.secondary",
+          mt: 1,
+        }}
+      >
         <Link
           href={`/schedule/all`}
           sx={{
@@ -49,7 +61,13 @@ export const Footer: React.FC<Props> = ({
           {t("footer.pages.privacy")}
         </NextLink>
       </Typography>
-      <Typography variant="body2" color="text.secondary" mt={1}>
+      <Typography
+        variant="body2"
+        sx={{
+          color: "text.secondary",
+          mt: 1,
+        }}
+      >
         &copy; {t("spodule")} {getCurrentUTCDate().getFullYear()}
       </Typography>
     </Box>

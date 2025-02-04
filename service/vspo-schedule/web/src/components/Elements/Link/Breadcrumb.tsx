@@ -18,7 +18,7 @@ export const Breadcrumb = () => {
         const name = t(`breadcrumbs.pages.${value}`, value);
 
         return last ? (
-          <Typography color="text.primary" key={to}>
+          <Typography key={to} sx={{ color: "text.primary" }}>
             {name}
           </Typography>
         ) : (

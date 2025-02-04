@@ -126,7 +126,7 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
             marginBottom: "20px",
           }}
         >
-          <Typography color="textSecondary">
+          <Typography sx={{ color: "text.secondary" }}>
             {formatDate(
               convertToUTCDate(event.startedAt.split("T")[0] || TEMP_TIMESTAMP),
               "MM/dd (E)",

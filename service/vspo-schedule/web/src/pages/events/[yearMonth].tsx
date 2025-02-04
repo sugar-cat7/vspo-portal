@@ -294,9 +294,9 @@ const IndexPage: NextPageWithLayout<Props> = ({
                   }}
                 >
                   <Typography
-                    color="textSecondary"
                     variant="h6"
                     sx={{
+                      color: "text.secondary",
                       marginLeft: matches ? "30px" : "0px",
                       width: matches ? "130px" : "100px",
                     }}
@@ -333,9 +333,9 @@ const IndexPage: NextPageWithLayout<Props> = ({
                           <Typography
                             variant="h6"
                             component="div"
-                            align="left"
                             sx={{
                               fontSize: matches ? "1.00rem" : "1.25rem",
+                              textAlign: "left",
                             }}
                           >
                             {event.title}

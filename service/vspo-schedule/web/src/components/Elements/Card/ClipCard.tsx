@@ -84,8 +84,8 @@ export const ClipCard: React.FC<Props> = ({ clip }) => {
           {clip.title}
         </Typography>
         <Box
-          mt="auto"
           sx={{
+            mt: "auto",
             display: "flex",
             alignItems: "center",
             gap: "0.5rem",
@@ -93,14 +93,18 @@ export const ClipCard: React.FC<Props> = ({ clip }) => {
           }}
         >
           <Box
-            mt="auto"
             sx={{
+              mt: "auto",
               display: "flex",
               alignItems: "center",
               gap: "0.5rem",
             }}
           >
-            <Typography variant="body2" color="textSecondary" component="p">
+            <Typography
+              variant="body2"
+              component="p"
+              sx={{ color: "text.secondary" }}
+            >
               {clip.channelTitle}
             </Typography>
             <StyledAvatar src={iconUrl} alt={clip.channelTitle} />
