@@ -56,15 +56,15 @@ const StyledCardContent = styled(CardContent)({
 
 const StyledTitle = styled(Typography)({
   display: "-webkit-box",
-  "-webkit-line-clamp": "2",
-  "-webkit-box-orient": "vertical",
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical",
   overflow: "hidden",
 });
 
 const StyledChannelTitle = styled(Typography)({
   display: "-webkit-box",
-  "-webkit-line-clamp": "1",
-  "-webkit-box-orient": "vertical",
+  WebkitLineClamp: 1,
+  WebkitBoxOrient: "vertical",
   overflow: "hidden",
 });
 

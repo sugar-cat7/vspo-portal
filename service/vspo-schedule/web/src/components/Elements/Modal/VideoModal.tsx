@@ -416,8 +416,8 @@ export const VideoModal: React.FC = () => {
           variant="body1"
           sx={{
             display: "-webkit-box",
-            "-webkit-line-clamp": "2",
-            "-webkit-box-orient": "vertical",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
             overflow: "hidden",
             textOverflow: "ellipsis",
             width: "80%", // 適宜調整してください
