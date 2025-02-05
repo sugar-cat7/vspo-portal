@@ -45,9 +45,9 @@ type Params = {
 
 type Props = {
   events: VspoEvent[];
-  prevYearMonth: string | null;
+  prevYearMonth?: string;
   currentYearMonth: string;
-  nextYearMonth: string | null;
+  nextYearMonth?: string;
   lastUpdateTimestamp: number;
   meta: {
     title: string;
@@ -187,8 +187,8 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
   }
 
   const currentIndex = yearMonths.indexOf(yearMonth);
-  const prevYearMonth = yearMonths[currentIndex - 1] ?? null;
-  const nextYearMonth = yearMonths[currentIndex + 1] ?? null;
+  const prevYearMonth = yearMonths[currentIndex - 1];
+  const nextYearMonth = yearMonths[currentIndex + 1];
 
   const sortedData = events.sort(
     (a, b) =>
@@ -206,9 +206,9 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     props: {
       ...translations,
       events: sortedData,
-      prevYearMonth,
+      ...(prevYearMonth && { prevYearMonth }),
       currentYearMonth: yearMonth,
-      nextYearMonth,
+      ...(nextYearMonth && { nextYearMonth }),
       lastUpdateTimestamp: getCurrentUTCDate().getTime(),
       meta: {
         title: t("title", { ns: "events" }),
@@ -274,9 +274,9 @@ const IndexPage: NextPageWithLayout<Props> = ({
         })}
       >
         <YearMonthSelector
-          prevYearMonth={prevYearMonth ?? undefined}
+          prevYearMonth={prevYearMonth}
           currentYearMonth={currentYearMonth}
-          nextYearMonth={nextYearMonth ?? undefined}
+          nextYearMonth={nextYearMonth}
         />
       </Toolbar>
 
