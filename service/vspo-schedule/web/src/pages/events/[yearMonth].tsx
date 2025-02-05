@@ -45,10 +45,10 @@ type Params = {
 
 type Props = {
   events: VspoEvent[];
-  lastUpdateTimestamp: number;
-  nextYearMonth: string;
-  beforeYearMonth: string;
+  prevYearMonth: string | null;
   currentYearMonth: string;
+  nextYearMonth: string | null;
+  lastUpdateTimestamp: number;
   meta: {
     title: string;
     description: string;
@@ -84,17 +84,17 @@ const AdjacentYearMonthButton: React.FC<{
 );
 
 const YearMonthSelector: React.FC<{
-  beforeYearMonth?: string;
-  currentYearMonth?: string;
+  prevYearMonth?: string;
+  currentYearMonth: string;
   nextYearMonth?: string;
-}> = ({ beforeYearMonth, currentYearMonth, nextYearMonth }) => {
+}> = ({ prevYearMonth, currentYearMonth, nextYearMonth }) => {
   const { t } = useTranslation("events");
 
   return (
     <>
       <AdjacentYearMonthButton
-        disabled={!beforeYearMonth}
-        yearMonth={beforeYearMonth}
+        disabled={!prevYearMonth}
+        yearMonth={prevYearMonth}
       >
         {t("prevMonth")}
       </AdjacentYearMonthButton>
@@ -103,8 +103,7 @@ const YearMonthSelector: React.FC<{
         component="div"
         style={{ width: "160px", textAlign: "center" }}
       >
-        {currentYearMonth &&
-          t("currMonth", { val: convertToUTCDate(currentYearMonth) })}
+        {t("currMonth", { val: convertToUTCDate(currentYearMonth) })}
       </Typography>
       <AdjacentYearMonthButton
         disabled={!nextYearMonth}
@@ -188,8 +187,8 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
   }
 
   const currentIndex = yearMonths.indexOf(yearMonth);
-  const nextYearMonth = yearMonths[currentIndex + 1] ?? "";
-  const beforeYearMonth = yearMonths[currentIndex - 1] ?? "";
+  const prevYearMonth = yearMonths[currentIndex - 1] ?? null;
+  const nextYearMonth = yearMonths[currentIndex + 1] ?? null;
 
   const sortedData = events.sort(
     (a, b) =>
@@ -207,10 +206,10 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     props: {
       ...translations,
       events: sortedData,
-      lastUpdateTimestamp: getCurrentUTCDate().getTime(),
-      beforeYearMonth: beforeYearMonth,
-      nextYearMonth: nextYearMonth,
+      prevYearMonth,
       currentYearMonth: yearMonth,
+      nextYearMonth,
+      lastUpdateTimestamp: getCurrentUTCDate().getTime(),
       meta: {
         title: t("title", { ns: "events" }),
         description: t("description", { ns: "events" }),
@@ -221,9 +220,9 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
 
 const IndexPage: NextPageWithLayout<Props> = ({
   events,
-  beforeYearMonth,
-  nextYearMonth,
+  prevYearMonth,
   currentYearMonth,
+  nextYearMonth,
 }) => {
   const router = useRouter();
   const todayEventRef = React.useRef<HTMLDivElement>(null);
@@ -275,9 +274,9 @@ const IndexPage: NextPageWithLayout<Props> = ({
         })}
       >
         <YearMonthSelector
-          beforeYearMonth={beforeYearMonth}
+          prevYearMonth={prevYearMonth ?? undefined}
           currentYearMonth={currentYearMonth}
-          nextYearMonth={nextYearMonth}
+          nextYearMonth={nextYearMonth ?? undefined}
         />
       </Toolbar>
 
