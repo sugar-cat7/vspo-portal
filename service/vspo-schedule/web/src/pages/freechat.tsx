@@ -5,7 +5,7 @@ import { GetStaticProps } from "next";
 import React from "react";
 import { NextPageWithLayout } from "./_app";
 import { Livestream } from "@/types/streaming";
-import { Grid } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import { members } from "@/data/members";
 import { fetchFreechats } from "@/lib/api";
 import { DEFAULT_LOCALE } from "@/lib/Const";
@@ -23,9 +23,9 @@ type FreechatsProps = {
 
 const FreechatPage: NextPageWithLayout<FreechatsProps> = ({ freechats }) => {
   return (
-    <Grid container spacing={3}>
+    <Grid container spacing={3} sx={{ width: "100%" }}>
       {freechats.map((freechat) => (
-        <Grid item xs={6} md={3} key={freechat.id}>
+        <Grid size={{ xs: 6, md: 3 }} key={freechat.id}>
           <LivestreamCard livestream={freechat} isFreechat={true} />
         </Grid>
       ))}
