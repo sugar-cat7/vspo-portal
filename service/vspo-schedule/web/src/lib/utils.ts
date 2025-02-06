@@ -12,7 +12,7 @@ import {
 import { Timeframe } from "@/types/timeframe";
 import { formatInTimeZone, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja, zhCN, zhTW, ko } from "date-fns/locale";
-import { Locale, getHours } from "date-fns";
+import { Locale, getHours, isMatch } from "date-fns";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP, TIME_ZONE_COOKIE } from "./Const";
 import { platforms } from "@/constants/platforms";
 import { SSRConfig } from "next-i18next";
@@ -317,6 +317,16 @@ export const formatDate = (
 };
 
 /**
+ * Determines whether a date string matches a specific date format.
+ * @param dateString - The date string to test.
+ * @param dateFormat - The date format pattern to test the string against.
+ * @returns True if the date string conforms to the date format, else false.
+ */
+export const matchesDateFormat = (dateString: string, dateFormat: string) => {
+  return isMatch(dateString, dateFormat);
+};
+
+/**
  * Determines if a livestream is live, upcoming, archived, or is a freechat.
  * @param {Livestream} livestream - The livestream to check the live status of.
  * @returns {LiveStatus | "freechat"} - The live status of the livestream
@@ -543,22 +553,9 @@ export const getSiteNewsTagColor = (tag: SiteNewsTag) => {
 };
 
 export const groupEventsByYearMonth = (events: VspoEvent[]) => {
-  const eventsByMonth: { [key: string]: VspoEvent[] } = {};
-
-  for (const event of events) {
-    const eventDate = convertToUTCDate(event.startedAt);
-    const year = eventDate.getFullYear();
-    const month = eventDate.getMonth() + 1;
-
-    // キーを 'yyyy-mm' の形式で生成
-    const key = `${year}-${month.toString().padStart(2, "0")}`;
-
-    if (!eventsByMonth[key]) {
-      eventsByMonth[key] = [];
-    }
-
-    eventsByMonth[key].push(event);
-  }
+  const eventsByMonth = groupBy(events, (event) =>
+    formatDate(event.startedAt, "yyyy-MM"),
+  );
 
   return Object.entries(eventsByMonth)
     .sort(([keyA], [keyB]) => (keyA > keyB ? 1 : -1))

@@ -27,6 +27,7 @@ import {
   getInitializedI18nInstance,
   getRelevantMembers,
   groupEventsByYearMonth,
+  matchesDateFormat,
 } from "@/lib/utils";
 import React, { useEffect } from "react";
 import { fetchEvents } from "@/lib/api";
@@ -44,11 +45,10 @@ type Params = {
 
 type Props = {
   events: VspoEvent[];
-  lastUpdateTimestamp: number;
+  prevYearMonth?: string;
+  currentYearMonth: string;
   nextYearMonth?: string;
-  beforeYearMonth?: string;
-  currentYearMonth?: string;
-  latestYearMonth?: string;
+  lastUpdateTimestamp: number;
   meta: {
     title: string;
     description: string;
@@ -84,17 +84,17 @@ const AdjacentYearMonthButton: React.FC<{
 );
 
 const YearMonthSelector: React.FC<{
-  beforeYearMonth?: string;
-  currentYearMonth?: string;
+  prevYearMonth?: string;
+  currentYearMonth: string;
   nextYearMonth?: string;
-}> = ({ beforeYearMonth, currentYearMonth, nextYearMonth }) => {
+}> = ({ prevYearMonth, currentYearMonth, nextYearMonth }) => {
   const { t } = useTranslation("events");
 
   return (
     <>
       <AdjacentYearMonthButton
-        disabled={!beforeYearMonth}
-        yearMonth={beforeYearMonth}
+        disabled={!prevYearMonth}
+        yearMonth={prevYearMonth}
       >
         {t("prevMonth")}
       </AdjacentYearMonthButton>
@@ -103,8 +103,7 @@ const YearMonthSelector: React.FC<{
         component="div"
         style={{ width: "160px", textAlign: "center" }}
       >
-        {currentYearMonth &&
-          t("currMonth", { val: convertToUTCDate(currentYearMonth) })}
+        {t("currMonth", { val: convertToUTCDate(currentYearMonth) })}
       </Typography>
       <AdjacentYearMonthButton
         disabled={!nextYearMonth}
@@ -142,40 +141,60 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
   params,
   locale = DEFAULT_LOCALE,
 }) => {
-  if (!params) {
+  const yearMonth = params?.yearMonth;
+  const isValidYearMonth =
+    yearMonth !== undefined && matchesDateFormat(yearMonth, "yyyy-MM");
+  if (!isValidYearMonth) {
     return {
       notFound: true,
     };
   }
-
   const fetchedEvents = await fetchEvents({ lang: locale });
-  const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
-
-  const yearMonth = params.yearMonth;
-
-  if (!eventsByMonth[yearMonth]) {
+  if (fetchedEvents.length === 0) {
     return {
       notFound: true,
     };
   }
 
+  const eventsByMonth = groupEventsByYearMonth(fetchedEvents);
   const events = eventsByMonth[yearMonth];
   const yearMonths = Object.keys(eventsByMonth);
+
+  const lastYearMonth = yearMonths.at(-1)!;
+  if (lastYearMonth < yearMonth) {
+    // Param yearMonth is later than last yearMonth with events, so
+    // redirect user to yearMonth containing last event
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/${locale}/events/${lastYearMonth}`,
+      },
+    };
+  }
+
+  if (events === undefined) {
+    // Param yearMonth has no events (but some future yearMonth has events), so
+    // redirect user to yearMonth containing next upcoming event
+    const upcomingEventYearMonth = yearMonths.find(
+      (eventYearMonth) => yearMonth < eventYearMonth,
+    );
+    return {
+      redirect: {
+        permanent: false,
+        destination: `/${locale}/events/${upcomingEventYearMonth}`,
+      },
+    };
+  }
+
   const currentIndex = yearMonths.indexOf(yearMonth);
-  const nextYearMonth = yearMonths.at(currentIndex + 1) || "";
-  const beforeYearMonth =
-    yearMonths.at(currentIndex - 1) !== yearMonth &&
-    yearMonths.at(currentIndex - 1) !== yearMonths.at(yearMonths.length - 1)
-      ? yearMonths.at(currentIndex - 1)
-      : "";
+  const prevYearMonth = yearMonths[currentIndex - 1];
+  const nextYearMonth = yearMonths[currentIndex + 1];
 
   const sortedData = events.sort(
     (a, b) =>
       convertToUTCDate(b.startedAt).getTime() -
       convertToUTCDate(a.startedAt).getTime(),
   );
-
-  const latestYearMonth = Object.keys(eventsByMonth).sort().pop();
 
   const translations = await serverSideTranslations(locale, [
     "common",
@@ -187,11 +206,10 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
     props: {
       ...translations,
       events: sortedData,
-      lastUpdateTimestamp: getCurrentUTCDate().getTime(),
-      beforeYearMonth: beforeYearMonth,
-      nextYearMonth: nextYearMonth,
+      ...(prevYearMonth && { prevYearMonth }),
       currentYearMonth: yearMonth,
-      latestYearMonth: latestYearMonth,
+      ...(nextYearMonth && { nextYearMonth }),
+      lastUpdateTimestamp: getCurrentUTCDate().getTime(),
       meta: {
         title: t("title", { ns: "events" }),
         description: t("description", { ns: "events" }),
@@ -202,10 +220,9 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
 
 const IndexPage: NextPageWithLayout<Props> = ({
   events,
-  beforeYearMonth,
-  nextYearMonth,
+  prevYearMonth,
   currentYearMonth,
-  latestYearMonth,
+  nextYearMonth,
 }) => {
   const router = useRouter();
   const todayEventRef = React.useRef<HTMLDivElement>(null);
@@ -247,12 +264,6 @@ const IndexPage: NextPageWithLayout<Props> = ({
     }
   }, []);
 
-  useEffect(() => {
-    if (!events || events.length === 0) {
-      router.replace(`/events/${latestYearMonth}`);
-    }
-  }, [events, router, latestYearMonth]);
-
   return (
     <>
       <Toolbar
@@ -263,7 +274,7 @@ const IndexPage: NextPageWithLayout<Props> = ({
         })}
       >
         <YearMonthSelector
-          beforeYearMonth={beforeYearMonth}
+          prevYearMonth={prevYearMonth}
           currentYearMonth={currentYearMonth}
           nextYearMonth={nextYearMonth}
         />
