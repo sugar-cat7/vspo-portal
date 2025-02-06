@@ -17,7 +17,7 @@ jobs:
         include:
           - name: "vspo-portal-app"
           - name: "vspo-portal-cron"
-          - name: "vspo-portal-api-gateway"
+          - name: "vspo-portal-gateway"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
