@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { zAIEnv } from "./ai";
 import { zCommonEnv } from "./common";
+import { zDiscordEnv } from "./discord";
 
 export const zAppWorkerEnv = z
   .object({
@@ -15,6 +16,7 @@ export const zAppWorkerEnv = z
     WRITE_QUEUE: z.custom<Queue>(),
   })
   .merge(zCommonEnv)
-  .merge(zAIEnv);
+  .merge(zAIEnv)
+  .merge(zDiscordEnv);
 
 export type AppWorkerEnv = z.infer<typeof zAppWorkerEnv>;

@@ -4,13 +4,13 @@ export abstract class BaseError<
   TContext extends ErrorContext = ErrorContext,
 > extends Error {
   public abstract readonly retry: boolean;
-  public readonly cause: BaseError | undefined;
+  public readonly cause: Error | undefined;
   public readonly context: TContext | undefined;
   public abstract readonly name: string;
 
   constructor(opts: {
     message: string;
-    cause?: BaseError;
+    cause?: Error;
     context?: TContext;
   }) {
     super(opts.message);

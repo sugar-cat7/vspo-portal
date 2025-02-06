@@ -25,6 +25,10 @@ import type {
   TranslateCreatorParam,
   TranslateVideoParam,
 } from "../../../../usecase";
+import type {
+  IDiscordInteractor,
+  SendMessageParams,
+} from "../../../../usecase/discord";
 
 export class VideoService extends RpcTarget {
   #usecase: IVideoInteractor;
@@ -120,6 +124,20 @@ export class CreatorService extends RpcTarget {
   }
 }
 
+export class DiscordService extends RpcTarget {
+  #usecase: IDiscordInteractor;
+  #queue: Queue<DiscordMessage>;
+  constructor(usecase: IDiscordInteractor, queue: Queue) {
+    super();
+    this.#usecase = usecase;
+    this.#queue = queue;
+  }
+
+  async sendVideosToMultipleChannels(params: SendMessageParams) {
+    return this.#usecase.batchSendMessages(params);
+  }
+}
+
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   newVideoUsecase() {
     const d = this.setup();
@@ -129,6 +147,11 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   newCreatorUsecase() {
     const d = this.setup();
     return new CreatorService(d.creatorInteractor, this.env.WRITE_QUEUE);
+  }
+
+  newDiscordUsecase() {
+    const d = this.setup();
+    return new DiscordService(d.discordInteractor, this.env.WRITE_QUEUE);
   }
 
   private setup() {
@@ -144,7 +167,8 @@ type Kind =
   | "translate-video"
   | "upsert-video"
   | "upsert-creator"
-  | "translate-creator";
+  | "translate-creator"
+  | "discord-send-message";
 
 type BaseMessageParam<T, K extends Kind> = T & { kind: K };
 
@@ -152,11 +176,12 @@ type TranslateVideo = BaseMessageParam<Video, "translate-video">;
 type TranslateCreator = BaseMessageParam<Creator, "translate-creator">;
 type UpsertVideo = BaseMessageParam<Video, "upsert-video">;
 type UpsertCreator = BaseMessageParam<Creator, "upsert-creator">;
+type DiscordMessage = BaseMessageParam<Video, "discord-send-message">;
 
 type CreatorMessage = TranslateCreator | UpsertCreator;
 type VideoMessage = TranslateVideo | UpsertVideo;
 
-type MessageParam = CreatorMessage | VideoMessage;
+type MessageParam = CreatorMessage | VideoMessage | DiscordMessage;
 
 export default createHandler({
   queue: async (
@@ -265,6 +290,10 @@ export default createHandler({
               body: { ...creator, kind: "upsert-creator" },
             })),
           );
+          break;
+        }
+        case "discord-send-message": {
+          // TODO: Implement
           break;
         }
         default:
