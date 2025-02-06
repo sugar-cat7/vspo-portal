@@ -313,16 +313,19 @@ export const getServerSideProps: GetServerSideProps<
     };
 
     // Execute the fetches in parallel using Promise.all
+    const useDateTabs = !["archive", "live", "upcoming"].includes(
+      params.status,
+    );
     const [
       uniqueLivestreams,
       events,
       { translations, footerMessage, title, headTitle, t },
-      { todayIndex, tabDates },
+      dateTabsInfo,
     ] = await Promise.all([
       fetchLivestreamsData(),
       fetchEventsData(),
       fetchTranslationsAndMeta(),
-      fetchDateTabsInfo(),
+      useDateTabs ? fetchDateTabsInfo() : undefined,
     ]);
 
     // Livestream description needs to be set after fetching
@@ -343,10 +346,7 @@ export const getServerSideProps: GetServerSideProps<
         lastUpdateTimestamp: getCurrentUTCDate().getTime(),
         liveStatus: params.status,
         locale: locale,
-        dateTabsInfo: {
-          todayIndex,
-          tabDates,
-        },
+        ...(useDateTabs && { dateTabsInfo }),
         footerMessage,
         meta: {
           title,
