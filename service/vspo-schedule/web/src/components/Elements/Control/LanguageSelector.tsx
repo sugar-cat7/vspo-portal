@@ -1,4 +1,5 @@
-import { MenuItem, TextField } from "@mui/material";
+import LanguageIcon from "@mui/icons-material/Language";
+import { InputAdornment, MenuItem, TextField } from "@mui/material";
 import { useTranslation } from "next-i18next";
 import { useLocale } from "@/hooks";
 
@@ -25,6 +26,15 @@ export const LanguageSelector = () => {
         onChange={(event) => {
           const selectedLocale = event.target.value;
           setLocale(selectedLocale);
+        }}
+        slotProps={{
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <LanguageIcon />
+              </InputAdornment>
+            ),
+          },
         }}
       >
         {Object.keys(localeLabels).map((loc) => (
