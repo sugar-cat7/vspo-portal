@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Grid, Box, Pagination } from "@mui/material";
+import { Box, Grid2 as Grid, Pagination } from "@mui/material";
 import { Clip } from "@/types/streaming";
 import { ClipCard } from "../Elements";
 
@@ -22,9 +22,9 @@ export const ClipList: React.FC<Props> = ({ clips }) => {
 
   return (
     <>
-      <Grid container spacing={3}>
+      <Grid container spacing={3} sx={{ width: "100%" }}>
         {paginatedClips.map((clip) => (
-          <Grid item xs={12} sm={6} md={4} key={clip.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={clip.id}>
             <ClipCard clip={clip} />
           </Grid>
         ))}

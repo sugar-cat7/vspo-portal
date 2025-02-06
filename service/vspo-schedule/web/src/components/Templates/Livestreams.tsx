@@ -5,7 +5,7 @@ import {
   AccordionSummary,
   Avatar,
   Box,
-  Grid,
+  Grid2 as Grid,
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -223,14 +223,10 @@ export const LivestreamCards: React.FC<Props> = ({
                     }}
                   >
                     <TimeRangeLabel variant="h6">{label}</TimeRangeLabel>
-                    <Grid container spacing={2}>
+                    <Grid container spacing={2} sx={{ width: "100%" }}>
                       {livestreams.map((livestream) => (
                         <Grid
-                          item
-                          xs={6}
-                          sm={6}
-                          md={3}
-                          lg={3}
+                          size={{ xs: 6, sm: 6, md: 3, lg: 3 }}
                           key={livestream.id}
                         >
                           <LivestreamCard
