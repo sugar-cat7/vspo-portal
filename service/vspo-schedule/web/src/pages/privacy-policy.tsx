@@ -1,7 +1,7 @@
 import React from "react";
-import styles from "@/styles/Terms.module.scss";
 import { NextPageWithLayout } from "./_app";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
+import { AgreementDocument } from "@/components/Templates";
 import { DEFAULT_LOCALE, QA_LINK } from "@/lib/Const";
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -36,7 +36,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 
 const PrivacyPolicy: NextPageWithLayout<Props> = () => {
   return (
-    <div className={styles.container}>
+    <AgreementDocument>
       <h1>プライバシーポリシー</h1>
       <p>
         このプライバシーポリシーは，サービス提供者がこのウェブサイト上で提供するサービス（以下，「本サービス」といいます。）のプライバシーポリシー（以下，「本ポリシー」といいます。）を定めます。
@@ -123,7 +123,7 @@ const PrivacyPolicy: NextPageWithLayout<Props> = () => {
         </a>
         までお願いいたします。
       </p>
-    </div>
+    </AgreementDocument>
   );
 };
 
