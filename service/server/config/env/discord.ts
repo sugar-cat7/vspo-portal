@@ -3,7 +3,9 @@ import { zCommonEnv } from "./common";
 
 export const zDiscordEnv = z
   .object({
-    DISCORD_BOT_TOKEN: z.string(),
+    DISCORD_APPLICATION_ID: z.string(),
+    DISCORD_PUBLIC_KEY: z.string(),
+    DISCORD_TOKEN: z.string(),
   })
   .merge(zCommonEnv);
 

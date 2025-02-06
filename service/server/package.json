@@ -19,7 +19,8 @@
     "biome:check:write": "pnpm biome check --write ./**/**",
     "tsc": "tsc --noEmit",
     "ci": "nx run vspo-portal-server:ci",
-    "test": "nx test vspo-portal-server"
+    "test": "nx test vspo-portal-server",
+    "register": "node --env-file=.env.local cmd/discord/interaction/register.ts"
   },
   "dependencies": {
     "@ai-sdk/openai": "^0.0.58",

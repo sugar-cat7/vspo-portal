@@ -45,3 +45,15 @@ curl "http://localhost:3002/__scheduled?cron=*+*+*+*+*"
 ```bash
 pnpm biome:check:write
 ```
+
+
+#### Discord Interaction
+
+- require `cloudflared`
+
+```
+# add interaction endpoint to discord portal
+cloudflared tunnel --url localhost:3000
+```
+
+- tutorial: https://discord.com/developers/docs/tutorials/hosting-on-cloudflare-workers

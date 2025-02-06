@@ -17,6 +17,7 @@ jobs:
         include:
           - name: "vspo-portal-app"
           - name: "vspo-portal-cron"
+          - name: "vspo-portal-api-gateway"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -47,6 +48,9 @@ jobs:
             TWITCH_CLIENT_ID
             TWITCH_CLIENT_SECRET
             TWITCASTING_ACCESS_TOKEN
+            DISCORD_APPLICATION_ID
+            DISCORD_PUBLIC_KEY
+            DISCORD_TOKEN
 
         env:
           OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
@@ -59,3 +63,6 @@ jobs:
           TWITCH_CLIENT_ID: ${{ secrets.TWITCH_CLIENT_ID }}
           TWITCH_CLIENT_SECRET: ${{ secrets.TWITCH_CLIENT_SECRET }}
           TWITCASTING_ACCESS_TOKEN: ${{ secrets.TWITCASTING_ACCESS_TOKEN }}
+          DISCORD_APPLICATION_ID: ${{ secrets.DISCORD_APPLICATION_ID }}
+          DISCORD_PUBLIC_KEY: ${{ secrets.DISCORD_PUBLIC_KEY }}
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}

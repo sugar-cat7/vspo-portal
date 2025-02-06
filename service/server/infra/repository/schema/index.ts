@@ -1,10 +1,4 @@
-import {
-  integer,
-  pgTable,
-  text,
-  timestamp,
-  unique,
-} from "drizzle-orm/pg-core";
+import { integer, pgTable, text, timestamp, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
 // Creator information table

@@ -1,5 +1,5 @@
 import type { APIEmbed } from "discord-api-types/v10";
-import type { CommandHandler, DiscordHono, Rest } from "discord-hono";
+import type { CommandHandler, Rest } from "discord-hono";
 import {
   DiscordHono as DHono,
   Rest as DRest,
@@ -15,14 +15,6 @@ import {
   wrap,
 } from "../../pkg/errors";
 
-export type ISlashCommandDefinition = {
-  name: string;
-  handler: CommandHandler<{
-    Bindings?: Record<string, unknown>;
-    Variables?: Record<string, unknown>;
-  }>;
-};
-
 type SendMessageParams = {
   channelId: string;
   content: string;
@@ -34,25 +26,10 @@ export interface IDiscordClinet {
 }
 
 export class DiscordClinet implements IDiscordClinet {
-  private app: DiscordHono;
-  private rest: Rest;
+  rest: Rest;
 
   constructor(env: DiscordEnv) {
-    this.app = new DHono({
-      discordEnv: () => ({ TOKEN: env.DISCORD_BOT_TOKEN }),
-    });
-    this.rest = new DRest(env.DISCORD_BOT_TOKEN);
-  }
-
-  /**
-   * Register commands from outside this class.
-   */
-  registerCommands(commands: ISlashCommandDefinition[]): void {
-    for (const { name, handler } of commands) {
-      this.app.command(name, handler);
-    }
-
-    this.app.command("", (c) => c.res("Unknown command."));
+    this.rest = new DRest(env.DISCORD_TOKEN);
   }
 
   /**
