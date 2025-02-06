@@ -1,4 +1,6 @@
-.container {
+import { styled } from "@mui/material/styles";
+
+export const AgreementDocument = styled("div")(`
   h1 {
     font-size: 2.5rem;
     margin-top: 0;
@@ -35,4 +37,4 @@
       text-decoration: underline;
     }
   }
-}
+`);

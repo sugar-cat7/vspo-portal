@@ -1,7 +1,7 @@
 import React from "react";
-import styles from "@/styles/Terms.module.scss";
 import { NextPageWithLayout } from "./_app";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
+import { AgreementDocument } from "@/components/Templates";
 import { GetStaticProps } from "next";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -36,7 +36,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({
 
 const Terms: NextPageWithLayout<Props> = () => {
   return (
-    <div className={styles.container}>
+    <AgreementDocument>
       <h1>利用規約</h1>
       <p>
         この利用規約（以下，「本規約」といいます。）は，サービス提供者がこのウェブサイト上で提供するサービス（以下，「本サービス」といいます。）の利用条件を定めます。
@@ -202,7 +202,7 @@ const Terms: NextPageWithLayout<Props> = () => {
       <p>
         本サービスに関して紛争が生じた場合には，サービス提供者の本店所在地を管轄する裁判所を専属的合意管轄とします。
       </p>
-    </div>
+    </AgreementDocument>
   );
 };
 
