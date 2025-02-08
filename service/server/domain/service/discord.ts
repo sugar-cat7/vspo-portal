@@ -138,7 +138,7 @@ export class DiscordService implements IDiscordService {
         if (index >= 0) {
           discordChannels[index] = {
             ...c.val,
-            id: discordChannels[index].id
+            id: discordChannels[index].id,
           };
         } else {
           discordChannels.push(c.val);
