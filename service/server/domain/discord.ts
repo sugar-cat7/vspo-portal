@@ -5,8 +5,9 @@ export const discordChannel = z.object({
   rawId: z.string(),
   serverId: z.string(),
   name: z.string(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  languageCode: z.string().optional().default("default"),
+  createdAt: z.string().datetime().optional(),
+  updatedAt: z.string().datetime().optional(),
 });
 
 export const discordChannels = z.array(discordChannel);
@@ -14,8 +15,9 @@ export const discordChannels = z.array(discordChannel);
 export const discordServer = z.object({
   id: z.string(),
   rawId: z.string(),
-  botMessageChannelIds: z.array(z.string()),
   name: z.string(),
+  languageCode: z.string().optional().default("default"),
+  discordChannels: discordChannels,
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });

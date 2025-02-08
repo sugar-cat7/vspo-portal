@@ -1,11 +1,17 @@
-import type { APIEmbed } from "discord-api-types/v10";
+import type {
+  APIChannel,
+  APIEmbed,
+  RESTGetAPIChannelResult,
+} from "discord-api-types/v10";
 import type { CommandHandler, Rest } from "discord-hono";
 import {
   DiscordHono as DHono,
   Rest as DRest,
+  _channels_$,
   _channels_$_messages,
 } from "discord-hono";
 import type { DiscordEnv } from "../../config/env/discord";
+import { type DiscordChannel, discordChannel } from "../../domain";
 import {
   AppError,
   Err,
@@ -14,6 +20,7 @@ import {
   type Result,
   wrap,
 } from "../../pkg/errors";
+import { createUUID } from "../../pkg/uuid";
 
 type SendMessageParams = {
   channelId: string;
@@ -21,8 +28,16 @@ type SendMessageParams = {
   embeds?: APIEmbed[];
 };
 
+type GetChannelInfoParams = {
+  serverId: string;
+  channelId: string;
+};
+
 export interface IDiscordClinet {
   sendMessage(params: SendMessageParams): Promise<Result<void, AppError>>;
+  getChannel(
+    params: GetChannelInfoParams,
+  ): Promise<Result<DiscordChannel, AppError>>;
 }
 
 export class DiscordClinet implements IDiscordClinet {
@@ -67,5 +82,43 @@ export class DiscordClinet implements IDiscordClinet {
     }
 
     return Ok();
+  }
+
+  /**
+   * Get channel information.
+   */
+  async getChannel(
+    params: GetChannelInfoParams,
+  ): Promise<Result<DiscordChannel, AppError>> {
+    const { channelId } = params;
+    // ignore ts
+    //@ts-ignore
+    const { response, result } = await this.rest.get(_channels_$, [channelId]);
+    if (!response.ok) {
+      return Err(
+        new AppError({
+          message: `Failed to fetch channel info for ${channelId}`,
+          code: ErrorCodeSchema.Enum.NOT_FOUND,
+        }),
+      );
+    }
+
+    if (!result) {
+      return Err(
+        new AppError({
+          message: `Channel info for ${channelId} is undefined`,
+          code: ErrorCodeSchema.Enum.NOT_FOUND,
+        }),
+      );
+    }
+    const c = result as unknown as APIChannel;
+    return Ok(
+      discordChannel.parse({
+        id: createUUID(),
+        rawId: c.id,
+        serverId: params.serverId,
+        name: c.name,
+      }),
+    );
   }
 }

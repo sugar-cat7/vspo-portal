@@ -98,6 +98,7 @@ export const discordServerTable = pgTable("discord_server", {
   id: text("id").primaryKey(),
   serverId: text("discord_server_id").notNull().unique(), // Actual guild ID in Discord
   name: text("name").notNull(), // User-customizable server name
+  languageCode: text("lang_code").notNull(), // ISO 639-1 language code or [default]
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -115,11 +116,12 @@ export const discordChannelTable = pgTable(
   "discord_channel",
   {
     id: text("id").primaryKey(),
-    channelId: text("discord_channel_id").notNull(), // Actual channel ID in Discord
+    channelId: text("discord_channel_id").notNull().unique(), // Actual channel ID in Discord
     serverId: text("server_id")
       .notNull()
       .references(() => discordServerTable.serverId, { onDelete: "cascade" }),
     name: text("name").notNull(), // Channel display name for internal management
+    languageCode: text("lang_code").notNull(), // ISO 639-1 language code or [default]
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ApplicationService } from "../../cmd/server/internal/application";
 import { zCommonEnv } from "./common";
 
 export const zDiscordEnv = z

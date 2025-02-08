@@ -1,8 +1,15 @@
 import { DiscordHono } from "discord-hono";
 import type { ApiEnv } from "../../config/env/api";
 import {
+  type DiscordCommandEnv,
   announceCommand,
+  botAddComponent,
+  botRemoveComponent,
+  cancelComponent,
+  langSelectComponent,
+  langSettingComponent,
   spoduleSettingCommand,
+  yesBotRemoveComponent,
 } from "../../infra/discord/command";
 import { newApp } from "../../infra/http/hono/app";
 import { createHandler, withTracer } from "../../infra/http/otel";
@@ -15,9 +22,19 @@ app.get("/health", (c) => {
   return c.text("OK");
 });
 
-const discord = new DiscordHono()
+const discord = new DiscordHono<DiscordCommandEnv>()
+  //setting
   .command(spoduleSettingCommand.name, spoduleSettingCommand.handler)
-  .command(announceCommand.name, announceCommand.handler);
+  .component(botAddComponent.name, botAddComponent.handler)
+  .component(botRemoveComponent.name, botRemoveComponent.handler)
+  .component(yesBotRemoveComponent.name, yesBotRemoveComponent.handler)
+  .component(langSettingComponent.name, langSettingComponent.handler)
+  .component(langSelectComponent.name, langSelectComponent.handler)
+  //announce
+  .command(announceCommand.name, announceCommand.handler)
+  //common
+  .component(cancelComponent.name, cancelComponent.handler);
+
 app.mount("/interaction", discord.fetch);
 
 // app.use(
