@@ -9,7 +9,11 @@ import type { AppError, Result } from "../../pkg/errors";
 import {
   CreatorRepository,
   type DB,
+  DiscordServerRepository,
+  type ICreatorRepository,
+  type IDiscordServerRepository,
   type ITxManager,
+  type IVideoRepository,
   TxManager,
   VideoRepository,
 } from "../repository";
@@ -36,14 +40,16 @@ import { AIService, type IAIService } from "../ai";
 import { DiscordClinet, type IDiscordClinet } from "../discord";
 
 export interface IRepositories {
-  creatorRepository: CreatorRepository;
-  videoRepository: VideoRepository;
+  creatorRepository: ICreatorRepository;
+  videoRepository: IVideoRepository;
+  discordServerRepository: IDiscordServerRepository;
 }
 
 export function createRepositories(tx: DB): IRepositories {
   return {
     creatorRepository: new CreatorRepository(tx),
     videoRepository: new VideoRepository(tx),
+    discordServerRepository: new DiscordServerRepository(tx),
   };
 }
 
@@ -76,6 +82,7 @@ export function createServices(
       aiService,
     }),
     discordService: new DiscordService({
+      discordServerRepository: repos.discordServerRepository,
       discordClient: discordClinet,
     }),
   };

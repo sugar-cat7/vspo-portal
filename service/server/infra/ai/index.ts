@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { z } from "zod";
+import { TargetLangSchema } from "../../domain/translate";
 import {
   AppError,
   Err,
@@ -20,17 +21,6 @@ const languageCodeMapping: Record<string, string> = {
   tw: "Chinese (Traditional)",
   ko: "Korean",
 };
-
-export const TargetLangSchema = z.enum([
-  "en",
-  "ja",
-  "fr",
-  "de",
-  "es",
-  "cn",
-  "tw",
-  "ko",
-]);
 
 const openAIResponseSchema = z.object({
   content: z.string(),

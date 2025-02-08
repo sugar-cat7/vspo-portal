@@ -3,8 +3,8 @@ import {
   type BindingAppWorkerEnv,
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
+import { TargetLangSchema } from "../../../../domain/translate";
 import { AppLogger } from "../../../../pkg/logging";
-import { TargetLangSchema } from "../../../ai";
 
 export const translateVideosWorkflow = () => {
   return {

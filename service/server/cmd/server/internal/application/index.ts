@@ -6,29 +6,31 @@ import {
 import {
   type Creator,
   CreatorsSchema,
+  type DiscordServer,
   type Video,
   VideosSchema,
+  discordServers,
 } from "../../../../domain";
 import { Container } from "../../../../infra/dependency";
 import { createHandler, withTracer } from "../../../../infra/http/otel";
 import { AppLogger } from "../../../../pkg/logging";
 import type {
+  AdjustBotChannelParams,
   BatchDeleteByVideoIdsParam,
   BatchUpsertCreatorsParam,
+  BatchUpsertDiscordServersParam,
   BatchUpsertVideosParam,
   ICreatorInteractor,
+  IDiscordInteractor,
   IVideoInteractor,
   ListByMemberTypeParam,
   ListParam,
   SearchByChannelIdsParam,
   SearchByMemberTypeParam,
+  SendMessageParams,
   TranslateCreatorParam,
   TranslateVideoParam,
 } from "../../../../usecase";
-import type {
-  IDiscordInteractor,
-  SendMessageParams,
-} from "../../../../usecase/discord";
 
 export class VideoService extends RpcTarget {
   #usecase: IVideoInteractor;
@@ -136,6 +138,26 @@ export class DiscordService extends RpcTarget {
   async sendVideosToMultipleChannels(params: SendMessageParams) {
     return this.#usecase.batchSendMessages(params);
   }
+
+  async adjustBotChannel(params: AdjustBotChannelParams) {
+    return this.#usecase.adjustBotChannel(params);
+  }
+
+  async get(serverId: string) {
+    return this.#usecase.get(serverId);
+  }
+
+  async batchUpsertEnqueue(params: BatchUpsertDiscordServersParam) {
+    return this.#queue.sendBatch(
+      params.map((server) => ({
+        body: { ...server, kind: "upsert-discord-server" },
+      })),
+    );
+  }
+
+  async batchDeleteChannelsByRowChannelIds(params: string[]) {
+    return this.#usecase.batchDeleteChannelsByRowChannelIds(params);
+  }
 }
 
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
@@ -168,7 +190,8 @@ type Kind =
   | "upsert-video"
   | "upsert-creator"
   | "translate-creator"
-  | "discord-send-message";
+  | "discord-send-message"
+  | "upsert-discord-server";
 
 type BaseMessageParam<T, K extends Kind> = T & { kind: K };
 
@@ -176,12 +199,21 @@ type TranslateVideo = BaseMessageParam<Video, "translate-video">;
 type TranslateCreator = BaseMessageParam<Creator, "translate-creator">;
 type UpsertVideo = BaseMessageParam<Video, "upsert-video">;
 type UpsertCreator = BaseMessageParam<Creator, "upsert-creator">;
-type DiscordMessage = BaseMessageParam<Video, "discord-send-message">;
+type DiscordSend = BaseMessageParam<Video, "discord-send-message">;
+type UpsertDiscordServer = BaseMessageParam<
+  DiscordServer,
+  "upsert-discord-server"
+>;
 
 type CreatorMessage = TranslateCreator | UpsertCreator;
 type VideoMessage = TranslateVideo | UpsertVideo;
+type DiscordMessage = DiscordSend | UpsertDiscordServer;
 
-type MessageParam = CreatorMessage | VideoMessage | DiscordMessage;
+type MessageParam =
+  | CreatorMessage
+  | VideoMessage
+  | DiscordMessage
+  | UpsertDiscordServer;
 
 export default createHandler({
   queue: async (
@@ -294,6 +326,17 @@ export default createHandler({
         }
         case "discord-send-message": {
           // TODO: Implement
+          break;
+        }
+        case "upsert-discord-server": {
+          const ds = discordServers.safeParse(
+            batch.messages.map((m) => m.body),
+          );
+          if (!ds.success) {
+            logger.error(`Invalid videos: ${ds.error.message}`);
+            return;
+          }
+          await c.discordInteractor.batchUpsert(ds.data);
           break;
         }
         default:
