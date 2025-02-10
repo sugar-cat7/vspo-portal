@@ -8,6 +8,7 @@ import type { BindingWorkflowEnv } from "../../config/env/workflow";
 import { createHandler, withTracer } from "../../infra/http/otel";
 import { searchChannelsWorkflow } from "../../infra/http/workflow/channel/search";
 import { translateCreatorsWorkflow } from "../../infra/http/workflow/channel/trasnlate";
+import { discordSendMessagesWorkflow } from "../../infra/http/workflow/discord/send";
 import { searchVideosWorkflow } from "../../infra/http/workflow/video/search";
 import { translateVideosWorkflow } from "../../infra/http/workflow/video/trasnlate";
 import { createUUID } from "../../pkg/uuid";
@@ -48,6 +49,15 @@ export class TranslateVideosWorkflow extends WorkflowEntrypoint<
   }
 }
 
+export class DiscordSendMessagesWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  Params
+> {
+  async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await discordSendMessagesWorkflow().handler()(this.env, _event, step);
+  }
+}
+
 export default createHandler({
   scheduled: async (
     controller: ScheduledController,
@@ -69,9 +79,10 @@ export default createHandler({
           await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
           break;
 
-        // case "*/2 * * * *":
-        //   await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
-        //   break;
+        case "*/2 * * * *":
+          // await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
+          await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
+          break;
         // case "1 * * * *":
         //   await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
         //   await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });

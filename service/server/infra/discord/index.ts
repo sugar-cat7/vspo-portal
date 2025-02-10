@@ -1,17 +1,16 @@
-import type {
-  APIChannel,
-  APIEmbed,
-  RESTGetAPIChannelResult,
-} from "discord-api-types/v10";
-import type { CommandHandler, Rest } from "discord-hono";
-import {
-  DiscordHono as DHono,
-  Rest as DRest,
-  _channels_$,
-  _channels_$_messages,
-} from "discord-hono";
+import type { RestManager } from "@discordeno/rest";
+import { createRestManager } from "@discordeno/rest";
+import type { DiscordEmbed } from "@discordeno/types";
 import type { DiscordEnv } from "../../config/env/discord";
-import { type DiscordChannel, discordChannel } from "../../domain";
+import {
+  type DiscordChannel,
+  type DiscordMessage,
+  discordChannel,
+  discordMessage,
+  discordMessages,
+  getStatusFromColor,
+} from "../../domain";
+import { getCurrentUTCString } from "../../pkg/dayjs";
 import {
   AppError,
   Err,
@@ -25,7 +24,7 @@ import { createUUID } from "../../pkg/uuid";
 type SendMessageParams = {
   channelId: string;
   content: string;
-  embeds?: APIEmbed[];
+  embeds?: DiscordEmbed[];
 };
 
 type GetChannelInfoParams = {
@@ -33,77 +32,81 @@ type GetChannelInfoParams = {
   channelId: string;
 };
 
-export interface IDiscordClinet {
+type UpdateMessageParams = {
+  channelId: string;
+  messageId: string;
+  content?: string;
+  embeds?: DiscordEmbed[];
+};
+
+type DeleteMessageParams = {
+  channelId: string;
+  messageId: string;
+};
+
+type GetMessageParams = {
+  channelId: string;
+  messageId: string;
+};
+
+export interface IDiscordClient {
   sendMessage(params: SendMessageParams): Promise<Result<void, AppError>>;
   getChannel(
     params: GetChannelInfoParams,
   ): Promise<Result<DiscordChannel, AppError>>;
+  updateMessage(params: UpdateMessageParams): Promise<Result<void, AppError>>;
+  deleteMessage(params: DeleteMessageParams): Promise<Result<void, AppError>>;
+  getLatestBotMessages(
+    channelId: string,
+  ): Promise<Result<DiscordMessage[], AppError>>;
+  getMessage(
+    params: GetMessageParams,
+  ): Promise<Result<DiscordMessage, AppError>>;
 }
 
-export class DiscordClinet implements IDiscordClinet {
-  rest: Rest;
+export class DiscordClient implements IDiscordClient {
+  rest: RestManager;
+  botId: string;
 
   constructor(env: DiscordEnv) {
-    this.rest = new DRest(env.DISCORD_TOKEN);
+    this.rest = createRestManager({
+      token: env.DISCORD_TOKEN,
+    });
+    this.botId = env.DISCORD_APPLICATION_ID;
   }
 
-  /**
-   * Send a message to a channel outside of an interaction context.
-   */
   async sendMessage(
     params: SendMessageParams,
   ): Promise<Result<void, AppError>> {
     const { channelId, content, embeds } = params;
-
-    const response = await this.rest.post(_channels_$_messages, [channelId], {
-      content,
-      embeds,
-    });
-
-    if (!response.ok) {
-      if (response.status === 429) {
-        const retryAfter = response.headers.get("Retry-After");
-        const rateLimit = response.headers.get("X-RateLimit-Limit");
-        const remaining = response.headers.get("X-RateLimit-Remaining");
-        const reset = response.headers.get("X-RateLimit-Reset");
-        return Err(
-          new AppError({
-            message: `Rate limited: ${retryAfter}ms, ${rateLimit} requests, ${remaining} remaining, ${reset} reset`,
-            code: ErrorCodeSchema.Enum.RATE_LIMITED,
-          }),
-        );
-      }
-      return Err(
+    console.log("sendMessage", JSON.stringify(params));
+    const responseResult = await wrap(
+      this.rest.sendMessage(channelId, { content, embeds }),
+      (err: Error) =>
         new AppError({
-          message: `Failed to send message to channel ${channelId}`,
+          message: `Failed to send message to channel ${channelId}: ${err.message}`,
           code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
         }),
-      );
-    }
-
+    );
+    if (responseResult.err) return Err(responseResult.err);
     return Ok();
   }
 
-  /**
-   * Get channel information.
-   */
   async getChannel(
     params: GetChannelInfoParams,
   ): Promise<Result<DiscordChannel, AppError>> {
-    const { channelId } = params;
-    // ignore ts
-    //@ts-ignore
-    const { response, result } = await this.rest.get(_channels_$, [channelId]);
-    if (!response.ok) {
-      return Err(
+    const { channelId, serverId } = params;
+    const responseResult = await wrap(
+      this.rest.getChannel(channelId),
+      (err: Error) =>
         new AppError({
-          message: `Failed to fetch channel info for ${channelId}`,
-          code: ErrorCodeSchema.Enum.NOT_FOUND,
+          message: `Failed to fetch channel info for ${channelId}: ${err.message}`,
+          code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
         }),
-      );
-    }
-
-    if (!result) {
+    );
+    if (responseResult.err) return Err(responseResult.err);
+    const channel = responseResult.val;
+    if (!channel) {
       return Err(
         new AppError({
           message: `Channel info for ${channelId} is undefined`,
@@ -111,13 +114,138 @@ export class DiscordClinet implements IDiscordClinet {
         }),
       );
     }
-    const c = result as unknown as APIChannel;
     return Ok(
       discordChannel.parse({
         id: createUUID(),
-        rawId: c.id,
-        serverId: params.serverId,
-        name: c.name,
+        rawId: channel.id,
+        serverId,
+        name: channel.name,
+      }),
+    );
+  }
+
+  async updateMessage(
+    params: UpdateMessageParams,
+  ): Promise<Result<void, AppError>> {
+    const { channelId, messageId, content, embeds } = params;
+    const responseResult = await wrap(
+      this.rest.editMessage(channelId, messageId, { content, embeds }),
+      (err: Error) =>
+        new AppError({
+          message: `Failed to update message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
+          code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+        }),
+    );
+    if (responseResult.err) return Err(responseResult.err);
+    return Ok();
+  }
+
+  async deleteMessage(
+    params: DeleteMessageParams,
+  ): Promise<Result<void, AppError>> {
+    const { channelId, messageId } = params;
+    const getMsgResult = await wrap(
+      this.rest.getMessage(channelId, messageId),
+      (err: Error) =>
+        new AppError({
+          message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
+          code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+        }),
+    );
+    if (getMsgResult.err) return Err(getMsgResult.err);
+    const message = getMsgResult.val;
+    if (!message.author?.bot || message.author.id !== this.botId) {
+      return Err(
+        new AppError({
+          message: `Message is not sent by bot. channelId=${channelId}, messageId=${messageId}`,
+          code: ErrorCodeSchema.Enum.FORBIDDEN,
+        }),
+      );
+    }
+    const deleteResult = await wrap(
+      this.rest.deleteMessage(channelId, messageId),
+      (err: Error) =>
+        new AppError({
+          message: `Failed to delete message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
+          code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+        }),
+    );
+    if (deleteResult.err) return Err(deleteResult.err);
+    return Ok();
+  }
+
+  async getLatestBotMessages(
+    channelId: string,
+  ): Promise<Result<DiscordMessage[], AppError>> {
+    const query = { limit: 50 };
+    const responseResult = await wrap(
+      this.rest.getMessages(channelId, query),
+      (err: Error) =>
+        new AppError({
+          message: `Failed to fetch messages in channel ${channelId}: ${err.message}`,
+          code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+          cause: err.cause,
+        }),
+    );
+    if (responseResult.err) return Err(responseResult.err);
+    const messages = responseResult.val;
+    const botMessages = messages.filter(
+      (m) => m.author?.bot && m.author.id === this.botId,
+    );
+    return Ok(
+      discordMessages.parse(
+        botMessages.map((m) => ({
+          id: createUUID(),
+          type: "bot",
+          rawId: m.id,
+          channelId,
+          content: m.content ?? "",
+          createdAt: getCurrentUTCString(),
+          updatedAt: getCurrentUTCString(),
+          embedVideos: m.embeds.map((e) => ({
+            identifier: e.url,
+            title: e.title,
+            url: e.url,
+            thumbnail: e.image?.url ?? "",
+            startedAt: e.fields?.[0]?.value ?? "",
+            status: getStatusFromColor(e.color ?? 0),
+          })),
+        })),
+      ),
+    );
+  }
+
+  async getMessage(
+    params: GetMessageParams,
+  ): Promise<Result<DiscordMessage, AppError>> {
+    const { channelId, messageId } = params;
+    const responseResult = await wrap(
+      this.rest.getMessage(channelId, messageId),
+      (err: Error) =>
+        new AppError({
+          message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
+          code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+        }),
+    );
+    if (responseResult.err) return Err(responseResult.err);
+    const message = responseResult.val;
+    return Ok(
+      discordMessage.parse({
+        id: createUUID(),
+        type: "bot",
+        rawId: message.id,
+        channelId,
+        content: message.content ?? "",
+        createdAt: getCurrentUTCString(),
+        updatedAt: getCurrentUTCString(),
+        embedVideos: message.embeds.map((e) => ({
+          identifier: e.url,
+          title: e.title,
+          url: e.url,
+          thumbnail: e.image?.url ?? "",
+          startedAt: e.fields?.[0]?.value ?? "",
+          status: getStatusFromColor(e.color ?? 0),
+        })),
       }),
     );
   }

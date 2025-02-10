@@ -1,4 +1,5 @@
-import { type SQL, and, asc, count, eq, inArray } from "drizzle-orm";
+import { type SQL, and, asc, count, desc, eq, inArray } from "drizzle-orm";
+import { TargetLangSchema } from "../../domain/translate";
 import {
   PlatformSchema,
   StatusSchema,
@@ -39,6 +40,7 @@ type ListQuery = {
   startedAt?: Date;
   endedAt?: Date;
   languageCode: string; // ISO 639-1 language code or [default] explicitly specified to narrow down to 1creator
+  orderBy?: "asc" | "desc";
 };
 
 export interface IVideoRepository {
@@ -102,7 +104,11 @@ export class VideoRepository implements IVideoRepository {
         .where(and(...filters))
         .limit(query.limit)
         .offset(query.page * query.limit)
-        .orderBy(asc(streamStatusTable.startedAt))
+        .orderBy(
+          query.orderBy === "asc" || !query.orderBy
+            ? asc(streamStatusTable.startedAt)
+            : desc(streamStatusTable.startedAt),
+        )
         .execute(),
       (err) =>
         new AppError({
@@ -122,7 +128,9 @@ export class VideoRepository implements IVideoRepository {
           rawId: r.video.rawId,
           rawChannelID: r.video.channelId,
           title: r.video_translation.title,
-          languageCode: r.video_translation.languageCode,
+          languageCode: TargetLangSchema.parse(
+            r.video_translation.languageCode,
+          ),
           description: r.video_translation.description,
           publishedAt: r.video.publishedAt
             ? convertToUTC(r.video.publishedAt)
@@ -318,7 +326,9 @@ export class VideoRepository implements IVideoRepository {
             rawChannelID: r.channelId,
             title: videoTranslation?.title ?? "",
             description: videoTranslation?.description ?? "",
-            languageCode: videoTranslation?.languageCode ?? "default",
+            languageCode: TargetLangSchema.parse(
+              videoTranslation?.languageCode ?? "default",
+            ),
             publishedAt: convertToUTC(r.publishedAt),
             startedAt: streamStatus?.startedAt
               ? convertToUTC(streamStatus.startedAt)

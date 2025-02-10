@@ -1,4 +1,7 @@
+import type { DiscordEmbed } from "@discordeno/types";
+import { EmbedsBuilder } from "@discordeno/utils";
 import { z } from "zod";
+import { StatusSchema, type Video } from "./video";
 
 export const discordChannel = z.object({
   id: z.string(),
@@ -29,6 +32,17 @@ export const discordMessage = z.object({
   type: z.enum(["bot", "admin"]),
   rawId: z.string(),
   channelId: z.string(),
+  content: z.string(),
+  embedVideos: z.array(
+    z.object({
+      identifier: z.string(),
+      title: z.string(),
+      url: z.string(),
+      thumbnail: z.string(),
+      startedAt: z.string(),
+      status: StatusSchema,
+    }),
+  ),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -77,3 +91,22 @@ export const createDiscordMessages = (
 ): DiscordMessages => {
   return discordMessages;
 };
+
+export function createVideoEmbed(video: Video): DiscordEmbed {
+  const embeds = new EmbedsBuilder()
+    .newEmbed()
+    .setTitle(video.title, video.link)
+    .setColor(video.statusColor)
+    .addField("配信日時/Streaming Date", video.formattedStartedAt, true)
+    .setImage(video.thumbnailURL)
+    .setAuthor(video.creatorName || "test", {
+      icon_url: video.creatorThumbnailURL || "",
+    })
+    .setFooter(`${video.platform} Powered by Spodule`, {
+      icon_url: video.platformIconURL,
+    });
+
+  embeds.validate();
+
+  return embeds[0];
+}
