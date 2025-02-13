@@ -29,3 +29,6 @@ ENVIRONMENT = "production"
 LOG_TYPE = "json"
 LOG_MINLEVEL = "1"
 LOG_HIDE_POSITION = "true"
+
+[observability]
+enabled = true
