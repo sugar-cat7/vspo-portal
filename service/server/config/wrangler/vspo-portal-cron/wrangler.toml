@@ -14,7 +14,7 @@ service = "vspo-portal-app"
 entrypoint = "ApplicationService"
 
 [triggers]
-crons = [ "0 0 * * *" ]
+crons = [ "0 0,8,16 * * *", "0 0,7,18 * * *", "0 0,9,17 * * *", "*/30 * * * *" ]
 
 [[workflows]]
 name = "search-videos-workflow"

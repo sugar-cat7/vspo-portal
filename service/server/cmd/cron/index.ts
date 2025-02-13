@@ -79,8 +79,8 @@ export default createHandler({
           await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
           break;
 
-        case "*/2 * * * *":
-          // await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
+        case "*/30 * * * *":
+          await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
           await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
           break;
         // case "1 * * * *":
