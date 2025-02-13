@@ -122,7 +122,6 @@ export const botAddComponent: IDiscordComponentDefinition<DiscordCommandEnv> = {
     }
 
     await u.batchUpsertEnqueue([r.val]);
-    await u.deleteAllMessagesInChannel(c.interaction.channel.id);
 
     return c.resUpdate({
       content: MESSAGES.BOT_ADD_SUCCESS(c.interaction.channel.name ?? ""),
@@ -248,7 +247,6 @@ export const langSelectComponent: IDiscordComponentDefinition<DiscordCommandEnv>
         }
 
         await u.batchUpsertEnqueue([r.val]);
-        await u.deleteAllMessagesInChannel(c.interaction.channel.id);
         return c.resUpdate({
           content: MESSAGES.LANG_SELECT_SUCCESS(
             LangCodeLabelMapping[selectedValue],
