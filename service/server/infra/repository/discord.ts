@@ -16,6 +16,7 @@ import { buildConflictUpdateColumns } from "./helper";
 import {
   type SelectDiscordChannel,
   createInsertDiscordServer,
+  discordBotMessageTable,
   discordChannelTable,
   discordServerTable,
 } from "./schema";
@@ -50,6 +51,10 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         .innerJoin(
           discordChannelTable,
           eq(discordServerTable.serverId, discordChannelTable.serverId),
+        )
+        .leftJoin(
+          discordBotMessageTable,
+          eq(discordChannelTable.channelId, discordBotMessageTable.channelId),
         )
         // .where(and(...filters))
         .limit(query.limit)
@@ -246,6 +251,10 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         .innerJoin(
           discordChannelTable,
           eq(discordServerTable.serverId, discordChannelTable.serverId),
+        )
+        .leftJoin(
+          discordBotMessageTable,
+          eq(discordChannelTable.channelId, discordBotMessageTable.channelId),
         )
         .where(eq(discordServerTable.serverId, query.serverId))
         .execute(),

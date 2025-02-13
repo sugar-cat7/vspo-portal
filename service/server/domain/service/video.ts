@@ -20,6 +20,7 @@ import {
   type OkResult,
   type Result,
 } from "../../pkg/errors";
+import { TargetLangSchema } from "../translate";
 
 export interface IVideoService {
   searchLiveYoutubeVideos(): Promise<Result<Videos, AppError>>;
@@ -67,7 +68,10 @@ export class VideoService implements IVideoService {
         eventType: "live",
       }),
       // this.deps.youtubeClient.searchVideos({ query: query.VSPO_EN, eventType: "live" }),
-      // this.deps.youtubeClient.searchVideos({ query: query.VSPO_JP, eventType: "upcoming" }),
+      this.deps.youtubeClient.searchVideos({
+        query: query.VSPO_JP,
+        eventType: "upcoming",
+      }),
       // this.deps.youtubeClient.searchVideos({ query: query.VSPO_EN, eventType: "upcoming" }),
     ];
 
@@ -294,7 +298,11 @@ export class VideoService implements IVideoService {
         translatedResults[i].status === "fulfilled"
           ? (translatedResults[i].value.val?.translatedText ?? video.title)
           : video.title;
-      return { ...video, title: translatedText, languageCode: languageCode };
+      return {
+        ...video,
+        title: translatedText,
+        languageCode: TargetLangSchema.parse(languageCode),
+      };
     });
 
     return Ok(translatedVideos);

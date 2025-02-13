@@ -11,6 +11,7 @@ import {
   VideosSchema,
   discordServers,
 } from "../../../../domain";
+import { TargetLangSchema } from "../../../../domain/translate";
 import { Container } from "../../../../infra/dependency";
 import { createHandler, withTracer } from "../../../../infra/http/otel";
 import { AppLogger } from "../../../../pkg/logging";
@@ -24,6 +25,7 @@ import type {
   IDiscordInteractor,
   IVideoInteractor,
   ListByMemberTypeParam,
+  ListDiscordServerParam,
   ListParam,
   SearchByChannelIdsParam,
   SearchByMemberTypeParam,
@@ -76,7 +78,7 @@ export class VideoService extends RpcTarget {
       params.videos.map((video) => ({
         body: {
           ...video,
-          languageCode: params.languageCode,
+          languageCode: TargetLangSchema.parse(params.languageCode),
           kind: "translate-video",
         },
       })),
@@ -157,6 +159,14 @@ export class DiscordService extends RpcTarget {
 
   async batchDeleteChannelsByRowChannelIds(params: string[]) {
     return this.#usecase.batchDeleteChannelsByRowChannelIds(params);
+  }
+
+  async list(params: ListDiscordServerParam) {
+    return this.#usecase.list(params);
+  }
+
+  async deleteAllMessagesInChannel(channelId: string) {
+    return this.#usecase.deleteAllMessagesInChannel(channelId);
   }
 }
 

@@ -1,11 +1,11 @@
 import type { DiscordServer, DiscordServers, Videos } from "../domain";
+import { type Page, createPage } from "../domain/pagination";
 import type { IAppContext } from "../infra/dependency";
 import { type AppError, Ok, type Result } from "../pkg/errors";
 
 export type SendMessageParams = {
   channelIds: string[];
-  content: string;
-  videos: Videos;
+  channelLangaugeCode: string;
 };
 
 export type AdjustBotChannelParams = {
@@ -16,18 +16,30 @@ export type AdjustBotChannelParams = {
   channelLangaugeCode?: string;
 };
 
-export type RetryErrorChannelId = string;
+export type ListDiscordServerParam = {
+  limit: number;
+  page: number;
+};
+
+export type ListDiscordServerResponse = {
+  discordServers: DiscordServers;
+  pagination: Page;
+};
 
 export type BatchUpsertDiscordServersParam = DiscordServers;
 
 export interface IDiscordInteractor {
-  batchSendMessages(
-    params: SendMessageParams,
-  ): Promise<Result<RetryErrorChannelId[], AppError>>;
+  batchSendMessages(params: SendMessageParams): Promise<Result<void, AppError>>;
   adjustBotChannel(
     params: AdjustBotChannelParams,
   ): Promise<Result<DiscordServer, AppError>>;
   get(serverId: string): Promise<Result<DiscordServer, AppError>>;
+  list(
+    params: ListDiscordServerParam,
+  ): Promise<Result<ListDiscordServerResponse, AppError>>;
+  deleteAllMessagesInChannel(
+    channelId: string,
+  ): Promise<Result<void, AppError>>;
   batchUpsert(
     params: BatchUpsertDiscordServersParam,
   ): Promise<Result<DiscordServers, AppError>>;
@@ -38,6 +50,30 @@ export interface IDiscordInteractor {
 
 export class DiscordInteractor implements IDiscordInteractor {
   constructor(private readonly context: IAppContext) {}
+
+  async list(
+    params: ListDiscordServerParam,
+  ): Promise<Result<ListDiscordServerResponse, AppError>> {
+    return this.context.runInTx(async (repos, _services) => {
+      const sv = await repos.discordServerRepository.list(params);
+      if (sv.err) {
+        return sv;
+      }
+
+      const count = await repos.discordServerRepository.count(params);
+      if (count.err) {
+        return count;
+      }
+      return Ok({
+        discordServers: sv.val,
+        pagination: createPage({
+          currentPage: params.page,
+          limit: params.limit,
+          totalCount: count.val,
+        }),
+      });
+    });
+  }
 
   async get(serverId: string): Promise<Result<DiscordServer, AppError>> {
     return this.context.runInTx(async (repos, _services) => {
@@ -51,14 +87,28 @@ export class DiscordInteractor implements IDiscordInteractor {
 
   async batchSendMessages(
     params: SendMessageParams,
-  ): Promise<Result<RetryErrorChannelId[], AppError>> {
+  ): Promise<Result<void, AppError>> {
+    return this.context.runInTx(async (_repos, services) => {
+      const v = await services.discordService.sendMessagesToChannel(params);
+
+      if (v.err) {
+        return v;
+      }
+
+      return Ok();
+    });
+  }
+
+  async deleteAllMessagesInChannel(
+    channelId: string,
+  ): Promise<Result<void, AppError>> {
     return this.context.runInTx(async (_repos, services) => {
       const sv =
-        await services.discordService.sendVideosToMultipleChannels(params);
+        await services.discordService.deleteAllMessagesInChannel(channelId);
       if (sv.err) {
         return sv;
       }
-      return sv;
+      return Ok();
     });
   }
 
