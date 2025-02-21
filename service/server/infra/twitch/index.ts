@@ -1,8 +1,7 @@
-import { ApiClient } from "@twurple/api";
-import { AppTokenAuthProvider } from "@twurple/auth";
 import { type Videos, createVideo, createVideos } from "../../domain/video";
 import { convertToUTC } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
+import type { paths } from "./twitch-api.generated";
 
 type TwitchServiceConfig = {
   clientId: string;
@@ -20,53 +19,144 @@ export interface ITwitchService {
 }
 
 export class TwitchService implements ITwitchService {
-  private apiClient: ApiClient;
+  private baseUrl = "https://api.twitch.tv/helix";
+  private accessToken: string | null = null;
 
-  constructor(config: TwitchServiceConfig) {
-    const authProvider = new AppTokenAuthProvider(
-      config.clientId,
-      config.clientSecret,
+  constructor(private config: TwitchServiceConfig) {}
+
+  private async getAccessToken(): Promise<Result<string, AppError>> {
+    if (this.accessToken) return Ok(this.accessToken);
+
+    const result = await wrap(
+      fetch(
+        `https://id.twitch.tv/oauth2/token?client_id=${this.config.clientId}&client_secret=${this.config.clientSecret}&grant_type=client_credentials`,
+        {
+          method: "POST",
+        },
+      ),
+      (err) =>
+        new AppError({
+          message: `Failed to get access token: ${err.message}`,
+          code: "INTERNAL_SERVER_ERROR",
+        }),
     );
-    this.apiClient = new ApiClient({ authProvider });
+
+    if (result.err) return Err(result.err);
+    if (!result.val.ok) {
+      const data = (await result.val.json()) as {
+        error?: string;
+        error_description?: string;
+      };
+      return Err(
+        new AppError({
+          message: `Twitch API error: ${data.error || ""}`,
+          code: "INTERNAL_SERVER_ERROR",
+        }),
+      );
+    }
+
+    const data = await wrap(
+      result.val.json() as Promise<{ access_token: string }>,
+      (err) =>
+        new AppError({
+          message: `Failed to parse access token response: ${err.message}`,
+          code: "INTERNAL_SERVER_ERROR",
+        }),
+    );
+
+    if (data.err) return Err(data.err);
+    this.accessToken = data.val.access_token;
+    return Ok(data.val.access_token);
+  }
+
+  private async fetchFromTwitch<T>(
+    endpoint: string,
+    params: Record<string, string | string[]>,
+  ): Promise<Result<T, AppError>> {
+    const tokenResult = await this.getAccessToken();
+    if (tokenResult.err) return Err(tokenResult.err);
+
+    const queryParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (Array.isArray(value)) {
+        for (const v of value) {
+          queryParams.append(key, v);
+        }
+      } else {
+        queryParams.append(key, value);
+      }
+    }
+
+    const result = await wrap(
+      fetch(`${this.baseUrl}${endpoint}?${queryParams.toString()}`, {
+        headers: {
+          "Client-ID": this.config.clientId,
+          Authorization: `Bearer ${tokenResult.val}`,
+        },
+      }),
+      (err) =>
+        new AppError({
+          message: `Network error: ${err.message}`,
+          code: "INTERNAL_SERVER_ERROR",
+        }),
+    );
+
+    if (result.err) return Err(result.err);
+    if (!result.val.ok) {
+      const data = (await result.val.json()) as {
+        error?: string;
+        error_description?: string;
+      };
+      return Err(
+        new AppError({
+          message: `Twitch API error: ${data.error || ""}`,
+          code: "INTERNAL_SERVER_ERROR",
+        }),
+      );
+    }
+
+    const data = await wrap(
+      result.val.json() as Promise<T>,
+      (err) =>
+        new AppError({
+          message: `Failed to parse response: ${err.message}`,
+          code: "INTERNAL_SERVER_ERROR",
+        }),
+    );
+
+    if (data.err) return Err(data.err);
+    return Ok(data.val);
   }
 
   async getStreams(
     params: GetStreamsParams,
   ): Promise<Result<Videos, AppError>> {
-    const streamsResult = await wrap(
-      this.apiClient.streams.getStreams({ userId: "858359149" }),
-      (err) =>
-        new AppError({
-          message: `Network error while fetching streams: ${err.message}`,
-          code: "INTERNAL_SERVER_ERROR",
-        }),
-    );
-    if (streamsResult.err) {
-      return Err(streamsResult.err);
-    }
-    const streams = streamsResult.val;
-    if (!streams.data) {
-      return Ok(createVideos([]));
-    }
+    type StreamsResponse =
+      paths["/streams"]["get"]["responses"]["200"]["content"]["application/json"];
+    const result = await this.fetchFromTwitch<StreamsResponse>("/streams", {
+      user_id: params.userIds,
+    });
+
+    if (result.err) return Err(result.err);
 
     return Ok(
       createVideos(
-        streams.data.map((video) =>
+        result.val.data.map((stream) =>
           createVideo({
             id: "",
-            rawId: video.id,
-            rawChannelID: video.userId,
+            rawId: stream.id,
+            rawChannelID: stream.user_id,
             languageCode: "default",
-            title: video.title,
-            description: video.title,
-            publishedAt: convertToUTC(video.startDate),
-            startedAt: convertToUTC(video.startDate),
+            title: stream.title,
+            description: stream.title,
+            publishedAt: convertToUTC(stream.started_at),
+            startedAt: convertToUTC(stream.started_at),
             endedAt: null,
             platform: "twitch",
             status: "live",
-            tags: video.tags,
-            viewCount: video.viewers,
-            thumbnailURL: video.thumbnailUrl,
+            tags: stream.tags,
+            viewCount: stream.viewer_count,
+            thumbnailURL: stream.thumbnail_url,
             videoType: "vspo_stream",
           }),
         ),
@@ -77,38 +167,32 @@ export class TwitchService implements ITwitchService {
   async getVideosByIDs(
     params: GetVideosByIDsParams,
   ): Promise<Result<Videos, AppError>> {
-    const videosResult = await wrap(
-      this.apiClient.videos.getVideosByIds(params.videoIds),
-      (err) =>
-        new AppError({
-          message: `Network error while fetching videos by IDs: ${err.message}`,
-          code: "INTERNAL_SERVER_ERROR",
-        }),
-    );
+    type VideosResponse =
+      paths["/videos"]["get"]["responses"]["200"]["content"]["application/json"];
+    const result = await this.fetchFromTwitch<VideosResponse>("/videos", {
+      id: params.videoIds.join(","),
+    });
 
-    if (videosResult.err) {
-      return Err(videosResult.err);
-    }
+    if (result.err) return Err(result.err);
 
-    const videos = videosResult.val;
     return Ok(
       createVideos(
-        videos.map((video) =>
+        result.val.data.map((video) =>
           createVideo({
             id: "",
             rawId: video.id,
-            rawChannelID: video.userId,
+            rawChannelID: video.user_id,
             languageCode: "default",
             title: video.title,
             description: video.description,
-            publishedAt: convertToUTC(video.publishDate),
-            startedAt: convertToUTC(video.creationDate),
+            publishedAt: convertToUTC(video.published_at),
+            startedAt: convertToUTC(video.created_at),
             endedAt: null,
             platform: "twitch",
             status: "ended",
             tags: [],
             viewCount: 0,
-            thumbnailURL: video.thumbnailUrl,
+            thumbnailURL: video.thumbnail_url,
             videoType: "vspo_stream",
           }),
         ),

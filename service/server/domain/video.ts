@@ -157,6 +157,8 @@ export {
   type Video,
   type Videos,
   type Platform,
+  type VideoInput,
+  type VideosInput,
   createVideo,
   createVideos,
 };

@@ -79,7 +79,6 @@ export class DiscordClient implements IDiscordClient {
     params: SendMessageParams,
   ): Promise<Result<void, AppError>> {
     const { channelId, content, embeds } = params;
-    console.log("sendMessage", JSON.stringify(params));
     const responseResult = await wrap(
       this.rest.sendMessage(channelId, { content, embeds }),
       (err: Error) =>

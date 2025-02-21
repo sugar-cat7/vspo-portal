@@ -186,20 +186,30 @@ export class CreatorRepository implements ICreatorRepository {
     const dbChannels: InsertChannel[] = [];
 
     for (const c of creators) {
-      dbCreatorss.push({
-        id: c.id,
-        memberType: c.memberType,
-        representativeThumbnailUrl: c.thumbnailURL,
-        updatedAt: getCurrentUTCDate(),
-      });
+      if (!dbCreatorss.some((creator) => creator.id === c.id)) {
+        dbCreatorss.push({
+          id: c.id,
+          memberType: c.memberType,
+          representativeThumbnailUrl: c.thumbnailURL,
+          updatedAt: getCurrentUTCDate(),
+        });
+      }
 
-      dbCreatorTranslations.push({
-        id: c.id,
-        creatorId: c.id,
-        languageCode: c.languageCode,
-        name: c.name,
-        updatedAt: getCurrentUTCDate(),
-      });
+      if (
+        !dbCreatorTranslations.some(
+          (translation) =>
+            translation.creatorId === c.id &&
+            translation.languageCode === c.languageCode,
+        )
+      ) {
+        dbCreatorTranslations.push({
+          id: c.id,
+          creatorId: c.id,
+          languageCode: c.languageCode,
+          name: c.name,
+          updatedAt: getCurrentUTCDate(),
+        });
+      }
 
       if (!c.channel) {
         continue;
@@ -209,19 +219,21 @@ export class CreatorRepository implements ICreatorRepository {
       if (!d.detail) {
         continue;
       }
-      dbChannels.push({
-        id: c.channel.id,
-        platformChannelId: d.detail.rawId,
-        creatorId: c.id,
-        platformType: d.platform,
-        title: d.detail.name,
-        description: d.detail.description ?? "",
-        thumbnailUrl: d.detail.thumbnailURL,
-        publishedAt: d.detail?.publishedAt
-          ? convertToUTCDate(d.detail.publishedAt)
-          : getCurrentUTCDate(),
-        subscriberCount: d.detail.subscriberCount ?? 0,
-      });
+      if (!d.detail.rawId) {
+        dbChannels.push({
+          id: c.channel.id,
+          platformChannelId: d.detail.rawId,
+          creatorId: c.id,
+          platformType: d.platform,
+          title: d.detail.name,
+          description: d.detail.description ?? "",
+          thumbnailUrl: d.detail.thumbnailURL,
+          publishedAt: d.detail?.publishedAt
+            ? convertToUTCDate(d.detail.publishedAt)
+            : getCurrentUTCDate(),
+          subscriberCount: d.detail.subscriberCount ?? 0,
+        });
+      }
     }
 
     const creatorResult = await wrap(

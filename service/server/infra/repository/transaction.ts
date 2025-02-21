@@ -28,7 +28,7 @@ export interface ITxManager {
   ): Promise<Result<T, E>>;
 }
 
-const defaultConfig: PgTransactionConfig = {
+export const defaultConfig: PgTransactionConfig = {
   isolationLevel: "read committed",
   accessMode: "read write",
   deferrable: false,
