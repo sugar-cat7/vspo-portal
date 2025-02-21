@@ -67,12 +67,18 @@ export class VideoService implements IVideoService {
         query: query.VSPO_JP,
         eventType: "live",
       }),
-      // this.deps.youtubeClient.searchVideos({ query: query.VSPO_EN, eventType: "live" }),
+      this.deps.youtubeClient.searchVideos({
+        query: query.VSPO_EN,
+        eventType: "live",
+      }),
       this.deps.youtubeClient.searchVideos({
         query: query.VSPO_JP,
         eventType: "upcoming",
       }),
-      // this.deps.youtubeClient.searchVideos({ query: query.VSPO_EN, eventType: "upcoming" }),
+      this.deps.youtubeClient.searchVideos({
+        query: query.VSPO_EN,
+        eventType: "upcoming",
+      }),
     ];
 
     const results = await Promise.allSettled(promises);
@@ -98,15 +104,19 @@ export class VideoService implements IVideoService {
       .concat(c.val.en.map((c) => c.channel?.youtube?.rawId))
       .filter((id) => id !== undefined);
 
-    const videoIds = videos
-      .map((v) => {
-        const channelId = v.rawChannelID;
-        if (channelIds.includes(channelId)) {
-          return v.rawId;
-        }
-        return null;
-      })
-      .filter((id) => id !== null);
+    const videoIds = Array.from(
+      new Set(
+        videos
+          .map((v) => {
+            const channelId = v.rawChannelID;
+            if (channelIds.includes(channelId)) {
+              return v.rawId;
+            }
+            return null;
+          })
+          .filter((id) => id !== null),
+      ),
+    );
 
     const fetchedVideos = await this.getVideosByIDs({
       youtubeVideoIds: videoIds,
@@ -128,14 +138,12 @@ export class VideoService implements IVideoService {
       .map((c) => c.channel?.twitch?.rawId)
       .concat(c.val.en.map((c) => c.channel?.twitch?.rawId))
       .filter((id) => id !== undefined);
-
     const result = await this.deps.twitchClient.getStreams({
       userIds: userIds,
     });
     if (result.err) {
       return result;
     }
-
     return Ok(result.val);
   }
 

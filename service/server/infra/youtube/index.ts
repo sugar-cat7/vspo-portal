@@ -19,14 +19,14 @@ export const query = {
   VSPO_EN_CLIP: "vspo clips",
 } as const;
 
-type QueryKeys = (typeof query)[keyof typeof query];
+export type QueryKeys = (typeof query)[keyof typeof query];
 
-type SearchVideosParams = {
+export type SearchVideosParams = {
   query: QueryKeys;
   eventType: "completed" | "live" | "upcoming";
 };
 
-type GetChannelsParams = {
+export type GetChannelsParams = {
   channelIds: string[];
 };
 
@@ -68,7 +68,7 @@ export class YoutubeService implements IYoutubeService {
       const response = responseResult.val;
       videos.push(...(response.data.items || []));
     }
-
+    console.log("videos", JSON.stringify(videos, null, 2));
     return Ok(
       createVideos(
         videos.map((video) =>
@@ -80,11 +80,21 @@ export class YoutubeService implements IYoutubeService {
             languageCode: "default",
             description: video.snippet?.description || "",
             publishedAt: video.snippet?.publishedAt || getCurrentUTCString(),
-            startedAt: video.liveStreamingDetails?.actualStartTime || null,
-            endedAt: video.liveStreamingDetails?.actualEndTime || null,
+            startedAt:
+              video.liveStreamingDetails?.actualStartTime ||
+              video.liveStreamingDetails?.scheduledStartTime ||
+              null,
+            endedAt:
+              video.liveStreamingDetails?.actualEndTime ||
+              video.liveStreamingDetails?.scheduledEndTime ||
+              null,
             platform: "youtube",
             status:
-              video.snippet?.liveBroadcastContent === "live" ? "live" : "ended",
+              video.snippet?.liveBroadcastContent === "live"
+                ? "live"
+                : video.snippet?.liveBroadcastContent === "upcoming"
+                  ? "upcoming"
+                  : "ended",
             tags: video.snippet?.tags || [],
             viewCount: Number.parseInt(video.statistics?.viewCount || "0", 10),
             thumbnailURL:

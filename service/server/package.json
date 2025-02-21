@@ -19,7 +19,7 @@
     "biome:check:write": "pnpm biome check --write ./**/**",
     "tsc": "tsc --noEmit",
     "ci": "nx run vspo-portal-server:ci",
-    "test": "nx test vspo-portal-server",
+    "test": "vitest --mode test",
     "register": "node --env-file=.env.local cmd/discord/interaction/register.ts"
   },
   "dependencies": {
@@ -54,6 +54,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@cloudflare/workers-types": "^4.20250204.0",
+    "@testcontainers/postgresql": "^10.18.0",
     "@types/pg": "^8.11.11",
     "@types/uuid": "^10.0.0",
     "discord-api-types": "^0.37.119",
@@ -61,7 +62,10 @@
     "drizzle-seed": "^0.3.1",
     "miniflare": "3.20240821.1",
     "nx": "20.3.2",
+    "testcontainers": "^10.18.0",
     "typescript": "^5.7.3",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.5",
     "wrangler": "^3.107.3"
   },
   "nx": {}

@@ -2,11 +2,11 @@ import { type Videos, createVideo, createVideos } from "../../domain/video";
 import { convertToUTC } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
 
-type TwitcastingUser = {
+export type TwitcastingUser = {
   id: string;
 };
 
-type TwitcastingMovie = {
+export type TwitcastingMovie = {
   id: string;
   title: string;
   is_live: boolean;
@@ -24,7 +24,7 @@ type GetVideosParams = {
   userIds: string[];
 };
 
-type TwitCastingVideo = {
+export type TwitCastingVideo = {
   id: string;
   userId: string;
   title: string;
@@ -82,7 +82,6 @@ export class TwitcastingService implements ITwitcastingService {
       if (result.err) {
         return Err(result.err);
       }
-      // Result が Ok の場合、TwitCastingVideo[] が入っている
       allVideos = createVideos([
         ...allVideos,
         ...result.val.map((video) => this.createVideoModel(video)),
@@ -122,7 +121,7 @@ export class TwitcastingService implements ITwitcastingService {
     if (!response.ok) {
       return Err(
         new AppError({
-          message: `Failed to fetch videos for user ${userId}: ${response.status} ${response.statusText}`,
+          message: `Failed to fetch videos for user ${userId}: ${response.status} ${response.statusText || "Unauthorized"}`,
           code: "INTERNAL_SERVER_ERROR",
         }),
       );
@@ -169,6 +168,9 @@ export class TwitcastingService implements ITwitcastingService {
   }
 
   private createVideoModel(video: TwitCastingVideo) {
+    // Convert UNIX timestamp to ISO string
+    const startedAt = new Date(video.startedAt * 1000).toISOString();
+
     return createVideo({
       id: "",
       rawId: video.id,
@@ -176,8 +178,8 @@ export class TwitcastingService implements ITwitcastingService {
       languageCode: "default",
       title: video.title,
       description: video.title,
-      publishedAt: convertToUTC(video.startedAt),
-      startedAt: convertToUTC(video.startedAt),
+      publishedAt: startedAt,
+      startedAt: startedAt,
       endedAt: null,
       platform: "twitcasting",
       status: video.isLive ? "live" : "ended",

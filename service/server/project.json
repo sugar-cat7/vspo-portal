@@ -18,7 +18,8 @@
           "commands": [
             "pnpm tsc",
             "pnpm run biome:check",
-            "nx run vspo-portal-server:build-dryrun"
+            "nx run vspo-portal-server:build-dryrun",
+            "pnpm test"
           ],
           "parallel": false
         }

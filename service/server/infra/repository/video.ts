@@ -194,39 +194,54 @@ export class VideoRepository implements IVideoRepository {
 
     for (const v of videos) {
       const videoId = v.id || createUUID();
-      dbVideos.push(
-        createInsertVideo({
-          id: videoId,
-          rawId: v.rawId,
-          channelId: v.rawChannelID,
-          platformType: v.platform,
-          videoType: v.videoType,
-          publishedAt: convertToUTCDate(v.publishedAt),
-          tags: v.tags.join(","),
-          thumbnailUrl: v.thumbnailURL,
-        }),
-      );
+      const existingVideo = dbVideos.find((video) => video.rawId === v.rawId);
+      if (!existingVideo) {
+        dbVideos.push(
+          createInsertVideo({
+            id: videoId,
+            rawId: v.rawId,
+            channelId: v.rawChannelID,
+            platformType: v.platform,
+            videoType: v.videoType,
+            publishedAt: convertToUTCDate(v.publishedAt),
+            tags: v.tags.join(","),
+            thumbnailUrl: v.thumbnailURL,
+          }),
+        );
+      }
 
-      dbStreamStatus.push(
-        createInsertStreamStatus({
+      const existingStreamStatus = dbStreamStatus.find(
+        (status) => status.videoId === v.rawId,
+      );
+      if (!existingStreamStatus) {
+        dbStreamStatus.push(
+          createInsertStreamStatus({
+            id: createUUID(),
+            videoId: v.rawId,
+            status: v.status,
+            startedAt: v.startedAt ? convertToUTCDate(v.startedAt) : null,
+            endedAt: v.endedAt ? convertToUTCDate(v.endedAt) : null,
+            viewCount: v.viewCount,
+            updatedAt: getCurrentUTCDate(),
+          }),
+        );
+      }
+
+      const existingTranslation = dbVideoTranslation.find(
+        (translation) =>
+          translation.videoId === v.rawId &&
+          translation.languageCode === v.languageCode,
+      );
+      if (!existingTranslation) {
+        dbVideoTranslation.push({
           id: createUUID(),
           videoId: v.rawId,
-          status: v.status,
-          startedAt: v.startedAt ? convertToUTCDate(v.startedAt) : null,
-          endedAt: v.endedAt ? convertToUTCDate(v.endedAt) : null,
-          viewCount: v.viewCount,
+          languageCode: v.languageCode,
+          title: v.title,
+          description: v.description,
           updatedAt: getCurrentUTCDate(),
-        }),
-      );
-
-      dbVideoTranslation.push({
-        id: createUUID(),
-        videoId: v.rawId,
-        languageCode: v.languageCode,
-        title: v.title,
-        description: v.description,
-        updatedAt: getCurrentUTCDate(),
-      });
+        });
+      }
     }
 
     const videoResult = await wrap(
