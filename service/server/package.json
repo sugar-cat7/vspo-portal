@@ -40,7 +40,7 @@
     "ai": "^3.4.33",
     "dayjs": "^1.11.13",
     "discord-hono": "^0.16.2",
-    "drizzle-orm": "^0.36.4",
+    "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.5.1",
     "googleapis": "^144.0.0",
     "hono": "^4.7.2",

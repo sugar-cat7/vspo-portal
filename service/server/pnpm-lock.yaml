@@ -60,11 +60,11 @@ importers:
         specifier: ^0.16.2
         version: 0.16.2
       drizzle-orm:
-        specifier: ^0.36.4
-        version: 0.36.4(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)(react@18.3.1)
+        specifier: ^0.39.3
+        version: 0.39.3(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)
       drizzle-zod:
         specifier: ^0.5.1
-        version: 0.5.1(drizzle-orm@0.36.4(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)(react@18.3.1))(zod@3.24.2)
+        version: 0.5.1(drizzle-orm@0.39.3(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5))(zod@3.24.2)
       googleapis:
         specifier: ^144.0.0
         version: 144.0.0
@@ -116,7 +116,7 @@ importers:
         version: 0.27.2
       drizzle-seed:
         specifier: ^0.3.1
-        version: 0.3.1(drizzle-orm@0.36.4(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)(react@18.3.1))
+        version: 0.3.1(drizzle-orm@0.39.3(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5))
       miniflare:
         specifier: 3.20240821.1
         version: 3.20240821.1
@@ -2078,11 +2078,11 @@ packages:
     resolution: {integrity: sha512-F6cFZ1wxa9XzFyeeQsp/0/lIzUbDuQjS8/njpYBDWa+wdWmXuY+Z/X2hHFK/9PGHZkv3c9mER+mVWfKlp/B6Vw==}
     hasBin: true
 
-  drizzle-orm@0.36.4:
-    resolution: {integrity: sha512-1OZY3PXD7BR00Gl61UUOFihslDldfH4NFRH2MbP54Yxi0G/PKn4HfO65JYZ7c16DeP3SpM3Aw+VXVG9j6CRSXA==}
+  drizzle-orm@0.39.3:
+    resolution: {integrity: sha512-EZ8ZpYvDIvKU9C56JYLOmUskazhad+uXZCTCRN4OnRMsL+xAJ05dv1eCpAG5xzhsm1hqiuC5kAZUCS924u2DTw==}
     peerDependencies:
       '@aws-sdk/client-rds-data': '>=3'
-      '@cloudflare/workers-types': '>=3'
+      '@cloudflare/workers-types': '>=4'
       '@electric-sql/pglite': '>=0.2.0'
       '@libsql/client': '>=0.10.0'
       '@libsql/client-wasm': '>=0.10.0'
@@ -2094,7 +2094,6 @@ packages:
       '@tidbcloud/serverless': '*'
       '@types/better-sqlite3': '*'
       '@types/pg': '*'
-      '@types/react': '>=18'
       '@types/sql.js': '*'
       '@vercel/postgres': '>=0.8.0'
       '@xata.io/client': '*'
@@ -2107,7 +2106,6 @@ packages:
       pg: '>=8'
       postgres: '>=3'
       prisma: '*'
-      react: '>=18'
       sql.js: '>=1'
       sqlite3: '>=5'
     peerDependenciesMeta:
@@ -2137,8 +2135,6 @@ packages:
         optional: true
       '@types/pg':
         optional: true
-      '@types/react':
-        optional: true
       '@types/sql.js':
         optional: true
       '@vercel/postgres':
@@ -2162,8 +2158,6 @@ packages:
       postgres:
         optional: true
       prisma:
-        optional: true
-      react:
         optional: true
       sql.js:
         optional: true
@@ -5221,7 +5215,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.36.4(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)(react@18.3.1):
+  drizzle-orm@0.39.3(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5):
     optionalDependencies:
       '@cloudflare/workers-types': 4.20250214.0
       '@neondatabase/serverless': 0.10.4
@@ -5231,17 +5225,16 @@ snapshots:
       bun-types: 1.1.34
       pg: 8.13.3
       postgres: 3.4.5
-      react: 18.3.1
 
-  drizzle-seed@0.3.1(drizzle-orm@0.36.4(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)(react@18.3.1)):
+  drizzle-seed@0.3.1(drizzle-orm@0.39.3(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)):
     dependencies:
       pure-rand: 6.1.0
     optionalDependencies:
-      drizzle-orm: 0.36.4(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)(react@18.3.1)
+      drizzle-orm: 0.39.3(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)
 
-  drizzle-zod@0.5.1(drizzle-orm@0.36.4(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)(react@18.3.1))(zod@3.24.2):
+  drizzle-zod@0.5.1(drizzle-orm@0.39.3(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5))(zod@3.24.2):
     dependencies:
-      drizzle-orm: 0.36.4(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)(react@18.3.1)
+      drizzle-orm: 0.39.3(@cloudflare/workers-types@4.20250214.0)(@neondatabase/serverless@0.10.4)(@opentelemetry/api@1.9.0)(@types/pg@8.11.11)(better-sqlite3@11.5.0)(bun-types@1.1.34)(pg@8.13.3)(postgres@3.4.5)
       zod: 3.24.2
 
   dunder-proto@1.0.1:
