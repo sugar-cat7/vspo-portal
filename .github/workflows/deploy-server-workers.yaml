@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'service/server/**'
+  workflow_dispatch:
 
 jobs:
   deploy:

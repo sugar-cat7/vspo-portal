@@ -13,10 +13,10 @@ updates:
   #     - dependency-name: "*"
   #       update-types: ["version-update:semver-major"]
 
-  - package-ecosystem: "gomod"
-    directory: "/service/common-job/"
+  - package-ecosystem: "npm"
+    directory: "/service/server/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
