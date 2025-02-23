@@ -30,11 +30,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Build & Deploy Worker
-        uses: cloudflare/wrangler-action@v3.13.1
+        uses: cloudflare/wrangler-action@v3.14.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: pnpm
+          wranglerVersion: "3.109.2"
           workingDirectory: service/server/config/wrangler/${{ matrix.name }}
           command: deploy
           preCommands: |
