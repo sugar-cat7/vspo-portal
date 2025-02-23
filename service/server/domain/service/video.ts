@@ -13,6 +13,7 @@ import {
   query,
 } from "../../infra";
 import type { IAIService } from "../../infra/ai";
+import { withTracer } from "../../infra/http/trace/cloudflare";
 import type { ICreatorRepository } from "../../infra/repository/creator";
 import {
   type AppError,
@@ -22,7 +23,6 @@ import {
 } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
 import { TargetLangSchema } from "../translate";
-import { withTracer } from "../../infra/http/trace/cloudflare";
 
 export interface IVideoService {
   searchLiveYoutubeVideos(): Promise<Result<Videos, AppError>>;

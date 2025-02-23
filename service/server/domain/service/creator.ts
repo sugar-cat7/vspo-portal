@@ -1,10 +1,10 @@
 import { type Creator, type Creators, createCreator } from "..";
 import type { ICreatorRepository, IYoutubeService } from "../../infra";
 import type { IAIService } from "../../infra/ai";
+import { withTracer } from "../../infra/http/trace/cloudflare";
 import { type AppError, Ok, type Result } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
-import { withTracer } from "../../infra/http/trace/cloudflare";
 
 export interface ICreatorService {
   searchCreatorsByMemberType(params: {
@@ -81,7 +81,9 @@ export class CreatorService implements ICreatorService {
 
         const creators = c.val
           .map((v) => {
-            const ch = chs.val.find((ch) => ch.id === v.channel?.youtube?.rawId);
+            const ch = chs.val.find(
+              (ch) => ch.id === v.channel?.youtube?.rawId,
+            );
             if (!v?.channel || !ch?.youtube) {
               return null;
             }
@@ -106,7 +108,7 @@ export class CreatorService implements ICreatorService {
           count: creators.length,
         });
         return Ok(creators);
-      }
+      },
     );
   }
 

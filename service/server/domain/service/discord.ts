@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/cloudflare";
-import { withTracer } from "../../infra/http/trace/cloudflare";
 import type { IDiscordServerRepository, IVideoRepository } from "../../infra";
 import type { IDiscordClient } from "../../infra/discord";
+import { withTracer } from "../../infra/http/trace/cloudflare";
 import { getCurrentUTCString } from "../../pkg/dayjs";
 import { type AppError, Err, Ok, type Result } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
@@ -229,7 +229,7 @@ export class DiscordService implements IDiscordService {
           videoStatus: options.liveVideo.status,
           targetMessageId: options.targetMessageId,
         });
-        
+
         AppLogger.info("Sending live video to channel", {
           service: this.SERVICE_NAME,
           channelId: options.channelId,
