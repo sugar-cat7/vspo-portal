@@ -49,6 +49,7 @@ export interface IVideoInteractor {
   translateVideo(
     params: TranslateVideoParam,
   ): Promise<Result<Videos, AppError>>;
+  getMemberVideos(): Promise<Result<Videos, AppError>>;
 }
 
 export class VideoInteractor implements IVideoInteractor {
@@ -170,6 +171,22 @@ export class VideoInteractor implements IVideoInteractor {
       async () => {
         return this.context.runInTx(async (_repos, services) => {
           const sv = await services.videoService.translateVideos(params);
+          if (sv.err) {
+            return sv;
+          }
+          return Ok(sv.val);
+        });
+      },
+    );
+  }
+
+  async getMemberVideos(): Promise<Result<Videos, AppError>> {
+    return await withTracerResult(
+      "VideoInteractor",
+      "getMemberVideos",
+      async () => {
+        return this.context.runInTx(async (_repos, services) => {
+          const sv = await services.videoService.getMemberVideos();
           if (sv.err) {
             return sv;
           }

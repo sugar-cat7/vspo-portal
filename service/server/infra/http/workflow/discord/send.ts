@@ -76,16 +76,24 @@ export const discordSendMessagesWorkflow = () => {
 
         const groupedChannels = shuffledDiscordServers.reduce<GroupedChannels>(
           (acc, server) => {
-            const lang = server.languageCode;
-            if (!acc[lang]) {
-              acc[lang] = {
-                channelLangaugeCode: lang,
-                channelIds: [],
-              };
+            // Process each channel of the server individually
+            for (const channel of server.discordChannels) {
+              // Prioritize the channel-specific language setting; use the server's language setting if none exists
+              const channelLang = channel.languageCode || server.languageCode;
+
+              if (!acc[channelLang]) {
+                acc[channelLang] = {
+                  channelLangaugeCode: channelLang,
+                  channelIds: [],
+                };
+              }
+
+              // Ensure the channel ID has not already been added (to prevent duplicates)
+              if (!acc[channelLang].channelIds.includes(channel.rawId)) {
+                acc[channelLang].channelIds.push(channel.rawId);
+              }
             }
-            acc[lang].channelIds.push(
-              ...server.discordChannels.map((c) => c.rawId),
-            );
+
             return acc;
           },
           {},
@@ -93,6 +101,15 @@ export const discordSendMessagesWorkflow = () => {
 
         const discordChannelMap: DiscordChannelIdsMap =
           Object.values(groupedChannels);
+
+        logger.info("Grouped channels by language", {
+          totalLanguages: discordChannelMap.length,
+          languageGroups: discordChannelMap.map((group) => ({
+            language: group.channelLangaugeCode,
+            channelCount: group.channelIds.length,
+            channelIds: group.channelIds,
+          })),
+        });
 
         const results = await Promise.allSettled(
           discordChannelMap.map((group) =>
@@ -104,10 +121,20 @@ export const discordSendMessagesWorkflow = () => {
               },
               async () => {
                 const vu = await env.APP_WORKER.newDiscordUsecase();
+                logger.info(
+                  `Sending videos to ${group.channelIds.length} channels with language: ${group.channelLangaugeCode}`,
+                  {
+                    channelCount: group.channelIds.length,
+                    language: group.channelLangaugeCode,
+                  },
+                );
                 await vu.sendVideosToMultipleChannels({
                   channelIds: group.channelIds,
                   channelLangaugeCode: group.channelLangaugeCode,
                 });
+                logger.info(
+                  `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
+                );
               },
             ),
           ),

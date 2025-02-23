@@ -56,6 +56,7 @@ export class CreatorService implements ICreatorService {
           limit: 100,
           page: 0,
           memberType: params.memberType,
+          languageCode: "default",
         });
         if (c.err) {
           AppLogger.error("Failed to list creators", {
@@ -182,7 +183,7 @@ export class CreatorService implements ICreatorService {
     });
 
     const translatePromises = creators.map((creator) =>
-      this.deps.aiService.translateText(creator.name, languageCode),
+      this.deps.aiService.translateText(creator.name ?? "", languageCode),
     );
     const translatedResults = await Promise.allSettled(translatePromises);
     const translatedCreators = creators.map((creator, i) => {

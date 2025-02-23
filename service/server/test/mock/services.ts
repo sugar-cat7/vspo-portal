@@ -34,6 +34,20 @@ export class MockYoutubeService implements IYoutubeService {
   }): Promise<Result<Video[], AppError>> {
     return Ok([]);
   }
+
+  async getVideosByChannel(params: {
+    channelId: string;
+    maxResults?: number;
+    order?:
+      | "date"
+      | "rating"
+      | "relevance"
+      | "title"
+      | "videoCount"
+      | "viewCount";
+  }): Promise<Result<Video[], AppError>> {
+    return Ok([]);
+  }
 }
 
 export class MockTwitchService implements ITwitchService {

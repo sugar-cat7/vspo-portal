@@ -1,4 +1,14 @@
-import { type SQL, and, asc, count, desc, eq, inArray } from "drizzle-orm";
+import {
+  type SQL,
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gte,
+  inArray,
+  lte,
+} from "drizzle-orm";
 import { TargetLangSchema } from "../../domain/translate";
 import {
   PlatformSchema,
@@ -67,10 +77,10 @@ export class VideoRepository implements IVideoRepository {
         filters.push(eq(streamStatusTable.status, query.status));
       }
       if (query.startedAt) {
-        filters.push(eq(streamStatusTable.startedAt, query.startedAt));
+        filters.push(gte(streamStatusTable.startedAt, query.startedAt));
       }
       if (query.endedAt) {
-        filters.push(eq(streamStatusTable.endedAt, query.endedAt));
+        filters.push(lte(streamStatusTable.endedAt, query.endedAt));
       }
       if (query.languageCode) {
         filters.push(

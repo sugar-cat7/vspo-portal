@@ -31,10 +31,25 @@ export type GetChannelsParams = {
   channelIds: string[];
 };
 
+export type GetVideosByChannelParams = {
+  channelId: string;
+  maxResults?: number;
+  order?:
+    | "date"
+    | "rating"
+    | "relevance"
+    | "title"
+    | "videoCount"
+    | "viewCount";
+};
+
 export interface IYoutubeService {
   getVideos(params: GetVideosParams): Promise<Result<Videos, AppError>>;
   searchVideos(params: SearchVideosParams): Promise<Result<Videos, AppError>>;
   getChannels(params: GetChannelsParams): Promise<Result<Channels, AppError>>;
+  getVideosByChannel(
+    params: GetVideosByChannelParams,
+  ): Promise<Result<Videos, AppError>>;
 }
 
 export class YoutubeService implements IYoutubeService {
@@ -223,6 +238,72 @@ export class YoutubeService implements IYoutubeService {
         ),
       );
     });
+  }
+
+  async getVideosByChannel(
+    params: GetVideosByChannelParams,
+  ): Promise<Result<Videos, AppError>> {
+    return withTracerResult(
+      "YoutubeService",
+      "getVideosByChannel",
+      async (span) => {
+        const responseResult = await wrap(
+          this.youtube.search.list({
+            part: ["snippet"],
+            channelId: params.channelId,
+            maxResults: params.maxResults || 50,
+            order: params.order || "date",
+            type: ["video"],
+          }),
+          (err) =>
+            new AppError({
+              message: `Network error while fetching videos by channel: ${err.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+            }),
+        );
+
+        if (responseResult.err) {
+          return Err(responseResult.err);
+        }
+
+        const response = responseResult.val;
+        return Ok(
+          createVideos(
+            response.data.items?.map((video) =>
+              createVideo({
+                id: "",
+                rawId: video.id?.videoId || "",
+                languageCode: "default",
+                title: video.snippet?.title || "",
+                description: video.snippet?.description || "",
+                rawChannelID: video.snippet?.channelId || "",
+                publishedAt:
+                  video.snippet?.publishedAt || getCurrentUTCString(),
+                startedAt: null,
+                endedAt: null,
+                platform: "youtube",
+                status:
+                  video.snippet?.liveBroadcastContent === "live"
+                    ? "live"
+                    : video.snippet?.liveBroadcastContent === "upcoming"
+                      ? "upcoming"
+                      : "ended",
+                tags: [],
+                viewCount: 0,
+                thumbnailURL:
+                  video.snippet?.thumbnails?.medium?.url ||
+                  video.snippet?.thumbnails?.standard?.url ||
+                  video.snippet?.thumbnails?.default?.url ||
+                  video.snippet?.thumbnails?.maxres?.url ||
+                  video.snippet?.thumbnails?.high?.url ||
+                  "",
+                videoType: "vspo_stream",
+              }),
+            ) || [],
+          ),
+        );
+      },
+    );
   }
 
   private chunkArray<T>(array: T[], size: number): T[][] {

@@ -4,14 +4,38 @@ import { ThumbnailURLSchema } from "./thumbnail";
 
 const MemberTypeSchema = z.enum(["vspo_jp", "vspo_en", "vspo_ch", "general"]);
 
-const CreatorSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  languageCode: z.string(),
-  memberType: MemberTypeSchema,
-  thumbnailURL: ThumbnailURLSchema,
-  channel: ChannelSchema.nullable(),
-});
+const CreatorSchema = z
+  .object({
+    id: z.string(),
+    name: z.string().optional(),
+    languageCode: z.string().default("default"),
+    memberType: MemberTypeSchema,
+    thumbnailURL: ThumbnailURLSchema.optional().default(""),
+    channel: ChannelSchema.nullable(),
+  })
+  .transform((creator) => {
+    const updatedCreator = { ...creator };
+
+    // If channel has YouTube data, use it for missing fields
+    if (creator.channel?.youtube) {
+      // Set name from YouTube if not provided
+      if (!creator.name && creator.channel.youtube.name) {
+        updatedCreator.name = creator.channel.youtube.name;
+      }
+
+      // Set thumbnailURL from YouTube if not provided
+      if (!creator.thumbnailURL && creator.channel.youtube.thumbnailURL) {
+        updatedCreator.thumbnailURL = creator.channel.youtube.thumbnailURL;
+      }
+    }
+
+    // Ensure name has a value (required field)
+    if (!updatedCreator.name) {
+      updatedCreator.name = "";
+    }
+
+    return updatedCreator;
+  });
 
 const CreatorsSchema = z.array(CreatorSchema);
 

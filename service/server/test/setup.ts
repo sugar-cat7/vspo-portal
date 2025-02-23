@@ -79,6 +79,7 @@ export const setupTxManager = async () => {
     getChannels: async () => Ok([testChannel]),
     getVideos: async () => Ok([]),
     searchVideos: async () => Ok([]),
+    getVideosByChannel: async () => Ok([]),
   };
 
   const twitchService = {
