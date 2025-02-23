@@ -34,7 +34,7 @@ describe("TwitchService", () => {
           languageCode: "default",
           platformIconURL:
             "https://raw.githubusercontent.com/sugar-cat7/vspo-portal/main/service/server/assets/icon/twitch.png",
-          link: "https://www.twitch.tv/user_id_1",
+          link: "https://www.twitch.tv/streamer1",
           statusColor: 16711680, // Red for live
           startedAt: "2024-01-01T00:00:00Z",
           endedAt: null,

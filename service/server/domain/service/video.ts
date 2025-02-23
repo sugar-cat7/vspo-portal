@@ -13,6 +13,7 @@ import {
   query,
 } from "../../infra";
 import type { IAIService } from "../../infra/ai";
+import { withTracerResult } from "../../infra/http/trace/cloudflare";
 import type { ICreatorRepository } from "../../infra/repository/creator";
 import {
   type AppError,
@@ -20,6 +21,7 @@ import {
   type OkResult,
   type Result,
 } from "../../pkg/errors";
+import { AppLogger } from "../../pkg/logging";
 import { TargetLangSchema } from "../translate";
 
 export interface IVideoService {
@@ -46,6 +48,8 @@ export interface IVideoService {
 }
 
 export class VideoService implements IVideoService {
+  private readonly SERVICE_NAME = "VideoService";
+
   constructor(
     private readonly deps: {
       youtubeClient: IYoutubeService;
@@ -58,79 +62,116 @@ export class VideoService implements IVideoService {
   ) {}
 
   async searchLiveYoutubeVideos(): Promise<Result<Videos, AppError>> {
-    const c = await this.masterCreators();
-    if (c.err) {
-      return c;
-    }
-    const promises = [
-      this.deps.youtubeClient.searchVideos({
-        query: query.VSPO_JP,
-        eventType: "live",
-      }),
-      this.deps.youtubeClient.searchVideos({
-        query: query.VSPO_EN,
-        eventType: "live",
-      }),
-      this.deps.youtubeClient.searchVideos({
-        query: query.VSPO_JP,
-        eventType: "upcoming",
-      }),
-      this.deps.youtubeClient.searchVideos({
-        query: query.VSPO_EN,
-        eventType: "upcoming",
-      }),
-    ];
+    return withTracerResult(
+      this.SERVICE_NAME,
+      "searchLiveYoutubeVideos",
+      async (span) => {
+        AppLogger.info("Searching live YouTube videos", {
+          service: this.SERVICE_NAME,
+        });
 
-    const results = await Promise.allSettled(promises);
-    const videos = results
-      .filter(
-        (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
-          r.status === "fulfilled" && !r.value.err,
-      )
-      .flatMap((r) => r.value.val);
-    const failedResults = results.filter(
-      (r): r is PromiseRejectedResult => r.status === "rejected",
+        const c = await this.masterCreators();
+        if (c.err) {
+          AppLogger.error("Failed to get master creators", {
+            service: this.SERVICE_NAME,
+            error: c.err,
+          });
+          return c;
+        }
+
+        span.setAttributes({
+          creatorCount: c.val.jp.length + c.val.en.length,
+        });
+
+        const promises = [
+          this.deps.youtubeClient.searchVideos({
+            query: query.VSPO_JP,
+            eventType: "live",
+          }),
+          this.deps.youtubeClient.searchVideos({
+            query: query.VSPO_EN,
+            eventType: "live",
+          }),
+          this.deps.youtubeClient.searchVideos({
+            query: query.VSPO_JP,
+            eventType: "upcoming",
+          }),
+          this.deps.youtubeClient.searchVideos({
+            query: query.VSPO_EN,
+            eventType: "upcoming",
+          }),
+        ];
+
+        const results = await Promise.allSettled(promises);
+        const videos = results
+          .filter(
+            (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
+              r.status === "fulfilled" && !r.value.err,
+          )
+          .flatMap((r) => r.value.val);
+        const failedResults = results.filter(
+          (r): r is PromiseRejectedResult => r.status === "rejected",
+        );
+
+        if (failedResults.length > 0) {
+          AppLogger.warn("Some YouTube video searches failed", {
+            service: this.SERVICE_NAME,
+            failedCount: failedResults.length,
+            errors: failedResults.map((r) => r.reason),
+          });
+        }
+
+        const channelIds = c.val.jp
+          .map((c) => c.channel?.youtube?.rawId)
+          .concat(c.val.en.map((c) => c.channel?.youtube?.rawId))
+          .filter((id) => id !== undefined);
+
+        const videoIds = Array.from(
+          new Set(
+            videos
+              .map((v) => {
+                const channelId = v.rawChannelID;
+                if (channelIds.includes(channelId)) {
+                  return v.rawId;
+                }
+                return null;
+              })
+              .filter((id) => id !== null),
+          ),
+        );
+
+        const fetchedVideos = await this.getVideosByIDs({
+          youtubeVideoIds: videoIds,
+          twitchVideoIds: [],
+        });
+        if (fetchedVideos.err) {
+          AppLogger.error("Failed to fetch videos by IDs", {
+            service: this.SERVICE_NAME,
+            error: fetchedVideos.err,
+          });
+          return fetchedVideos;
+        }
+
+        AppLogger.info("Successfully fetched YouTube videos", {
+          service: this.SERVICE_NAME,
+          count: fetchedVideos.val.length,
+        });
+        return Ok(fetchedVideos.val);
+      },
     );
-
-    if (failedResults.length > 0) {
-      console.error(
-        "Failed to fetch some YouTube videos:",
-        failedResults.map((r) => r.reason),
-      );
-    }
-
-    const channelIds = c.val.jp
-      .map((c) => c.channel?.youtube?.rawId)
-      .concat(c.val.en.map((c) => c.channel?.youtube?.rawId))
-      .filter((id) => id !== undefined);
-
-    const videoIds = Array.from(
-      new Set(
-        videos
-          .map((v) => {
-            const channelId = v.rawChannelID;
-            if (channelIds.includes(channelId)) {
-              return v.rawId;
-            }
-            return null;
-          })
-          .filter((id) => id !== null),
-      ),
-    );
-
-    const fetchedVideos = await this.getVideosByIDs({
-      youtubeVideoIds: videoIds,
-      twitchVideoIds: [],
-    });
-    if (fetchedVideos.err) {
-      return fetchedVideos;
-    }
-    return Ok(fetchedVideos.val);
   }
 
   async searchLiveTwitchVideos(): Promise<Result<Videos, AppError>> {
+    AppLogger.info("Searching live Twitch videos", {
+      service: this.SERVICE_NAME,
+    });
+
     const c = await this.masterCreators();
     if (c.err) {
+      AppLogger.error("Failed to get master creators", {
+        service: this.SERVICE_NAME,
+        error: c.err,
+      });
       return c;
     }
 
@@ -138,18 +179,49 @@ export class VideoService implements IVideoService {
       .map((c) => c.channel?.twitch?.rawId)
       .concat(c.val.en.map((c) => c.channel?.twitch?.rawId))
       .filter((id) => id !== undefined);
-    const result = await this.deps.twitchClient.getStreams({
-      userIds: userIds,
-    });
-    if (result.err) {
-      return result;
+
+    const results = await Promise.allSettled([
+      this.deps.twitchClient.getStreams({ userIds }),
+      this.deps.twitchClient.getArchive({ userIds }),
+    ]);
+
+    const videos = results
+      .filter(
+        (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
+          r.status === "fulfilled" && !r.value.err,
+      )
+      .flatMap((r) => r.value.val);
+
+    const failedResults = results.filter(
+      (r): r is PromiseRejectedResult => r.status === "rejected",
+    );
+
+    if (failedResults.length > 0) {
+      AppLogger.warn("Some Twitch video fetches failed", {
+        service: this.SERVICE_NAME,
+        failedCount: failedResults.length,
+        errors: failedResults.map((r) => r.reason),
+      });
     }
-    return Ok(result.val);
+
+    AppLogger.info("Successfully fetched Twitch videos", {
+      service: this.SERVICE_NAME,
+      count: videos.length,
+    });
+    return Ok(videos);
   }
 
   async searchLiveTwitCastingVideos(): Promise<Result<Videos, AppError>> {
+    AppLogger.info("Searching live TwitCasting videos", {
+      service: this.SERVICE_NAME,
+    });
+
     const c = await this.masterCreators();
     if (c.err) {
+      AppLogger.error("Failed to get master creators", {
+        service: this.SERVICE_NAME,
+        error: c.err,
+      });
       return c;
     }
 
@@ -162,17 +234,29 @@ export class VideoService implements IVideoService {
       userIds: userIds,
     });
     if (result.err) {
+      AppLogger.error("Failed to get TwitCasting videos", {
+        service: this.SERVICE_NAME,
+        error: result.err,
+      });
       return result;
     }
 
+    AppLogger.info("Successfully fetched TwitCasting videos", {
+      service: this.SERVICE_NAME,
+      count: result.val.length,
+    });
     return Ok(result.val);
   }
 
   async searchAllLiveVideos(): Promise<Result<Videos, AppError>> {
+    AppLogger.info("Searching all live videos", {
+      service: this.SERVICE_NAME,
+    });
+
     const results = await Promise.allSettled([
       this.searchLiveYoutubeVideos(),
-      // this.searchLiveTwitchVideos(),
-      // this.searchLiveTwitCastingVideos(),
+      this.searchLiveTwitchVideos(),
+      this.searchLiveTwitCastingVideos(),
     ]);
 
     const videos = results
@@ -182,6 +266,22 @@ export class VideoService implements IVideoService {
       )
       .flatMap((r) => r.value.val);
 
+    const failedResults = results.filter(
+      (r): r is PromiseRejectedResult => r.status === "rejected",
+    );
+
+    if (failedResults.length > 0) {
+      AppLogger.warn("Some video searches failed", {
+        service: this.SERVICE_NAME,
+        failedCount: failedResults.length,
+        errors: failedResults.map((r) => r.reason),
+      });
+    }
+
+    AppLogger.info("Successfully fetched all live videos", {
+      service: this.SERVICE_NAME,
+      count: videos.length,
+    });
     return Ok(videos);
   }
 
@@ -297,6 +397,12 @@ export class VideoService implements IVideoService {
     languageCode: string;
     videos: Videos;
   }): Promise<Result<Videos, AppError>> {
+    AppLogger.info("Translating videos", {
+      service: this.SERVICE_NAME,
+      languageCode,
+      videoCount: videos.length,
+    });
+
     const translatePromises = videos.map((video) =>
       this.deps.aiService.translateText(video.title, languageCode),
     );
@@ -313,6 +419,10 @@ export class VideoService implements IVideoService {
       };
     });
 
+    AppLogger.info("Successfully translated videos", {
+      service: this.SERVICE_NAME,
+      count: translatedVideos.length,
+    });
     return Ok(translatedVideos);
   }
 

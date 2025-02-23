@@ -165,10 +165,7 @@ export const handleZodError = (
 
 export const handleError = (err: Error, c: Context<HonoEnv>): Response => {
   const e = env<CommonEnv, AppContext>(c);
-  const logger = new AppLogger({
-    env: e,
-    requestId: c.get("requestId"),
-  });
+  const logger = AppLogger.getInstance(e);
 
   if (err instanceof AppError) {
     logger.error(err.message, {

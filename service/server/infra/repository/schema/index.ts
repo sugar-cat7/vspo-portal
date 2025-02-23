@@ -54,6 +54,7 @@ export const videoTable = pgTable("video", {
   publishedAt: timestamp("published_at", { withTimezone: true }).notNull(), // Publication date and time
   tags: text("tags").notNull(), // Video tags
   thumbnailUrl: text("thumbnail_url").notNull(), // Video's thumbnail URL
+  link: text("link"), // Video's link
 });
 
 // Stream status table

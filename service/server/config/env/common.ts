@@ -15,6 +15,7 @@ export const zCommonEnv = z.object({
     .default("false"),
   OTEL_EXPORTER_URL: z.string(),
   BASELIME_API_KEY: z.string(),
+  SENTRY_DSN: z.string(),
 });
 
 export type CommonEnv = z.infer<typeof zCommonEnv>;

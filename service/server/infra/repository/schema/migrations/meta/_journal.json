@@ -29,6 +29,13 @@
       "when": 1739037344906,
       "tag": "0003_large_midnight",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1740327711637,
+      "tag": "0004_fair_pestilence",
+      "breakpoints": true
     }
   ]
 }

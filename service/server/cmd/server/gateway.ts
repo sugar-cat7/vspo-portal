@@ -2,7 +2,6 @@ import { DiscordHono } from "discord-hono";
 import type { ApiEnv } from "../../config/env/api";
 import {
   type DiscordCommandEnv,
-  announceCommand,
   botAddComponent,
   botRemoveComponent,
   cancelComponent,
@@ -12,7 +11,7 @@ import {
   yesBotRemoveComponent,
 } from "../../infra/discord/command";
 import { newApp } from "../../infra/http/hono/app";
-import { createHandler, withTracer } from "../../infra/http/otel";
+import { createHandler, withTracer } from "../../infra/http/trace";
 
 const app = newApp();
 app.notFound((c) => {
@@ -30,8 +29,6 @@ const discord = new DiscordHono<DiscordCommandEnv>()
   .component(yesBotRemoveComponent.name, yesBotRemoveComponent.handler)
   .component(langSettingComponent.name, langSettingComponent.handler)
   .component(langSelectComponent.name, langSelectComponent.handler)
-  //announce
-  .command(announceCommand.name, announceCommand.handler)
   //common
   .component(cancelComponent.name, cancelComponent.handler);
 
@@ -39,14 +36,13 @@ app.mount("/interaction", discord.fetch);
 
 // app.use(
 //   "*",
-//   cors({
-//     origin: "*",
-//     allowHeaders: ["*"],
-//     allowMethods: ["POST", "GET", "OPTIONS"],
-//     exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
-//     maxAge: 600,
-//   }),
-//   requestId(),
+//   // cors({
+//   //   origin: "*",
+//   //   allowHeaders: ["*"],
+//   //   allowMethods: ["POST", "GET", "OPTIONS"],
+//   //   exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
+//   //   maxAge: 600,
+//   // }),
 //   init,
 // );
 // registerVideoListApi(app);

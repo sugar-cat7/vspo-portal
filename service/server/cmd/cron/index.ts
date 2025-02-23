@@ -5,7 +5,7 @@ import {
 } from "cloudflare:workers";
 import type { BindingAppWorkerEnv } from "../../config/env/worker";
 import type { BindingWorkflowEnv } from "../../config/env/workflow";
-import { createHandler, withTracer } from "../../infra/http/otel";
+import { createHandler, withTracer } from "../../infra/http/trace";
 import { searchChannelsWorkflow } from "../../infra/http/workflow/channel/search";
 import { translateCreatorsWorkflow } from "../../infra/http/workflow/channel/trasnlate";
 import { discordSendMessagesWorkflow } from "../../infra/http/workflow/discord/send";
@@ -68,28 +68,18 @@ export default createHandler({
       span.setAttribute("cron", controller.cron);
       switch (controller.cron) {
         // FIXME: Temporarily
-        case "0 0,8,16 * * *":
-          await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
-          break;
         case "0 0,7,18 * * *":
           await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
           await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
           break;
-        case "0 0,9,17 * * *":
+        case "*/10 * * * *":
           await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
           break;
 
-        case "*/30 * * * *":
+        case "*/5 * * * *":
           await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
           await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
           break;
-        // case "1 * * * *":
-        //   await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
-        //   await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
-        //   break;
-        // case "*/3 * * * *":
-        //   await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
-        //   break;
         default:
           console.error("Unknown cron", controller.cron);
           break;

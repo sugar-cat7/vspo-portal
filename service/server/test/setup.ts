@@ -92,6 +92,7 @@ export const setupTxManager = async () => {
     searchVideos: async () => Ok([]),
     getStreams: async () => Ok([]),
     getVideosByIDs: async () => Ok([]),
+    getArchive: async () => Ok([]),
   };
 
   const twitcastingService = {
@@ -102,6 +103,7 @@ export const setupTxManager = async () => {
     getChannels: async () => Ok([]),
     getVideos: async () => Ok([]),
     searchVideos: async () => Ok([]),
+    getArchive: async () => Ok([]),
   };
 
   afterEach(async () => {

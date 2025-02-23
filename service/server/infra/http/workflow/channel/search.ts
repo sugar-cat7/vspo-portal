@@ -19,7 +19,7 @@ export const searchChannelsWorkflow = () => {
           console.error(e.error.message);
           return;
         }
-        const logger = new AppLogger({ env: e.data });
+        const logger = AppLogger.getInstance(e.data);
         const results = await Promise.allSettled([
           step.do(
             "fetch and send vspo_jp channels",

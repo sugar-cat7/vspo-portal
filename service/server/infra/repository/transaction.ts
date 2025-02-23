@@ -50,7 +50,7 @@ export class TxManager implements ITxManager {
       db.transaction(async (tx) => {
         const op = await operation(tx);
         if (op.err) {
-          const logger = new AppLogger();
+          const logger = AppLogger.getInstance();
           logger.error(`Failed to execute transaction: ${op.err}`);
           tx.rollback();
         }

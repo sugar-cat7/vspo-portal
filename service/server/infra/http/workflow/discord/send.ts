@@ -32,11 +32,11 @@ export const discordSendMessagesWorkflow = () => {
           console.error(e.error.message);
           return;
         }
-        const logger = new AppLogger({ env: e.data });
+        const logger = AppLogger.getInstance(e.data);
         const lv = await step.do(
           "fetch DiscordServers",
           {
-            retries: { limit: 3, delay: "5 second", backoff: "linear" },
+            retries: { limit: 3, delay: "3 second", backoff: "linear" },
             timeout: "1 minutes",
           },
           async () => {
@@ -69,7 +69,12 @@ export const discordSendMessagesWorkflow = () => {
           return;
         }
 
-        const groupedChannels = lv.allDiscordServers.reduce<GroupedChannels>(
+        // ramdomly shuffle allDiscordServers
+        const shuffledDiscordServers = lv.allDiscordServers.sort(
+          () => Math.random() - 0.5,
+        );
+
+        const groupedChannels = shuffledDiscordServers.reduce<GroupedChannels>(
           (acc, server) => {
             const lang = server.languageCode;
             if (!acc[lang]) {

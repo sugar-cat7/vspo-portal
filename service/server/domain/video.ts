@@ -110,16 +110,19 @@ const VideoSchema = z
     videoType: VideoTypeSchema,
     creatorName: z.string().optional(),
     creatorThumbnailURL: ThumbnailURLSchema.optional(),
+    link: z.string().optional(),
   })
   .transform((video) => ({
     ...video,
     platformIconURL: getPlatformIconURL(video.platform),
-    link: getVideoLink(
-      video.rawId,
-      video.platform,
-      video.rawChannelID,
-      video.status,
-    ),
+    link:
+      video.link ||
+      getVideoLink(
+        video.rawId,
+        video.platform,
+        video.rawChannelID,
+        video.status,
+      ),
     statusColor: getStatusColor(video.status),
     formattedStartedAt: formatToLocalizedDate(
       video.startedAt ?? getCurrentUTCDate(),

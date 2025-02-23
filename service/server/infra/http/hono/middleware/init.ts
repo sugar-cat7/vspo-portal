@@ -15,12 +15,7 @@ export const init = createMiddleware<HonoEnv>(async (c, next) => {
       message: e.error.message,
     });
   }
-  const requestId = c.get("requestId");
-  const logger = new AppLogger({
-    env: e.data,
-    requestId: requestId,
-  });
-  c.set("requestId", requestId);
+  const logger = AppLogger.getInstance(e.data);
   c.set("services", {
     logger: logger,
   });

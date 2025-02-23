@@ -99,7 +99,7 @@ export function createVideoEmbed(video: Video): DiscordEmbed {
     .setColor(video.statusColor)
     .addField("配信日時/Streaming Date", video.formattedStartedAt, true)
     .setImage(video.thumbnailURL)
-    .setAuthor(video.creatorName || "test", {
+    .setAuthor(video.creatorName || "Unknown", {
       icon_url: video.creatorThumbnailURL || "",
     })
     .setFooter(`${video.platform} Powered by Spodule`, {

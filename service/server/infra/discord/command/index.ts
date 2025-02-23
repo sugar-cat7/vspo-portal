@@ -78,6 +78,41 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
   {
     name: "setting",
     handler: async (c) => {
+      const u = await c.env.APP_WORKER.newDiscordUsecase();
+      const r = await u.exists(c.interaction.guild_id ?? "");
+      if (r.err || !r.val) {
+        return c.res({
+          content: MESSAGES.SPODULE_SETTING_LABEL,
+          components: new Components().row(
+            new Button(
+              botAddComponent.name,
+              MESSAGES.BOT_ADD_BUTTON_LABEL,
+              "Success",
+            ),
+          ),
+        });
+      }
+
+      const d = await u.get(c.interaction.guild_id ?? "");
+      if (d.err) {
+        return c.res(MESSAGES.BOT_ADD_ERROR);
+      }
+
+      if (
+        !d.val.discordChannels.some((d) => d.rawId === c.interaction.channel.id)
+      ) {
+        return c.res({
+          content: MESSAGES.SPODULE_SETTING_LABEL,
+          components: new Components().row(
+            new Button(
+              botAddComponent.name,
+              MESSAGES.BOT_ADD_BUTTON_LABEL,
+              "Success",
+            ),
+          ),
+        });
+      }
+
       return c.res({
         content: MESSAGES.SPODULE_SETTING_LABEL,
         components: new Components().row(

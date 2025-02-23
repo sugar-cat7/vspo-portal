@@ -60,6 +60,12 @@ export class MockTwitchService implements ITwitchService {
   > {
     return Ok([]);
   }
+
+  async getArchive(params: { userIds: string[] }): Promise<
+    Result<Video[], AppError>
+  > {
+    return Ok([]);
+  }
 }
 
 export class MockTwitcastingService implements ITwitcastingService {

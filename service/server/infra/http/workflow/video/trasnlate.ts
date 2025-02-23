@@ -20,7 +20,7 @@ export const translateVideosWorkflow = () => {
           console.error(e.error.message);
           return;
         }
-        const logger = new AppLogger({ env: e.data });
+        const logger = AppLogger.getInstance(e.data);
         const lv = await step.do(
           "fetch default language videos",
           {
