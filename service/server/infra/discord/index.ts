@@ -312,14 +312,15 @@ export class DiscordClient implements IDiscordClient {
             content: m.content ?? "",
             createdAt: getCurrentUTCString(),
             updatedAt: getCurrentUTCString(),
-            embedVideos: m.embeds.map((e) => ({
-              identifier: e.url,
-              title: e.title,
-              url: e.url,
-              thumbnail: e.image?.url ?? "",
-              startedAt: e.fields?.[0]?.value ?? "",
-              status: getStatusFromColor(e.color ?? 0),
-            })),
+            embedVideos:
+              m.embeds.map((e) => ({
+                identifier: e.url,
+                title: e.title,
+                url: e.url,
+                thumbnail: e.image?.url ?? "",
+                startedAt: e.fields?.[0]?.value ?? "",
+                status: getStatusFromColor(e.color ?? 0),
+              })) ?? [],
           })),
         ),
       );
