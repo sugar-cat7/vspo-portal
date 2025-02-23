@@ -42,8 +42,8 @@ importers:
         specifier: ^9.1.0
         version: 9.1.0
       '@tsndr/cloudflare-worker-jwt':
-        specifier: 2.5.3
-        version: 2.5.3
+        specifier: 2.5.4
+        version: 2.5.4
       '@twurple/api':
         specifier: ^7.2.1
         version: 7.2.1(@twurple/auth@7.2.1)
@@ -1516,8 +1516,8 @@ packages:
   '@testcontainers/postgresql@10.18.0':
     resolution: {integrity: sha512-WxkE/tBlBpoKvqDEqL3i/mL6BOBWnXb8FXKtLhEeZ3lSt0zlldkTozMmewNsKJtFTBZdv7uFwMzWyXP12t0sxQ==}
 
-  '@tsndr/cloudflare-worker-jwt@2.5.3':
-    resolution: {integrity: sha512-zbdvjRG86y/ObiBgTJrzBC39t2FcaeGwB6AV7VO4LvHKJNyZvLYRbKT68eaoJhnJldyHhs7yZ69neRVdUd9knA==}
+  '@tsndr/cloudflare-worker-jwt@2.5.4':
+    resolution: {integrity: sha512-f9lU8CL9NrsA3f8+Hanlgjl8Ten+WRAaV3DbmbReQGdH5rCRJeDSzpVaMjV6ifZP5hl8gvEumc18KqtT6xtX4A==}
 
   '@twurple/api-call@7.2.1':
     resolution: {integrity: sha512-x+p6fMleFA/pJHVu8tFpkDkARGGt30EAUA+cLc+dEtU1EpH1mv7nv5LLHh9NW9vdZpYp0jk5TyY/TSbHdj7Ggw==}
@@ -4574,7 +4574,7 @@ snapshots:
       - bare-buffer
       - supports-color
 
-  '@tsndr/cloudflare-worker-jwt@2.5.3': {}
+  '@tsndr/cloudflare-worker-jwt@2.5.4': {}
 
   '@twurple/api-call@7.2.1':
     dependencies:
