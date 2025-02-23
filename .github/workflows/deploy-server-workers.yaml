@@ -53,6 +53,7 @@ jobs:
             DISCORD_APPLICATION_ID
             DISCORD_PUBLIC_KEY
             DISCORD_TOKEN
+            SENTRY_DSN
 
         env:
           OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
@@ -68,3 +69,4 @@ jobs:
           DISCORD_APPLICATION_ID: ${{ secrets.DISCORD_APPLICATION_ID }}
           DISCORD_PUBLIC_KEY: ${{ secrets.DISCORD_PUBLIC_KEY }}
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
