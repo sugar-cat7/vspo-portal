@@ -1,4 +1,4 @@
 export * from "./app";
-export * from "../otel";
+export * from "../trace";
 export * from "./env";
 export * from "./middleware";

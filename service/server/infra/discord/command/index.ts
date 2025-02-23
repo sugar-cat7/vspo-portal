@@ -7,6 +7,7 @@ import {
 } from "discord-hono";
 import type { ApplicationService } from "../../../cmd/server/internal/application";
 import { LangCodeLabelMapping } from "../../../domain/translate";
+import { withTracer } from "../../http/trace/cloudflare";
 
 const MESSAGES = {
   // spoduleSettingCommand
@@ -78,25 +79,51 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
   {
     name: "setting",
     handler: async (c) => {
-      return c.res({
-        content: MESSAGES.SPODULE_SETTING_LABEL,
-        components: new Components().row(
-          new Button(
-            botAddComponent.name,
-            MESSAGES.BOT_ADD_BUTTON_LABEL,
-            "Success",
+      return withTracer("discord-command", "spodule-setting", async (span) => {
+        const u = await c.env.APP_WORKER.newDiscordUsecase();
+        const r = await u.get(c.interaction.guild_id ?? "");
+        if (r.err) {
+          return c.res({
+            content: MESSAGES.BOT_ADD_ERROR,
+            components: [],
+          });
+        }
+        if (
+          !r.val.discordChannels.some(
+            (d) => d.rawId === c.interaction.channel.id,
+          )
+        ) {
+          return c.res({
+            content: MESSAGES.SPODULE_SETTING_LABEL,
+            components: new Components().row(
+              new Button(
+                botAddComponent.name,
+                MESSAGES.BOT_ADD_BUTTON_LABEL,
+                "Success",
+              ),
+            ),
+          });
+        }
+        return c.res({
+          content: MESSAGES.SPODULE_SETTING_LABEL,
+          components: new Components().row(
+            new Button(
+              botAddComponent.name,
+              MESSAGES.BOT_ADD_BUTTON_LABEL,
+              "Success",
+            ),
+            new Button(
+              botRemoveComponent.name,
+              MESSAGES.BOT_REMOVE_BUTTON_LABEL,
+              "Danger",
+            ),
+            new Button(
+              langSettingComponent.name,
+              MESSAGES.LANG_SETTING_BUTTON_LABEL,
+              "Primary",
+            ),
           ),
-          new Button(
-            botRemoveComponent.name,
-            MESSAGES.BOT_REMOVE_BUTTON_LABEL,
-            "Danger",
-          ),
-          new Button(
-            langSettingComponent.name,
-            MESSAGES.LANG_SETTING_BUTTON_LABEL,
-            "Primary",
-          ),
-        ),
+        });
       });
     },
   };
@@ -107,25 +134,27 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
 export const botAddComponent: IDiscordComponentDefinition<DiscordCommandEnv> = {
   name: "bot-add-setting",
   handler: async (c) => {
-    const u = await c.env.APP_WORKER.newDiscordUsecase();
-    const r = await u.adjustBotChannel({
-      type: "add",
-      serverId: c.interaction.guild_id ?? "",
-      targetChannelId: c.interaction.channel.id,
-    });
+    return withTracer("discord-command", "bot-add-setting", async (span) => {
+      const u = await c.env.APP_WORKER.newDiscordUsecase();
+      const r = await u.adjustBotChannel({
+        type: "add",
+        serverId: c.interaction.guild_id ?? "",
+        targetChannelId: c.interaction.channel.id,
+      });
 
-    if (r.err) {
+      if (r.err) {
+        return c.resUpdate({
+          content: MESSAGES.BOT_ADD_ERROR,
+          components: [],
+        });
+      }
+
+      await u.batchUpsertEnqueue([r.val]);
+
       return c.resUpdate({
-        content: MESSAGES.BOT_ADD_ERROR,
+        content: MESSAGES.BOT_ADD_SUCCESS(c.interaction.channel.name ?? ""),
         components: [],
       });
-    }
-
-    await u.batchUpsertEnqueue([r.val]);
-
-    return c.resUpdate({
-      content: MESSAGES.BOT_ADD_SUCCESS(c.interaction.channel.name ?? ""),
-      components: [],
     });
   },
 };
@@ -137,21 +166,27 @@ export const botRemoveComponent: IDiscordComponentDefinition<DiscordCommandEnv> 
   {
     name: "bot-remove-setting",
     handler: async (c) => {
-      return c.resUpdate({
-        content: MESSAGES.BOT_REMOVE_LABEL,
-        components: new Components().row(
-          new Button(
-            yesBotRemoveComponent.name,
-            MESSAGES.BOT_REMOVE_BUTTON_STOP,
-            "Danger",
-          ),
-          new Button(
-            cancelComponent.name,
-            MESSAGES.BOT_REMOVE_BUTTON_CANCEL,
-            "Primary",
-          ),
-        ),
-      });
+      return withTracer(
+        "discord-command",
+        "bot-remove-setting",
+        async (span) => {
+          return c.resUpdate({
+            content: MESSAGES.BOT_REMOVE_LABEL,
+            components: new Components().row(
+              new Button(
+                yesBotRemoveComponent.name,
+                MESSAGES.BOT_REMOVE_BUTTON_STOP,
+                "Danger",
+              ),
+              new Button(
+                cancelComponent.name,
+                MESSAGES.BOT_REMOVE_BUTTON_CANCEL,
+                "Primary",
+              ),
+            ),
+          });
+        },
+      );
     },
   };
 
@@ -162,24 +197,30 @@ export const yesBotRemoveComponent: IDiscordComponentDefinition<DiscordCommandEn
   {
     name: "yes-bot-remove-setting",
     handler: async (c) => {
-      const u = await c.env.APP_WORKER.newDiscordUsecase();
-      const r = await u.batchDeleteChannelsByRowChannelIds([
-        c.interaction.channel.id,
-      ]);
+      return withTracer(
+        "discord-command",
+        "yes-bot-remove-setting",
+        async (span) => {
+          const u = await c.env.APP_WORKER.newDiscordUsecase();
+          const r = await u.batchDeleteChannelsByRowChannelIds([
+            c.interaction.channel.id,
+          ]);
 
-      if (r.err) {
-        return c.resUpdate({
-          content: MESSAGES.YES_BOT_REMOVE_ERROR,
-          components: [],
-        });
-      }
+          if (r.err) {
+            return c.resUpdate({
+              content: MESSAGES.YES_BOT_REMOVE_ERROR,
+              components: [],
+            });
+          }
 
-      return c.resUpdate({
-        content: MESSAGES.YES_BOT_REMOVE_SUCCESS(
-          c.interaction.channel.name ?? "",
-        ),
-        components: [],
-      });
+          return c.resUpdate({
+            content: MESSAGES.YES_BOT_REMOVE_SUCCESS(
+              c.interaction.channel.name ?? "",
+            ),
+            components: [],
+          });
+        },
+      );
     },
   };
 
@@ -189,9 +230,11 @@ export const yesBotRemoveComponent: IDiscordComponentDefinition<DiscordCommandEn
 export const cancelComponent: IDiscordComponentDefinition<DiscordCommandEnv> = {
   name: "cancel",
   handler: async (c) => {
-    return c.resUpdate({
-      content: MESSAGES.CANCELLED,
-      components: [],
+    return withTracer("discord-command", "cancel", async (span) => {
+      return c.resUpdate({
+        content: MESSAGES.CANCELLED,
+        components: [],
+      });
     });
   },
 };
@@ -203,16 +246,18 @@ export const langSettingComponent: IDiscordComponentDefinition<DiscordCommandEnv
   {
     name: "lang-setting",
     handler: async (c) => {
-      return c.resUpdate({
-        content: MESSAGES.LANG_SETTING_LABEL,
-        components: new Components().row(
-          new Select(langSelectComponent.name, "String").options(
-            ...Object.entries(LangCodeLabelMapping).map(([value, label]) => ({
-              value,
-              label,
-            })),
+      return withTracer("discord-command", "lang-setting", async (span) => {
+        return c.resUpdate({
+          content: MESSAGES.LANG_SETTING_LABEL,
+          components: new Components().row(
+            new Select(langSelectComponent.name, "String").options(
+              ...Object.entries(LangCodeLabelMapping).map(([value, label]) => ({
+                value,
+                label,
+              })),
+            ),
           ),
-        ),
+        });
       });
     },
   };
@@ -224,49 +269,39 @@ export const langSelectComponent: IDiscordComponentDefinition<DiscordCommandEnv>
   {
     name: "lang-select",
     handler: async (c) => {
-      // Check if user has selected a language
-      if ("values" in c.interaction.data) {
-        const selectedValue = c.interaction.data.values.at(
-          0,
-        ) as keyof typeof LangCodeLabelMapping;
-        const u = await c.env.APP_WORKER.newDiscordUsecase();
+      return withTracer("discord-command", "lang-select", async (span) => {
+        if ("values" in c.interaction.data) {
+          const selectedValue = c.interaction.data.values.at(
+            0,
+          ) as keyof typeof LangCodeLabelMapping;
+          const u = await c.env.APP_WORKER.newDiscordUsecase();
 
-        // Adjust the bot channel with the newly selected language
-        const r = await u.adjustBotChannel({
-          type: "add",
-          serverId: c.interaction.guild_id ?? "",
-          targetChannelId: c.interaction.channel.id,
-          channelLangaugeCode: selectedValue,
-        });
+          const r = await u.adjustBotChannel({
+            type: "add",
+            serverId: c.interaction.guild_id ?? "",
+            targetChannelId: c.interaction.channel.id,
+            channelLangaugeCode: selectedValue,
+          });
 
-        if (r.err) {
+          if (r.err) {
+            return c.resUpdate({
+              content: MESSAGES.LANG_SELECT_ERROR,
+              components: [],
+            });
+          }
+
+          await u.batchUpsertEnqueue([r.val]);
           return c.resUpdate({
-            content: MESSAGES.LANG_SELECT_ERROR,
+            content: MESSAGES.LANG_SELECT_SUCCESS(
+              LangCodeLabelMapping[selectedValue],
+            ),
             components: [],
           });
         }
-
-        await u.batchUpsertEnqueue([r.val]);
         return c.resUpdate({
-          content: MESSAGES.LANG_SELECT_SUCCESS(
-            LangCodeLabelMapping[selectedValue],
-          ),
+          content: MESSAGES.LANG_SELECT_ERROR,
           components: [],
         });
-      }
-      return c.resUpdate({
-        content: MESSAGES.LANG_SELECT_ERROR,
-        components: [],
       });
     },
   };
-
-/**
- * /announce - Allows admins to send custom messages to all channels.
- */
-export const announceCommand: IDiscordSlashDefinition<DiscordCommandEnv> = {
-  name: "announce",
-  handler: async (c) => {
-    return c.res(MESSAGES.ANNOUNCE_SENT);
-  },
-};

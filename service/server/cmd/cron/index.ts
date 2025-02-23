@@ -5,7 +5,7 @@ import {
 } from "cloudflare:workers";
 import type { BindingAppWorkerEnv } from "../../config/env/worker";
 import type { BindingWorkflowEnv } from "../../config/env/workflow";
-import { createHandler, withTracer } from "../../infra/http/otel";
+import { createHandler, withTracer } from "../../infra/http/trace";
 import { searchChannelsWorkflow } from "../../infra/http/workflow/channel/search";
 import { translateCreatorsWorkflow } from "../../infra/http/workflow/channel/trasnlate";
 import { discordSendMessagesWorkflow } from "../../infra/http/workflow/discord/send";
@@ -18,7 +18,9 @@ export class SearchChannelsWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    await searchChannelsWorkflow().handler()(this.env, _event, step);
+    return await withTracer("SearchChannelsWorkflow", "run", async () => {
+      await searchChannelsWorkflow().handler()(this.env, _event, step);
+    });
   }
 }
 
@@ -27,7 +29,9 @@ export class SearchVideosWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    await searchVideosWorkflow().handler()(this.env, _event, step);
+    return await withTracer("SearchVideosWorkflow", "run", async () => {
+      await searchVideosWorkflow().handler()(this.env, _event, step);
+    });
   }
 }
 
@@ -36,7 +40,9 @@ export class TranslateCreatorsWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    await translateCreatorsWorkflow().handler()(this.env, _event, step);
+    return await withTracer("TranslateCreatorsWorkflow", "run", async () => {
+      await translateCreatorsWorkflow().handler()(this.env, _event, step);
+    });
   }
 }
 
@@ -45,7 +51,9 @@ export class TranslateVideosWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    await translateVideosWorkflow().handler()(this.env, _event, step);
+    return await withTracer("TranslateVideosWorkflow", "run", async () => {
+      await translateVideosWorkflow().handler()(this.env, _event, step);
+    });
   }
 }
 
@@ -54,7 +62,9 @@ export class DiscordSendMessagesWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    await discordSendMessagesWorkflow().handler()(this.env, _event, step);
+    return await withTracer("DiscordSendMessagesWorkflow", "run", async () => {
+      await discordSendMessagesWorkflow().handler()(this.env, _event, step);
+    });
   }
 }
 

@@ -13,7 +13,7 @@ import {
 } from "../../../../domain";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { Container } from "../../../../infra/dependency";
-import { createHandler, withTracer } from "../../../../infra/http/otel";
+import { createHandler, withTracer } from "../../../../infra/http/trace";
 import { AppLogger } from "../../../../pkg/logging";
 import type {
   AdjustBotChannelParams,
@@ -44,44 +44,68 @@ export class VideoService extends RpcTarget {
   }
 
   async batchUpsertEnqueue(params: BatchUpsertVideosParam) {
-    return this.#queue.sendBatch(
-      params.map((video) => ({ body: { ...video, kind: "upsert-video" } })),
-    );
+    return await withTracer("VideoService", "batchUpsertEnqueue", async () => {
+      return this.#queue.sendBatch(
+        params.map((video) => ({ body: { ...video, kind: "upsert-video" } })),
+      );
+    });
   }
 
   async batchUpsert(params: BatchUpsertVideosParam) {
-    return this.#usecase.batchUpsert(params);
+    return await withTracer("VideoService", "batchUpsert", async () => {
+      return this.#usecase.batchUpsert(params);
+    });
   }
 
   async searchLive() {
-    return this.#usecase.searchLive();
+    return await withTracer("VideoService", "searchLive", async () => {
+      return this.#usecase.searchLive();
+    });
   }
 
   async searchExist() {
-    return this.#usecase.searchExist();
+    return await withTracer("VideoService", "searchExist", async () => {
+      return this.#usecase.searchExist();
+    });
   }
 
   async list(params: ListParam) {
-    return this.#usecase.list(params);
+    return await withTracer("VideoService", "list", async () => {
+      return this.#usecase.list(params);
+    });
   }
 
   async searchDeleted() {
-    return this.#usecase.searchDeleted();
+    return await withTracer("VideoService", "searchDeleted", async () => {
+      return this.#usecase.searchDeleted();
+    });
   }
 
   async batchDeleteByVideoIds(params: BatchDeleteByVideoIdsParam) {
-    return this.#usecase.batchDeleteByVideoIds(params);
+    return await withTracer(
+      "VideoService",
+      "batchDeleteByVideoIds",
+      async () => {
+        return this.#usecase.batchDeleteByVideoIds(params);
+      },
+    );
   }
 
   async translateVideoEnqueue(params: TranslateVideoParam) {
-    return this.#queue.sendBatch(
-      params.videos.map((video) => ({
-        body: {
-          ...video,
-          languageCode: TargetLangSchema.parse(params.languageCode),
-          kind: "translate-video",
-        },
-      })),
+    return await withTracer(
+      "VideoService",
+      "translateVideoEnqueue",
+      async () => {
+        return this.#queue.sendBatch(
+          params.videos.map((video) => ({
+            body: {
+              ...video,
+              languageCode: TargetLangSchema.parse(params.languageCode),
+              kind: "translate-video",
+            },
+          })),
+        );
+      },
     );
   }
 }
@@ -96,35 +120,61 @@ export class CreatorService extends RpcTarget {
   }
 
   async batchUpsertEnqueue(params: BatchUpsertCreatorsParam) {
-    return this.#queue.sendBatch(
-      params.map((creator) => ({
-        body: { ...creator, kind: "upsert-creator" },
-      })),
+    return await withTracer(
+      "CreatorService",
+      "batchUpsertEnqueue",
+      async () => {
+        return this.#queue.sendBatch(
+          params.map((creator) => ({
+            body: { ...creator, kind: "upsert-creator" },
+          })),
+        );
+      },
     );
   }
 
   async translateCreatorEnqueue(params: TranslateCreatorParam) {
-    return this.#queue.sendBatch(
-      params.creators.map((creator) => ({
-        body: {
-          ...creator,
-          languageCode: params.languageCode,
-          kind: "translate-creator",
-        },
-      })),
+    return await withTracer(
+      "CreatorService",
+      "translateCreatorEnqueue",
+      async () => {
+        return this.#queue.sendBatch(
+          params.creators.map((creator) => ({
+            body: {
+              ...creator,
+              languageCode: params.languageCode,
+              kind: "translate-creator",
+            },
+          })),
+        );
+      },
     );
   }
 
   async searchByChannelIds(params: SearchByChannelIdsParam) {
-    return this.#usecase.searchByChannelIds(params);
+    return await withTracer(
+      "CreatorService",
+      "searchByChannelIds",
+      async () => {
+        return this.#usecase.searchByChannelIds(params);
+      },
+    );
   }
 
   async searchByMemberType(params: SearchByMemberTypeParam) {
-    return this.#usecase.searchByMemberType(params);
+    return await withTracer(
+      "CreatorService",
+      "searchByMemberType",
+      async () => {
+        return this.#usecase.searchByMemberType(params);
+      },
+    );
   }
 
   async list(params: ListByMemberTypeParam) {
-    return this.#usecase.list(params);
+    return await withTracer("CreatorService", "list", async () => {
+      return this.#usecase.list(params);
+    });
   }
 }
 
@@ -138,52 +188,100 @@ export class DiscordService extends RpcTarget {
   }
 
   async sendVideosToMultipleChannels(params: SendMessageParams) {
-    return this.#usecase.batchSendMessages(params);
+    return await withTracer(
+      "DiscordService",
+      "sendVideosToMultipleChannels",
+      async () => {
+        return this.#usecase.batchSendMessages(params);
+      },
+    );
   }
 
   async adjustBotChannel(params: AdjustBotChannelParams) {
-    return this.#usecase.adjustBotChannel(params);
+    return await withTracer("DiscordService", "adjustBotChannel", async () => {
+      return this.#usecase.adjustBotChannel(params);
+    });
   }
 
   async get(serverId: string) {
-    return this.#usecase.get(serverId);
+    return await withTracer("DiscordService", "get", async () => {
+      return this.#usecase.get(serverId);
+    });
   }
 
   async batchUpsertEnqueue(params: BatchUpsertDiscordServersParam) {
-    return this.#queue.sendBatch(
-      params.map((server) => ({
-        body: { ...server, kind: "upsert-discord-server" },
-      })),
+    return await withTracer(
+      "DiscordService",
+      "batchUpsertEnqueue",
+      async () => {
+        return this.#queue.sendBatch(
+          params.map((server) => ({
+            body: { ...server, kind: "upsert-discord-server" },
+          })),
+        );
+      },
     );
   }
 
   async batchDeleteChannelsByRowChannelIds(params: string[]) {
-    return this.#usecase.batchDeleteChannelsByRowChannelIds(params);
+    return await withTracer(
+      "DiscordService",
+      "batchDeleteChannelsByRowChannelIds",
+      async () => {
+        return this.#usecase.batchDeleteChannelsByRowChannelIds(params);
+      },
+    );
   }
 
   async list(params: ListDiscordServerParam) {
-    return this.#usecase.list(params);
+    return await withTracer("DiscordService", "list", async () => {
+      return this.#usecase.list(params);
+    });
   }
 
   async deleteAllMessagesInChannel(channelId: string) {
-    return this.#usecase.deleteAllMessagesInChannel(channelId);
+    return await withTracer(
+      "DiscordService",
+      "deleteAllMessagesInChannel",
+      async () => {
+        return this.#usecase.deleteAllMessagesInChannel(channelId);
+      },
+    );
   }
 }
 
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
-  newVideoUsecase() {
-    const d = this.setup();
-    return new VideoService(d.videoInteractor, this.env.WRITE_QUEUE);
+  async newVideoUsecase() {
+    return await withTracer(
+      "ApplicationService",
+      "newVideoUsecase",
+      async () => {
+        const d = this.setup();
+        return new VideoService(d.videoInteractor, this.env.WRITE_QUEUE);
+      },
+    );
   }
 
-  newCreatorUsecase() {
-    const d = this.setup();
-    return new CreatorService(d.creatorInteractor, this.env.WRITE_QUEUE);
+  async newCreatorUsecase() {
+    return await withTracer(
+      "ApplicationService",
+      "newCreatorUsecase",
+      async () => {
+        const d = this.setup();
+        return new CreatorService(d.creatorInteractor, this.env.WRITE_QUEUE);
+      },
+    );
   }
 
-  newDiscordUsecase() {
-    const d = this.setup();
-    return new DiscordService(d.discordInteractor, this.env.WRITE_QUEUE);
+  async newDiscordUsecase() {
+    return await withTracer(
+      "ApplicationService",
+      "newDiscordUsecase",
+      async () => {
+        const d = this.setup();
+        return new DiscordService(d.discordInteractor, this.env.WRITE_QUEUE);
+      },
+    );
   }
 
   private setup() {
@@ -238,9 +336,7 @@ export default createHandler({
         return;
       }
       const c = new Container(e.data);
-      const logger = new AppLogger({
-        env: e.data,
-      });
+      const logger = AppLogger.getInstance(e.data);
       const kind = batch.messages.at(0)?.body?.kind;
       if (!kind) {
         logger.error("Invalid kind");
