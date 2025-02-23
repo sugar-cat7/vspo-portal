@@ -171,8 +171,8 @@ export class VideoService implements IVideoService {
   async searchAllLiveVideos(): Promise<Result<Videos, AppError>> {
     const results = await Promise.allSettled([
       this.searchLiveYoutubeVideos(),
-      // this.searchLiveTwitchVideos(),
-      // this.searchLiveTwitCastingVideos(),
+      this.searchLiveTwitchVideos(),
+      this.searchLiveTwitCastingVideos(),
     ]);
 
     const videos = results

@@ -282,26 +282,44 @@ export default createHandler({
             return;
           }
 
-          const tv = await c.videoInteractor.translateVideo({
-            languageCode: v.data[0].languageCode,
-            videos: v.data,
-          });
-
-          if (tv.err) {
-            logger.error(`Failed to translate videos: ${tv.err.message}`);
-            return;
-          }
-
-          if (!tv.val?.length || tv.val.length === 0) {
-            logger.info("No videos to translate");
-            return;
-          }
-
-          await env.WRITE_QUEUE.sendBatch(
-            tv.val.map((video) => ({
-              body: { ...video, kind: "upsert-video" },
-            })),
+          // Group videos by language code
+          const videosByLang = v.data.reduce(
+            (acc, video) => {
+              const langCode = video.languageCode;
+              if (!acc[langCode]) {
+                acc[langCode] = [];
+              }
+              acc[langCode].push(video);
+              return acc;
+            },
+            {} as Record<string, typeof v.data>,
           );
+
+          // Process each language group separately
+          for (const [langCode, videos] of Object.entries(videosByLang)) {
+            const tv = await c.videoInteractor.translateVideo({
+              languageCode: langCode,
+              videos: videos,
+            });
+
+            if (tv.err) {
+              logger.error(
+                `Failed to translate videos for ${langCode}: ${tv.err.message}`,
+              );
+              continue;
+            }
+
+            if (!tv.val?.length || tv.val.length === 0) {
+              logger.info(`No videos to translate for ${langCode}`);
+              continue;
+            }
+
+            await env.WRITE_QUEUE.sendBatch(
+              tv.val.map((video) => ({
+                body: { ...video, kind: "upsert-video" },
+              })),
+            );
+          }
           break;
         }
         case "translate-creator": {
@@ -312,26 +330,45 @@ export default createHandler({
             logger.error(`Invalid creators: ${cr.error.message}`);
             return;
           }
-          const tc = await c.creatorInteractor.translateCreator({
-            languageCode: cr.data[0].languageCode,
-            creators: cr.data,
-          });
 
-          if (tc.err) {
-            logger.error(`Failed to translate creators: ${tc.err.message}`);
-            return;
-          }
-
-          if (!tc.val?.length || tc.val.length === 0) {
-            logger.info("No creators to translate");
-            return;
-          }
-
-          await env.WRITE_QUEUE.sendBatch(
-            tc.val.map((creator) => ({
-              body: { ...creator, kind: "upsert-creator" },
-            })),
+          // Group creators by language code
+          const creatorsByLang = cr.data.reduce(
+            (acc, creator) => {
+              const langCode = creator.languageCode;
+              if (!acc[langCode]) {
+                acc[langCode] = [];
+              }
+              acc[langCode].push(creator);
+              return acc;
+            },
+            {} as Record<string, typeof cr.data>,
           );
+
+          // Process each language group separately
+          for (const [langCode, creators] of Object.entries(creatorsByLang)) {
+            const tc = await c.creatorInteractor.translateCreator({
+              languageCode: langCode,
+              creators: creators,
+            });
+
+            if (tc.err) {
+              logger.error(
+                `Failed to translate creators for ${langCode}: ${tc.err.message}`,
+              );
+              continue;
+            }
+
+            if (!tc.val?.length || tc.val.length === 0) {
+              logger.info(`No creators to translate for ${langCode}`);
+              continue;
+            }
+
+            await env.WRITE_QUEUE.sendBatch(
+              tc.val.map((creator) => ({
+                body: { ...creator, kind: "upsert-creator" },
+              })),
+            );
+          }
           break;
         }
         case "discord-send-message": {

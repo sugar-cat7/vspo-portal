@@ -78,16 +78,22 @@ export const discordSendMessagesWorkflow = () => {
                 channelIds: [],
               };
             }
-            acc[lang].channelIds.push(
-              ...server.discordChannels.map((c) => c.rawId),
-            );
+            const newChannelIds = server.discordChannels
+              .map((c) => c.rawId)
+              .filter((id) => !acc[lang].channelIds.includes(id));
+
+            acc[lang].channelIds.push(...newChannelIds);
             return acc;
           },
           {},
         );
 
-        const discordChannelMap: DiscordChannelIdsMap =
-          Object.values(groupedChannels);
+        const discordChannelMap: DiscordChannelIdsMap = Object.values(
+          groupedChannels,
+        ).map((group) => ({
+          ...group,
+          channelIds: [...new Set(group.channelIds)],
+        }));
 
         const results = await Promise.allSettled(
           discordChannelMap.map((group) =>
