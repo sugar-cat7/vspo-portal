@@ -41,6 +41,11 @@ name = "discord-send-messages-workflow"
 binding = "DISCORD_SEND_MESSAGES_WORKFLOW"
 class_name = "DiscordSendMessagesWorkflow"
 
+[[workflows]]
+name = "search-member-videos-by-channel-workflow"
+binding = "SEARCH_MEMBER_VIDEOS_BY_CHANNEL_WORKFLOW"
+class_name = "SearchMemberVideosByChannelWorkflow"
+
 [vars]
 SERVICE_NAME = "vspo-portal-cron"
 ENVIRONMENT = "production"

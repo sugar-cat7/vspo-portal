@@ -6,5 +6,6 @@ export const zBindingWorkflowEnv = z.object({
   TRANSLATE_VIDEOS_WORKFLOW: z.custom<Workflow>(),
   TRANSLATE_CREATORS_WORKFLOW: z.custom<Workflow>(),
   DISCORD_SEND_MESSAGES_WORKFLOW: z.custom<Workflow>(),
+  SEARCH_MEMBER_VIDEOS_BY_CHANNEL_WORKFLOW: z.custom<Workflow>(),
 });
 export type BindingWorkflowEnv = z.infer<typeof zBindingWorkflowEnv>;

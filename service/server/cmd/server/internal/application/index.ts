@@ -88,6 +88,10 @@ export class VideoService extends RpcTarget {
       })),
     );
   }
+
+  async getMemberVideos() {
+    return this.#usecase.getMemberVideos();
+  }
 }
 
 export class CreatorService extends RpcTarget {

@@ -158,4 +158,18 @@ export const mockYoutubeService: IYoutubeService = {
   }): Promise<Result<Video[], AppError>> => {
     return Ok([]);
   },
+
+  getVideosByChannel: async (params: {
+    channelId: string;
+    maxResults?: number;
+    order?:
+      | "date"
+      | "rating"
+      | "relevance"
+      | "title"
+      | "videoCount"
+      | "viewCount";
+  }): Promise<Result<Video[], AppError>> => {
+    return Ok([]);
+  },
 };

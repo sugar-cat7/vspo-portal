@@ -45,6 +45,22 @@ export interface IVideoService {
     languageCode: string;
     videos: Videos;
   }): Promise<Result<Videos, AppError>>;
+  getVideosByChannel({
+    channelId,
+    maxResults,
+    order,
+  }: {
+    channelId: string;
+    maxResults?: number;
+    order?:
+      | "date"
+      | "rating"
+      | "relevance"
+      | "title"
+      | "videoCount"
+      | "viewCount";
+  }): Promise<Result<Videos, AppError>>;
+  getMemberVideos(): Promise<Result<Videos, AppError>>;
 }
 
 export class VideoService implements IVideoService {
@@ -180,28 +196,72 @@ export class VideoService implements IVideoService {
       .concat(c.val.en.map((c) => c.channel?.twitch?.rawId))
       .filter((id) => id !== undefined);
 
-    const results = await Promise.allSettled([
+    // Fetch both live streams and archives in parallel
+    const [liveStreamsResult, archivesResult] = await Promise.all([
       this.deps.twitchClient.getStreams({ userIds }),
       this.deps.twitchClient.getArchive({ userIds }),
     ]);
 
-    const videos = results
-      .filter(
-        (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
-          r.status === "fulfilled" && !r.value.err,
-      )
-      .flatMap((r) => r.value.val);
+    if (liveStreamsResult.err) {
+      AppLogger.error("Failed to get Twitch live streams", {
+        service: this.SERVICE_NAME,
+        error: liveStreamsResult.err,
+      });
+      return liveStreamsResult;
+    }
 
-    const failedResults = results.filter(
-      (r): r is PromiseRejectedResult => r.status === "rejected",
+    if (archivesResult.err) {
+      AppLogger.warn(
+        "Failed to get Twitch archives, continuing with live streams only",
+        {
+          service: this.SERVICE_NAME,
+          error: archivesResult.err,
+        },
+      );
+    }
+
+    // Get the current live stream IDs to check against existing videos
+    const liveStreamIds = new Set(
+      liveStreamsResult.val.map((video) => video.rawId),
     );
 
-    if (failedResults.length > 0) {
-      AppLogger.warn("Some Twitch video fetches failed", {
-        service: this.SERVICE_NAME,
-        failedCount: failedResults.length,
-        errors: failedResults.map((r) => r.reason),
-      });
+    // Get existing videos that are marked as live from Twitch
+    const existingLiveVideosResult = await this.deps.videoRepository.list({
+      limit: 30,
+      page: 0,
+      status: StatusSchema.Enum.live,
+      platform: PlatformSchema.Enum.twitch,
+      languageCode: "default",
+    });
+
+    let videos = liveStreamsResult.val;
+
+    // Add archives if available
+    if (archivesResult.val) {
+      videos = videos.concat(archivesResult.val);
+    }
+
+    // Process ended videos in parallel with other operations
+    if (
+      !existingLiveVideosResult.err &&
+      existingLiveVideosResult.val.length > 0
+    ) {
+      const endedVideoIds = existingLiveVideosResult.val
+        .filter((video) => !liveStreamIds.has(video.rawId))
+        .map((video) => video.id);
+
+      // Delete videos that are no longer live
+      if (endedVideoIds.length > 0) {
+        AppLogger.info(
+          `Deleting ${endedVideoIds.length} Twitch videos that have ended`,
+          {
+            service: this.SERVICE_NAME,
+          },
+        );
+
+        // Delete videos that have ended using batchDelete (don't await here)
+        await this.deps.videoRepository.batchDelete(endedVideoIds);
+      }
     }
 
     AppLogger.info("Successfully fetched Twitch videos", {
@@ -424,6 +484,87 @@ export class VideoService implements IVideoService {
       count: translatedVideos.length,
     });
     return Ok(translatedVideos);
+  }
+
+  async getMemberVideos(): Promise<Result<Videos, AppError>> {
+    // Check if the channel exists in our creators
+    const creators = await this.masterCreators();
+    if (creators.err) {
+      AppLogger.error("Failed to get master creators", {
+        service: this.SERVICE_NAME,
+        error: creators.err,
+      });
+      return creators;
+    }
+
+    const channelIds = creators.val.jp
+      .map((c) => c.channel?.youtube?.rawId)
+      .concat(creators.val.en.map((c) => c.channel?.youtube?.rawId))
+      .filter((id) => id !== undefined);
+
+    const promises = channelIds.map((id) =>
+      this.getVideosByChannel({ channelId: id }),
+    );
+    const results = await Promise.allSettled(promises);
+    const videos = results
+      .filter(
+        (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
+          r.status === "fulfilled" && !r.value.err,
+      )
+      .flatMap((r) => r.value.val);
+
+    return Ok(videos);
+  }
+
+  async getVideosByChannel({
+    channelId,
+    maxResults,
+    order,
+  }: {
+    channelId: string;
+    maxResults?: number;
+    order?:
+      | "date"
+      | "rating"
+      | "relevance"
+      | "title"
+      | "videoCount"
+      | "viewCount";
+  }): Promise<Result<Videos, AppError>> {
+    return withTracerResult(
+      this.SERVICE_NAME,
+      "getVideosByChannel",
+      async (span) => {
+        AppLogger.info("Fetching videos by channel ID", {
+          service: this.SERVICE_NAME,
+          channelId,
+        });
+
+        // Fetch videos from the channel
+        const result = await this.deps.youtubeClient.getVideosByChannel({
+          channelId,
+          maxResults,
+          order,
+        });
+
+        if (result.err) {
+          AppLogger.error("Failed to fetch videos by channel", {
+            service: this.SERVICE_NAME,
+            channelId,
+            error: result.err,
+          });
+          return result;
+        }
+
+        AppLogger.info("Successfully fetched videos by channel", {
+          service: this.SERVICE_NAME,
+          channelId,
+          count: result.val.length,
+        });
+
+        return Ok(result.val);
+      },
+    );
   }
 
   private async masterCreators(): Promise<

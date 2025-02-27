@@ -215,7 +215,7 @@ export class CreatorRepository implements ICreatorRepository {
               id: c.id,
               creatorId: c.id,
               languageCode: c.languageCode,
-              name: c.name,
+              name: c.name ?? "",
               updatedAt: getCurrentUTCDate(),
             });
           }
@@ -228,7 +228,7 @@ export class CreatorRepository implements ICreatorRepository {
           if (!d.detail) {
             continue;
           }
-          if (!d.detail.rawId) {
+          if (d.detail.rawId) {
             dbChannels.push({
               id: c.channel.id,
               platformChannelId: d.detail.rawId,
@@ -325,13 +325,13 @@ export class CreatorRepository implements ICreatorRepository {
         return Ok(
           createCreators(
             creatorResult.val.map((r) => {
-              const transaction = creatorTranslationResult?.val?.find(
+              const translation = creatorTranslationResult?.val?.find(
                 (t) => t.creatorId === r.id,
               );
               return {
                 id: r.id,
-                name: transaction?.name ?? "",
-                languageCode: transaction?.languageCode ?? "",
+                name: translation?.name ?? "",
+                languageCode: translation?.languageCode ?? "",
                 memberType: MemberTypeSchema.parse(r.memberType),
                 thumbnailURL: r.representativeThumbnailUrl,
                 channel: null,

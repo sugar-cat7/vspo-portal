@@ -10,6 +10,7 @@ import { searchChannelsWorkflow } from "../../infra/http/workflow/channel/search
 import { translateCreatorsWorkflow } from "../../infra/http/workflow/channel/trasnlate";
 import { discordSendMessagesWorkflow } from "../../infra/http/workflow/discord/send";
 import { searchVideosWorkflow } from "../../infra/http/workflow/video/search";
+import { searchMemberVideosByChannelWorkflow } from "../../infra/http/workflow/video/searchMemberVideoByChannel";
 import { translateVideosWorkflow } from "../../infra/http/workflow/video/trasnlate";
 import { createUUID } from "../../pkg/uuid";
 
@@ -58,6 +59,19 @@ export class DiscordSendMessagesWorkflow extends WorkflowEntrypoint<
   }
 }
 
+export class SearchMemberVideosByChannelWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  Params
+> {
+  async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await searchMemberVideosByChannelWorkflow().handler()(
+      this.env,
+      _event,
+      step,
+    );
+  }
+}
+
 export default createHandler({
   scheduled: async (
     controller: ScheduledController,
@@ -67,18 +81,21 @@ export default createHandler({
     return await withTracer("ScheduledHandler", "scheduled", async (span) => {
       span.setAttribute("cron", controller.cron);
       switch (controller.cron) {
-        // FIXME: Temporarily
         case "0 0,7,18 * * *":
           await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
+          break;
+        case "5 0,7,18 * * *":
           await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
           break;
-        case "*/10 * * * *":
-          await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
-          break;
-
-        case "*/5 * * * *":
+        case "*/2 * * * *":
           await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
           await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
+          await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
+          break;
+        case "*/30 * * * *":
+          await env.SEARCH_MEMBER_VIDEOS_BY_CHANNEL_WORKFLOW.create({
+            id: createUUID(),
+          });
           break;
         default:
           console.error("Unknown cron", controller.cron);

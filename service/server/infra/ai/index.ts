@@ -71,6 +71,9 @@ export class AIService implements IAIService {
         );
       }
 
+      if (parseResult.data === "default" || !text) {
+        return Ok({ translatedText: text });
+      }
       const targetLanguage = languageCodeMapping[parseResult.data] || "English";
 
       const keywordMapString = JSON.stringify(vspoKeywordMap, null, 2);
