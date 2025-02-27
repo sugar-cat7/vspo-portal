@@ -13,4 +13,7 @@ export const freechatVideoIds = [
   "pT6aeI5S1Kk",
   "sKJ5moF3X8Y",
   "7-rmkxy7SSg",
+  "PYifZFKwxTA",
+  "CTFmzc2g4LU",
+  "yOx9VJYmOfY",
 ];
