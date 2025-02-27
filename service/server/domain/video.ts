@@ -132,6 +132,14 @@ const VideoSchema = z
       video.endedAt ?? getCurrentUTCDate(),
       video.languageCode,
     ),
+    thumbnailURL:
+      video.platform === PlatformSchema.Enum.twitch
+        ? video.thumbnailURL
+            .replace("%{width}", "320")
+            .replace("%{height}", "180")
+            .replace("-{width}x{height}", "-320x180")
+            .replace("http://", "https://")
+        : video.thumbnailURL,
   }));
 
 const VideosSchema = z.array(VideoSchema);
