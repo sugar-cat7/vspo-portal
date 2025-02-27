@@ -2,13 +2,13 @@ import { Livestream } from "@/types/streaming";
 
 export const mockFreechats: Livestream[] = [
   {
-    id: "7-rmkxy7SSg",
+    id: "4RgoOHvpzsA",
     title: "Free chat",
     description:
       "ふりちゃです たまにきたりもします サムネのイラストはメンバーシップ限定で全身のイラストを壁紙として配布してます！",
     channelId: "UCjXBuHmWkieBApgBhDuJMMQ",
     channelTitle: "八雲べに",
-    thumbnailUrl: "https://i.ytimg.com/vi/7-rmkxy7SSg/hqdefault_live.jpg",
+    thumbnailUrl: "https://i.ytimg.com/vi/4RgoOHvpzsA/hqdefault_live.jpg",
     scheduledStartTime: "2023-09-24T15:00:00.000Z",
     actualEndTime: "1998-01-01T12:00:00Z",
     iconUrl:
