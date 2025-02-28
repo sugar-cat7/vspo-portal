@@ -19,6 +19,7 @@ export type ListParam = {
   startedAt?: Date;
   endedAt?: Date;
   languageCode: string;
+  orderBy?: "asc" | "desc";
 };
 
 export type ListResponse = {

@@ -35,6 +35,9 @@ importers:
       '@neondatabase/serverless':
         specifier: ^0.10.4
         version: 0.10.4
+      '@openfeature/server-sdk':
+        specifier: ^1.17.1
+        version: 1.17.1(@openfeature/core@1.7.2)
       '@opentelemetry/api':
         specifier: 1.9.0
         version: 1.9.0
@@ -1180,6 +1183,15 @@ packages:
 
   '@open-draft/until@2.1.0':
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
+
+  '@openfeature/core@1.7.2':
+    resolution: {integrity: sha512-pbpREdO/8D6ocFYWIzAJ24iJ1td04Anl+TehUzx9r1xR8vKJab+O4TlC/XP7s9JuD5hRPBfmo5gDha/KWVSG4A==}
+
+  '@openfeature/server-sdk@1.17.1':
+    resolution: {integrity: sha512-z5MaVvSNnk1SpRSuU02usnoX9rY9BtnLBNp9T08JOitwiuXs4byR8R5Es4WpsGRnnzBSoBQJL1iGIIYEeeEyxw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@openfeature/core': ^1.7.0
 
   '@opentelemetry/api-logs@0.53.0':
     resolution: {integrity: sha512-8HArjKx+RaAI8uEIgcORbZIPklyh1YLjPSBus8hjRmvLi6DeFzgOcdZ7KwPabKj8mXF8dX0hyfAyGfycz0DbFw==}
@@ -4051,6 +4063,12 @@ snapshots:
 
   '@open-draft/until@2.1.0':
     optional: true
+
+  '@openfeature/core@1.7.2': {}
+
+  '@openfeature/server-sdk@1.17.1(@openfeature/core@1.7.2)':
+    dependencies:
+      '@openfeature/core': 1.7.2
 
   '@opentelemetry/api-logs@0.53.0':
     dependencies:

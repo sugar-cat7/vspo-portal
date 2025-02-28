@@ -48,6 +48,7 @@ export interface IDiscordInteractor {
     channelIds: string[],
   ): Promise<Result<void, AppError>>;
   exists(serverId: string): Promise<Result<boolean, AppError>>;
+  existsChannel(channelId: string): Promise<Result<boolean, AppError>>;
 }
 
 export class DiscordInteractor implements IDiscordInteractor {
@@ -190,6 +191,20 @@ export class DiscordInteractor implements IDiscordInteractor {
             return sv;
           }
           return Ok();
+        });
+      },
+    );
+  }
+
+  async existsChannel(channelId: string): Promise<Result<boolean, AppError>> {
+    return await withTracerResult(
+      "DiscordInteractor",
+      "existsChannel",
+      async () => {
+        return this.context.runInTx(async (repos, _services) => {
+          return await repos.discordServerRepository.existsChannel({
+            channelId,
+          });
         });
       },
     );

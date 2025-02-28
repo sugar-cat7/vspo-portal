@@ -102,9 +102,12 @@ export function createVideoEmbed(video: Video): DiscordEmbed {
     .setAuthor(video.creatorName || "Unknown", {
       icon_url: video.creatorThumbnailURL || "",
     })
-    .setFooter(`${video.platform} Powered by Spodule`, {
-      icon_url: video.platformIconURL,
-    });
+    .setFooter(
+      `${video.platform.charAt(0).toUpperCase() + video.platform.slice(1)} Powered by Spodule`,
+      {
+        icon_url: video.platformIconURL,
+      },
+    );
 
   embeds.validate();
 

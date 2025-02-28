@@ -1,5 +1,6 @@
 import { DiscordHono } from "discord-hono";
 import type { ApiEnv } from "../../config/env/api";
+import { setFeatureFlagProvider } from "../../config/featureFlag";
 import {
   type DiscordCommandEnv,
   botAddComponent,
@@ -50,6 +51,7 @@ app.mount("/interaction", discord.fetch);
 
 export default createHandler({
   fetch: async (req: Request, env: ApiEnv, executionCtx: ExecutionContext) => {
+    setFeatureFlagProvider(env);
     return await withTracer("OTelCFWorkers:Fetcher", "Exec", async () => {
       return app.fetch(req, env, executionCtx);
     });

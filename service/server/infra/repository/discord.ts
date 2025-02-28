@@ -39,6 +39,9 @@ export interface IDiscordServerRepository {
   ): Promise<Result<void, AppError>>;
   get(query: { serverId: string }): Promise<Result<DiscordServer, AppError>>;
   exists(query: { serverId: string }): Promise<Result<boolean, AppError>>;
+  existsChannel(query: { channelId: string }): Promise<
+    Result<boolean, AppError>
+  >;
 }
 
 export class DiscordServerRepository implements IDiscordServerRepository {
@@ -303,21 +306,19 @@ export class DiscordServerRepository implements IDiscordServerRepository {
           }),
         );
       }
-
+      const dc = discordServerResult.val?.map((c) => ({
+        id: c.discord_channel.id,
+        rawId: c.discord_channel.channelId,
+        serverId: c.discord_channel.serverId,
+        name: c.discord_channel.name,
+        languageCode: c.discord_channel.languageCode,
+        createdAt: convertToUTC(c.discord_channel.createdAt),
+        updatedAt: convertToUTC(c.discord_channel.updatedAt),
+      }));
       return Ok({
         id: discordServer.discord_server.id,
         rawId: discordServer.discord_server.serverId,
-        discordChannels: discordChannels.parse([
-          {
-            id: discordServer.discord_channel.id,
-            rawId: discordServer.discord_channel.channelId,
-            serverId: discordServer.discord_channel.serverId,
-            name: discordServer.discord_channel.name,
-            languageCode: discordServer.discord_channel.languageCode,
-            createdAt: convertToUTC(discordServer.discord_channel.createdAt),
-            updatedAt: convertToUTC(discordServer.discord_channel.updatedAt),
-          },
-        ]),
+        discordChannels: discordChannels.parse(dc),
         name: discordServer.discord_server.name,
         languageCode: discordServer.discord_server.languageCode,
         createdAt: convertToUTC(discordServer.discord_server.createdAt),
@@ -351,6 +352,35 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         }
 
         return Ok(discordServerResult.val.length > 0);
+      },
+    );
+  }
+
+  async existsChannel(query: { channelId: string }): Promise<
+    Result<boolean, AppError>
+  > {
+    return withTracerResult(
+      "DiscordServerRepository",
+      "existsChannel",
+      async (span) => {
+        const discordChannelResult = await wrap(
+          this.db
+            .select()
+            .from(discordChannelTable)
+            .where(eq(discordChannelTable.channelId, query.channelId))
+            .execute(),
+          (err) =>
+            new AppError({
+              message: `Database error during discord channel exists query: ${err.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+            }),
+        );
+
+        if (discordChannelResult.err) {
+          return Err(discordChannelResult.err);
+        }
+
+        return Ok(discordChannelResult.val.length > 0);
       },
     );
   }

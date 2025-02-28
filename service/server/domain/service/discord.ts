@@ -133,169 +133,92 @@ export class DiscordService implements IDiscordService {
       const liveMessages = latestMessagesResult.val.filter((msg) =>
         msg.embedVideos.some((video) => video.status === "live"),
       );
-
-      // Process live messages
-      for (const msg of liveMessages) {
-        const videoInMessage = msg.embedVideos[0]; // Live messages have only one embed
-        const currentVideo = liveVideos.find(
-          (v) => v.link === videoInMessage.identifier,
-        );
-
-        if (currentVideo && currentVideo.status === "live") {
-          // Case: Message is live, Video is still live
-          // Action: Update if needed
-          if (this.shouldUpdateEmbed(videoInMessage, currentVideo)) {
-            messagePromises.push(
-              this.dependencies.discordClient.updateMessage({
-                channelId,
-                messageId: msg.rawId,
-                embeds: [createVideoEmbed(currentVideo)],
-              }),
-            );
-          }
-        } else if (currentVideo && currentVideo.status === "upcoming") {
-          // Case: Message is live, Video is now upcoming
-          // Action: Delete live message, add to upcoming message
-          messagePromises.push(
-            this.dependencies.discordClient.deleteMessage({
-              channelId,
-              messageId: msg.rawId,
-            }),
-          );
-
-          // Will handle adding to upcoming message later
-        } else {
-          // Case: Message is live, Video is ended or not found
-          // Action: Delete the message
-          messagePromises.push(
-            this.dependencies.discordClient.deleteMessage({
-              channelId,
-              messageId: msg.rawId,
-            }),
-          );
-        }
-      }
-
       // Process upcoming message
       if (upcomingMessage) {
         const upcomingVideosInMessage = upcomingMessage.embedVideos;
-        const upcomingVideoIdentifiers = upcomingVideosInMessage.map(
-          (v) => v.identifier,
-        );
 
-        // Check which videos in the message are now live
-        const nowLiveVideos = upcomingVideosInMessage.filter((video) => {
-          const matchingVideo = videoListResult.val.find(
-            (v) => v.link === video.identifier,
-          );
-          return matchingVideo && matchingVideo.status === "live";
-        });
-
-        // Check which videos in the message are still upcoming
-        const stillUpcomingVideos = upcomingVideosInMessage.filter((video) => {
-          const matchingVideo = videoListResult.val.find(
-            (v) => v.link === video.identifier,
-          );
-          return matchingVideo && matchingVideo.status === "upcoming";
-        });
-
-        // Check which videos in the message need updates
-        const needsUpdate = stillUpcomingVideos.some((video) => {
-          const matchingVideo = upcomingVideos.find(
-            (v) => v.link === video.identifier,
-          );
-          return matchingVideo && this.shouldUpdateEmbed(video, matchingVideo);
-        });
-
-        // Find new upcoming videos not in the message
-        const newUpcomingVideos = upcomingVideos.filter(
-          (video) => !upcomingVideoIdentifiers.includes(video.link),
-        );
-
-        // Handle videos that changed from upcoming to live
-        for (const video of nowLiveVideos) {
-          const matchingVideo = liveVideos.find(
-            (v) => v.link === video.identifier,
-          );
-          if (matchingVideo) {
-            // Send a new live message for this video
-            messagePromises.push(
-              this.dependencies.discordClient.sendMessage({
-                channelId,
-                content: "",
-                embeds: [createVideoEmbed(matchingVideo)],
-              }),
+        // Check if there is a difference between the embedded upcoming videos and the latest upcoming videos
+        const hasDiff =
+          upcomingVideos.some((v) => {
+            return !upcomingVideosInMessage.some(
+              (v2) => v2.identifier === v.link,
             );
-          }
-        }
+          }) ||
+          upcomingVideosInMessage.some((v) => {
+            return !upcomingVideos.some((v2) => v2.link === v.identifier);
+          });
 
-        // Update or delete the upcoming message
-        const remainingUpcomingVideos = [
-          ...upcomingVideos.filter((video) =>
-            stillUpcomingVideos.some((v) => v.identifier === video.link),
-          ),
-          ...newUpcomingVideos,
-        ].sort(
-          (a, b) =>
-            new Date(a.startedAt || "").getTime() -
-            new Date(b.startedAt || "").getTime(),
-        );
-
-        if (remainingUpcomingVideos.length > 0) {
-          // If there are still upcoming videos, update the message
-          if (
-            needsUpdate ||
-            newUpcomingVideos.length > 0 ||
-            nowLiveVideos.length > 0
-          ) {
-            messagePromises.push(
-              this.dependencies.discordClient.updateMessage({
-                channelId,
-                messageId: upcomingMessage.rawId,
-                embeds: remainingUpcomingVideos.map((video) =>
-                  createVideoEmbed(video),
-                ),
-              }),
-            );
-          }
-        } else {
-          // If no upcoming videos remain, delete the message
+        if (hasDiff) {
           messagePromises.push(
-            this.dependencies.discordClient.deleteMessage({
+            this.dependencies.discordClient.updateMessage({
               channelId,
               messageId: upcomingMessage.rawId,
+              embeds: upcomingVideos.map((video) => createVideoEmbed(video)),
             }),
           );
         }
-      } else if (upcomingVideos.length > 0) {
-        // No existing upcoming message but we have upcoming videos
-        // Create a new upcoming message
+      } else {
+        if (upcomingVideos.length > 0) {
+          messagePromises.push(
+            this.dependencies.discordClient.sendMessage({
+              channelId,
+              content: "",
+              embeds: upcomingVideos.map((video) => createVideoEmbed(video)),
+            }),
+          );
+        }
+      }
+
+      for (const liveVideo of liveVideos) {
+        const liveMessage = liveMessages.find(
+          (msg) => msg.embedVideos[0].identifier === liveVideo.link,
+        );
+        const lm = liveMessage?.embedVideos[0];
+        if (lm && this.shouldUpdateEmbed(lm, liveVideo)) {
+          messagePromises.push(
+            this.dependencies.discordClient.updateMessage({
+              channelId,
+              messageId: liveMessage.rawId,
+              embeds: [createVideoEmbed(liveVideo)],
+            }),
+          );
+        }
+
+        if (!liveMessage) {
+          messagePromises.push(
+            this.dependencies.discordClient.sendMessage({
+              channelId,
+              content: "",
+              embeds: [createVideoEmbed(liveVideo)],
+            }),
+          );
+        }
+      }
+
+      // Messages to be deleted
+      const deletedMessages = liveMessages.filter(
+        (msg) =>
+          !liveVideos.some((v) => v.link === msg.embedVideos[0].identifier),
+      );
+      for (const msg of deletedMessages) {
         messagePromises.push(
-          this.dependencies.discordClient.sendMessage({
+          this.dependencies.discordClient.deleteMessage({
             channelId,
-            content: "",
-            embeds: upcomingVideos.map((video) => createVideoEmbed(video)),
+            messageId: msg.rawId,
           }),
         );
       }
 
-      // Send new live messages for videos not already covered
-      const existingLiveVideoIds = liveMessages
-        .map((msg) => msg.embedVideos[0]?.identifier)
-        .filter(Boolean);
-
-      const newLiveVideos = liveVideos.filter(
-        (video) => !existingLiveVideoIds.includes(video.link),
-      );
-
-      for (const video of newLiveVideos) {
-        messagePromises.push(
-          this.dependencies.discordClient.sendMessage({
-            channelId,
-            content: "",
-            embeds: [createVideoEmbed(video)],
-          }),
-        );
+      if (upcomingVideos.length === 0) {
+        const deletedMessageId = upcomingMessage?.rawId;
+        if (deletedMessageId) {
+          messagePromises.push(
+            this.dependencies.discordClient.deleteMessage({
+              channelId,
+              messageId: deletedMessageId,
+            }),
+          );
+        }
       }
 
       const results = await Promise.allSettled(messagePromises);

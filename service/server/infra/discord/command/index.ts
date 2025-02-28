@@ -1,3 +1,4 @@
+import { OpenFeature } from "@openfeature/server-sdk";
 import {
   Button,
   type CommandHandler,
@@ -79,7 +80,7 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
     name: "setting",
     handler: async (c) => {
       const u = await c.env.APP_WORKER.newDiscordUsecase();
-      const r = await u.exists(c.interaction.guild_id ?? "");
+      const r = await u.existsChannel(c.interaction.channel.id);
       if (r.err || !r.val) {
         return c.res({
           content: MESSAGES.SPODULE_SETTING_LABEL,
@@ -93,45 +94,39 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
         });
       }
 
-      const d = await u.get(c.interaction.guild_id ?? "");
-      if (d.err) {
-        return c.res(MESSAGES.BOT_ADD_ERROR);
-      }
+      const client = OpenFeature.getClient();
+      const enabled = await client.getBooleanValue(
+        "discord-translation-setting",
+        false,
+      );
 
-      if (
-        !d.val.discordChannels.some((d) => d.rawId === c.interaction.channel.id)
-      ) {
-        return c.res({
-          content: MESSAGES.SPODULE_SETTING_LABEL,
-          components: new Components().row(
-            new Button(
-              botAddComponent.name,
-              MESSAGES.BOT_ADD_BUTTON_LABEL,
-              "Success",
-            ),
-          ),
-        });
-      }
+      const components = new Components();
+      const buttons: Button<"Success" | "Danger" | "Primary">[] = [
+        new Button(
+          botAddComponent.name,
+          MESSAGES.BOT_ADD_BUTTON_LABEL,
+          "Success",
+        ),
+        new Button(
+          botRemoveComponent.name,
+          MESSAGES.BOT_REMOVE_BUTTON_LABEL,
+          "Danger",
+        ),
+      ];
 
-      return c.res({
-        content: MESSAGES.SPODULE_SETTING_LABEL,
-        components: new Components().row(
-          new Button(
-            botAddComponent.name,
-            MESSAGES.BOT_ADD_BUTTON_LABEL,
-            "Success",
-          ),
-          new Button(
-            botRemoveComponent.name,
-            MESSAGES.BOT_REMOVE_BUTTON_LABEL,
-            "Danger",
-          ),
+      if (enabled) {
+        buttons.push(
           new Button(
             langSettingComponent.name,
             MESSAGES.LANG_SETTING_BUTTON_LABEL,
             "Primary",
           ),
-        ),
+        );
+      }
+
+      return c.res({
+        content: MESSAGES.SPODULE_SETTING_LABEL,
+        components: components.row(...buttons),
       });
     },
   };
@@ -145,7 +140,7 @@ export const botAddComponent: IDiscordComponentDefinition<DiscordCommandEnv> = {
     const u = await c.env.APP_WORKER.newDiscordUsecase();
     const r = await u.adjustBotChannel({
       type: "add",
-      serverId: c.interaction.guild_id ?? "",
+      serverId: c.interaction.guild_id || c.interaction.guild?.id || "",
       targetChannelId: c.interaction.channel.id,
     });
 
@@ -269,7 +264,7 @@ export const langSelectComponent: IDiscordComponentDefinition<DiscordCommandEnv>
         // Adjust the bot channel with the newly selected language
         const r = await u.adjustBotChannel({
           type: "add",
-          serverId: c.interaction.guild_id ?? "",
+          serverId: c.interaction.guild_id || c.interaction.guild?.id || "",
           targetChannelId: c.interaction.channel.id,
           channelLangaugeCode: selectedValue,
         });

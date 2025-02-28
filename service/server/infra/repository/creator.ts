@@ -12,6 +12,7 @@ import {
   getCurrentUTCDate,
 } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
+import { createUUID } from "../../pkg/uuid";
 import { withTracerResult } from "../http/trace/cloudflare";
 import { buildConflictUpdateColumns } from "./helper";
 import {
@@ -195,7 +196,8 @@ export class CreatorRepository implements ICreatorRepository {
         const dbChannels: InsertChannel[] = [];
 
         for (const c of creators) {
-          if (!dbCreatorss.some((creator) => creator.id === c.id)) {
+          const creator = dbCreatorss.find((creator) => creator.id === c.id);
+          if (!creator) {
             dbCreatorss.push({
               id: c.id,
               memberType: c.memberType,
@@ -204,15 +206,15 @@ export class CreatorRepository implements ICreatorRepository {
             });
           }
 
-          if (
-            !dbCreatorTranslations.some(
-              (translation) =>
-                translation.creatorId === c.id &&
-                translation.languageCode === c.languageCode,
-            )
-          ) {
+          const translation = dbCreatorTranslations.find(
+            (translation) =>
+              translation.creatorId === c.id &&
+              translation.languageCode === c.languageCode,
+          );
+
+          if (!translation) {
             dbCreatorTranslations.push({
-              id: c.id,
+              id: createUUID(),
               creatorId: c.id,
               languageCode: c.languageCode,
               name: c.name ?? "",
@@ -228,7 +230,11 @@ export class CreatorRepository implements ICreatorRepository {
           if (!d.detail) {
             continue;
           }
-          if (d.detail.rawId) {
+          const channel = dbChannels.find(
+            (c) => c.platformChannelId === d.detail?.rawId,
+          );
+
+          if (!channel) {
             dbChannels.push({
               id: c.channel.id,
               platformChannelId: d.detail.rawId,
@@ -306,6 +312,7 @@ export class CreatorRepository implements ICreatorRepository {
               ],
               set: buildConflictUpdateColumns(creatorTranslationTable, [
                 "name",
+                "languageCode",
                 "updatedAt",
               ]),
             })
