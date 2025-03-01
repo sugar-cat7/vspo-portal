@@ -29,21 +29,40 @@ export const translateVideosWorkflow = () => {
           },
           async () => {
             const vu = await env.APP_WORKER.newVideoUsecase();
-            const result = await vu.list({
-              limit: 100,
+            const liveVideos = await vu.list({
+              limit: 10,
               page: 0,
               languageCode: "default",
+              videoType: "vspo_stream",
+              status: "live",
+              orderBy: "desc",
             });
 
-            if (result.err) {
-              throw result.err;
+            if (liveVideos.err) {
+              throw liveVideos.err;
             }
 
-            return { val: result.val };
+            const upcomingVideos = await vu.list({
+              limit: 10,
+              page: 0,
+              languageCode: "default",
+              videoType: "vspo_stream",
+              status: "upcoming",
+              orderBy: "desc",
+            });
+
+            if (upcomingVideos.err) {
+              throw upcomingVideos.err;
+            }
+
+            const videos = liveVideos.val.videos.concat(
+              upcomingVideos.val.videos,
+            );
+            return { val: videos };
           },
         );
 
-        if (lv.val.videos.length === 0) {
+        if (lv.val?.length === 0) {
           logger.info("No videos to translate");
           return;
         }
@@ -60,7 +79,7 @@ export const translateVideosWorkflow = () => {
                 const vu = await env.APP_WORKER.newVideoUsecase();
                 await vu.translateVideoEnqueue({
                   languageCode: lang,
-                  videos: lv.val.videos,
+                  videos: lv.val,
                 });
               },
             ),

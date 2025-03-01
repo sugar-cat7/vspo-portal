@@ -5,6 +5,7 @@ import type { ApiEnv } from "../../../config/env/api";
 import type { CommonEnv } from "../../../config/env/common";
 import type { AppWorkerEnv } from "../../../config/env/internal";
 import type { BindingWorkflowEnv } from "../../../config/env/workflow";
+import { setFeatureFlagProvider } from "../../../config/featureFlag";
 import { AppError } from "../../../pkg/errors";
 import { Err, Ok, type Result } from "../../../pkg/errors/result";
 import { AppLogger } from "../../../pkg/logging";

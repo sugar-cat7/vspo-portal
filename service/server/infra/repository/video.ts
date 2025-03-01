@@ -271,7 +271,6 @@ export class VideoRepository implements IVideoRepository {
           .onConflictDoUpdate({
             target: videoTable.rawId,
             set: buildConflictUpdateColumns(videoTable, [
-              "videoType",
               "publishedAt",
               "tags",
               "thumbnailUrl",

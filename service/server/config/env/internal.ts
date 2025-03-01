@@ -2,7 +2,7 @@ import { z } from "zod";
 import { zAIEnv } from "./ai";
 import { zCommonEnv } from "./common";
 import { zDiscordEnv } from "./discord";
-
+import { zFeatureFlagEnv } from "./flag";
 export const zAppWorkerEnv = z
   .object({
     YOUTUBE_API_KEY: z.string(),
@@ -17,6 +17,7 @@ export const zAppWorkerEnv = z
   })
   .merge(zCommonEnv)
   .merge(zAIEnv)
-  .merge(zDiscordEnv);
+  .merge(zDiscordEnv)
+  .merge(zFeatureFlagEnv);
 
 export type AppWorkerEnv = z.infer<typeof zAppWorkerEnv>;

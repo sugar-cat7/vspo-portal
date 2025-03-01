@@ -103,46 +103,66 @@ class AppLogger implements CustomLogger {
 
   debug(message: string, fields?: Fields): void {
     const context = this.getContext();
-    this.loggerInstance.debug({
-      message,
+    console.debug(message, {
       requestId: context.requestId,
       service: context.service,
       ...(context.additionalFields || {}),
       ...fields,
     });
+    // this.loggerInstance.debug(message, {
+    //   requestId: context.requestId,
+    //   service: context.service,
+    //   ...(context.additionalFields || {}),
+    //   ...fields,
+    // });
   }
 
   info(message: string, fields?: Fields): void {
     const context = this.getContext();
-    this.loggerInstance.info({
-      message,
+    console.info(message, {
       requestId: context.requestId,
       service: context.service,
       ...(context.additionalFields || {}),
       ...fields,
     });
+    // this.loggerInstance.info(message, {
+    //   requestId: context.requestId,
+    //   service: context.service,
+    //   ...(context.additionalFields || {}),
+    //   ...fields,
+    // });
   }
 
   warn(message: string, fields?: Fields): void {
     const context = this.getContext();
-    this.loggerInstance.warn({
-      message,
+    console.warn(message, {
       requestId: context.requestId,
       service: context.service,
       ...(context.additionalFields || {}),
       ...fields,
     });
+    // this.loggerInstance.warn(message, {
+    //   requestId: context.requestId,
+    //   service: context.service,
+    //   ...(context.additionalFields || {}),
+    //   ...fields,
+    // });
   }
 
   error(message: string, fields?: Fields): void {
     const context = this.getContext();
-    this.loggerInstance.error({
-      message,
+    console.error(message, {
       requestId: context.requestId,
       service: context.service,
       ...(context.additionalFields || {}),
       ...fields,
     });
+    // this.loggerInstance.error(message, {
+    //   requestId: context.requestId,
+    //   service: context.service,
+    //   ...(context.additionalFields || {}),
+    //   ...fields,
+    // });
   }
 }
 

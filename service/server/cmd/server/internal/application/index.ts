@@ -3,6 +3,7 @@ import {
   type AppWorkerEnv,
   zAppWorkerEnv,
 } from "../../../../config/env/internal";
+import { setFeatureFlagProvider } from "../../../../config/featureFlag";
 import {
   type Creator,
   CreatorsSchema,
@@ -180,6 +181,10 @@ export class DiscordService extends RpcTarget {
   async exists(serverId: string) {
     return this.#usecase.exists(serverId);
   }
+
+  async existsChannel(channelId: string) {
+    return this.#usecase.existsChannel(channelId);
+  }
 }
 
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
@@ -243,6 +248,7 @@ export default createHandler({
     env: AppWorkerEnv,
     _executionContext: ExecutionContext,
   ) => {
+    setFeatureFlagProvider(env);
     return await withTracer("QueueHandler", "queue.consumer", async (span) => {
       const e = zAppWorkerEnv.safeParse(env);
       if (!e.success) {
@@ -341,21 +347,32 @@ export default createHandler({
             return;
           }
 
-          // Group creators by language code
-          const creatorsByLang = cr.data.reduce(
-            (acc, creator) => {
-              const langCode = creator.languageCode;
-              if (!acc[langCode]) {
-                acc[langCode] = [];
-              }
-              acc[langCode].push(creator);
-              return acc;
-            },
-            {} as Record<string, typeof cr.data>,
-          );
+          // Group creators by language code more efficiently
+          const creatorsByLang = new Map<string, typeof cr.data>();
+
+          for (const creator of cr.data) {
+            const langCode = creator.languageCode;
+            if (!langCode) {
+              logger.warn(
+                `Creator missing language code, skipping: ${creator.id || "unknown"}`,
+              );
+              continue;
+            }
+
+            if (!creatorsByLang.has(langCode)) {
+              creatorsByLang.set(langCode, []);
+            }
+            creatorsByLang.get(langCode)?.push(creator);
+          }
+
+          logger.info(`Grouped creators by ${creatorsByLang.size} languages`);
 
           // Process each language group separately
-          for (const [langCode, creators] of Object.entries(creatorsByLang)) {
+          for (const [langCode, creators] of creatorsByLang.entries()) {
+            logger.info(
+              `Processing ${creators.length} creators for language: ${langCode}`,
+            );
+
             const tc = await c.creatorInteractor.translateCreator({
               languageCode: langCode,
               creators: creators,

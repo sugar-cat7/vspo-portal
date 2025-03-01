@@ -30,20 +30,32 @@ export const translateCreatorsWorkflow = () => {
           async () => {
             const vu = await env.APP_WORKER.newCreatorUsecase();
             const result = await vu.list({
-              limit: 100,
+              limit: 30,
               page: 0,
               languageCode: "default",
+              memberType: "vspo_jp",
             });
 
             if (result.err) {
               throw result.err;
             }
 
-            return { val: result.val };
+            const result2 = await vu.list({
+              limit: 30,
+              page: 0,
+              languageCode: "default",
+              memberType: "vspo_en",
+            });
+
+            if (result2.err) {
+              throw result2.err;
+            }
+
+            return { val: result.val.creators.concat(result2.val.creators) };
           },
         );
 
-        if (lv.val.creators.length === 0) {
+        if (lv.val?.length === 0) {
           logger.info("No creators to translate");
           return;
         }
@@ -60,7 +72,7 @@ export const translateCreatorsWorkflow = () => {
                 const vu = await env.APP_WORKER.newCreatorUsecase();
                 await vu.translateCreatorEnqueue({
                   languageCode: lang,
-                  creators: lv.val.creators,
+                  creators: lv.val,
                 });
               },
             ),

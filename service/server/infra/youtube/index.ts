@@ -85,7 +85,6 @@ export class YoutubeService implements IYoutubeService {
         const response = responseResult.val;
         videos.push(...(response.data.items || []));
       }
-      console.log("videos", JSON.stringify(videos, null, 2));
       return Ok(
         createVideos(
           videos.map((video) =>
