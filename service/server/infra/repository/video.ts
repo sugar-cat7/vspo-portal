@@ -94,7 +94,7 @@ export class VideoRepository implements IVideoRepository {
       if (query.memberType) {
         filters.push(eq(creatorTable.memberType, query.memberType));
       }
-      if (query.channelIds) {
+      if (query.channelIds && query.channelIds.length > 0) {
         filters.push(inArray(videoTable.channelId, query.channelIds));
       }
 
