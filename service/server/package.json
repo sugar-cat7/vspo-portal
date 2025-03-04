@@ -40,7 +40,7 @@
     "@twurple/auth": "^7.2.1",
     "ai": "^4.1.45",
     "dayjs": "^1.11.13",
-    "discord-hono": "^0.16.2",
+    "discord-hono": "^0.16.3",
     "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.7.0",
     "googleapis": "^144.0.0",
