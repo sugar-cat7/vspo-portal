@@ -496,11 +496,47 @@ export class VideoService implements IVideoService {
       });
       return creators;
     }
-
     const channelIds = creators.val.jp
       .map((c) => c.channel?.youtube?.rawId)
       .concat(creators.val.en.map((c) => c.channel?.youtube?.rawId))
       .filter((id) => id !== undefined);
+
+    const existingLiveVideos = await this.deps.videoRepository.list({
+      limit: 200,
+      page: 0,
+      languageCode: "default",
+      status: StatusSchema.Enum.live,
+      channelIds: channelIds,
+    });
+    if (existingLiveVideos.err) {
+      return existingLiveVideos;
+    }
+
+    const existingUpcomingVideos = await this.deps.videoRepository.list({
+      limit: 200,
+      page: 0,
+      languageCode: "default",
+      status: StatusSchema.Enum.upcoming,
+      channelIds: channelIds,
+    });
+    if (existingUpcomingVideos.err) {
+      return existingUpcomingVideos;
+    }
+
+    const existingEndedVideos = await this.deps.videoRepository.list({
+      limit: 200,
+      page: 0,
+      languageCode: "default",
+      status: StatusSchema.Enum.ended,
+      channelIds: channelIds,
+    });
+    if (existingEndedVideos.err) {
+      return existingEndedVideos;
+    }
+
+    const existingVideos = existingLiveVideos.val
+      .concat(existingUpcomingVideos.val)
+      .concat(existingEndedVideos.val);
 
     const promises = channelIds.map((id) =>
       this.getVideosByChannel({ channelId: id }),
@@ -513,7 +549,9 @@ export class VideoService implements IVideoService {
       )
       .flatMap((r) => r.value.val);
 
-    return Ok(videos);
+    const videosWithDiff = this.getVideoDifferences(videos, existingVideos);
+
+    return Ok(videosWithDiff);
   }
 
   async getVideosByChannel({

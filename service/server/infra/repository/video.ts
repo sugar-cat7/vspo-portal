@@ -52,6 +52,7 @@ type ListQuery = {
   endedAt?: Date;
   languageCode: string; // ISO 639-1 language code or [default] explicitly specified to narrow down to 1creator
   orderBy?: "asc" | "desc";
+  channelIds?: string[];
 };
 
 export interface IVideoRepository {
@@ -92,6 +93,9 @@ export class VideoRepository implements IVideoRepository {
       }
       if (query.memberType) {
         filters.push(eq(creatorTable.memberType, query.memberType));
+      }
+      if (query.channelIds) {
+        filters.push(inArray(videoTable.channelId, query.channelIds));
       }
 
       const videoResult = await wrap(
