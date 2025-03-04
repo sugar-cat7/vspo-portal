@@ -41,6 +41,7 @@ export type GetVideosByChannelParams = {
     | "title"
     | "videoCount"
     | "viewCount";
+  eventType: "completed" | "live" | "upcoming";
 };
 
 export interface IYoutubeService {
@@ -254,6 +255,7 @@ export class YoutubeService implements IYoutubeService {
             maxResults: params.maxResults || 50,
             order: params.order || "date",
             type: ["video"],
+            eventType: params.eventType,
           }),
           (err) =>
             new AppError({

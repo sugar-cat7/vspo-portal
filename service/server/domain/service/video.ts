@@ -512,34 +512,10 @@ export class VideoService implements IVideoService {
       return existingLiveVideos;
     }
 
-    const existingUpcomingVideos = await this.deps.videoRepository.list({
-      limit: 200,
-      page: 0,
-      languageCode: "default",
-      status: StatusSchema.Enum.upcoming,
-      channelIds: channelIds,
-    });
-    if (existingUpcomingVideos.err) {
-      return existingUpcomingVideos;
-    }
-
-    const existingEndedVideos = await this.deps.videoRepository.list({
-      limit: 200,
-      page: 0,
-      languageCode: "default",
-      status: StatusSchema.Enum.ended,
-      channelIds: channelIds,
-    });
-    if (existingEndedVideos.err) {
-      return existingEndedVideos;
-    }
-
-    const existingVideos = existingLiveVideos.val
-      .concat(existingUpcomingVideos.val)
-      .concat(existingEndedVideos.val);
+    const existingVideos = existingLiveVideos.val;
 
     const promises = channelIds.map((id) =>
-      this.getVideosByChannel({ channelId: id }),
+      this.getVideosByChannel({ channelId: id, eventType: "live" }),
     );
     const results = await Promise.allSettled(promises);
     const videos = results
@@ -551,6 +527,11 @@ export class VideoService implements IVideoService {
 
     const videosWithDiff = this.getVideoDifferences(videos, existingVideos);
 
+    AppLogger.info("Successfully fetched member videos", {
+      service: this.SERVICE_NAME,
+      count: videosWithDiff.length,
+      videoIds: videosWithDiff.map((v) => v.rawId),
+    });
     return Ok(videosWithDiff);
   }
 
@@ -558,6 +539,7 @@ export class VideoService implements IVideoService {
     channelId,
     maxResults,
     order,
+    eventType,
   }: {
     channelId: string;
     maxResults?: number;
@@ -568,6 +550,7 @@ export class VideoService implements IVideoService {
       | "title"
       | "videoCount"
       | "viewCount";
+    eventType: "completed" | "live" | "upcoming";
   }): Promise<Result<Videos, AppError>> {
     return withTracerResult(
       this.SERVICE_NAME,
@@ -583,6 +566,7 @@ export class VideoService implements IVideoService {
           channelId,
           maxResults,
           order,
+          eventType,
         });
 
         if (result.err) {
