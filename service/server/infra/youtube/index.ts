@@ -138,10 +138,11 @@ export class YoutubeService implements IYoutubeService {
       const responseResult = await wrap(
         this.youtube.search.list({
           part: ["snippet"],
-          q: params.query,
+          q: encodeURIComponent(params.query),
           maxResults: 50,
           eventType: params.eventType,
           type: ["video"],
+          safeSearch: "none",
         }),
         (err) =>
           new AppError({

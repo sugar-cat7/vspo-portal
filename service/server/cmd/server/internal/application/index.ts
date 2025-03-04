@@ -14,11 +14,7 @@ import {
 } from "../../../../domain";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { Container } from "../../../../infra/dependency";
-import {
-  createHandler,
-  withTracer,
-  withTracerResult,
-} from "../../../../infra/http/trace";
+import { createHandler, withTracer } from "../../../../infra/http/trace";
 import { AppLogger } from "../../../../pkg/logging";
 import type {
   AdjustBotChannelParams,
@@ -39,6 +35,22 @@ import type {
   TranslateVideoParam,
 } from "../../../../usecase";
 
+async function batchEnqueueWithChunks<T, U extends MessageParam>(
+  items: T[],
+  chunkSize: number,
+  transform: (item: T) => { body: U },
+  queue: Queue<U>,
+): Promise<void> {
+  const chunks = [];
+  for (let i = 0; i < items.length; i += chunkSize) {
+    chunks.push(items.slice(i, i + chunkSize));
+  }
+
+  await Promise.all(
+    chunks.map((chunk) => queue.sendBatch(chunk.map(transform))),
+  );
+}
+
 export class VideoService extends RpcTarget {
   #usecase: IVideoInteractor;
   #queue: Queue<VideoMessage>;
@@ -49,8 +61,11 @@ export class VideoService extends RpcTarget {
   }
 
   async batchUpsertEnqueue(params: BatchUpsertVideosParam) {
-    return this.#queue.sendBatch(
-      params.map((video) => ({ body: { ...video, kind: "upsert-video" } })),
+    return batchEnqueueWithChunks(
+      params,
+      100,
+      (video) => ({ body: { ...video, kind: "upsert-video" } }),
+      this.#queue,
     );
   }
 
@@ -79,14 +94,17 @@ export class VideoService extends RpcTarget {
   }
 
   async translateVideoEnqueue(params: TranslateVideoParam) {
-    return this.#queue.sendBatch(
-      params.videos.map((video) => ({
+    return batchEnqueueWithChunks(
+      params.videos,
+      100,
+      (video) => ({
         body: {
           ...video,
           languageCode: TargetLangSchema.parse(params.languageCode),
           kind: "translate-video",
         },
-      })),
+      }),
+      this.#queue,
     );
   }
 
@@ -105,22 +123,26 @@ export class CreatorService extends RpcTarget {
   }
 
   async batchUpsertEnqueue(params: BatchUpsertCreatorsParam) {
-    return this.#queue.sendBatch(
-      params.map((creator) => ({
-        body: { ...creator, kind: "upsert-creator" },
-      })),
+    return batchEnqueueWithChunks(
+      params,
+      100,
+      (creator) => ({ body: { ...creator, kind: "upsert-creator" } }),
+      this.#queue,
     );
   }
 
   async translateCreatorEnqueue(params: TranslateCreatorParam) {
-    return this.#queue.sendBatch(
-      params.creators.map((creator) => ({
+    return batchEnqueueWithChunks(
+      params.creators,
+      100,
+      (creator) => ({
         body: {
           ...creator,
           languageCode: params.languageCode,
           kind: "translate-creator",
         },
-      })),
+      }),
+      this.#queue,
     );
   }
 
@@ -159,10 +181,11 @@ export class DiscordService extends RpcTarget {
   }
 
   async batchUpsertEnqueue(params: BatchUpsertDiscordServersParam) {
-    return this.#queue.sendBatch(
-      params.map((server) => ({
-        body: { ...server, kind: "upsert-discord-server" },
-      })),
+    return batchEnqueueWithChunks(
+      params,
+      100,
+      (server) => ({ body: { ...server, kind: "upsert-discord-server" } }),
+      this.#queue,
     );
   }
 
