@@ -23,7 +23,7 @@
     "register": "node --env-file=.env.local cmd/discord/interaction/register.ts"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.1.13",
+    "@ai-sdk/openai": "^1.1.15",
     "@discordeno/rest": "^21.0.0",
     "@discordeno/types": "^21.0.0",
     "@discordeno/utils": "^21.0.0",
