@@ -52,12 +52,12 @@ type GetMessageParams = {
 };
 
 export interface IDiscordClient {
-  sendMessage(params: SendMessageParams): Promise<Result<void, AppError>>;
+  sendMessage(params: SendMessageParams): Promise<Result<string, AppError>>;
   getChannel(
     params: GetChannelInfoParams,
   ): Promise<Result<DiscordChannel, AppError>>;
-  updateMessage(params: UpdateMessageParams): Promise<Result<void, AppError>>;
-  deleteMessage(params: DeleteMessageParams): Promise<Result<void, AppError>>;
+  updateMessage(params: UpdateMessageParams): Promise<Result<string, AppError>>;
+  deleteMessage(params: DeleteMessageParams): Promise<Result<string, AppError>>;
   getLatestBotMessages(
     channelId: string,
   ): Promise<Result<DiscordMessage[], AppError>>;
@@ -79,7 +79,7 @@ export class DiscordClient implements IDiscordClient {
 
   async sendMessage(
     params: SendMessageParams,
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<string, AppError>> {
     return withTracerResult("discord", "sendMessage", async (span) => {
       const { channelId, content, embeds } = params;
       AppLogger.info("Sending message to Discord channel", {
@@ -110,7 +110,7 @@ export class DiscordClient implements IDiscordClient {
       AppLogger.info("Successfully sent message to Discord channel", {
         channel_id: channelId,
       });
-      return Ok();
+      return Ok(responseResult.val.id);
     });
   }
 
@@ -171,7 +171,7 @@ export class DiscordClient implements IDiscordClient {
 
   async updateMessage(
     params: UpdateMessageParams,
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<string, AppError>> {
     return withTracerResult("discord", "updateMessage", async (span) => {
       const { channelId, messageId, content, embeds } = params;
       AppLogger.info("Updating Discord message", {
@@ -200,13 +200,13 @@ export class DiscordClient implements IDiscordClient {
         channel_id: channelId,
         message_id: messageId,
       });
-      return Ok();
+      return Ok(messageId);
     });
   }
 
   async deleteMessage(
     params: DeleteMessageParams,
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<string, AppError>> {
     return withTracerResult("discord", "deleteMessage", async (span) => {
       const { channelId, messageId } = params;
       AppLogger.info("Deleting Discord message", {
@@ -265,7 +265,7 @@ export class DiscordClient implements IDiscordClient {
         channel_id: channelId,
         message_id: messageId,
       });
-      return Ok();
+      return Ok(messageId);
     });
   }
 
@@ -277,7 +277,7 @@ export class DiscordClient implements IDiscordClient {
         channel_id: channelId,
       });
 
-      const query = { limit: 50 };
+      const query = { limit: 100 };
       const responseResult = await wrap(
         this.rest.getMessages(channelId, query),
         (err: Error) => {

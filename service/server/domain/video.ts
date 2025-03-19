@@ -111,6 +111,7 @@ const VideoSchema = z
     creatorName: z.string().optional(),
     creatorThumbnailURL: ThumbnailURLSchema.optional(),
     link: z.string().optional(),
+    deleted: z.boolean().default(false),
   })
   .transform((video) => ({
     ...video,

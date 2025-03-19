@@ -3,6 +3,7 @@ import {
   and,
   asc,
   count,
+  countDistinct,
   desc,
   eq,
   gte,
@@ -53,6 +54,7 @@ type ListQuery = {
   languageCode: string; // ISO 639-1 language code or [default] explicitly specified to narrow down to 1creator
   orderBy?: "asc" | "desc";
   channelIds?: string[];
+  includeDeleted?: boolean;
 };
 
 export interface IVideoRepository {
@@ -60,6 +62,7 @@ export interface IVideoRepository {
   batchUpsert(videos: Videos): Promise<Result<Videos, AppError>>;
   count(query: ListQuery): Promise<Result<number, AppError>>;
   batchDelete(videoIds: string[]): Promise<Result<void, AppError>>;
+  deletedListIds(): Promise<Result<string[], AppError>>;
 }
 
 export class VideoRepository implements IVideoRepository {
@@ -67,36 +70,7 @@ export class VideoRepository implements IVideoRepository {
 
   async list(query: ListQuery): Promise<Result<Videos, AppError>> {
     return withTracerResult("VideoRepository", "list", async (span) => {
-      const filters: SQL[] = [];
-      if (query.platform) {
-        filters.push(eq(videoTable.platformType, query.platform));
-      }
-      if (query.videoType) {
-        filters.push(eq(videoTable.videoType, query.videoType));
-      }
-      if (query.status) {
-        filters.push(eq(streamStatusTable.status, query.status));
-      }
-      if (query.startedAt) {
-        filters.push(gte(streamStatusTable.startedAt, query.startedAt));
-      }
-      if (query.endedAt) {
-        filters.push(lte(streamStatusTable.endedAt, query.endedAt));
-      }
-      if (query.languageCode) {
-        filters.push(
-          eq(videoTranslationTable.languageCode, query.languageCode),
-        );
-        filters.push(
-          eq(creatorTranslationTable.languageCode, query.languageCode),
-        );
-      }
-      if (query.memberType) {
-        filters.push(eq(creatorTable.memberType, query.memberType));
-      }
-      if (query.channelIds && query.channelIds.length > 0) {
-        filters.push(inArray(videoTable.channelId, query.channelIds));
-      }
+      const filters = this.buildFilters(query);
 
       const videoResult = await wrap(
         this.db
@@ -176,21 +150,28 @@ export class VideoRepository implements IVideoRepository {
 
   async count(query: ListQuery): Promise<Result<number, AppError>> {
     return withTracerResult("VideoRepository", "count", async (span) => {
-      const filters: SQL[] = [];
-      if (query.platform) {
-        filters.push(eq(videoTable.platformType, query.platform));
-      }
-      if (query.status) {
-        filters.push(eq(streamStatusTable.status, query.status));
-      }
+      const filters = this.buildFilters(query);
 
       const videoResult = await wrap(
         this.db
-          .select({ count: count() })
+          .select({ value: countDistinct(videoTable.id) })
           .from(videoTable)
           .innerJoin(
             streamStatusTable,
-            eq(videoTable.id, streamStatusTable.videoId),
+            eq(videoTable.rawId, streamStatusTable.videoId),
+          )
+          .innerJoin(
+            videoTranslationTable,
+            eq(videoTable.rawId, videoTranslationTable.videoId),
+          )
+          .innerJoin(
+            channelTable,
+            eq(videoTable.channelId, channelTable.platformChannelId),
+          )
+          .innerJoin(creatorTable, eq(channelTable.creatorId, creatorTable.id))
+          .innerJoin(
+            creatorTranslationTable,
+            eq(creatorTable.id, creatorTranslationTable.creatorId),
           )
           .where(and(...filters))
           .execute(),
@@ -205,7 +186,7 @@ export class VideoRepository implements IVideoRepository {
         return Err(videoResult.err);
       }
 
-      return Ok(videoResult.val.at(0)?.count ?? 0);
+      return Ok(videoResult.val.at(0)?.value ?? 0);
     });
   }
 
@@ -230,6 +211,7 @@ export class VideoRepository implements IVideoRepository {
               tags: v.tags.join(","),
               thumbnailUrl: v.thumbnailURL,
               link: v.link,
+              deleted: v.deleted,
             }),
           );
         }
@@ -278,6 +260,7 @@ export class VideoRepository implements IVideoRepository {
               "publishedAt",
               "tags",
               "thumbnailUrl",
+              "deleted",
             ]),
           })
           .returning()
@@ -408,5 +391,69 @@ export class VideoRepository implements IVideoRepository {
 
       return Ok();
     });
+  }
+
+  async deletedListIds(): Promise<Result<string[], AppError>> {
+    return withTracerResult(
+      "VideoRepository",
+      "deletedListIds",
+      async (span) => {
+        const result = await wrap(
+          this.db
+            .select({ rawId: videoTable.rawId })
+            .from(videoTable)
+            .where(eq(videoTable.deleted, true)),
+          (err) =>
+            new AppError({
+              message: `Database error during video deleted list: ${err.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+            }),
+        );
+
+        if (result.err) {
+          return Err(result.err);
+        }
+
+        return Ok(result.val.map((v) => v.rawId));
+      },
+    );
+  }
+
+  private buildFilters(query: ListQuery): SQL[] {
+    const filters: SQL[] = [];
+    const languageCode = query.languageCode || "default";
+
+    if (query.platform) {
+      filters.push(eq(videoTable.platformType, query.platform));
+    }
+    if (query.videoType) {
+      filters.push(eq(videoTable.videoType, query.videoType));
+    }
+    if (query.status) {
+      filters.push(eq(streamStatusTable.status, query.status));
+    }
+    if (query.startedAt) {
+      filters.push(gte(streamStatusTable.startedAt, query.startedAt));
+    }
+    if (query.endedAt) {
+      filters.push(lte(streamStatusTable.endedAt, query.endedAt));
+    }
+
+    if (!query.includeDeleted) {
+      filters.push(eq(videoTable.deleted, false));
+    }
+
+    // Always add language filters with default fallback
+    filters.push(eq(videoTranslationTable.languageCode, languageCode));
+    filters.push(eq(creatorTranslationTable.languageCode, languageCode));
+
+    if (query.memberType) {
+      filters.push(eq(creatorTable.memberType, query.memberType));
+    }
+    if (query.channelIds && query.channelIds.length > 0) {
+      filters.push(inArray(videoTable.channelId, query.channelIds));
+    }
+
+    return filters;
   }
 }

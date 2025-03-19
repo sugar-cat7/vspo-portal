@@ -140,7 +140,7 @@ describe.concurrent("CreatorInteractor", () => {
         },
         expectedResult: {
           currentPage: 1,
-          creatorsLength: 6,
+          creatorsLength: 10,
         },
       },
       {

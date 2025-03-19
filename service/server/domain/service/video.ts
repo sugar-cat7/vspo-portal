@@ -137,10 +137,22 @@ export class VideoService implements IVideoService {
           });
         }
 
+        AppLogger.info("Successfully fetched Raw YouTube videos", {
+          service: this.SERVICE_NAME,
+          count: videos.length,
+          videoTitles: videos.map((v) => v.title),
+        });
+
         const channelIds = c.val.jp
           .map((c) => c.channel?.youtube?.rawId)
           .concat(c.val.en.map((c) => c.channel?.youtube?.rawId))
           .filter((id) => id !== undefined);
+
+        AppLogger.info("Youtube Channels", {
+          service: this.SERVICE_NAME,
+          channelIds,
+          channelTitles: c.val.jp.map((c) => c.channel?.youtube?.name),
+        });
 
         const videoIds = Array.from(
           new Set(
@@ -155,6 +167,14 @@ export class VideoService implements IVideoService {
               .filter((id) => id !== null),
           ),
         );
+
+        AppLogger.info("Successfully fetched Filtered YouTube videos", {
+          service: this.SERVICE_NAME,
+          count: videoIds.length,
+          videoTitles: videoIds.map(
+            (id) => videos.find((v) => v.rawId === id)?.title,
+          ),
+        });
 
         const fetchedVideos = await this.getVideosByIDs({
           youtubeVideoIds: videoIds,
@@ -171,6 +191,7 @@ export class VideoService implements IVideoService {
         AppLogger.info("Successfully fetched YouTube videos", {
           service: this.SERVICE_NAME,
           count: fetchedVideos.val.length,
+          videoTitles: fetchedVideos.val.map((v) => v.title),
         });
         return Ok(fetchedVideos.val);
       },
@@ -202,58 +223,58 @@ export class VideoService implements IVideoService {
       this.deps.twitchClient.getArchive({ userIds }),
     ]);
 
-    // Handle live streams result
-    const liveStreamsResult =
-      results[0].status === "fulfilled"
-        ? results[0].value
-        : results[0].reason || {
-            err: { message: "Failed to fetch live streams" },
-          };
+    const liveStreams =
+      results[0].status === "fulfilled" ? results[0].value.val : [];
+    const archives =
+      results[1].status === "fulfilled" ? results[1].value.val : [];
 
-    // Handle archives result
-    const archivesResult =
-      results[1].status === "fulfilled"
-        ? results[1].value
-        : results[1].reason || { err: { message: "Failed to fetch archives" } };
+    const videos = liveStreams?.concat(archives ?? []);
 
-    if (liveStreamsResult.err) {
-      AppLogger.error("Failed to get Twitch live streams", {
-        service: this.SERVICE_NAME,
-        error: liveStreamsResult.err,
-      });
-      return liveStreamsResult;
+    if (!videos) {
+      return Ok([]);
     }
 
-    if (archivesResult.err) {
-      AppLogger.warn(
-        "Failed to get Twitch archives, continuing with live streams only",
-        {
-          service: this.SERVICE_NAME,
-          error: archivesResult.err,
-        },
-      );
+    const err = results.filter(
+      (r): r is PromiseRejectedResult => r.status === "rejected",
+    );
+
+    if (err.length > 0) {
+      AppLogger.error("Failed to get live streams", {
+        service: this.SERVICE_NAME,
+        errors: err.map((r) => r.reason),
+      });
+    }
+
+    const errLive =
+      results[0].status === "fulfilled" ? results[0].value.err : null;
+    const errArchive =
+      results[1].status === "fulfilled" ? results[1].value.err : null;
+
+    if (errLive) {
+      AppLogger.error("Failed to get live streams", {
+        service: this.SERVICE_NAME,
+        error: errLive,
+      });
+    }
+
+    if (errArchive) {
+      AppLogger.error("Failed to get archive", {
+        service: this.SERVICE_NAME,
+        error: errArchive,
+      });
     }
 
     // Get the current live stream IDs to check against existing videos
-    const liveStreamIds = new Set(
-      liveStreamsResult.val.map((video: { rawId: string }) => video.rawId),
-    );
-
+    const ids = new Set(videos.map((video) => video.rawId));
     // Get existing videos that are marked as live from Twitch
     const existingLiveVideosResult = await this.deps.videoRepository.list({
-      limit: 30,
+      limit: 500,
       page: 0,
       status: StatusSchema.Enum.live,
       platform: PlatformSchema.Enum.twitch,
       languageCode: "default",
+      orderBy: "desc",
     });
-
-    let videos = liveStreamsResult.val;
-
-    // Add archives if available
-    if (archivesResult.val) {
-      videos = videos.concat(archivesResult.val);
-    }
 
     // Process ended videos in parallel with other operations
     if (
@@ -261,7 +282,7 @@ export class VideoService implements IVideoService {
       existingLiveVideosResult.val.length > 0
     ) {
       const endedVideoIds = existingLiveVideosResult.val
-        .filter((video) => !liveStreamIds.has(video.rawId))
+        .filter((video) => !ids.has(video.rawId))
         .map((video) => video.id);
 
       // Delete videos that are no longer live
@@ -270,9 +291,10 @@ export class VideoService implements IVideoService {
           `Deleting ${endedVideoIds.length} Twitch videos that have ended`,
           {
             service: this.SERVICE_NAME,
+            endedVideoIds: endedVideoIds,
+            streamIds: ids,
           },
         );
-
         // Delete videos that have ended using batchDelete (don't await here)
         await this.deps.videoRepository.batchDelete(endedVideoIds);
       }
@@ -362,16 +384,18 @@ export class VideoService implements IVideoService {
   // Get videos that have differences from existing videos
   async searchExistVideos(): Promise<Result<Videos, AppError>> {
     const liveVideos = await this.deps.videoRepository.list({
-      limit: 30,
+      limit: 500,
       page: 0,
       status: StatusSchema.Enum.live,
       languageCode: "default",
+      orderBy: "desc",
     });
     const upcomingVideos = await this.deps.videoRepository.list({
-      limit: 30,
+      limit: 500,
       page: 0,
       status: StatusSchema.Enum.upcoming,
       languageCode: "default",
+      orderBy: "desc",
     });
     if (liveVideos.err) {
       return liveVideos;
@@ -403,9 +427,10 @@ export class VideoService implements IVideoService {
 
   async searchDeletedVideos(): Promise<Result<Videos, AppError>> {
     const existingVideos = await this.deps.videoRepository.list({
-      limit: 100,
+      limit: 500,
       page: 0,
       languageCode: "default",
+      orderBy: "desc",
     });
     if (existingVideos.err) {
       return existingVideos;
@@ -431,7 +456,18 @@ export class VideoService implements IVideoService {
     const deletedVideos = existingVideos.val.filter(
       (v) => !fetchedVideos.val.find((fv) => fv.rawId === v.rawId),
     );
-    return Ok(deletedVideos);
+
+    AppLogger.info("Successfully fetched deleted videos", {
+      service: this.SERVICE_NAME,
+      count: deletedVideos.length,
+    });
+
+    return Ok(
+      deletedVideos.map((video) => ({
+        ...video,
+        deleted: true,
+      })),
+    );
   }
 
   async getVideosByIDs({
@@ -516,11 +552,12 @@ export class VideoService implements IVideoService {
       .filter((id) => id !== undefined);
 
     const existingLiveVideos = await this.deps.videoRepository.list({
-      limit: 200,
+      limit: 500,
       page: 0,
       languageCode: "default",
       status: StatusSchema.Enum.live,
       channelIds: channelIds,
+      orderBy: "desc",
     });
     if (existingLiveVideos.err) {
       return existingLiveVideos;
@@ -607,18 +644,20 @@ export class VideoService implements IVideoService {
     Result<{ jp: Creator[]; en: Creator[] }, AppError>
   > {
     const jpCreators = await this.deps.creatorRepository.list({
-      limit: 50,
+      limit: 300,
       page: 0,
       memberType: MemberTypeSchema.Enum.vspo_jp,
+      languageCode: "default",
     });
     if (jpCreators.err) {
       return jpCreators;
     }
 
     const enCreators = await this.deps.creatorRepository.list({
-      limit: 50,
+      limit: 300,
       page: 0,
       memberType: MemberTypeSchema.Enum.vspo_en,
+      languageCode: "default",
     });
     if (enCreators.err) {
       return enCreators;

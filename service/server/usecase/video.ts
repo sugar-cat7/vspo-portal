@@ -3,6 +3,7 @@ import type { Videos } from "../domain/video";
 import type { IAppContext } from "../infra/dependency";
 import { withTracerResult } from "../infra/http/trace";
 import { type AppError, Ok, type Result } from "../pkg/errors";
+import { AppLogger } from "../pkg/logging";
 
 export type BatchUpsertVideosParam = Videos;
 export type BatchUpsertByIdsParam = {
@@ -43,7 +44,7 @@ export interface IVideoInteractor {
   searchLive(): Promise<Result<Videos, AppError>>;
   searchExist(): Promise<Result<Videos, AppError>>;
   list(params: ListParam): Promise<Result<ListResponse, AppError>>;
-  searchDeleted(): Promise<Result<Videos, AppError>>;
+  searchDeletedCheck(): Promise<Result<Videos, AppError>>;
   batchDeleteByVideoIds(
     params: BatchDeleteByVideoIdsParam,
   ): Promise<Result<void, AppError>>;
@@ -51,6 +52,7 @@ export interface IVideoInteractor {
     params: TranslateVideoParam,
   ): Promise<Result<Videos, AppError>>;
   getMemberVideos(): Promise<Result<Videos, AppError>>;
+  deletedListIds(): Promise<Result<string[], AppError>>;
 }
 
 export class VideoInteractor implements IVideoInteractor {
@@ -128,10 +130,10 @@ export class VideoInteractor implements IVideoInteractor {
     });
   }
 
-  async searchDeleted(): Promise<Result<Videos, AppError>> {
+  async searchDeletedCheck(): Promise<Result<Videos, AppError>> {
     return await withTracerResult(
       "VideoInteractor",
-      "searchDeleted",
+      "searchDeletedCheck",
       async () => {
         return this.context.runInTx(async (repos, services) => {
           const sv = await services.videoService.searchDeletedVideos();
@@ -191,6 +193,25 @@ export class VideoInteractor implements IVideoInteractor {
           if (sv.err) {
             return sv;
           }
+          return Ok(sv.val);
+        });
+      },
+    );
+  }
+
+  async deletedListIds(): Promise<Result<string[], AppError>> {
+    return await withTracerResult(
+      "VideoInteractor",
+      "deletedListIds",
+      async () => {
+        return this.context.runInTx(async (repos, _services) => {
+          const sv = await repos.videoRepository.deletedListIds();
+          if (sv.err) {
+            return sv;
+          }
+          AppLogger.info("deletedListIds", {
+            videoIds: sv.val,
+          });
           return Ok(sv.val);
         });
       },

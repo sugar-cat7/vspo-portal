@@ -167,7 +167,8 @@ export class YoutubeService implements IYoutubeService {
               languageCode: "default",
               title: video.snippet?.title || "",
               description: video.snippet?.description || "",
-              rawChannelID: video.snippet?.channelId || "",
+              rawChannelID:
+                video.snippet?.channelId || video.id?.channelId || "",
               publishedAt: video.snippet?.publishedAt || getCurrentUTCString(),
               startedAt: null,
               endedAt: null,

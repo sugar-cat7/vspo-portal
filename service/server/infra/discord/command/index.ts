@@ -8,6 +8,7 @@ import {
 } from "discord-hono";
 import type { ApplicationService } from "../../../cmd/server/internal/application";
 import { LangCodeLabelMapping } from "../../../domain/translate";
+import { AppLogger } from "../../../pkg/logging";
 
 const MESSAGES = {
   // spoduleSettingCommand
@@ -193,23 +194,27 @@ export const yesBotRemoveComponent: IDiscordComponentDefinition<DiscordCommandEn
     name: "yes-bot-remove-setting",
     handler: async (c) => {
       const u = await c.env.APP_WORKER.newDiscordUsecase();
+      let response: { content: string; components: [] };
+
       const r = await u.batchDeleteChannelsByRowChannelIds([
         c.interaction.channel.id,
       ]);
 
       if (r.err) {
-        return c.resUpdate({
+        response = {
           content: MESSAGES.YES_BOT_REMOVE_ERROR,
           components: [],
-        });
+        };
+      } else {
+        response = {
+          content: MESSAGES.YES_BOT_REMOVE_SUCCESS(
+            c.interaction.channel.name ?? "",
+          ),
+          components: [],
+        };
       }
 
-      return c.resUpdate({
-        content: MESSAGES.YES_BOT_REMOVE_SUCCESS(
-          c.interaction.channel.name ?? "",
-        ),
-        components: [],
-      });
+      return c.resUpdate(response);
     },
   };
 

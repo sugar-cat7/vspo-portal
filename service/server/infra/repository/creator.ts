@@ -1,4 +1,12 @@
-import { type SQL, and, asc, count, eq, inArray } from "drizzle-orm";
+import {
+  type SQL,
+  and,
+  asc,
+  count,
+  countDistinct,
+  eq,
+  inArray,
+} from "drizzle-orm";
 import {
   type Channel,
   type Creators,
@@ -44,15 +52,7 @@ export class CreatorRepository implements ICreatorRepository {
 
   async list(query: ListQuery): Promise<Result<Creators, AppError>> {
     return withTracerResult("CreatorRepository", "list", async (span) => {
-      const filters: SQL[] = [];
-      if (query.memberType) {
-        filters.push(eq(creatorTable.memberType, query.memberType));
-      }
-      if (query.languageCode) {
-        filters.push(
-          eq(creatorTranslationTable.languageCode, query.languageCode),
-        );
-      }
+      const filters = this.buildFilters(query);
 
       const creatorResult = await wrap(
         this.db
@@ -160,15 +160,17 @@ export class CreatorRepository implements ICreatorRepository {
 
   async count(query: ListQuery): Promise<Result<number, AppError>> {
     return withTracerResult("CreatorRepository", "count", async (span) => {
-      const filters: SQL[] = [];
-      if (query.memberType) {
-        filters.push(eq(creatorTable.memberType, query.memberType));
-      }
+      const filters = this.buildFilters(query);
 
       const creatorResult = await wrap(
         this.db
-          .select({ count: count() })
+          .select({ value: countDistinct(creatorTable.id) })
           .from(creatorTable)
+          .innerJoin(channelTable, eq(creatorTable.id, channelTable.creatorId))
+          .innerJoin(
+            creatorTranslationTable,
+            eq(creatorTable.id, creatorTranslationTable.creatorId),
+          )
           .where(and(...filters))
           .execute(),
         (err) =>
@@ -182,7 +184,7 @@ export class CreatorRepository implements ICreatorRepository {
         return Err(creatorResult.err);
       }
 
-      return Ok(creatorResult.val.at(0)?.count ?? 0);
+      return Ok(creatorResult.val.at(0)?.value ?? 0);
     });
   }
 
@@ -374,5 +376,14 @@ export class CreatorRepository implements ICreatorRepository {
         return Ok();
       },
     );
+  }
+  private buildFilters(query: ListQuery): SQL[] {
+    const filters: SQL[] = [];
+    const languageCode = query.languageCode || "default";
+    if (query.memberType) {
+      filters.push(eq(creatorTable.memberType, query.memberType));
+    }
+    filters.push(eq(creatorTranslationTable.languageCode, languageCode));
+    return filters;
   }
 }

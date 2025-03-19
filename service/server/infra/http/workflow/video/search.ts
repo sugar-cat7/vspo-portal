@@ -57,20 +57,24 @@ export const searchVideosWorkflow = () => {
               const _ = await vu.batchUpsertEnqueue(result.val);
             },
           ),
-          // step.do(
-          //   "fetch and send deleted videos",
-          //   {
-          //     retries: { limit: 1, delay: "5 second", backoff: "linear" },
-          //     timeout: "1 minutes",
-          //   },
-          //   async () => {
-          //     const vu = await env.APP_WORKER.newVideoUsecase();
-          //     const result = await vu.searchDeleted();
-          //     if (result.err) {
-          //       throw result.err;
-          //     }
-          //   },
-          // ),
+          step.do(
+            "fetch and send deleted videos",
+            {
+              retries: { limit: 1, delay: "5 second", backoff: "linear" },
+              timeout: "1 minutes",
+            },
+            async () => {
+              const vu = await env.APP_WORKER.newVideoUsecase();
+              const result = await vu.searchDeletedCheck();
+              if (result.err) {
+                throw result.err;
+              }
+              if (result.val.length === 0) {
+                return;
+              }
+              const _ = await vu.batchUpsertEnqueue(result.val);
+            },
+          ),
         ]);
 
         const failedSteps = results.filter(

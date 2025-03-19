@@ -1,5 +1,4 @@
 import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
-import { OpenFeature } from "@openfeature/server-sdk";
 import {
   type BindingAppWorkerEnv,
   zBindingAppWorkerEnv,
@@ -19,13 +18,17 @@ type GroupedChannels = {
   };
 };
 
-export const discordSendMessagesWorkflow = () => {
+export type DiscordSendMessageAllChannelParams = {
+  content: string;
+};
+
+export const discordSendMessageAllChannelWorkflow = () => {
   return {
     handler:
       () =>
       async (
         env: BindingAppWorkerEnv,
-        _event: WorkflowEvent<Params>,
+        event: WorkflowEvent<DiscordSendMessageAllChannelParams>,
         step: WorkflowStep,
       ) => {
         const e = zBindingAppWorkerEnv.safeParse(env);
@@ -34,15 +37,6 @@ export const discordSendMessagesWorkflow = () => {
           return;
         }
         const logger = AppLogger.getInstance(e.data);
-        const client = OpenFeature.getClient();
-        const enabled = await client.getBooleanValue(
-          "discord-bot-maintenance",
-          false,
-        );
-        if (enabled) {
-          logger.info("Bot is under maintenance");
-          return;
-        }
         const lv = await step.do(
           "fetch DiscordServers",
           {
@@ -75,7 +69,7 @@ export const discordSendMessagesWorkflow = () => {
         );
 
         if (lv.allDiscordServers.length === 0) {
-          logger.info("No videos to translate");
+          logger.info("No Discord servers to process");
           return;
         }
 
@@ -122,30 +116,33 @@ export const discordSendMessagesWorkflow = () => {
         });
 
         const results = await Promise.allSettled(
-          discordChannelMap.map((group) =>
-            step.do(
-              `send videos to channels for ${group.channelLangaugeCode}`,
-              {
-                retries: { limit: 3, delay: "5 second", backoff: "linear" },
-                timeout: "1 minutes",
-              },
-              async () => {
-                const vu = await env.APP_WORKER.newDiscordUsecase();
-                logger.info(
-                  `Sending videos to ${group.channelIds.length} channels with language: ${group.channelLangaugeCode}`,
-                  {
-                    channelCount: group.channelIds.length,
-                    language: group.channelLangaugeCode,
-                  },
-                );
-                await vu.sendVideosToMultipleChannels({
-                  channelIds: group.channelIds,
-                  channelLangaugeCode: group.channelLangaugeCode,
-                });
-                logger.info(
-                  `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
-                );
-              },
+          discordChannelMap.flatMap((group) =>
+            group.channelIds.map((channelId) =>
+              step.do(
+                `send message to channel ${channelId} for language ${group.channelLangaugeCode}`,
+                {
+                  retries: { limit: 3, delay: "5 second", backoff: "linear" },
+                  timeout: "1 minutes",
+                },
+                async () => {
+                  const vu = await env.APP_WORKER.newDiscordUsecase();
+                  logger.info(
+                    `Sending message to channel ${channelId} with language: ${group.channelLangaugeCode}`,
+                    {
+                      channelId,
+                      language: group.channelLangaugeCode,
+                    },
+                  );
+                  // Send message to the specified channel
+                  await vu.sendAdminMessage({
+                    channelId,
+                    content: event.payload.content,
+                  });
+                  logger.info(
+                    `Successfully sent message to channel ${channelId} with language: ${group.channelLangaugeCode}`,
+                  );
+                },
+              ),
             ),
           ),
         );

@@ -1,3 +1,4 @@
+import { OpenFeature } from "@openfeature/server-sdk";
 import { DiscordHono } from "discord-hono";
 import type { ApiEnv } from "../../config/env/api";
 import { setFeatureFlagProvider } from "../../config/featureFlag";
@@ -12,6 +13,7 @@ import {
   yesBotRemoveComponent,
 } from "../../infra/discord/command";
 import { newApp } from "../../infra/http/hono/app";
+import { maintenanceMiddleware } from "../../infra/http/hono/middleware";
 import { createHandler, withTracer } from "../../infra/http/trace";
 
 const app = newApp();
@@ -33,6 +35,7 @@ const discord = new DiscordHono<DiscordCommandEnv>()
   //common
   .component(cancelComponent.name, cancelComponent.handler);
 
+app.use("/interaction", maintenanceMiddleware);
 app.mount("/interaction", discord.fetch);
 
 // app.use(

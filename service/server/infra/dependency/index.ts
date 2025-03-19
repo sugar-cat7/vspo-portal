@@ -9,8 +9,10 @@ import type { AppError, Result } from "../../pkg/errors";
 import {
   CreatorRepository,
   type DB,
+  DiscordMessageRepository,
   DiscordServerRepository,
   type ICreatorRepository,
+  type IDiscordMessageRepository,
   type IDiscordServerRepository,
   type ITxManager,
   type IVideoRepository,
@@ -43,6 +45,7 @@ export interface IRepositories {
   creatorRepository: ICreatorRepository;
   videoRepository: IVideoRepository;
   discordServerRepository: IDiscordServerRepository;
+  discordMessageRepository: IDiscordMessageRepository;
 }
 
 export function createRepositories(tx: DB): IRepositories {
@@ -50,6 +53,7 @@ export function createRepositories(tx: DB): IRepositories {
     creatorRepository: new CreatorRepository(tx),
     videoRepository: new VideoRepository(tx),
     discordServerRepository: new DiscordServerRepository(tx),
+    discordMessageRepository: new DiscordMessageRepository(tx),
   };
 }
 
