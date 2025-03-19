@@ -197,10 +197,24 @@ export class VideoService implements IVideoService {
       .filter((id) => id !== undefined);
 
     // Fetch both live streams and archives in parallel
-    const [liveStreamsResult, archivesResult] = await Promise.all([
+    const results = await Promise.allSettled([
       this.deps.twitchClient.getStreams({ userIds }),
       this.deps.twitchClient.getArchive({ userIds }),
     ]);
+
+    // Handle live streams result
+    const liveStreamsResult =
+      results[0].status === "fulfilled"
+        ? results[0].value
+        : results[0].reason || {
+            err: { message: "Failed to fetch live streams" },
+          };
+
+    // Handle archives result
+    const archivesResult =
+      results[1].status === "fulfilled"
+        ? results[1].value
+        : results[1].reason || { err: { message: "Failed to fetch archives" } };
 
     if (liveStreamsResult.err) {
       AppLogger.error("Failed to get Twitch live streams", {
@@ -222,7 +236,7 @@ export class VideoService implements IVideoService {
 
     // Get the current live stream IDs to check against existing videos
     const liveStreamIds = new Set(
-      liveStreamsResult.val.map((video) => video.rawId),
+      liveStreamsResult.val.map((video: { rawId: string }) => video.rawId),
     );
 
     // Get existing videos that are marked as live from Twitch
@@ -515,7 +529,7 @@ export class VideoService implements IVideoService {
     const existingVideos = existingLiveVideos.val;
 
     const promises = channelIds.map((id) =>
-      this.getVideosByChannel({ channelId: id, eventType: "live" }),
+      this.getVideosByChannel({ channelId: id, maxResults: 5 }),
     );
     const results = await Promise.allSettled(promises);
     const videos = results
@@ -550,7 +564,7 @@ export class VideoService implements IVideoService {
       | "title"
       | "videoCount"
       | "viewCount";
-    eventType: "completed" | "live" | "upcoming";
+    eventType?: "completed" | "live" | "upcoming";
   }): Promise<Result<Videos, AppError>> {
     return withTracerResult(
       this.SERVICE_NAME,

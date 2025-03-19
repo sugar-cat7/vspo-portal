@@ -41,7 +41,7 @@ export type GetVideosByChannelParams = {
     | "title"
     | "videoCount"
     | "viewCount";
-  eventType: "completed" | "live" | "upcoming";
+  eventType?: "completed" | "live" | "upcoming";
 };
 
 export interface IYoutubeService {
@@ -144,6 +144,7 @@ export class YoutubeService implements IYoutubeService {
           eventType: params.eventType,
           type: ["video"],
           safeSearch: "none",
+          order: "relevance",
         }),
         (err) =>
           new AppError({
@@ -248,15 +249,28 @@ export class YoutubeService implements IYoutubeService {
       "YoutubeService",
       "getVideosByChannel",
       async (span) => {
+        const option: youtube_v3.Params$Resource$Search$List = {
+          part: ["snippet"],
+          channelId: params.channelId,
+          maxResults: 50,
+          order: "date",
+          type: ["video"],
+        };
+
+        if (params.eventType) {
+          option.eventType = params.eventType;
+        }
+
+        if (params.order) {
+          option.order = params.order;
+        }
+
+        if (params.maxResults) {
+          option.maxResults = params.maxResults;
+        }
+
         const responseResult = await wrap(
-          this.youtube.search.list({
-            part: ["snippet"],
-            channelId: params.channelId,
-            maxResults: params.maxResults || 50,
-            order: params.order || "date",
-            type: ["video"],
-            eventType: params.eventType,
-          }),
+          this.youtube.search.list(option),
           (err) =>
             new AppError({
               message: `Network error while fetching videos by channel: ${err.message}`,
