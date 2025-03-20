@@ -1,8 +1,16 @@
-import type { DiscordServer, DiscordServers, Videos } from "../domain";
+import {
+  type DiscordMessage,
+  type DiscordServer,
+  type DiscordServers,
+  type Videos,
+  createDiscordMessage,
+} from "../domain";
 import { type Page, createPage } from "../domain/pagination";
 import type { IAppContext } from "../infra/dependency";
 import { withTracerResult } from "../infra/http/trace";
+import { getCurrentUTCString } from "../pkg/dayjs";
 import { type AppError, Ok, type Result } from "../pkg/errors";
+import { createUUID } from "../pkg/uuid";
 
 export type SendMessageParams = {
   channelIds: string[];
@@ -29,6 +37,11 @@ export type ListDiscordServerResponse = {
 
 export type BatchUpsertDiscordServersParam = DiscordServers;
 
+export type SendAdminMessageParams = {
+  channelId: string;
+  content: string;
+};
+
 export interface IDiscordInteractor {
   batchSendMessages(params: SendMessageParams): Promise<Result<void, AppError>>;
   adjustBotChannel(
@@ -49,6 +62,9 @@ export interface IDiscordInteractor {
   ): Promise<Result<void, AppError>>;
   exists(serverId: string): Promise<Result<boolean, AppError>>;
   existsChannel(channelId: string): Promise<Result<boolean, AppError>>;
+  sendAdminMessage(
+    message: SendAdminMessageParams,
+  ): Promise<Result<DiscordMessage, AppError>>;
 }
 
 export class DiscordInteractor implements IDiscordInteractor {
@@ -205,6 +221,37 @@ export class DiscordInteractor implements IDiscordInteractor {
           return await repos.discordServerRepository.existsChannel({
             channelId,
           });
+        });
+      },
+    );
+  }
+
+  async sendAdminMessage(
+    message: SendAdminMessageParams,
+  ): Promise<Result<DiscordMessage, AppError>> {
+    return await withTracerResult(
+      "DiscordInteractor",
+      "sendAdminMessage",
+      async () => {
+        return this.context.runInTx(async (repos, _services) => {
+          const sv = await _services.discordService.sendAdminMessage(message);
+          if (sv.err) {
+            return sv;
+          }
+
+          const now = getCurrentUTCString();
+          return await repos.discordMessageRepository.create(
+            createDiscordMessage({
+              id: createUUID(),
+              type: "admin",
+              rawId: sv.val,
+              channelId: message.channelId,
+              content: message.content,
+              embedVideos: [],
+              createdAt: now,
+              updatedAt: now,
+            }),
+          );
         });
       },
     );

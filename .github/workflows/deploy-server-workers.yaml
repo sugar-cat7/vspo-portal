@@ -56,6 +56,8 @@ jobs:
             DISCORD_PUBLIC_KEY
             DISCORD_TOKEN
             SENTRY_DSN
+            DISCORD_TRANSLATION_SETTING
+            DISCORD_BOT_MAINTENANCE
 
         env:
           OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
@@ -72,3 +74,5 @@ jobs:
           DISCORD_PUBLIC_KEY: ${{ secrets.DISCORD_PUBLIC_KEY }}
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          DISCORD_TRANSLATION_SETTING: ${{ secrets.DISCORD_TRANSLATION_SETTING }}
+          DISCORD_BOT_MAINTENANCE: ${{ secrets.DISCORD_BOT_MAINTENANCE }}

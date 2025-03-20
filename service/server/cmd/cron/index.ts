@@ -5,10 +5,21 @@ import {
 } from "cloudflare:workers";
 import type { BindingAppWorkerEnv } from "../../config/env/worker";
 import type { BindingWorkflowEnv } from "../../config/env/workflow";
+import { setFeatureFlagProvider } from "../../config/featureFlag";
 import { createHandler, withTracer } from "../../infra/http/trace";
 import { searchChannelsWorkflow } from "../../infra/http/workflow/channel/search";
 import { translateCreatorsWorkflow } from "../../infra/http/workflow/channel/trasnlate";
+import { discordDeleteAllWorkflow } from "../../infra/http/workflow/discord/deleteAll";
 import { discordSendMessagesWorkflow } from "../../infra/http/workflow/discord/send";
+import {
+  type DiscordSendMessageAllChannelParams,
+  discordSendMessageAllChannelWorkflow,
+} from "../../infra/http/workflow/discord/sendMessageAllChannel";
+import {
+  type DiscordSendMessageChannelsParams,
+  discordSendMessageChannelsWorkflow,
+} from "../../infra/http/workflow/discord/sendMessageChannels";
+import { deleteVideosWorkflow } from "../../infra/http/workflow/video/delete";
 import { searchVideosWorkflow } from "../../infra/http/workflow/video/search";
 import { searchMemberVideosByChannelWorkflow } from "../../infra/http/workflow/video/searchMemberVideoByChannel";
 import { translateVideosWorkflow } from "../../infra/http/workflow/video/trasnlate";
@@ -72,6 +83,52 @@ export class SearchMemberVideosByChannelWorkflow extends WorkflowEntrypoint<
   }
 }
 
+export class DeleteVideosWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  Params
+> {
+  async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await deleteVideosWorkflow().handler()(this.env, _event, step);
+  }
+}
+
+export class DiscordDeleteAllWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  Params
+> {
+  async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await discordDeleteAllWorkflow().handler()(this.env, _event, step);
+  }
+}
+
+export class DiscordSendMessageAllChannelWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  DiscordSendMessageAllChannelParams
+> {
+  async run(
+    event: WorkflowEvent<DiscordSendMessageAllChannelParams>,
+    step: WorkflowStep,
+  ) {
+    await discordSendMessageAllChannelWorkflow().handler()(
+      this.env,
+      event,
+      step,
+    );
+  }
+}
+
+export class DiscordSendMessageChannelsWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  DiscordSendMessageChannelsParams
+> {
+  async run(
+    event: WorkflowEvent<DiscordSendMessageChannelsParams>,
+    step: WorkflowStep,
+  ) {
+    await discordSendMessageChannelsWorkflow().handler()(this.env, event, step);
+  }
+}
+
 export default createHandler({
   scheduled: async (
     controller: ScheduledController,
@@ -80,6 +137,7 @@ export default createHandler({
   ) => {
     return await withTracer("ScheduledHandler", "scheduled", async (span) => {
       span.setAttribute("cron", controller.cron);
+      setFeatureFlagProvider(env);
       switch (controller.cron) {
         case "0 0,7,18 * * *":
           await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
@@ -96,6 +154,7 @@ export default createHandler({
           await env.SEARCH_MEMBER_VIDEOS_BY_CHANNEL_WORKFLOW.create({
             id: createUUID(),
           });
+          await env.DELETE_VIDEOS_WORKFLOW.create({ id: createUUID() });
           break;
         default:
           console.error("Unknown cron", controller.cron);

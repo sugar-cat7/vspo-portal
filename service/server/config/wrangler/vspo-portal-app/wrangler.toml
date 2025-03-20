@@ -20,8 +20,9 @@ localConnectionString = "postgres://user:password@localhost:5432/vspo"
 
 [[queues.consumers]]
  queue = "write-queue"
- max_batch_size = 50
- max_batch_timeout = 5
+ max_batch_size = 100
+ max_batch_timeout = 30
+ dead_letter_queue = "write-queue-dead-letter"
 
 [vars]
 SERVICE_NAME = "vspo-portal-app"

@@ -36,6 +36,20 @@
       "when": 1740327711637,
       "tag": "0004_fair_pestilence",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1742469731806,
+      "tag": "0005_puzzling_nehzno",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1742487752241,
+      "tag": "0006_white_bullseye",
+      "breakpoints": true
     }
   ]
 }

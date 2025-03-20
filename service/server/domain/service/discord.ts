@@ -11,6 +11,7 @@ import { type AppError, Err, Ok, type Result } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
 import {
+  DiscordMessage,
   type DiscordMessages,
   type DiscordServer,
   createDiscordServer,
@@ -34,6 +35,11 @@ type BotChannelAdjustmentParams = {
   channelLangaugeCode?: string;
 };
 
+type SendAdminMessageParams = {
+  channelId: string;
+  content: string;
+};
+
 export interface IDiscordService {
   sendMessagesToChannel(
     params: ChannelMessageParams,
@@ -44,6 +50,9 @@ export interface IDiscordService {
   deleteAllMessagesInChannel(
     channelId: string,
   ): Promise<Result<void, AppError>>;
+  sendAdminMessage(
+    params: SendAdminMessageParams,
+  ): Promise<Result<string, AppError>>;
 }
 
 export class DiscordService implements IDiscordService {
@@ -79,13 +88,14 @@ export class DiscordService implements IDiscordService {
     }
 
     const videoListResult = await this.dependencies.videoRepository.list({
-      limit: 100,
+      limit: 1000,
       page: 0,
       languageCode: options.channelLangaugeCode,
       videoType: "vspo_stream",
       startedAt: convertToUTCDate(
         getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
       ),
+      orderBy: "asc",
     });
     if (videoListResult.err) {
       AppLogger.error("Failed to fetch video list", {
@@ -122,7 +132,7 @@ export class DiscordService implements IDiscordService {
         return latestMessagesResult;
       }
 
-      const messagePromises: Promise<Result<void, AppError>>[] = [];
+      const messagePromises: Promise<Result<string, AppError>>[] = [];
 
       // Find existing upcoming message (there should be at most one)
       const upcomingMessage = latestMessagesResult.val.find((msg) =>
@@ -381,7 +391,6 @@ export class DiscordService implements IDiscordService {
       service: this.SERVICE_NAME,
       channelId,
     });
-
     const botMessagesResult =
       await this.dependencies.discordClient.getLatestBotMessages(channelId);
     if (botMessagesResult.err) {
@@ -421,6 +430,22 @@ export class DiscordService implements IDiscordService {
       failureCount: failedResults.length,
     });
     return Ok();
+  }
+
+  async sendAdminMessage(
+    message: SendAdminMessageParams,
+  ): Promise<Result<string, AppError>> {
+    return await withTracerResult(
+      "DiscordService",
+      "sendAdminMessage",
+      async () => {
+        return this.dependencies.discordClient.sendMessage({
+          channelId: message.channelId,
+          content: message.content,
+          embeds: [],
+        });
+      },
+    );
   }
 
   /**

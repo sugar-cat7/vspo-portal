@@ -30,11 +30,11 @@ import type {
   ListParam,
   SearchByChannelIdsParam,
   SearchByMemberTypeParam,
+  SendAdminMessageParams,
   SendMessageParams,
   TranslateCreatorParam,
   TranslateVideoParam,
 } from "../../../../usecase";
-
 async function batchEnqueueWithChunks<T, U extends MessageParam>(
   items: T[],
   chunkSize: number,
@@ -85,8 +85,8 @@ export class VideoService extends RpcTarget {
     return this.#usecase.list(params);
   }
 
-  async searchDeleted() {
-    return this.#usecase.searchDeleted();
+  async searchDeletedCheck() {
+    return this.#usecase.searchDeletedCheck();
   }
 
   async batchDeleteByVideoIds(params: BatchDeleteByVideoIdsParam) {
@@ -110,6 +110,10 @@ export class VideoService extends RpcTarget {
 
   async getMemberVideos() {
     return this.#usecase.getMemberVideos();
+  }
+
+  async deletedListIds() {
+    return this.#usecase.deletedListIds();
   }
 }
 
@@ -207,6 +211,10 @@ export class DiscordService extends RpcTarget {
 
   async existsChannel(channelId: string) {
     return this.#usecase.existsChannel(channelId);
+  }
+
+  async sendAdminMessage(message: SendAdminMessageParams) {
+    return this.#usecase.sendAdminMessage(message);
   }
 }
 
@@ -433,7 +441,27 @@ export default createHandler({
             logger.error(`Invalid videos: ${ds.error.message}`);
             return;
           }
-          await c.discordInteractor.batchUpsert(ds.data);
+          const sv = await c.discordInteractor.batchUpsert(ds.data);
+          if (sv.err) {
+            logger.error(`Failed to upsert discord servers: ${sv.err.message}`);
+            return;
+          }
+
+          const cIds = sv.val.flatMap((server) =>
+            server.discordChannels.map((channel) => channel.id),
+          );
+
+          if (cIds.length > 0) {
+            await Promise.allSettled(
+              cIds.map((id) =>
+                c.discordInteractor.sendAdminMessage({
+                  channelId: id,
+                  content:
+                    "すぽじゅーるは、ぶいすぽっ!メンバーの配信(Youtube/Twitch/ツイキャス/ニコニコ)や切り抜きを一覧で確認できる非公式サイトです。 /Spodule aggregates schedules for Japan's Vtuber group, Vspo.\n\nWeb版はこちら：https://www.vspo-schedule.com/schedule/all",
+                }),
+              ),
+            );
+          }
           break;
         }
         default:
