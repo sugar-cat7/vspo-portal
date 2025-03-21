@@ -1,5 +1,4 @@
 import { type Videos, createVideo, createVideos } from "../../domain/video";
-import { convertToUTC } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
 import { withTracerResult } from "../http/trace/cloudflare";
 
@@ -9,16 +8,31 @@ export type TwitcastingUser = {
 
 export type TwitcastingMovie = {
   id: string;
+  user_id: string;
   title: string;
+  subtitle?: string;
+  last_owner_comment?: string;
+  category?: string;
+  link: string;
   is_live: boolean;
-  total_view_count: number;
+  is_recorded: boolean;
+  comment_count: number;
   large_thumbnail: string;
+  small_thumbnail: string;
+  country?: string;
+  duration: number;
   created: number;
-  user: TwitcastingUser;
+  is_collabo: boolean;
+  is_protected: boolean;
+  max_view_count: number;
+  current_view_count: number;
+  total_view_count: number;
+  hls_url: string | null;
 };
 
 type TwitcastingMoviesResponse = {
   movies: TwitcastingMovie[];
+  total_count: number;
 };
 
 type GetVideosParams = {
@@ -49,6 +63,12 @@ function hasMoviesProperty(
   return Object.prototype.hasOwnProperty.call(obj, "movies");
 }
 
+function hasTotalCountProperty(
+  obj: Record<PropertyKey, unknown>,
+): obj is { total_count: unknown } {
+  return Object.prototype.hasOwnProperty.call(obj, "total_count");
+}
+
 function isMoviesArray(obj: { movies: unknown }): obj is { movies: unknown[] } {
   return Array.isArray(obj.movies);
 }
@@ -63,6 +83,12 @@ function isValidMoviesResponse(
     return false;
   }
   if (!isMoviesArray(data)) {
+    return false;
+  }
+  if (!hasTotalCountProperty(data)) {
+    return false;
+  }
+  if (typeof data.total_count !== "number") {
     return false;
   }
   return true;
@@ -167,7 +193,7 @@ export class TwitcastingService implements ITwitcastingService {
   private mapToTwitCastingVideo(movie: TwitcastingMovie): TwitCastingVideo {
     return {
       id: movie.id,
-      userId: movie.user.id,
+      userId: movie.user_id,
       title: movie.title,
       isLive: movie.is_live,
       viewCount: movie.total_view_count,

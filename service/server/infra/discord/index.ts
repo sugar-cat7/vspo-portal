@@ -14,6 +14,7 @@ import { getCurrentUTCString } from "../../pkg/dayjs";
 import {
   AppError,
   Err,
+  type ErrorCode,
   ErrorCodeSchema,
   Ok,
   type Result,
@@ -77,6 +78,45 @@ export class DiscordClient implements IDiscordClient {
     this.botId = env.DISCORD_APPLICATION_ID;
   }
 
+  // Helper function to determine the appropriate error code based on Discord API errors
+  private getErrorCodeFromDiscordError(err: Error): ErrorCode {
+    // https://github.com/discordeno/discordeno/blob/main/packages/rest/src/manager.ts
+    if (err.cause && typeof err.cause === "object" && "status" in err.cause) {
+      const status = (err.cause as { status: number }).status;
+
+      switch (status) {
+        case 429:
+          return "RATE_LIMITED";
+        case 403:
+          return "FORBIDDEN";
+        case 404:
+          return "NOT_FOUND";
+        default:
+          return "INTERNAL_SERVER_ERROR";
+      }
+    }
+
+    // If there's no status in the error, check message for common error strings
+    const errorMessage = err.message.toLowerCase();
+    if (
+      errorMessage.includes("rate limit") ||
+      errorMessage.includes("too many requests")
+    ) {
+      return "RATE_LIMITED";
+    }
+    if (
+      errorMessage.includes("forbidden") ||
+      errorMessage.includes("unauthorized")
+    ) {
+      return "FORBIDDEN";
+    }
+    if (errorMessage.includes("not found")) {
+      return "NOT_FOUND";
+    }
+
+    return "INTERNAL_SERVER_ERROR";
+  }
+
   async sendMessage(
     params: SendMessageParams,
   ): Promise<Result<string, AppError>> {
@@ -95,13 +135,15 @@ export class DiscordClient implements IDiscordClient {
         (err: Error) => {
           AppLogger.error("Failed to send message to Discord channel", {
             channel_id: channelId,
-            error: err.message,
-            cause: err.cause,
-            stack: err.stack,
+            error: err,
           });
+
+          const errorCode = this.getErrorCodeFromDiscordError(err);
+
           return new AppError({
             message: `Failed to send message to channel ${channelId}: ${err.message}`,
-            code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+            code: errorCode,
+            cause: err.cause,
           });
         },
       );
@@ -130,11 +172,15 @@ export class DiscordClient implements IDiscordClient {
           AppLogger.error("Failed to fetch Discord channel info", {
             channel_id: channelId,
             server_id: serverId,
-            error: err.message,
+            error: err,
           });
+
+          const errorCode = this.getErrorCodeFromDiscordError(err);
+
           return new AppError({
             message: `Failed to fetch channel info for ${channelId}: ${err.message}`,
-            code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+            code: errorCode,
+            cause: err.cause,
           });
         },
       );
@@ -186,11 +232,15 @@ export class DiscordClient implements IDiscordClient {
           AppLogger.error("Failed to update Discord message", {
             channel_id: channelId,
             message_id: messageId,
-            error: err.message,
+            error: err,
           });
+
+          const errorCode = this.getErrorCodeFromDiscordError(err);
+
           return new AppError({
             message: `Failed to update message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
-            code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+            code: errorCode,
+            cause: err.cause,
           });
         },
       );
@@ -220,11 +270,15 @@ export class DiscordClient implements IDiscordClient {
           AppLogger.error("Failed to fetch Discord message for deletion", {
             channel_id: channelId,
             message_id: messageId,
-            error: err.message,
+            error: err,
           });
+
+          const errorCode = this.getErrorCodeFromDiscordError(err);
+
           return new AppError({
             message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
-            code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+            code: errorCode,
+            cause: err.cause,
           });
         },
       );
@@ -251,11 +305,15 @@ export class DiscordClient implements IDiscordClient {
           AppLogger.error("Failed to delete Discord message", {
             channel_id: channelId,
             message_id: messageId,
-            error: err.message,
+            error: err,
           });
+
+          const errorCode = this.getErrorCodeFromDiscordError(err);
+
           return new AppError({
             message: `Failed to delete message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
-            code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+            code: errorCode,
+            cause: err.cause,
           });
         },
       );
@@ -283,11 +341,14 @@ export class DiscordClient implements IDiscordClient {
         (err: Error) => {
           AppLogger.error("Failed to fetch messages from Discord channel", {
             channel_id: channelId,
-            error: err.message,
+            error: err,
           });
+
+          const errorCode = this.getErrorCodeFromDiscordError(err);
+
           return new AppError({
             message: `Failed to fetch messages in channel ${channelId}: ${err.message}`,
-            code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+            code: errorCode,
             cause: err.cause,
           });
         },
@@ -343,11 +404,15 @@ export class DiscordClient implements IDiscordClient {
           AppLogger.error("Failed to fetch Discord message", {
             channel_id: channelId,
             message_id: messageId,
-            error: err.message,
+            error: err,
           });
+
+          const errorCode = this.getErrorCodeFromDiscordError(err);
+
           return new AppError({
             message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
-            code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+            code: errorCode,
+            cause: err.cause,
           });
         },
       );

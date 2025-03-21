@@ -94,13 +94,13 @@ export class VideoRepository implements IVideoRepository {
             eq(creatorTable.id, creatorTranslationTable.creatorId),
           )
           .where(and(...filters))
-          .limit(query.limit)
-          .offset(query.page * query.limit)
           .orderBy(
             query.orderBy === "asc" || !query.orderBy
               ? asc(streamStatusTable.startedAt)
               : desc(streamStatusTable.startedAt),
           )
+          .limit(query.limit)
+          .offset(query.page * query.limit)
           .execute(),
         (err) =>
           new AppError({
