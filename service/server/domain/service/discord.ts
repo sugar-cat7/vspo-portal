@@ -40,6 +40,11 @@ type SendAdminMessageParams = {
   content: string;
 };
 
+type DeletedChannelCheckParams = {
+  serverId: string;
+  channelId: string;
+};
+
 export interface IDiscordService {
   sendMessagesToChannel(
     params: ChannelMessageParams,
@@ -53,6 +58,9 @@ export interface IDiscordService {
   sendAdminMessage(
     params: SendAdminMessageParams,
   ): Promise<Result<string, AppError>>;
+  isDeletedChannel(
+    params: DeletedChannelCheckParams,
+  ): Promise<Result<boolean, AppError>>;
 }
 
 export class DiscordService implements IDiscordService {
@@ -87,30 +95,52 @@ export class DiscordService implements IDiscordService {
       });
     }
 
-    const videoListResult = await this.dependencies.videoRepository.list({
-      limit: 1000,
+    const liveVideoListResult = await this.dependencies.videoRepository.list({
+      limit: 500,
       page: 0,
       languageCode: options.channelLangaugeCode,
       videoType: "vspo_stream",
-      startedAt: convertToUTCDate(
-        getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
-      ),
-      orderBy: "asc",
+      // startedAt: convertToUTCDate(
+      //   getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
+      // ),
+      status: "live",
+      orderBy: "desc",
     });
-    if (videoListResult.err) {
+    if (liveVideoListResult.err) {
       AppLogger.error("Failed to fetch video list", {
         service: this.SERVICE_NAME,
-        error: videoListResult.err,
+        error: liveVideoListResult.err,
       });
-      return Err(videoListResult.err);
+      return Err(liveVideoListResult.err);
     }
 
-    const liveVideos = videoListResult.val.filter(
-      (video) => video.status === "live",
-    );
-    const upcomingVideos = videoListResult.val.filter(
-      (video) => video.status === "upcoming",
-    );
+    const liveVideos = liveVideoListResult.val;
+
+    liveVideos.sort((a, b) => {
+      return (
+        new Date(a.startedAt || "").getTime() -
+        new Date(b.startedAt || "").getTime()
+      );
+    });
+
+    const upcomingVideoListResult =
+      await this.dependencies.videoRepository.list({
+        limit: 500,
+        page: 0,
+        languageCode: options.channelLangaugeCode,
+        videoType: "vspo_stream",
+        // startedAt: convertToUTCDate(getCurrentUTCDate()),
+        status: "upcoming",
+        orderBy: "desc",
+      });
+    if (upcomingVideoListResult.err) {
+      AppLogger.error("Failed to fetch video list", {
+        service: this.SERVICE_NAME,
+        error: upcomingVideoListResult.err,
+      });
+      return Err(upcomingVideoListResult.err);
+    }
+    const upcomingVideos = upcomingVideoListResult.val;
 
     // Sort upcoming videos by broadcast start time in ascending order
     upcomingVideos.sort((a, b) => {
@@ -143,6 +173,7 @@ export class DiscordService implements IDiscordService {
       const liveMessages = latestMessagesResult.val.filter((msg) =>
         msg.embedVideos.some((video) => video.status === "live"),
       );
+
       // Process upcoming message
       if (upcomingMessage) {
         const upcomingVideosInMessage = upcomingMessage.embedVideos;
@@ -184,6 +215,7 @@ export class DiscordService implements IDiscordService {
           (msg) => msg.embedVideos[0].identifier === liveVideo.link,
         );
         const lm = liveMessage?.embedVideos[0];
+
         if (lm && this.shouldUpdateEmbed(lm, liveVideo)) {
           messagePromises.push(
             this.dependencies.discordClient.updateMessage({
@@ -448,6 +480,36 @@ export class DiscordService implements IDiscordService {
     );
   }
 
+  async isDeletedChannel(
+    options: DeletedChannelCheckParams,
+  ): Promise<Result<boolean, AppError>> {
+    return await withTracerResult(
+      "DiscordService",
+      "isDeletedChannel",
+      async () => {
+        const channelResult = await this.dependencies.discordClient.getChannel({
+          serverId: options.serverId,
+          channelId: options.channelId,
+        });
+
+        if (channelResult.err) {
+          if (
+            channelResult.err.code === "NOT_FOUND" ||
+            channelResult.err.code === "FORBIDDEN"
+          ) {
+            AppLogger.info("Channel is deleted", {
+              service: this.SERVICE_NAME,
+              channelId: options.channelId,
+              serverId: options.serverId,
+            });
+            return Ok(true);
+          }
+          return Err(channelResult.err);
+        }
+        return Ok(false);
+      },
+    );
+  }
   /**
    * Check if an embed needs to be updated by comparing key properties.
    */

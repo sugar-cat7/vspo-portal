@@ -146,6 +146,7 @@ export class TwitchService implements ITwitchService {
         paths["/streams"]["get"]["responses"]["200"]["content"]["application/json"];
       const result = await this.fetchFromTwitch<StreamsResponse>("/streams", {
         user_id: params.userIds,
+        type: "live",
       });
 
       if (result.err) return Err(result.err);
@@ -184,7 +185,7 @@ export class TwitchService implements ITwitchService {
       type VideosResponse =
         paths["/videos"]["get"]["responses"]["200"]["content"]["application/json"];
       const result = await this.fetchFromTwitch<VideosResponse>("/videos", {
-        id: params.videoIds.join(","),
+        id: params.videoIds,
       });
 
       if (result.err) return Err(result.err);
@@ -221,39 +222,54 @@ export class TwitchService implements ITwitchService {
     return withTracerResult("TwitchService", "getArchive", async (span) => {
       type ArchiveResponse =
         paths["/videos"]["get"]["responses"]["200"]["content"]["application/json"];
-      const result = await this.fetchFromTwitch<ArchiveResponse>("/videos", {
-        user_id: params.userIds.join(","),
-        first: "20",
+
+      const promises = params.userIds.map(async (uid) => {
+        return this.fetchFromTwitch<ArchiveResponse>("/videos", {
+          user_id: uid,
+          period: "week",
+          type: "archive",
+        });
       });
 
-      if (result.err) return Err(result.err);
+      const settledResults = await Promise.allSettled(promises);
 
-      return Ok(
-        createVideos(
-          result.val.data
-            .filter((video) => video.type === "archive")
-            .map((video) =>
-              createVideo({
-                id: "",
-                rawId: video.id,
-                rawChannelID: video.user_id,
-                languageCode: "default",
-                title: video.title,
-                description: video.description,
-                publishedAt: convertToUTC(video.published_at),
-                startedAt: convertToUTC(video.created_at),
-                endedAt: null,
-                platform: "twitch",
-                status: "ended",
-                tags: [],
-                viewCount: 0,
-                thumbnailURL: video.thumbnail_url,
-                videoType: "vspo_stream",
-                link: `https://www.twitch.tv/videos/${video.id}`,
-              }),
-            ),
-        ),
-      );
+      // Collect only successful results
+      const successfulVideos = settledResults
+        .filter(
+          (
+            result,
+          ): result is PromiseFulfilledResult<
+            Result<ArchiveResponse, AppError>
+          > => result.status === "fulfilled",
+        )
+        .flatMap((result) => {
+          // Only use results that don't have errors
+          if (result.value.err) return [];
+          return result.value.val.data;
+        })
+        .filter((video) => video.type === "archive")
+        .map((video) =>
+          createVideo({
+            id: "",
+            rawId: video.id,
+            rawChannelID: video.user_id,
+            languageCode: "default",
+            title: video.title,
+            description: video.description,
+            publishedAt: convertToUTC(video.published_at),
+            startedAt: convertToUTC(video.created_at),
+            endedAt: null,
+            platform: "twitch",
+            status: "ended",
+            tags: [],
+            viewCount: 0,
+            thumbnailURL: video.thumbnail_url,
+            videoType: "vspo_stream",
+            link: `https://www.twitch.tv/videos/${video.id}`,
+          }),
+        );
+
+      return Ok(createVideos(successfulVideos));
     });
   }
 }

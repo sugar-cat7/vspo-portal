@@ -42,6 +42,11 @@ export type SendAdminMessageParams = {
   content: string;
 };
 
+export type DeletedChannelCheckParams = {
+  serverId: string;
+  channelId: string;
+};
+
 export interface IDiscordInteractor {
   batchSendMessages(params: SendMessageParams): Promise<Result<void, AppError>>;
   adjustBotChannel(
@@ -65,6 +70,9 @@ export interface IDiscordInteractor {
   sendAdminMessage(
     message: SendAdminMessageParams,
   ): Promise<Result<DiscordMessage, AppError>>;
+  isDeletedChannel(
+    params: DeletedChannelCheckParams,
+  ): Promise<Result<boolean, AppError>>;
 }
 
 export class DiscordInteractor implements IDiscordInteractor {
@@ -252,6 +260,24 @@ export class DiscordInteractor implements IDiscordInteractor {
               updatedAt: now,
             }),
           );
+        });
+      },
+    );
+  }
+
+  async isDeletedChannel(
+    params: DeletedChannelCheckParams,
+  ): Promise<Result<boolean, AppError>> {
+    return await withTracerResult(
+      "DiscordInteractor",
+      "isDeletedChannel",
+      async () => {
+        return this.context.runInTx(async (repos, services) => {
+          const sv = await services.discordService.isDeletedChannel(params);
+          if (sv.err) {
+            return sv;
+          }
+          return Ok(sv.val);
         });
       },
     );

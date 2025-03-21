@@ -635,6 +635,14 @@ export class VideoService implements IVideoService {
           count: result.val.length,
         });
 
+        const yt = await this.deps.youtubeClient.getVideos({
+          videoIds: result.val.map((v) => v.rawId),
+        });
+
+        if (yt.err) {
+          return yt;
+        }
+
         return Ok(result.val);
       },
     );
