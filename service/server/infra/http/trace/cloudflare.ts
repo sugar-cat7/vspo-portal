@@ -5,9 +5,8 @@ import type { ApiEnv } from "../../../config/env/api";
 import type { CommonEnv } from "../../../config/env/common";
 import type { AppWorkerEnv } from "../../../config/env/internal";
 import type { BindingWorkflowEnv } from "../../../config/env/workflow";
-import { setFeatureFlagProvider } from "../../../config/featureFlag";
 import { AppError } from "../../../pkg/errors";
-import { Err, Ok, type Result } from "../../../pkg/errors/result";
+import { Err, type Result } from "../../../pkg/errors/result";
 import { AppLogger } from "../../../pkg/logging";
 
 export const withTracerResult = async <T, E extends AppError = AppError>(
@@ -63,6 +62,7 @@ export const withTracerResult = async <T, E extends AppError = AppError>(
               }) as E;
             }
             span.recordException(appError);
+            Sentry.captureException(appError);
             return Err(appError);
           } finally {
             span.end();
@@ -106,6 +106,7 @@ export const withTracer = async <T>(
             return await callback(span);
           } catch (error) {
             span.recordException(error);
+            Sentry.captureException(error);
             throw error;
           } finally {
             span.end();

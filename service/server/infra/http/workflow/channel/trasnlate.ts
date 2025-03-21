@@ -5,6 +5,7 @@ import {
 } from "../../../../config/env/worker";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../../http/trace/cloudflare";
 
 export const translateCreatorsWorkflow = () => {
   return {
@@ -28,30 +29,40 @@ export const translateCreatorsWorkflow = () => {
             timeout: "1 minutes",
           },
           async () => {
-            const vu = await env.APP_WORKER.newCreatorUsecase();
-            const result = await vu.list({
-              limit: 30,
-              page: 0,
-              languageCode: "default",
-              memberType: "vspo_jp",
-            });
+            return withTracer(
+              "creator-workflow",
+              "fetch-default-language-creators",
+              async (span) => {
+                const vu = await env.APP_WORKER.newCreatorUsecase();
+                const result = await vu.list({
+                  limit: 30,
+                  page: 0,
+                  languageCode: "default",
+                  memberType: "vspo_jp",
+                });
 
-            if (result.err) {
-              throw result.err;
-            }
+                if (result.err) {
+                  throw result.err;
+                }
 
-            const result2 = await vu.list({
-              limit: 30,
-              page: 0,
-              languageCode: "default",
-              memberType: "vspo_en",
-            });
+                const result2 = await vu.list({
+                  limit: 30,
+                  page: 0,
+                  languageCode: "default",
+                  memberType: "vspo_en",
+                });
 
-            if (result2.err) {
-              throw result2.err;
-            }
+                if (result2.err) {
+                  throw result2.err;
+                }
 
-            return { val: result.val.creators.concat(result2.val.creators) };
+                const creators = result.val.creators.concat(
+                  result2.val.creators,
+                );
+                span.setAttribute("creators_count", creators.length);
+                return { val: creators };
+              },
+            );
           },
         );
 
@@ -69,11 +80,19 @@ export const translateCreatorsWorkflow = () => {
                 timeout: "1 minutes",
               },
               async () => {
-                const vu = await env.APP_WORKER.newCreatorUsecase();
-                await vu.translateCreatorEnqueue({
-                  languageCode: lang,
-                  creators: lv.val,
-                });
+                return withTracer(
+                  "creator-workflow",
+                  `translate-creators-to-${lang}`,
+                  async (span) => {
+                    const vu = await env.APP_WORKER.newCreatorUsecase();
+                    span.setAttribute("language", lang);
+                    span.setAttribute("creators_count", lv.val.length);
+                    await vu.translateCreatorEnqueue({
+                      languageCode: lang,
+                      creators: lv.val,
+                    });
+                  },
+                );
               },
             ),
           ),

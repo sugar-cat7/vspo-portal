@@ -4,6 +4,7 @@ import {
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
 import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../../http/trace/cloudflare";
 
 export type DiscordSendMessageChannelsParams = {
   channelIds: string[];
@@ -35,17 +36,24 @@ export const discordSendMessageChannelsWorkflow = () => {
                 timeout: "1 minutes",
               },
               async () => {
-                const vu = await env.APP_WORKER.newDiscordUsecase();
-                logger.info(`Sending message to channel ${channelId}`, {
-                  channelId,
-                });
-                // Send message to the specified channel
-                await vu.sendAdminMessage({
-                  channelId,
-                  content: event.payload.content,
-                });
-                logger.info(
-                  `Successfully sent message to channel ${channelId}`,
+                return withTracer(
+                  "discord-workflow",
+                  `send-admin-message-channel-${channelId}`,
+                  async (span) => {
+                    const vu = await env.APP_WORKER.newDiscordUsecase();
+                    logger.info(`Sending message to channel ${channelId}`, {
+                      channelId,
+                    });
+                    span.setAttribute("channel_id", channelId);
+                    // Send message to the specified channel
+                    await vu.sendAdminMessage({
+                      channelId,
+                      content: event.payload.content,
+                    });
+                    logger.info(
+                      `Successfully sent message to channel ${channelId}`,
+                    );
+                  },
                 );
               },
             ),

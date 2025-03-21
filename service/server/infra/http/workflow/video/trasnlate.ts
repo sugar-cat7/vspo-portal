@@ -5,6 +5,7 @@ import {
 } from "../../../../config/env/worker";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../../http/trace/cloudflare";
 
 export const translateVideosWorkflow = () => {
   return {
@@ -28,37 +29,52 @@ export const translateVideosWorkflow = () => {
             timeout: "1 minutes",
           },
           async () => {
-            const vu = await env.APP_WORKER.newVideoUsecase();
-            const liveVideos = await vu.list({
-              limit: 10,
-              page: 0,
-              languageCode: "default",
-              videoType: "vspo_stream",
-              status: "live",
-              orderBy: "desc",
-            });
+            return withTracer(
+              "video-workflow",
+              "fetch-default-language-videos",
+              async (span) => {
+                const vu = await env.APP_WORKER.newVideoUsecase();
+                const liveVideos = await vu.list({
+                  limit: 10,
+                  page: 0,
+                  languageCode: "default",
+                  videoType: "vspo_stream",
+                  status: "live",
+                  orderBy: "desc",
+                });
 
-            if (liveVideos.err) {
-              throw liveVideos.err;
-            }
+                if (liveVideos.err) {
+                  throw liveVideos.err;
+                }
 
-            const upcomingVideos = await vu.list({
-              limit: 10,
-              page: 0,
-              languageCode: "default",
-              videoType: "vspo_stream",
-              status: "upcoming",
-              orderBy: "desc",
-            });
+                const upcomingVideos = await vu.list({
+                  limit: 10,
+                  page: 0,
+                  languageCode: "default",
+                  videoType: "vspo_stream",
+                  status: "upcoming",
+                  orderBy: "desc",
+                });
 
-            if (upcomingVideos.err) {
-              throw upcomingVideos.err;
-            }
+                if (upcomingVideos.err) {
+                  throw upcomingVideos.err;
+                }
 
-            const videos = liveVideos.val.videos.concat(
-              upcomingVideos.val.videos,
+                const videos = liveVideos.val.videos.concat(
+                  upcomingVideos.val.videos,
+                );
+                span.setAttribute(
+                  "live_videos_count",
+                  liveVideos.val.videos.length,
+                );
+                span.setAttribute(
+                  "upcoming_videos_count",
+                  upcomingVideos.val.videos.length,
+                );
+                span.setAttribute("total_videos_count", videos.length);
+                return { val: videos };
+              },
             );
-            return { val: videos };
           },
         );
 
@@ -76,11 +92,19 @@ export const translateVideosWorkflow = () => {
                 timeout: "1 minutes",
               },
               async () => {
-                const vu = await env.APP_WORKER.newVideoUsecase();
-                await vu.translateVideoEnqueue({
-                  languageCode: lang,
-                  videos: lv.val,
-                });
+                return withTracer(
+                  "video-workflow",
+                  `translate-videos-to-${lang}`,
+                  async (span) => {
+                    const vu = await env.APP_WORKER.newVideoUsecase();
+                    span.setAttribute("language", lang);
+                    span.setAttribute("videos_count", lv.val.length);
+                    await vu.translateVideoEnqueue({
+                      languageCode: lang,
+                      videos: lv.val,
+                    });
+                  },
+                );
               },
             ),
           ),
