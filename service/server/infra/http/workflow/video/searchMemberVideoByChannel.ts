@@ -4,6 +4,7 @@ import {
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
 import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../../http/trace/cloudflare";
 
 export const searchMemberVideosByChannelWorkflow = () => {
   return {
@@ -28,15 +29,23 @@ export const searchMemberVideosByChannelWorkflow = () => {
               timeout: "1 minutes",
             },
             async () => {
-              const vu = await env.APP_WORKER.newVideoUsecase();
-              const result = await vu.getMemberVideos();
-              if (result.err) {
-                throw result.err;
-              }
-              if (result.val.length === 0) {
-                return;
-              }
-              const _ = await vu.batchUpsertEnqueue(result.val);
+              return withTracer(
+                "video-workflow",
+                "search-member-videos",
+                async (span) => {
+                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const result = await vu.getMemberVideos();
+                  if (result.err) {
+                    throw result.err;
+                  }
+                  if (result.val.length === 0) {
+                    span.setAttribute("videos_count", 0);
+                    return;
+                  }
+                  span.setAttribute("videos_count", result.val.length);
+                  const _ = await vu.batchUpsertEnqueue(result.val);
+                },
+              );
             },
           ),
         ]);

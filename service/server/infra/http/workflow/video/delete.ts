@@ -4,6 +4,7 @@ import {
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
 import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../../http/trace/cloudflare";
 
 export const deleteVideosWorkflow = () => {
   return {
@@ -28,23 +29,31 @@ export const deleteVideosWorkflow = () => {
               timeout: "1 minutes",
             },
             async () => {
-              const vu = await env.APP_WORKER.newVideoUsecase();
-              const result = await vu.deletedListIds();
-              if (result.err) {
-                throw result.err;
-              }
-              AppLogger.info("after deletedListIds", {
-                videoIds: result.val,
-              });
-              if (result.val.length === 0) {
-                return;
-              }
-              AppLogger.info("batchDeleteByVideoIds", {
-                videoIds: result.val,
-              });
-              const _ = await vu.batchDeleteByVideoIds({
-                videoIds: result.val,
-              });
+              return withTracer(
+                "video-workflow",
+                "delete-deleted-videos",
+                async (span) => {
+                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const result = await vu.deletedListIds();
+                  if (result.err) {
+                    throw result.err;
+                  }
+                  AppLogger.info("after deletedListIds", {
+                    videoIds: result.val,
+                  });
+                  if (result.val.length === 0) {
+                    span.setAttribute("videos_count", 0);
+                    return;
+                  }
+                  AppLogger.info("batchDeleteByVideoIds", {
+                    videoIds: result.val,
+                  });
+                  span.setAttribute("videos_count", result.val.length);
+                  const _ = await vu.batchDeleteByVideoIds({
+                    videoIds: result.val,
+                  });
+                },
+              );
             },
           ),
         ]);

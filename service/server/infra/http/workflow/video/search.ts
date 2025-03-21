@@ -4,6 +4,7 @@ import {
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
 import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../../http/trace/cloudflare";
 
 export const searchVideosWorkflow = () => {
   return {
@@ -28,15 +29,23 @@ export const searchVideosWorkflow = () => {
               timeout: "1 minutes",
             },
             async () => {
-              const vu = await env.APP_WORKER.newVideoUsecase();
-              const result = await vu.searchLive();
-              if (result.err) {
-                throw result.err;
-              }
-              if (result.val.length === 0) {
-                return;
-              }
-              const _ = await vu.batchUpsertEnqueue(result.val);
+              return withTracer(
+                "video-workflow",
+                "search-live-videos",
+                async (span) => {
+                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const result = await vu.searchLive();
+                  if (result.err) {
+                    throw result.err;
+                  }
+                  if (result.val.length === 0) {
+                    span.setAttribute("videos_count", 0);
+                    return;
+                  }
+                  span.setAttribute("videos_count", result.val.length);
+                  const _ = await vu.batchUpsertEnqueue(result.val);
+                },
+              );
             },
           ),
           step.do(
@@ -46,15 +55,23 @@ export const searchVideosWorkflow = () => {
               timeout: "1 minutes",
             },
             async () => {
-              const vu = await env.APP_WORKER.newVideoUsecase();
-              const result = await vu.searchExist();
-              if (result.err) {
-                throw result.err;
-              }
-              if (result.val.length === 0) {
-                return;
-              }
-              const _ = await vu.batchUpsertEnqueue(result.val);
+              return withTracer(
+                "video-workflow",
+                "search-existing-videos",
+                async (span) => {
+                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const result = await vu.searchExist();
+                  if (result.err) {
+                    throw result.err;
+                  }
+                  if (result.val.length === 0) {
+                    span.setAttribute("videos_count", 0);
+                    return;
+                  }
+                  span.setAttribute("videos_count", result.val.length);
+                  const _ = await vu.batchUpsertEnqueue(result.val);
+                },
+              );
             },
           ),
           step.do(
@@ -64,15 +81,23 @@ export const searchVideosWorkflow = () => {
               timeout: "1 minutes",
             },
             async () => {
-              const vu = await env.APP_WORKER.newVideoUsecase();
-              const result = await vu.searchDeletedCheck();
-              if (result.err) {
-                throw result.err;
-              }
-              if (result.val.length === 0) {
-                return;
-              }
-              const _ = await vu.batchUpsertEnqueue(result.val);
+              return withTracer(
+                "video-workflow",
+                "search-deleted-videos",
+                async (span) => {
+                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const result = await vu.searchDeletedCheck();
+                  if (result.err) {
+                    throw result.err;
+                  }
+                  if (result.val.length === 0) {
+                    span.setAttribute("videos_count", 0);
+                    return;
+                  }
+                  span.setAttribute("videos_count", result.val.length);
+                  const _ = await vu.batchUpsertEnqueue(result.val);
+                },
+              );
             },
           ),
         ]);

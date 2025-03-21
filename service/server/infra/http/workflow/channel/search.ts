@@ -4,6 +4,7 @@ import {
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
 import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../../http/trace/cloudflare";
 
 export const searchChannelsWorkflow = () => {
   return {
@@ -28,17 +29,24 @@ export const searchChannelsWorkflow = () => {
               timeout: "1 minutes",
             },
             async () => {
-              const vu = await env.APP_WORKER.newCreatorUsecase();
-              const result = await vu.searchByMemberType({
-                memberType: "vspo_jp",
-              });
-              if (result.err) {
-                throw result.err;
-              }
-              if (result.val.length === 0) {
-                return;
-              }
-              const _ = await vu.batchUpsertEnqueue(result.val);
+              return withTracer(
+                "channel-workflow",
+                "fetch-vspo-jp-channels",
+                async (span) => {
+                  const vu = await env.APP_WORKER.newCreatorUsecase();
+                  const result = await vu.searchByMemberType({
+                    memberType: "vspo_jp",
+                  });
+                  if (result.err) {
+                    throw result.err;
+                  }
+                  if (result.val.length === 0) {
+                    return;
+                  }
+                  span.setAttribute("channels_count", result.val.length);
+                  const _ = await vu.batchUpsertEnqueue(result.val);
+                },
+              );
             },
           ),
           step.do(
@@ -48,17 +56,24 @@ export const searchChannelsWorkflow = () => {
               timeout: "1 minutes",
             },
             async () => {
-              const vu = await env.APP_WORKER.newCreatorUsecase();
-              const result = await vu.searchByMemberType({
-                memberType: "vspo_en",
-              });
-              if (result.err) {
-                throw result.err;
-              }
-              if (result.val.length === 0) {
-                return;
-              }
-              const _ = await vu.batchUpsertEnqueue(result.val);
+              return withTracer(
+                "channel-workflow",
+                "fetch-vspo-en-channels",
+                async (span) => {
+                  const vu = await env.APP_WORKER.newCreatorUsecase();
+                  const result = await vu.searchByMemberType({
+                    memberType: "vspo_en",
+                  });
+                  if (result.err) {
+                    throw result.err;
+                  }
+                  if (result.val.length === 0) {
+                    return;
+                  }
+                  span.setAttribute("channels_count", result.val.length);
+                  const _ = await vu.batchUpsertEnqueue(result.val);
+                },
+              );
             },
           ),
         ]);

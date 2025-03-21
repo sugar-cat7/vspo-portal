@@ -140,17 +140,24 @@ export default createHandler({
       setFeatureFlagProvider(env);
       switch (controller.cron) {
         case "0 0,7,18 * * *":
+          span.setAttribute("workflow", "search-channels");
           await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
           break;
         case "5 0,7,18 * * *":
+          span.setAttribute("workflow", "translate-creators");
           await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
           break;
         case "*/2 * * * *":
+          span.setAttribute("workflow", "search-videos");
           await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
-          await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
           await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
           break;
+        case "*/1 * * * *":
+          span.setAttribute("workflow", "discord-send-messages");
+          await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
+          break;
         case "*/30 * * * *":
+          span.setAttribute("workflow", "search-member-videos-by-channel");
           await env.SEARCH_MEMBER_VIDEOS_BY_CHANNEL_WORKFLOW.create({
             id: createUUID(),
           });

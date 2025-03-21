@@ -6,6 +6,7 @@ import {
 } from "../../../../config/env/worker";
 import type { DiscordServers } from "../../../../domain";
 import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../../http/trace/cloudflare";
 
 type DiscordChannelIdsMap = {
   channelIds: string[];
@@ -50,27 +51,34 @@ export const discordSendMessagesWorkflow = () => {
             timeout: "1 minutes",
           },
           async () => {
-            const du = await env.APP_WORKER.newDiscordUsecase();
-            const allDiscordServers: DiscordServers = [];
-            let currentPage = 0;
-            let hasNext = true;
+            return withTracer(
+              "discord-workflow",
+              "fetch-discord-servers",
+              async (span) => {
+                const du = await env.APP_WORKER.newDiscordUsecase();
+                const allDiscordServers: DiscordServers = [];
+                let currentPage = 0;
+                let hasNext = true;
 
-            while (hasNext) {
-              const result = await du.list({
-                limit: 100,
-                page: currentPage,
-              });
+                while (hasNext) {
+                  const result = await du.list({
+                    limit: 100,
+                    page: currentPage,
+                  });
 
-              if (result.err) {
-                throw result.err;
-              }
+                  if (result.err) {
+                    throw result.err;
+                  }
 
-              allDiscordServers.push(...result.val.discordServers);
-              currentPage++;
-              hasNext = result.val.pagination.hasNext;
-            }
+                  allDiscordServers.push(...result.val.discordServers);
+                  currentPage++;
+                  hasNext = result.val.pagination.hasNext;
+                }
 
-            return { allDiscordServers };
+                span.setAttribute("servers_count", allDiscordServers.length);
+                return { allDiscordServers };
+              },
+            );
           },
         );
 
@@ -130,20 +138,31 @@ export const discordSendMessagesWorkflow = () => {
                 timeout: "1 minutes",
               },
               async () => {
-                const vu = await env.APP_WORKER.newDiscordUsecase();
-                logger.info(
-                  `Sending videos to ${group.channelIds.length} channels with language: ${group.channelLangaugeCode}`,
-                  {
-                    channelCount: group.channelIds.length,
-                    language: group.channelLangaugeCode,
+                return withTracer(
+                  "discord-workflow",
+                  `send-videos-language-${group.channelLangaugeCode}`,
+                  async (span) => {
+                    const vu = await env.APP_WORKER.newDiscordUsecase();
+                    logger.info(
+                      `Sending videos to ${group.channelIds.length} channels with language: ${group.channelLangaugeCode}`,
+                      {
+                        channelCount: group.channelIds.length,
+                        language: group.channelLangaugeCode,
+                      },
+                    );
+                    span.setAttribute("language", group.channelLangaugeCode);
+                    span.setAttribute(
+                      "channels_count",
+                      group.channelIds.length,
+                    );
+                    await vu.sendVideosToMultipleChannels({
+                      channelIds: group.channelIds,
+                      channelLangaugeCode: group.channelLangaugeCode,
+                    });
+                    logger.info(
+                      `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
+                    );
                   },
-                );
-                await vu.sendVideosToMultipleChannels({
-                  channelIds: group.channelIds,
-                  channelLangaugeCode: group.channelLangaugeCode,
-                });
-                logger.info(
-                  `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
                 );
               },
             ),

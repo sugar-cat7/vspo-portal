@@ -5,6 +5,7 @@ import {
 } from "../../../../config/env/worker";
 import type { DiscordServers } from "../../../../domain";
 import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../../http/trace/cloudflare";
 
 type DiscordChannelIdsMap = {
   channelIds: string[];
@@ -40,27 +41,34 @@ export const discordDeleteAllWorkflow = () => {
             timeout: "1 minutes",
           },
           async () => {
-            const du = await env.APP_WORKER.newDiscordUsecase();
-            const allDiscordServers: DiscordServers = [];
-            let currentPage = 0;
-            let hasNext = true;
+            return withTracer(
+              "discord-workflow",
+              "fetch-discord-servers",
+              async (span) => {
+                const du = await env.APP_WORKER.newDiscordUsecase();
+                const allDiscordServers: DiscordServers = [];
+                let currentPage = 0;
+                let hasNext = true;
 
-            while (hasNext) {
-              const result = await du.list({
-                limit: 100,
-                page: currentPage,
-              });
+                while (hasNext) {
+                  const result = await du.list({
+                    limit: 100,
+                    page: currentPage,
+                  });
 
-              if (result.err) {
-                throw result.err;
-              }
+                  if (result.err) {
+                    throw result.err;
+                  }
 
-              allDiscordServers.push(...result.val.discordServers);
-              currentPage++;
-              hasNext = result.val.pagination.hasNext;
-            }
+                  allDiscordServers.push(...result.val.discordServers);
+                  currentPage++;
+                  hasNext = result.val.pagination.hasNext;
+                }
 
-            return { allDiscordServers };
+                span.setAttribute("servers_count", allDiscordServers.length);
+                return { allDiscordServers };
+              },
+            );
           },
         );
 
@@ -121,18 +129,26 @@ export const discordDeleteAllWorkflow = () => {
                   timeout: "1 minutes",
                 },
                 async () => {
-                  const vu = await env.APP_WORKER.newDiscordUsecase();
-                  logger.info(
-                    `Deleting all messages in channel ${channelId} with language: ${group.channelLangaugeCode}`,
-                    {
-                      channelId,
-                      language: group.channelLangaugeCode,
+                  return withTracer(
+                    "discord-workflow",
+                    `delete-messages-channel-${channelId}`,
+                    async (span) => {
+                      const vu = await env.APP_WORKER.newDiscordUsecase();
+                      logger.info(
+                        `Deleting all messages in channel ${channelId} with language: ${group.channelLangaugeCode}`,
+                        {
+                          channelId,
+                          language: group.channelLangaugeCode,
+                        },
+                      );
+                      span.setAttribute("channel_id", channelId);
+                      span.setAttribute("language", group.channelLangaugeCode);
+                      // Delete all messages in the specified channel
+                      await vu.deleteAllMessagesInChannel(channelId);
+                      logger.info(
+                        `Successfully deleted all messages in channel ${channelId} with language: ${group.channelLangaugeCode}`,
+                      );
                     },
-                  );
-                  // Delete all messages in the specified channel
-                  await vu.deleteAllMessagesInChannel(channelId);
-                  logger.info(
-                    `Successfully deleted all messages in channel ${channelId} with language: ${group.channelLangaugeCode}`,
                   );
                 },
               ),
