@@ -28,9 +28,7 @@ export const mockTwitcastingResponses = {
           total_view_count: 1000,
           large_thumbnail: "https://example.com/thumbnail1.jpg",
           created: 1704067200, // 2024-01-01T00:00:00Z
-          user: {
-            id: "user_id_1",
-          },
+          user_id: "user_id_1",
         },
         {
           id: "movie_id_2",
@@ -39,9 +37,7 @@ export const mockTwitcastingResponses = {
           total_view_count: 5000,
           large_thumbnail: "https://example.com/thumbnail2.jpg",
           created: 1704153600, // 2024-01-02T00:00:00Z
-          user: {
-            id: "user_id_1",
-          },
+          user_id: "user_id_1",
         },
       ],
     },
