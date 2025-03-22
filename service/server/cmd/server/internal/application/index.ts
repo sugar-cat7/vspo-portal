@@ -1,4 +1,5 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
+import { z } from "zod";
 import {
   type AppWorkerEnv,
   zAppWorkerEnv,
@@ -216,6 +217,17 @@ export class DiscordService extends RpcTarget {
   async sendAdminMessage(message: SendAdminMessageParams) {
     return this.#usecase.sendAdminMessage(message);
   }
+
+  async deleteMessageInChannelEnqueue(channelId: string) {
+    return batchEnqueueWithChunks(
+      [channelId],
+      100,
+      (channelId) => ({
+        body: { channelId, kind: "delete-message-in-channel" },
+      }),
+      this.#queue,
+    );
+  }
 }
 
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
@@ -249,7 +261,8 @@ type Kind =
   | "upsert-creator"
   | "translate-creator"
   | "discord-send-message"
-  | "upsert-discord-server";
+  | "upsert-discord-server"
+  | "delete-message-in-channel";
 
 type BaseMessageParam<T, K extends Kind> = T & { kind: K };
 
@@ -262,16 +275,92 @@ type UpsertDiscordServer = BaseMessageParam<
   DiscordServer,
   "upsert-discord-server"
 >;
+type DeleteMessageInChannel = BaseMessageParam<
+  { channelId: string },
+  "delete-message-in-channel"
+>;
 
 type CreatorMessage = TranslateCreator | UpsertCreator;
 type VideoMessage = TranslateVideo | UpsertVideo;
-type DiscordMessage = DiscordSend | UpsertDiscordServer;
+type DiscordMessage =
+  | DiscordSend
+  | UpsertDiscordServer
+  | DeleteMessageInChannel;
 
 type MessageParam =
   | CreatorMessage
   | VideoMessage
   | DiscordMessage
-  | UpsertDiscordServer;
+  | UpsertDiscordServer
+  | DeleteMessageInChannel;
+
+// Type guard functions for each message type
+function isTranslateVideo(message: unknown): message is TranslateVideo {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "translate-video"
+  );
+}
+
+function isUpsertVideo(message: unknown): message is UpsertVideo {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "upsert-video"
+  );
+}
+
+function isUpsertCreator(message: unknown): message is UpsertCreator {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "upsert-creator"
+  );
+}
+
+function isTranslateCreator(message: unknown): message is TranslateCreator {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "translate-creator"
+  );
+}
+
+function isDiscordSend(message: unknown): message is DiscordSend {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "discord-send-message"
+  );
+}
+
+function isUpsertDiscordServer(
+  message: unknown,
+): message is UpsertDiscordServer {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "upsert-discord-server"
+  );
+}
+
+function isDeleteMessageInChannel(
+  message: unknown,
+): message is DeleteMessageInChannel {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "delete-message-in-channel"
+  );
+}
 
 export default createHandler({
   queue: async (
@@ -288,47 +377,111 @@ export default createHandler({
       }
       const c = new Container(e.data);
       const logger = AppLogger.getInstance(e.data);
-      const kind = batch.messages.at(0)?.body?.kind;
-      if (!kind) {
-        logger.error("Invalid kind");
-        return;
+
+      // Define type-safe message storage
+      const messageGroups = {
+        "translate-video": [] as TranslateVideo[],
+        "upsert-video": [] as UpsertVideo[],
+        "upsert-creator": [] as UpsertCreator[],
+        "translate-creator": [] as TranslateCreator[],
+        "discord-send-message": [] as DiscordSend[],
+        "upsert-discord-server": [] as UpsertDiscordServer[],
+        "delete-message-in-channel": [] as DeleteMessageInChannel[],
+      };
+
+      // Group messages by kind without type assertions
+      for (const message of batch.messages) {
+        const body = message.body;
+        if (!body) continue;
+
+        if (isTranslateVideo(body)) {
+          messageGroups["translate-video"].push(body);
+        } else if (isUpsertVideo(body)) {
+          messageGroups["upsert-video"].push(body);
+        } else if (isUpsertCreator(body)) {
+          messageGroups["upsert-creator"].push(body);
+        } else if (isTranslateCreator(body)) {
+          messageGroups["translate-creator"].push(body);
+        } else if (isDiscordSend(body)) {
+          messageGroups["discord-send-message"].push(body);
+        } else if (isUpsertDiscordServer(body)) {
+          messageGroups["upsert-discord-server"].push(body);
+        } else if (isDeleteMessageInChannel(body)) {
+          messageGroups["delete-message-in-channel"].push(body);
+        }
       }
 
-      logger.info(`Consume: ${kind}`);
-      span.setAttributes({
-        queue: batch.queue,
-        kind: kind,
-      });
-      switch (kind) {
-        case "upsert-video": {
-          const videos = VideosSchema.safeParse(
-            batch.messages.map((m) => m.body),
-          );
-          if (!videos.success) {
-            logger.error(`Invalid videos: ${videos.error.message}`);
-            return;
-          }
-          await c.videoInteractor.batchUpsert(videos.data);
-          break;
-        }
-        case "upsert-creator": {
-          const creators = CreatorsSchema.safeParse(
-            batch.messages.map((m) => m.body),
-          );
-          if (!creators.success) {
-            logger.error(`Invalid creators: ${creators.error.message}`);
-            return;
-          }
-          await c.creatorInteractor.batchUpsert(creators.data);
-          break;
-        }
-        case "translate-video": {
-          const v = VideosSchema.safeParse(batch.messages.map((m) => m.body));
-          if (!v.success) {
-            logger.error(`Invalid videos: ${v.error.message}`);
-            return;
-          }
+      // Get non-empty message groups for logging
+      const nonEmptyGroupNames = Object.entries(messageGroups)
+        .filter(([_, messages]) => messages.length > 0)
+        .map(([kind]) => kind);
 
+      logger.info(
+        `Processing message groups: ${nonEmptyGroupNames.join(", ")}`,
+      );
+
+      // Process each kind of message
+      if (messageGroups["upsert-video"].length > 0) {
+        const messages = messageGroups["upsert-video"];
+        logger.info(
+          `Processing ${messages.length} messages of kind: upsert-video`,
+        );
+        span.setAttributes({
+          queue: batch.queue,
+          kind: "upsert-video",
+          count: messages.length,
+        });
+
+        const videos = VideosSchema.safeParse(messages);
+        if (!videos.success) {
+          logger.error(`Invalid videos: ${videos.error.message}`);
+        } else {
+          const v = await c.videoInteractor.batchUpsert(videos.data);
+          if (v.err) {
+            logger.error(`Failed to upsert videos: ${v.err.message}`);
+            throw v.err;
+          }
+        }
+      }
+
+      if (messageGroups["upsert-creator"].length > 0) {
+        const messages = messageGroups["upsert-creator"];
+        logger.info(
+          `Processing ${messages.length} messages of kind: upsert-creator`,
+        );
+        span.setAttributes({
+          queue: batch.queue,
+          kind: "upsert-creator",
+          count: messages.length,
+        });
+
+        const creators = CreatorsSchema.safeParse(messages);
+        if (!creators.success) {
+          logger.error(`Invalid creators: ${creators.error.message}`);
+        } else {
+          const r = await c.creatorInteractor.batchUpsert(creators.data);
+          if (r.err) {
+            logger.error(`Failed to upsert creators: ${r.err.message}`);
+            throw r.err;
+          }
+        }
+      }
+
+      if (messageGroups["translate-video"].length > 0) {
+        const messages = messageGroups["translate-video"];
+        logger.info(
+          `Processing ${messages.length} messages of kind: translate-video`,
+        );
+        span.setAttributes({
+          queue: batch.queue,
+          kind: "translate-video",
+          count: messages.length,
+        });
+
+        const v = VideosSchema.safeParse(messages);
+        if (!v.success) {
+          logger.error(`Invalid videos: ${v.error.message}`);
+        } else {
           // Group videos by language code
           const videosByLang = v.data.reduce(
             (acc, video) => {
@@ -367,17 +520,24 @@ export default createHandler({
               })),
             );
           }
-          break;
         }
-        case "translate-creator": {
-          const cr = CreatorsSchema.safeParse(
-            batch.messages.map((m) => m.body),
-          );
-          if (!cr.success) {
-            logger.error(`Invalid creators: ${cr.error.message}`);
-            return;
-          }
+      }
 
+      if (messageGroups["translate-creator"].length > 0) {
+        const messages = messageGroups["translate-creator"];
+        logger.info(
+          `Processing ${messages.length} messages of kind: translate-creator`,
+        );
+        span.setAttributes({
+          queue: batch.queue,
+          kind: "translate-creator",
+          count: messages.length,
+        });
+
+        const cr = CreatorsSchema.safeParse(messages);
+        if (!cr.success) {
+          logger.error(`Invalid creators: ${cr.error.message}`);
+        } else {
           // Group creators by language code more efficiently
           const creatorsByLang = new Map<string, typeof cr.data>();
 
@@ -427,46 +587,54 @@ export default createHandler({
               })),
             );
           }
-          break;
         }
-        case "discord-send-message": {
-          // TODO: Implement
-          break;
-        }
-        case "upsert-discord-server": {
-          const ds = discordServers.safeParse(
-            batch.messages.map((m) => m.body),
-          );
-          if (!ds.success) {
-            logger.error(`Invalid videos: ${ds.error.message}`);
-            return;
-          }
-          const sv = await c.discordInteractor.batchUpsert(ds.data);
-          if (sv.err) {
-            logger.error(`Failed to upsert discord servers: ${sv.err.message}`);
-            return;
-          }
+      }
 
-          const cIds = sv.val.flatMap((server) =>
-            server.discordChannels.map((channel) => channel.id),
-          );
+      if (messageGroups["upsert-discord-server"].length > 0) {
+        const messages = messageGroups["upsert-discord-server"];
+        logger.info(
+          `Processing ${messages.length} messages of kind: upsert-discord-server`,
+        );
+        span.setAttributes({
+          queue: batch.queue,
+          kind: "upsert-discord-server",
+          count: messages.length,
+        });
 
-          if (cIds.length > 0) {
-            await Promise.allSettled(
-              cIds.map((id) =>
-                c.discordInteractor.sendAdminMessage({
-                  channelId: id,
-                  content:
-                    "すぽじゅーるは、ぶいすぽっ!メンバーの配信(Youtube/Twitch/ツイキャス/ニコニコ)や切り抜きを一覧で確認できる非公式サイトです。 /Spodule aggregates schedules for Japan's Vtuber group, Vspo.\n\nWeb版はこちら：https://www.vspo-schedule.com/schedule/all",
-                }),
-              ),
-            );
-          }
-          break;
+        logger.info(`Upserting Discord servers: ${messages.length}`);
+        logger.debug("Discord servers", {
+          servers: messages,
+        });
+        const sv = await c.discordInteractor.batchUpsert(messages);
+        if (sv.err) {
+          logger.error(`Failed to upsert discord servers: ${sv.err.message}`);
+          throw sv.err;
         }
-        default:
-          logger.error(`Invalid kind: ${kind}`);
-          return;
+      }
+
+      if (messageGroups["delete-message-in-channel"].length > 0) {
+        const messages = messageGroups["delete-message-in-channel"];
+        logger.info(
+          `Processing ${messages.length} messages of kind: delete-message-in-channel`,
+        );
+        span.setAttributes({
+          queue: batch.queue,
+          kind: "delete-message-in-channel",
+          count: messages.length,
+        });
+
+        if (!messages.length) {
+          logger.error("Invalid delete message in channel");
+        } else {
+          logger.info("Deleting messages in channels", {
+            channelIds: messages,
+          });
+          await Promise.allSettled(
+            messages.map((msg) =>
+              c.discordInteractor.deleteAllMessagesInChannel(msg.channelId),
+            ),
+          );
+        }
       }
     });
   },

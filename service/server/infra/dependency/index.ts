@@ -89,6 +89,7 @@ export function createServices(
       discordServerRepository: repos.discordServerRepository,
       discordClient: discordClinet,
       videoRepository: repos.videoRepository,
+      discordMessageRepository: repos.discordMessageRepository,
     }),
   };
 }
