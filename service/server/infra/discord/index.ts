@@ -227,7 +227,10 @@ export class DiscordClient implements IDiscordClient {
       });
 
       const responseResult = await wrap(
-        this.rest.editMessage(channelId, messageId, { content, embeds }),
+        this.rest.editMessage(channelId, messageId, {
+          content,
+          embeds: embeds?.slice(0, 10),
+        }),
         (err: Error) => {
           AppLogger.error("Failed to update Discord message", {
             channel_id: channelId,

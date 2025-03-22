@@ -96,13 +96,13 @@ export class DiscordService implements IDiscordService {
     }
 
     const liveVideoListResult = await this.dependencies.videoRepository.list({
-      limit: 500,
+      limit: 1000,
       page: 0,
       languageCode: options.channelLangaugeCode,
       videoType: "vspo_stream",
-      // startedAt: convertToUTCDate(
-      //   getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
-      // ),
+      startedAt: convertToUTCDate(
+        getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
+      ),
       status: "live",
       orderBy: "desc",
     });
@@ -125,11 +125,13 @@ export class DiscordService implements IDiscordService {
 
     const upcomingVideoListResult =
       await this.dependencies.videoRepository.list({
-        limit: 500,
+        limit: 1000,
         page: 0,
         languageCode: options.channelLangaugeCode,
         videoType: "vspo_stream",
-        // startedAt: convertToUTCDate(getCurrentUTCDate()),
+        startedAt: convertToUTCDate(
+          getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
+        ),
         status: "upcoming",
         orderBy: "desc",
       });
@@ -308,6 +310,8 @@ export class DiscordService implements IDiscordService {
       type: options.type,
       serverId: options.serverId,
       channelId: options.targetChannelId,
+      channelLangaugeCode: options.channelLangaugeCode,
+      serverLangaugeCode: options.serverLangaugeCode,
     });
 
     let server: DiscordServer;
@@ -384,6 +388,9 @@ export class DiscordService implements IDiscordService {
           channels[existingIndex] = {
             ...channelResult.val,
             id: channels[existingIndex].id,
+            languageCode:
+              options.channelLangaugeCode ??
+              channels[existingIndex].languageCode,
           };
         } else {
           // Add new channel
@@ -404,11 +411,12 @@ export class DiscordService implements IDiscordService {
       discordChannels: channels,
     });
 
-    AppLogger.info("Successfully adjusted bot channel", {
+    AppLogger.debug("Successfully adjusted bot channel", {
       service: this.SERVICE_NAME,
       type: options.type,
       serverId: options.serverId,
       channelId: options.targetChannelId,
+      updatedServer: updatedServer,
     });
     return Ok(updatedServer);
   }
@@ -471,11 +479,30 @@ export class DiscordService implements IDiscordService {
       "DiscordService",
       "sendAdminMessage",
       async () => {
-        return this.dependencies.discordClient.sendMessage({
+        AppLogger.debug("Sending admin message", {
+          service: this.SERVICE_NAME,
+          channelId: message.channelId,
+          content: message.content,
+        });
+        const r = await this.dependencies.discordClient.sendMessage({
           channelId: message.channelId,
           content: message.content,
           embeds: [],
         });
+        if (r.err) {
+          AppLogger.error("Failed to send admin message", {
+            service: this.SERVICE_NAME,
+            channelId: message.channelId,
+            error: r.err,
+          });
+          return r;
+        }
+        AppLogger.debug("Successfully sent admin message", {
+          service: this.SERVICE_NAME,
+          channelId: message.channelId,
+          messageId: r.val,
+        });
+        return Ok(r.val);
       },
     );
   }

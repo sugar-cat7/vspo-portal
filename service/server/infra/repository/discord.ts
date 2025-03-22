@@ -12,6 +12,7 @@ import {
   getCurrentUTCDate,
 } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
+import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
 import { withTracerResult } from "../http/trace/cloudflare";
 import { buildConflictUpdateColumns } from "./helper";
@@ -49,6 +50,9 @@ export class DiscordServerRepository implements IDiscordServerRepository {
 
   async list(query: ListQuery): Promise<Result<DiscordServers, AppError>> {
     return withTracerResult("DiscordServerRepository", "list", async (span) => {
+      AppLogger.info("DiscordServerRepository list", {
+        query,
+      });
       const discordServerResult = await wrap(
         this.db
           .select()
@@ -148,12 +152,41 @@ export class DiscordServerRepository implements IDiscordServerRepository {
       "DiscordServerRepository",
       "batchUpsert",
       async (span) => {
-        const dbDiscordServers = discordServers.map((server) =>
+        // Deduplicate servers and merge their channels
+        const serverMap = new Map<string, DiscordServer>();
+        for (const server of discordServers) {
+          if (!server.rawId) {
+            continue;
+          }
+          const existingServer = serverMap.get(server.rawId);
+          if (existingServer) {
+            // Merge channels, avoiding duplicates by channelId
+            const channelMap = new Map<
+              string,
+              (typeof server.discordChannels)[0]
+            >();
+            for (const ch of existingServer.discordChannels) {
+              channelMap.set(ch.rawId, ch);
+            }
+            for (const ch of server.discordChannels) {
+              channelMap.set(ch.rawId, ch);
+            }
+            existingServer.discordChannels = Array.from(channelMap.values());
+          } else {
+            serverMap.set(server.rawId, server);
+          }
+        }
+        const uniqueServers = Array.from(serverMap.values());
+        AppLogger.info("DiscordServerRepository batchUpsert", {
+          uniqueServers,
+        });
+
+        const dbDiscordServers = uniqueServers.map((server) =>
           createInsertDiscordServer({
-            id: server.id,
+            id: server.id || createUUID(),
             serverId: server.rawId,
-            name: server.name,
-            languageCode: server.languageCode,
+            name: server.name || "",
+            languageCode: server.languageCode || "default",
             createdAt: convertToUTCDate(server.createdAt),
             updatedAt: convertToUTCDate(server.updatedAt),
           }),
@@ -183,7 +216,8 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         if (discordServerResult.err) {
           return Err(discordServerResult.err);
         }
-        const dbDiscordChannels = discordServers.flatMap((server) =>
+
+        const dbDiscordChannels = uniqueServers.flatMap((server) =>
           server.discordChannels.map((c) => ({
             id: c.id || createUUID(),
             channelId: c.rawId,
@@ -194,6 +228,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             updatedAt: convertToUTCDate(c.updatedAt ?? getCurrentUTCDate()),
           })),
         );
+
         const discordChannelResult = await wrap(
           this.db
             .insert(discordChannelTable)
@@ -226,7 +261,19 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             discordServerResult.val.map((r) => ({
               id: r.id,
               rawId: r.serverId,
-              discordChannels: [],
+              discordChannels: discordChannels.parse(
+                dbDiscordChannels
+                  .filter((ch) => ch.serverId === r.serverId)
+                  .map((ch) => ({
+                    id: ch.id,
+                    rawId: ch.channelId,
+                    serverId: ch.serverId,
+                    name: ch.name,
+                    languageCode: ch.languageCode,
+                    createdAt: convertToUTC(ch.createdAt),
+                    updatedAt: convertToUTC(ch.updatedAt),
+                  })),
+              ),
               name: r.name,
               languageCode: r.languageCode,
               createdAt: convertToUTC(r.createdAt),

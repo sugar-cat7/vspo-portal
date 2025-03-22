@@ -1,4 +1,5 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
+import { z } from "zod";
 import {
   type AppWorkerEnv,
   zAppWorkerEnv,
@@ -216,6 +217,17 @@ export class DiscordService extends RpcTarget {
   async sendAdminMessage(message: SendAdminMessageParams) {
     return this.#usecase.sendAdminMessage(message);
   }
+
+  async deleteMessageInChannelEnqueue(channelId: string) {
+    return batchEnqueueWithChunks(
+      [channelId],
+      100,
+      (channelId) => ({
+        body: { channelId, kind: "delete-message-in-channel" },
+      }),
+      this.#queue,
+    );
+  }
 }
 
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
@@ -249,7 +261,8 @@ type Kind =
   | "upsert-creator"
   | "translate-creator"
   | "discord-send-message"
-  | "upsert-discord-server";
+  | "upsert-discord-server"
+  | "delete-message-in-channel";
 
 type BaseMessageParam<T, K extends Kind> = T & { kind: K };
 
@@ -262,16 +275,24 @@ type UpsertDiscordServer = BaseMessageParam<
   DiscordServer,
   "upsert-discord-server"
 >;
+type DeleteMessageInChannel = BaseMessageParam<
+  { channelId: string },
+  "delete-message-in-channel"
+>;
 
 type CreatorMessage = TranslateCreator | UpsertCreator;
 type VideoMessage = TranslateVideo | UpsertVideo;
-type DiscordMessage = DiscordSend | UpsertDiscordServer;
+type DiscordMessage =
+  | DiscordSend
+  | UpsertDiscordServer
+  | DeleteMessageInChannel;
 
 type MessageParam =
   | CreatorMessage
   | VideoMessage
   | DiscordMessage
-  | UpsertDiscordServer;
+  | UpsertDiscordServer
+  | DeleteMessageInChannel;
 
 export default createHandler({
   queue: async (
@@ -302,28 +323,44 @@ export default createHandler({
       switch (kind) {
         case "upsert-video": {
           const videos = VideosSchema.safeParse(
-            batch.messages.map((m) => m.body),
+            batch.messages
+              .map((m) => m.body)
+              .filter((m) => m.kind === "upsert-video"),
           );
           if (!videos.success) {
             logger.error(`Invalid videos: ${videos.error.message}`);
             return;
           }
-          await c.videoInteractor.batchUpsert(videos.data);
+          const v = await c.videoInteractor.batchUpsert(videos.data);
+          if (v.err) {
+            logger.error(`Failed to upsert videos: ${v.err.message}`);
+            throw v.err;
+          }
           break;
         }
         case "upsert-creator": {
           const creators = CreatorsSchema.safeParse(
-            batch.messages.map((m) => m.body),
+            batch.messages
+              .map((m) => m.body)
+              .filter((m) => m.kind === "upsert-creator"),
           );
           if (!creators.success) {
             logger.error(`Invalid creators: ${creators.error.message}`);
             return;
           }
-          await c.creatorInteractor.batchUpsert(creators.data);
+          const r = await c.creatorInteractor.batchUpsert(creators.data);
+          if (r.err) {
+            logger.error(`Failed to upsert creators: ${r.err.message}`);
+            throw r.err;
+          }
           break;
         }
         case "translate-video": {
-          const v = VideosSchema.safeParse(batch.messages.map((m) => m.body));
+          const v = VideosSchema.safeParse(
+            batch.messages
+              .map((m) => m.body)
+              .filter((m) => m.kind === "translate-video"),
+          );
           if (!v.success) {
             logger.error(`Invalid videos: ${v.error.message}`);
             return;
@@ -371,7 +408,9 @@ export default createHandler({
         }
         case "translate-creator": {
           const cr = CreatorsSchema.safeParse(
-            batch.messages.map((m) => m.body),
+            batch.messages
+              .map((m) => m.body)
+              .filter((m) => m.kind === "translate-creator"),
           );
           if (!cr.success) {
             logger.error(`Invalid creators: ${cr.error.message}`);
@@ -429,39 +468,37 @@ export default createHandler({
           }
           break;
         }
-        case "discord-send-message": {
-          // TODO: Implement
-          break;
-        }
         case "upsert-discord-server": {
-          const ds = discordServers.safeParse(
-            batch.messages.map((m) => m.body),
-          );
-          if (!ds.success) {
-            logger.error(`Invalid videos: ${ds.error.message}`);
-            return;
-          }
-          const sv = await c.discordInteractor.batchUpsert(ds.data);
+          const ds = batch.messages
+            .map((m) => m.body)
+            .filter((m) => m.kind === "upsert-discord-server");
+          logger.info(`Upserting Discord servers: ${ds.length}`);
+          logger.debug("Discord servers", {
+            servers: ds,
+          });
+          const sv = await c.discordInteractor.batchUpsert(ds);
           if (sv.err) {
             logger.error(`Failed to upsert discord servers: ${sv.err.message}`);
+            throw sv.err;
+          }
+          break;
+        }
+        case "delete-message-in-channel": {
+          const chIds = batch.messages
+            .map((m) => m.body)
+            .filter((m) => m.kind === "delete-message-in-channel");
+          if (!chIds.length) {
+            logger.error("Invalid delete message in channel");
             return;
           }
-
-          const cIds = sv.val.flatMap((server) =>
-            server.discordChannels.map((channel) => channel.id),
+          AppLogger.info("Deleting messages in channels", {
+            channelIds: chIds,
+          });
+          await Promise.allSettled(
+            chIds.map((chId) =>
+              c.discordInteractor.deleteAllMessagesInChannel(chId.channelId),
+            ),
           );
-
-          if (cIds.length > 0) {
-            await Promise.allSettled(
-              cIds.map((id) =>
-                c.discordInteractor.sendAdminMessage({
-                  channelId: id,
-                  content:
-                    "すぽじゅーるは、ぶいすぽっ!メンバーの配信(Youtube/Twitch/ツイキャス/ニコニコ)や切り抜きを一覧で確認できる非公式サイトです。 /Spodule aggregates schedules for Japan's Vtuber group, Vspo.\n\nWeb版はこちら：https://www.vspo-schedule.com/schedule/all",
-                }),
-              ),
-            );
-          }
           break;
         }
         default:

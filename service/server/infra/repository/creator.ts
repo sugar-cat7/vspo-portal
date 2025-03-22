@@ -20,6 +20,7 @@ import {
   getCurrentUTCDate,
 } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
+import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
 import { withTracerResult } from "../http/trace/cloudflare";
 import { buildConflictUpdateColumns } from "./helper";
@@ -52,6 +53,9 @@ export class CreatorRepository implements ICreatorRepository {
 
   async list(query: ListQuery): Promise<Result<Creators, AppError>> {
     return withTracerResult("CreatorRepository", "list", async (span) => {
+      AppLogger.info("CreatorRepository list", {
+        query,
+      });
       const filters = this.buildFilters(query);
 
       const creatorResult = await wrap(

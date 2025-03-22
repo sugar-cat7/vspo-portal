@@ -24,6 +24,7 @@ import {
   getCurrentUTCDate,
 } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
+import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
 import { withTracerResult } from "../http/trace/cloudflare";
 import { buildConflictUpdateColumns } from "./helper";
@@ -70,6 +71,9 @@ export class VideoRepository implements IVideoRepository {
 
   async list(query: ListQuery): Promise<Result<Videos, AppError>> {
     return withTracerResult("VideoRepository", "list", async (span) => {
+      AppLogger.info("VideoRepository list", {
+        query,
+      });
       const filters = this.buildFilters(query);
 
       const videoResult = await wrap(
@@ -433,10 +437,14 @@ export class VideoRepository implements IVideoRepository {
       filters.push(eq(streamStatusTable.status, query.status));
     }
     if (query.startedAt) {
-      filters.push(gte(streamStatusTable.startedAt, query.startedAt));
+      filters.push(
+        gte(streamStatusTable.startedAt, convertToUTCDate(query.startedAt)),
+      );
     }
     if (query.endedAt) {
-      filters.push(lte(streamStatusTable.endedAt, query.endedAt));
+      filters.push(
+        lte(streamStatusTable.endedAt, convertToUTCDate(query.endedAt)),
+      );
     }
 
     if (!query.includeDeleted) {
