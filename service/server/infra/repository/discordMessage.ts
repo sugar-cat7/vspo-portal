@@ -24,7 +24,7 @@ import type { DB } from "./transaction";
 type ListQuery = {
   limit: number;
   page: number;
-  channelId?: string;
+  channelId: string;
 };
 
 export interface IDiscordMessageRepository {
@@ -194,6 +194,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
               discordAdminMessageTable,
               eq(discordMessageTable.id, discordAdminMessageTable.messageId),
             )
+            .where(eq(discordAdminMessageTable.channelId, query.channelId))
             .limit(query.limit)
             .offset(query.page * query.limit)
             .orderBy(desc(discordMessageTable.createdAt))

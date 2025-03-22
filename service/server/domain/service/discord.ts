@@ -452,6 +452,11 @@ export class DiscordService implements IDiscordService {
     }
     const adminMessages =
       adminMessagesResult.val?.filter((msg) => msg.type === "admin") ?? [];
+    AppLogger.info("Admin messages", {
+      service: this.SERVICE_NAME,
+      channelId,
+      adminMessages: adminMessages,
+    });
     const botMessagesResult =
       await this.dependencies.discordClient.getLatestBotMessages(channelId);
     if (botMessagesResult.err) {
