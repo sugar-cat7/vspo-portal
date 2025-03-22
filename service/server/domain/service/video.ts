@@ -16,6 +16,11 @@ import type { IAIService } from "../../infra/ai";
 import { withTracerResult } from "../../infra/http/trace/cloudflare";
 import type { ICreatorRepository } from "../../infra/repository/creator";
 import {
+  convertToUTCDate,
+  getCurrentUTCDate,
+  getCurrentUTCString,
+} from "../../pkg/dayjs";
+import {
   type AppError,
   Ok,
   type OkResult,
@@ -377,6 +382,11 @@ export class VideoService implements IVideoService {
     AppLogger.info("Successfully fetched all live videos", {
       service: this.SERVICE_NAME,
       count: videos.length,
+      videos: videos.map((v) => ({
+        rawId: v.rawId,
+        title: v.title,
+        status: v.status,
+      })),
     });
     return Ok(videos);
   }
@@ -384,16 +394,22 @@ export class VideoService implements IVideoService {
   // Get videos that have differences from existing videos
   async searchExistVideos(): Promise<Result<Videos, AppError>> {
     const liveVideos = await this.deps.videoRepository.list({
-      limit: 500,
+      limit: 1000,
       page: 0,
       status: StatusSchema.Enum.live,
+      startedAt: convertToUTCDate(
+        getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
+      ),
       languageCode: "default",
       orderBy: "desc",
     });
     const upcomingVideos = await this.deps.videoRepository.list({
-      limit: 500,
+      limit: 1000,
       page: 0,
       status: StatusSchema.Enum.upcoming,
+      startedAt: convertToUTCDate(
+        getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
+      ),
       languageCode: "default",
       orderBy: "desc",
     });
@@ -422,13 +438,36 @@ export class VideoService implements IVideoService {
       return fetchedVideos;
     }
 
-    return Ok(this.getVideoDifferences(fetchedVideos.val, existingVideos));
+    AppLogger.debug("Successfully fetched videos", {
+      service: this.SERVICE_NAME,
+      count: fetchedVideos.val.length,
+      videos: fetchedVideos.val.map((v) => ({
+        rawId: v.rawId,
+        title: v.title,
+        status: v.status,
+      })),
+    });
+
+    const diff = this.getVideoDifferences(fetchedVideos.val, existingVideos);
+
+    AppLogger.debug("Successfully fetched videos", {
+      service: this.SERVICE_NAME,
+      count: diff.length,
+      videos: diff.map((v) => ({
+        rawId: v.rawId,
+        title: v.title,
+        status: v.status,
+      })),
+    });
+
+    return Ok(diff);
   }
 
   async searchDeletedVideos(): Promise<Result<Videos, AppError>> {
     const existingVideos = await this.deps.videoRepository.list({
       limit: 500,
       page: 0,
+      platform: PlatformSchema.Enum.youtube,
       languageCode: "default",
       orderBy: "desc",
     });
@@ -440,26 +479,46 @@ export class VideoService implements IVideoService {
       .filter((v) => v.platform === PlatformSchema.Enum.youtube)
       .map((v) => v.rawId);
 
-    const twitchVideoIds = existingVideos.val
-      .filter((v) => v.platform === PlatformSchema.Enum.twitch)
-      .map((v) => v.rawId);
-
-    const fetchedVideos = await this.getVideosByIDs({
+    const ytFetchedVideos = await this.getVideosByIDs({
       youtubeVideoIds,
-      twitchVideoIds,
+      twitchVideoIds: [],
     });
 
-    if (fetchedVideos.err) {
-      return fetchedVideos;
+    if (ytFetchedVideos.err) {
+      return ytFetchedVideos;
     }
 
-    const deletedVideos = existingVideos.val.filter(
-      (v) => !fetchedVideos.val.find((fv) => fv.rawId === v.rawId),
+    // const existTwitchVideos = existingVideos.val.filter(
+    //   (v) => v.platform === PlatformSchema.Enum.twitch,
+    // );
+
+    // const liveTwitchVideos = await this.searchLiveTwitchVideos();
+    // if (liveTwitchVideos.err) {
+    //   return liveTwitchVideos;
+    // }
+
+    // const liveTwitchVideoIds = liveTwitchVideos.val
+    //   .filter((v) => v.platform === PlatformSchema.Enum.twitch)
+    //   .map((v) => v.rawId);
+
+    // const deletedTwitchVideos = existTwitchVideos.filter(
+    //   (v) => !liveTwitchVideoIds.includes(v.rawId),
+    // );
+
+    const deletedYtVideos = existingVideos.val.filter(
+      (v) => !ytFetchedVideos.val.find((fv) => fv.rawId === v.rawId),
     );
+
+    const deletedVideos = deletedYtVideos;
 
     AppLogger.info("Successfully fetched deleted videos", {
       service: this.SERVICE_NAME,
       count: deletedVideos.length,
+      videos: deletedVideos.map((v) => ({
+        rawId: v.rawId,
+        title: v.title,
+        status: v.status,
+      })),
     });
 
     return Ok(
@@ -581,7 +640,11 @@ export class VideoService implements IVideoService {
     AppLogger.info("Successfully fetched member videos", {
       service: this.SERVICE_NAME,
       count: videosWithDiff.length,
-      videoIds: videosWithDiff.map((v) => v.rawId),
+      videos: videosWithDiff.map((v) => ({
+        rawId: v.rawId,
+        title: v.title,
+        status: v.status,
+      })),
     });
     return Ok(videosWithDiff);
   }
@@ -629,12 +692,6 @@ export class VideoService implements IVideoService {
           return result;
         }
 
-        AppLogger.info("Successfully fetched videos by channel", {
-          service: this.SERVICE_NAME,
-          channelId,
-          count: result.val.length,
-        });
-
         const yt = await this.deps.youtubeClient.getVideos({
           videoIds: result.val.map((v) => v.rawId),
         });
@@ -643,7 +700,18 @@ export class VideoService implements IVideoService {
           return yt;
         }
 
-        return Ok(result.val);
+        AppLogger.info("Successfully fetched videos by channel", {
+          service: this.SERVICE_NAME,
+          channelId,
+          count: yt.val.length,
+          videos: yt.val.map((v) => ({
+            rawId: v.rawId,
+            title: v.title,
+            status: v.status,
+          })),
+        });
+
+        return Ok(yt.val);
       },
     );
   }

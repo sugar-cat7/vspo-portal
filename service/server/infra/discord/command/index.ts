@@ -20,8 +20,6 @@ const MESSAGES = {
   // botAddComponent
   BOT_ADD_ERROR:
     "An error occurred. Please try again later. / エラーが発生しました。時間をおいて再度試してください。",
-  BOT_ADD_SUCCESS: (channelName: string) =>
-    `${channelName} has been added to Spodule bot / ${channelName}にすぽじゅーるbotが追加されました`,
 
   // botRemoveComponent
   BOT_REMOVE_LABEL:
@@ -50,6 +48,10 @@ const MESSAGES = {
   // announceCommand
   ANNOUNCE_SENT:
     "Announcement sent to all channels. / すべてのチャンネルにアナウンスが送信されました。",
+
+  // bot
+  BOT_ADD_SUCCESS:
+    "すぽじゅーるは、ぶいすぽっ!メンバーの配信(Youtube/Twitch/ツイキャス/ニコニコ)や切り抜きを一覧で確認できる非公式サイトです。\nSpodule aggregates schedules for Japan's Vtuber group, Vspo.\n\nWeb版はこちら：https://www.vspo-schedule.com/schedule/all",
 } as const;
 
 type Env = {
@@ -80,6 +82,10 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
   {
     name: "setting",
     handler: async (c) => {
+      AppLogger.info("Spodule setting command", {
+        server_id: c.interaction.guild_id || c.interaction.guild?.id || "",
+        channel_id: c.interaction.channel.id,
+      });
       const u = await c.env.APP_WORKER.newDiscordUsecase();
       const r = await u.existsChannel(c.interaction.channel.id);
       if (r.err || !r.val) {
@@ -138,6 +144,10 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
 export const botAddComponent: IDiscordComponentDefinition<DiscordCommandEnv> = {
   name: "bot-add-setting",
   handler: async (c) => {
+    AppLogger.info("Bot add component", {
+      server_id: c.interaction.guild_id || c.interaction.guild?.id || "",
+      channel_id: c.interaction.channel.id,
+    });
     const u = await c.env.APP_WORKER.newDiscordUsecase();
     const r = await u.adjustBotChannel({
       type: "add",
@@ -155,7 +165,7 @@ export const botAddComponent: IDiscordComponentDefinition<DiscordCommandEnv> = {
     await u.batchUpsertEnqueue([r.val]);
 
     return c.resUpdate({
-      content: MESSAGES.BOT_ADD_SUCCESS(c.interaction.channel.name ?? ""),
+      content: MESSAGES.BOT_ADD_SUCCESS,
       components: [],
     });
   },
@@ -259,6 +269,11 @@ export const langSelectComponent: IDiscordComponentDefinition<DiscordCommandEnv>
   {
     name: "lang-select",
     handler: async (c) => {
+      AppLogger.info("Lang select component", {
+        server_id: c.interaction.guild_id || c.interaction.guild?.id || "",
+        channel_id: c.interaction.channel.id,
+        selected_value: c.interaction.data,
+      });
       // Check if user has selected a language
       if ("values" in c.interaction.data) {
         const selectedValue = c.interaction.data.values.at(
@@ -282,6 +297,7 @@ export const langSelectComponent: IDiscordComponentDefinition<DiscordCommandEnv>
         }
 
         await u.batchUpsertEnqueue([r.val]);
+        await u.deleteMessageInChannelEnqueue(c.interaction.channel.id);
         return c.resUpdate({
           content: MESSAGES.LANG_SELECT_SUCCESS(
             LangCodeLabelMapping[selectedValue],

@@ -21,7 +21,7 @@ localConnectionString = "postgres://user:password@localhost:5432/vspo"
 [[queues.consumers]]
  queue = "write-queue"
  max_batch_size = 100
- max_batch_timeout = 30
+ max_batch_timeout = 5
  dead_letter_queue = "write-queue-dead-letter"
 
 [vars]

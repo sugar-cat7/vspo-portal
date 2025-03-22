@@ -13,7 +13,7 @@ export const creatorTable = pgTable("creator", {
   id: text("id").primaryKey(), // Unique identifier for the creator
   memberType: text("member_type").notNull(), // Member type
   representativeThumbnailUrl: text("representative_thumbnail_url").notNull(), // Thumbnail image URL
-  updatedAt: timestamp("updated_at", { withTimezone: true })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .defaultNow(), // Last updated date and time
 });
@@ -27,7 +27,7 @@ export const creatorTranslationTable = pgTable(
       .references(() => creatorTable.id, { onDelete: "cascade" }),
     languageCode: text("lang_code").notNull(), // ISO 639-1 language code or [default]
     name: text("name").notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
       .notNull()
       .defaultNow(),
   },
@@ -58,7 +58,10 @@ export const videoTable = pgTable("video", {
     .references(() => channelTable.platformChannelId, { onDelete: "cascade" }), // Channel ID
   platformType: text("platform_type").notNull(), // Platform type
   videoType: text("video_type").notNull(), // Type of video
-  publishedAt: timestamp("published_at", { withTimezone: true }).notNull(), // Publication date and time
+  publishedAt: timestamp("published_at", {
+    withTimezone: true,
+    mode: "date",
+  }).notNull(), // Publication date and time
   tags: text("tags").notNull(), // Video tags
   thumbnailUrl: text("thumbnail_url").notNull(), // Video's thumbnail URL
   link: text("link"), // Video's link
@@ -73,10 +76,10 @@ export const streamStatusTable = pgTable("stream_status", {
     .references(() => videoTable.rawId, { onDelete: "cascade" })
     .unique(), // Video ID
   status: text("status").notNull(), // Stream status
-  startedAt: timestamp("started_at", { withTimezone: true }), // Start date and time
-  endedAt: timestamp("ended_at", { withTimezone: true }), // End date and time
+  startedAt: timestamp("started_at", { withTimezone: true, mode: "date" }), // Start date and time
+  endedAt: timestamp("ended_at", { withTimezone: true, mode: "date" }), // End date and time
   viewCount: integer("view_count").notNull(), // View count
-  updatedAt: timestamp("updated_at", { withTimezone: true })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .defaultNow(), // Last updated date and time
 });
@@ -91,7 +94,7 @@ export const videoTranslationTable = pgTable(
     languageCode: text("lang_code").notNull(), // ISO 639-1 language code or [default]
     title: text("title").notNull(),
     description: text("description").notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
       .notNull()
       .defaultNow(),
   },
@@ -108,10 +111,10 @@ export const discordServerTable = pgTable("discord_server", {
   serverId: text("discord_server_id").notNull().unique(), // Actual guild ID in Discord
   name: text("name").notNull(), // User-customizable server name
   languageCode: text("lang_code").notNull(), // ISO 639-1 language code or [default]
-  createdAt: timestamp("created_at", { withTimezone: true })
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .defaultNow(),
 });
@@ -131,10 +134,10 @@ export const discordChannelTable = pgTable(
       .references(() => discordServerTable.serverId, { onDelete: "cascade" }),
     name: text("name").notNull(), // Channel display name for internal management
     languageCode: text("lang_code").notNull(), // ISO 639-1 language code or [default]
-    createdAt: timestamp("created_at", { withTimezone: true })
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .notNull()
       .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
       .notNull()
       .defaultNow(),
   },
@@ -149,10 +152,10 @@ export const discordChannelTable = pgTable(
 export const discordMessageTable = pgTable("discord_message", {
   id: text("id").primaryKey(),
   message: text("message").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true })
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
     .notNull()
     .defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
     .notNull()
     .defaultNow(),
 });
@@ -173,10 +176,10 @@ export const discordAdminMessageTable = pgTable(
     messageId: text("message_id")
       .notNull()
       .references(() => discordMessageTable.id, { onDelete: "cascade" }),
-    createdAt: timestamp("created_at", { withTimezone: true })
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .notNull()
       .defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true })
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
       .notNull()
       .defaultNow(),
   },

@@ -1,5 +1,9 @@
 import * as Sentry from "@sentry/cloudflare";
-import type { IDiscordServerRepository, IVideoRepository } from "../../infra";
+import type {
+  IDiscordMessageRepository,
+  IDiscordServerRepository,
+  IVideoRepository,
+} from "../../infra";
 import type { IDiscordClient } from "../../infra/discord";
 import { withTracerResult } from "../../infra/http/trace/cloudflare";
 import {
@@ -71,6 +75,7 @@ export class DiscordService implements IDiscordService {
     private readonly dependencies: {
       discordClient: IDiscordClient;
       discordServerRepository: IDiscordServerRepository;
+      discordMessageRepository: IDiscordMessageRepository;
       videoRepository: IVideoRepository;
     },
   ) {}
@@ -96,13 +101,13 @@ export class DiscordService implements IDiscordService {
     }
 
     const liveVideoListResult = await this.dependencies.videoRepository.list({
-      limit: 500,
+      limit: 1000,
       page: 0,
       languageCode: options.channelLangaugeCode,
       videoType: "vspo_stream",
-      // startedAt: convertToUTCDate(
-      //   getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
-      // ),
+      startedAt: convertToUTCDate(
+        getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
+      ),
       status: "live",
       orderBy: "desc",
     });
@@ -125,11 +130,13 @@ export class DiscordService implements IDiscordService {
 
     const upcomingVideoListResult =
       await this.dependencies.videoRepository.list({
-        limit: 500,
+        limit: 1000,
         page: 0,
         languageCode: options.channelLangaugeCode,
         videoType: "vspo_stream",
-        // startedAt: convertToUTCDate(getCurrentUTCDate()),
+        startedAt: convertToUTCDate(
+          getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
+        ),
         status: "upcoming",
         orderBy: "desc",
       });
@@ -308,6 +315,8 @@ export class DiscordService implements IDiscordService {
       type: options.type,
       serverId: options.serverId,
       channelId: options.targetChannelId,
+      channelLangaugeCode: options.channelLangaugeCode,
+      serverLangaugeCode: options.serverLangaugeCode,
     });
 
     let server: DiscordServer;
@@ -384,6 +393,9 @@ export class DiscordService implements IDiscordService {
           channels[existingIndex] = {
             ...channelResult.val,
             id: channels[existingIndex].id,
+            languageCode:
+              options.channelLangaugeCode ??
+              channels[existingIndex].languageCode,
           };
         } else {
           // Add new channel
@@ -404,11 +416,12 @@ export class DiscordService implements IDiscordService {
       discordChannels: channels,
     });
 
-    AppLogger.info("Successfully adjusted bot channel", {
+    AppLogger.debug("Successfully adjusted bot channel", {
       service: this.SERVICE_NAME,
       type: options.type,
       serverId: options.serverId,
       channelId: options.targetChannelId,
+      updatedServer: updatedServer,
     });
     return Ok(updatedServer);
   }
@@ -423,6 +436,22 @@ export class DiscordService implements IDiscordService {
       service: this.SERVICE_NAME,
       channelId,
     });
+
+    const adminMessagesResult =
+      await this.dependencies.discordMessageRepository.list({
+        channelId,
+        limit: 10,
+        page: 0,
+      });
+    if (adminMessagesResult.err) {
+      AppLogger.error("Failed to get admin messages", {
+        service: this.SERVICE_NAME,
+        channelId,
+        error: adminMessagesResult.err,
+      });
+    }
+    const adminMessages =
+      adminMessagesResult.val?.filter((msg) => msg.type === "admin") ?? [];
     const botMessagesResult =
       await this.dependencies.discordClient.getLatestBotMessages(channelId);
     if (botMessagesResult.err) {
@@ -434,12 +463,14 @@ export class DiscordService implements IDiscordService {
       return botMessagesResult;
     }
 
-    const deletePromises = botMessagesResult.val.map((msg) =>
-      this.dependencies.discordClient.deleteMessage({
-        channelId,
-        messageId: msg.rawId,
-      }),
-    );
+    const deletePromises = botMessagesResult.val
+      .filter((msg) => !adminMessages.some((am) => am.rawId === msg.rawId))
+      .map((msg) =>
+        this.dependencies.discordClient.deleteMessage({
+          channelId,
+          messageId: msg.rawId,
+        }),
+      );
 
     const results = await Promise.allSettled(deletePromises);
     const failedResults = results.filter(
@@ -471,11 +502,30 @@ export class DiscordService implements IDiscordService {
       "DiscordService",
       "sendAdminMessage",
       async () => {
-        return this.dependencies.discordClient.sendMessage({
+        AppLogger.debug("Sending admin message", {
+          service: this.SERVICE_NAME,
+          channelId: message.channelId,
+          content: message.content,
+        });
+        const r = await this.dependencies.discordClient.sendMessage({
           channelId: message.channelId,
           content: message.content,
           embeds: [],
         });
+        if (r.err) {
+          AppLogger.error("Failed to send admin message", {
+            service: this.SERVICE_NAME,
+            channelId: message.channelId,
+            error: r.err,
+          });
+          return r;
+        }
+        AppLogger.debug("Successfully sent admin message", {
+          service: this.SERVICE_NAME,
+          channelId: message.channelId,
+          messageId: r.val,
+        });
+        return Ok(r.val);
       },
     );
   }

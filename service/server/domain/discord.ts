@@ -1,51 +1,80 @@
 import type { DiscordEmbed } from "@discordeno/types";
 import { EmbedsBuilder } from "@discordeno/utils";
 import { z } from "zod";
+import { getCurrentUTCString } from "../pkg/dayjs";
 import { StatusSchema, type Video } from "./video";
 
-export const discordChannel = z.object({
-  id: z.string(),
-  rawId: z.string(),
-  serverId: z.string(),
-  name: z.string(),
-  languageCode: z.string().optional().default("default"),
-  createdAt: z.string().datetime().optional(),
-  updatedAt: z.string().datetime().optional(),
-});
+export const discordChannel = z
+  .object({
+    id: z.string(),
+    rawId: z.string(),
+    serverId: z.string(),
+    name: z.string(),
+    languageCode: z.string().optional().default("default"),
+    createdAt: z.string().datetime().optional(),
+    updatedAt: z.string().datetime().optional(),
+  })
+  .transform((val) => {
+    const now = getCurrentUTCString();
+    return {
+      ...val,
+      createdAt: val.createdAt || now,
+      updatedAt: val.updatedAt || now,
+    };
+  });
 
 export const discordChannels = z.array(discordChannel);
 
-export const discordServer = z.object({
-  id: z.string(),
-  rawId: z.string(),
-  name: z.string(),
-  languageCode: z.string().optional().default("default"),
-  discordChannels: discordChannels,
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-});
-
+export const discordServer = z
+  .object({
+    id: z.string(),
+    rawId: z.string(),
+    name: z.string(),
+    languageCode: z.string().optional().default("default"),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+  })
+  .extend({
+    discordChannels: z.lazy(() => discordChannels),
+  })
+  .transform((val) => {
+    const now = getCurrentUTCString();
+    return {
+      ...val,
+      createdAt: val.createdAt || now,
+      updatedAt: val.updatedAt || now,
+    };
+  });
 export const discordServers = z.array(discordServer);
 
-export const discordMessage = z.object({
-  id: z.string(),
-  type: z.enum(["bot", "admin"]),
-  rawId: z.string(),
-  channelId: z.string(),
-  content: z.string(),
-  embedVideos: z.array(
-    z.object({
-      identifier: z.string(),
-      title: z.string(),
-      url: z.string(),
-      thumbnail: z.string(),
-      startedAt: z.string(),
-      status: StatusSchema,
-    }),
-  ),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
-});
+export const discordMessage = z
+  .object({
+    id: z.string(),
+    type: z.enum(["bot", "admin"]),
+    rawId: z.string(),
+    channelId: z.string(),
+    content: z.string(),
+    embedVideos: z.array(
+      z.object({
+        identifier: z.string(),
+        title: z.string(),
+        url: z.string(),
+        thumbnail: z.string(),
+        startedAt: z.string(),
+        status: StatusSchema,
+      }),
+    ),
+    createdAt: z.string().datetime(),
+    updatedAt: z.string().datetime(),
+  })
+  .transform((val) => {
+    const now = getCurrentUTCString();
+    return {
+      ...val,
+      createdAt: val.createdAt || now,
+      updatedAt: val.updatedAt || now,
+    };
+  });
 
 export const discordMessages = z.array(discordMessage);
 
