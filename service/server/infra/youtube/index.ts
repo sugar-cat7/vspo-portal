@@ -323,56 +323,37 @@ export class YoutubeService implements IYoutubeService {
 
   private determineVideoStatus(
     video: youtube_v3.Schema$Video | youtube_v3.Schema$SearchResult,
-  ): "live" | "upcoming" | "ended" {
-    // For SearchResult objects, we only have liveBroadcastContent
-    if ("snippet" in video && !("liveStreamingDetails" in video)) {
-      if (video.snippet?.liveBroadcastContent === "live") {
+  ): "live" | "upcoming" | "ended" | "unknown" {
+    if (video?.snippet?.liveBroadcastContent) {
+      if (video.snippet.liveBroadcastContent === "live") {
         return "live";
       }
 
-      if (video.snippet?.liveBroadcastContent === "upcoming") {
+      if (video.snippet.liveBroadcastContent === "upcoming") {
+        return "upcoming";
+      }
+    }
+
+    if ("liveStreamingDetails" in video) {
+      if (
+        video?.liveStreamingDetails?.actualStartTime &&
+        !video?.liveStreamingDetails?.actualEndTime
+      ) {
+        return "live";
+      }
+
+      if (
+        video?.liveStreamingDetails?.scheduledStartTime &&
+        !video.liveStreamingDetails?.actualStartTime
+      ) {
         return "upcoming";
       }
 
-      return "ended";
+      if (video?.liveStreamingDetails?.actualEndTime) {
+        return "ended";
+      }
     }
 
-    // For Video objects, we have more detailed information
-    // If actualEndTime exists, always mark as ended
-    if (
-      "liveStreamingDetails" in video &&
-      video.liveStreamingDetails?.actualEndTime
-    ) {
-      return "ended";
-    }
-
-    // If actualStartTime exists but actualEndTime doesn't, it's live
-    if (
-      "liveStreamingDetails" in video &&
-      video.liveStreamingDetails?.actualStartTime &&
-      !video.liveStreamingDetails?.actualEndTime
-    ) {
-      return "live";
-    }
-
-    // If scheduledEndTime is in the future, it's upcoming
-    if (
-      "liveStreamingDetails" in video &&
-      video.liveStreamingDetails?.scheduledEndTime &&
-      new Date(video.liveStreamingDetails.scheduledEndTime) > new Date()
-    ) {
-      return "upcoming";
-    }
-
-    // Fall back to the original logic based on liveBroadcastContent
-    if (video.snippet?.liveBroadcastContent === "live") {
-      return "live";
-    }
-
-    if (video.snippet?.liveBroadcastContent === "upcoming") {
-      return "upcoming";
-    }
-
-    return "ended";
+    return "unknown";
   }
 }
