@@ -203,7 +203,7 @@ export class CreatorRepository implements ICreatorRepository {
 
         for (const c of creators) {
           const creator = dbCreatorss.find((creator) => creator.id === c.id);
-          if (!creator) {
+          if (!creator && c.languageCode === "default") {
             dbCreatorss.push({
               id: c.id,
               memberType: c.memberType,
@@ -240,7 +240,7 @@ export class CreatorRepository implements ICreatorRepository {
             (c) => c.platformChannelId === d.detail?.rawId,
           );
 
-          if (!channel) {
+          if (!channel && !c.translated) {
             dbChannels.push({
               id: c.channel.id,
               platformChannelId: d.detail.rawId,

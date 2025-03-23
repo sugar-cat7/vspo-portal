@@ -589,6 +589,7 @@ export class VideoService implements IVideoService {
         ...video,
         title: translatedText,
         languageCode: TargetLangSchema.parse(languageCode),
+        translated: true,
       };
     });
 

@@ -203,7 +203,7 @@ export class VideoRepository implements IVideoRepository {
       for (const v of videos) {
         const videoId = v.id || createUUID();
         const existingVideo = dbVideos.find((video) => video.rawId === v.rawId);
-        if (!existingVideo) {
+        if (!existingVideo && !v.translated) {
           dbVideos.push(
             createInsertVideo({
               id: videoId,
@@ -223,7 +223,7 @@ export class VideoRepository implements IVideoRepository {
         const existingStreamStatus = dbStreamStatus.find(
           (status) => status.videoId === v.rawId,
         );
-        if (!existingStreamStatus) {
+        if (!existingStreamStatus && !v.translated) {
           dbStreamStatus.push(
             createInsertStreamStatus({
               id: createUUID(),

@@ -12,6 +12,7 @@ const CreatorSchema = z
     memberType: MemberTypeSchema,
     thumbnailURL: ThumbnailURLSchema.optional().default(""),
     channel: ChannelSchema.nullable(),
+    translated: z.boolean().optional(),
   })
   .transform((creator) => {
     const updatedCreator = { ...creator };
