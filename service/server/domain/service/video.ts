@@ -196,7 +196,11 @@ export class VideoService implements IVideoService {
         AppLogger.info("Successfully fetched YouTube videos", {
           service: this.SERVICE_NAME,
           count: fetchedVideos.val.length,
-          videoTitles: fetchedVideos.val.map((v) => v.title),
+          videos: fetchedVideos.val.map((v) => ({
+            rawId: v.rawId,
+            title: v.title,
+            status: v.status,
+          })),
         });
         return Ok(fetchedVideos.val);
       },

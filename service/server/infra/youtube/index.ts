@@ -335,6 +335,10 @@ export class YoutubeService implements IYoutubeService {
     }
 
     if ("liveStreamingDetails" in video) {
+      if (video?.liveStreamingDetails?.actualEndTime) {
+        return "ended";
+      }
+
       if (
         video?.liveStreamingDetails?.actualStartTime &&
         !video?.liveStreamingDetails?.actualEndTime
@@ -347,10 +351,6 @@ export class YoutubeService implements IYoutubeService {
         !video.liveStreamingDetails?.actualStartTime
       ) {
         return "upcoming";
-      }
-
-      if (video?.liveStreamingDetails?.actualEndTime) {
-        return "ended";
       }
     }
 
