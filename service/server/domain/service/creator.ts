@@ -158,6 +158,7 @@ export class CreatorService implements ICreatorService {
           twitch: null,
           niconico: null,
         },
+        translated: false,
       });
       creators.push(creator);
     }
@@ -191,7 +192,12 @@ export class CreatorService implements ICreatorService {
         translatedResults[i].status === "fulfilled"
           ? (translatedResults[i].value.val?.translatedText ?? creator.name)
           : creator.name;
-      return { ...creator, name: translatedText, languageCode: languageCode };
+      return {
+        ...creator,
+        name: translatedText,
+        languageCode: languageCode,
+        translated: true,
+      };
     });
 
     AppLogger.info("Successfully translated creators", {

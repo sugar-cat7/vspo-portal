@@ -112,6 +112,7 @@ const VideoSchema = z
     creatorThumbnailURL: ThumbnailURLSchema.optional(),
     link: z.string().optional(),
     deleted: z.boolean().default(false),
+    translated: z.boolean().optional(),
   })
   .transform((video) => ({
     ...video,

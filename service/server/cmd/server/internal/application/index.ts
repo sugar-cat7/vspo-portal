@@ -432,6 +432,15 @@ export default createHandler({
           count: messages.length,
         });
 
+        logger.debug("Upserting Queued videos", {
+          videos: messages.map((v) => ({
+            rawId: v.rawId,
+            title: v.title,
+            status: v.status,
+            languageCode: v.languageCode,
+          })),
+        });
+
         const videos = VideosSchema.safeParse(messages);
         if (!videos.success) {
           logger.error(`Invalid videos: ${videos.error.message}`);
