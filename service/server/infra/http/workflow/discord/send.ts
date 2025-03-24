@@ -11,11 +11,18 @@ import { withTracer } from "../../../http/trace/cloudflare";
 type DiscordChannelIdsMap = {
   channelIds: string[];
   channelLangaugeCode: string;
+  channelMemberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "vspo_all" | "general";
 }[];
 
 type GroupedChannels = {
-  [language: string]: {
+  [key: string]: {
     channelLangaugeCode: string;
+    channelMemberType:
+      | "vspo_jp"
+      | "vspo_en"
+      | "vspo_ch"
+      | "vspo_all"
+      | "general";
     channelIds: string[];
   };
 };
@@ -98,17 +105,20 @@ export const discordSendMessagesWorkflow = () => {
             for (const channel of server.discordChannels) {
               // Prioritize the channel-specific language setting; use the server's language setting if none exists
               const channelLang = channel.languageCode || server.languageCode;
+              const memberType = channel.memberType || "vspo_all";
+              const compositeKey = `${channelLang}-${memberType}`;
 
-              if (!acc[channelLang]) {
-                acc[channelLang] = {
+              if (!acc[compositeKey]) {
+                acc[compositeKey] = {
                   channelLangaugeCode: channelLang,
+                  channelMemberType: memberType,
                   channelIds: [],
                 };
               }
 
               // Ensure the channel ID has not already been added (to prevent duplicates)
-              if (!acc[channelLang].channelIds.includes(channel.rawId)) {
-                acc[channelLang].channelIds.push(channel.rawId);
+              if (!acc[compositeKey].channelIds.includes(channel.rawId)) {
+                acc[compositeKey].channelIds.push(channel.rawId);
               }
             }
 
@@ -120,10 +130,11 @@ export const discordSendMessagesWorkflow = () => {
         const discordChannelMap: DiscordChannelIdsMap =
           Object.values(groupedChannels);
 
-        logger.info("Grouped channels by language", {
-          totalLanguages: discordChannelMap.length,
-          languageGroups: discordChannelMap.map((group) => ({
+        logger.info("Grouped channels by language and member type", {
+          totalGroups: discordChannelMap.length,
+          groups: discordChannelMap.map((group) => ({
             language: group.channelLangaugeCode,
+            memberType: group.channelMemberType,
             channelCount: group.channelIds.length,
             channelIds: group.channelIds,
           })),
@@ -158,6 +169,7 @@ export const discordSendMessagesWorkflow = () => {
                     await vu.sendVideosToMultipleChannels({
                       channelIds: group.channelIds,
                       channelLangaugeCode: group.channelLangaugeCode,
+                      channelMemberType: group.channelMemberType,
                     });
                     logger.info(
                       `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
@@ -173,6 +185,58 @@ export const discordSendMessagesWorkflow = () => {
           (result) => result.status === "rejected",
         );
         if (failedSteps.length > 0) {
+          logger.error(
+            `${failedSteps.length} step(s) failed. Check logs for details.`,
+          );
+        }
+
+        step.sleep("30 seconds", "30 seconds");
+
+        const results2 = await Promise.allSettled(
+          discordChannelMap.map((group) =>
+            step.do(
+              `send videos to channels for ${group.channelLangaugeCode} 2`,
+              {
+                retries: { limit: 3, delay: "5 second", backoff: "linear" },
+                timeout: "1 minutes",
+              },
+              async () => {
+                return withTracer(
+                  "discord-workflow",
+                  `send-videos-language-${group.channelLangaugeCode}-2`,
+                  async (span) => {
+                    const vu = await env.APP_WORKER.newDiscordUsecase();
+                    logger.info(
+                      `Sending videos to ${group.channelIds.length} channels with language: ${group.channelLangaugeCode}`,
+                      {
+                        channelCount: group.channelIds.length,
+                        language: group.channelLangaugeCode,
+                      },
+                    );
+                    span.setAttribute("language", group.channelLangaugeCode);
+                    span.setAttribute(
+                      "channels_count",
+                      group.channelIds.length,
+                    );
+                    await vu.sendVideosToMultipleChannels({
+                      channelIds: group.channelIds,
+                      channelLangaugeCode: group.channelLangaugeCode,
+                      channelMemberType: group.channelMemberType,
+                    });
+                    logger.info(
+                      `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        );
+
+        const failedSteps2 = results2.filter(
+          (result) => result.status === "rejected",
+        );
+        if (failedSteps2.length > 0) {
           logger.error(
             `${failedSteps.length} step(s) failed. Check logs for details.`,
           );

@@ -50,6 +50,13 @@
       "when": 1742487752241,
       "tag": "0006_white_bullseye",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1742834013745,
+      "tag": "0007_tricky_sentinel",
+      "breakpoints": true
     }
   ]
 }

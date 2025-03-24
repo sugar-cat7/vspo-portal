@@ -9,6 +9,8 @@ import {
   cancelComponent,
   langSelectComponent,
   langSettingComponent,
+  memberTypeSelectComponent,
+  memberTypeSettingComponent,
   spoduleSettingCommand,
   yesBotRemoveComponent,
 } from "../../infra/discord/command";
@@ -32,6 +34,11 @@ const discord = new DiscordHono<DiscordCommandEnv>()
   .component(yesBotRemoveComponent.name, yesBotRemoveComponent.handler)
   .component(langSettingComponent.name, langSettingComponent.handler)
   .component(langSelectComponent.name, langSelectComponent.handler)
+  .component(
+    memberTypeSettingComponent.name,
+    memberTypeSettingComponent.handler,
+  )
+  .component(memberTypeSelectComponent.name, memberTypeSelectComponent.handler)
   //common
   .component(cancelComponent.name, cancelComponent.handler);
 

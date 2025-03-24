@@ -27,6 +27,7 @@ import type { Video, Videos } from "../video";
 // Parameters for sending messages to multiple channels
 type ChannelMessageParams = {
   channelLangaugeCode: string;
+  channelMemberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "vspo_all" | "general";
   channelIds: string[];
 };
 
@@ -37,6 +38,7 @@ type BotChannelAdjustmentParams = {
   targetChannelId: string;
   serverLangaugeCode?: string;
   channelLangaugeCode?: string;
+  memberType?: "vspo_jp" | "vspo_en" | "vspo_ch" | "vspo_all" | "general";
 };
 
 type SendAdminMessageParams = {
@@ -108,6 +110,7 @@ export class DiscordService implements IDiscordService {
       startedAt: convertToUTCDate(
         getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
       ),
+      memberType: options.channelMemberType,
       status: "live",
       orderBy: "desc",
     });
@@ -137,6 +140,7 @@ export class DiscordService implements IDiscordService {
         startedAt: convertToUTCDate(
           getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
         ),
+        memberType: options.channelMemberType,
         status: "upcoming",
         orderBy: "desc",
       });
@@ -317,6 +321,7 @@ export class DiscordService implements IDiscordService {
       channelId: options.targetChannelId,
       channelLangaugeCode: options.channelLangaugeCode,
       serverLangaugeCode: options.serverLangaugeCode,
+      memberType: options.memberType,
     });
 
     let server: DiscordServer;
@@ -396,10 +401,15 @@ export class DiscordService implements IDiscordService {
             languageCode:
               options.channelLangaugeCode ??
               channels[existingIndex].languageCode,
+            memberType:
+              options.memberType ?? channels[existingIndex].memberType,
           };
         } else {
           // Add new channel
-          channels.push(channelResult.val);
+          channels.push({
+            ...channelResult.val,
+            memberType: options.memberType ?? "vspo_all",
+          });
         }
         break;
       }

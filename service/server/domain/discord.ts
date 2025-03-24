@@ -2,6 +2,7 @@ import type { DiscordEmbed } from "@discordeno/types";
 import { EmbedsBuilder } from "@discordeno/utils";
 import { z } from "zod";
 import { getCurrentUTCString } from "../pkg/dayjs";
+import { MemberTypeSchema } from "./creator";
 import { StatusSchema, type Video } from "./video";
 
 export const discordChannel = z
@@ -11,6 +12,7 @@ export const discordChannel = z
     serverId: z.string(),
     name: z.string(),
     languageCode: z.string().optional().default("default"),
+    memberType: MemberTypeSchema.optional(),
     createdAt: z.string().datetime().optional(),
     updatedAt: z.string().datetime().optional(),
   })

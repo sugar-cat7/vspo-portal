@@ -85,7 +85,7 @@ export class CreatorRepository implements ICreatorRepository {
       type CreatorMapValue = {
         id: string;
         name: string;
-        memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
+        memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "vspo_all" | "general";
         thumbnailURL: string;
         languageCode: string;
         channel: Channel;

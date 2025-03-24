@@ -103,6 +103,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
                     serverId: s.serverId,
                     name: s.name,
                     languageCode: s.languageCode,
+                    memberType: s.memberType,
                     createdAt: convertToUTC(s.createdAt),
                     updatedAt: convertToUTC(s.updatedAt),
                   };
@@ -224,6 +225,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             serverId: server.rawId,
             name: c.name,
             languageCode: c.languageCode,
+            memberType: c.memberType,
             createdAt: convertToUTCDate(c.createdAt ?? getCurrentUTCDate()),
             updatedAt: convertToUTCDate(c.updatedAt ?? getCurrentUTCDate()),
           })),
@@ -241,6 +243,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
               set: buildConflictUpdateColumns(discordChannelTable, [
                 "name",
                 "languageCode",
+                "memberType",
                 "updatedAt",
               ]),
             })
@@ -270,6 +273,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
                     serverId: ch.serverId,
                     name: ch.name,
                     languageCode: ch.languageCode,
+                    memberType: ch.memberType,
                     createdAt: convertToUTC(ch.createdAt),
                     updatedAt: convertToUTC(ch.updatedAt),
                   })),
@@ -351,6 +355,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         serverId: c.discord_channel.serverId,
         name: c.discord_channel.name,
         languageCode: c.discord_channel.languageCode,
+        memberType: c.discord_channel.memberType,
         createdAt: convertToUTC(c.discord_channel.createdAt),
         updatedAt: convertToUTC(c.discord_channel.updatedAt),
       }));
