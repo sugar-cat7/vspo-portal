@@ -137,9 +137,9 @@ const VideoSchema = z
     thumbnailURL:
       video.platform === PlatformSchema.Enum.twitch
         ? video.thumbnailURL
-            .replace("%{width}", "320")
-            .replace("%{height}", "180")
-            .replace("-{width}x{height}", "-320x180")
+            .replace("%{width}", "400")
+            .replace("%{height}", "220")
+            .replace("-{width}x{height}", "-400x220")
             .replace("http://", "https://")
         : video.thumbnailURL,
   }));

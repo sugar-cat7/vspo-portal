@@ -35,7 +35,7 @@ export const translateVideosWorkflow = () => {
               async (span) => {
                 const vu = await env.APP_WORKER.newVideoUsecase();
                 const liveVideos = await vu.list({
-                  limit: 10,
+                  limit: 100,
                   page: 0,
                   languageCode: "default",
                   videoType: "vspo_stream",
@@ -48,7 +48,7 @@ export const translateVideosWorkflow = () => {
                 }
 
                 const upcomingVideos = await vu.list({
-                  limit: 10,
+                  limit: 100,
                   page: 0,
                   languageCode: "default",
                   videoType: "vspo_stream",
@@ -82,33 +82,66 @@ export const translateVideosWorkflow = () => {
           logger.info("No videos to translate");
           return;
         }
+        const target = TargetLangSchema.options.map(async (lang) => {
+          const vu = await env.APP_WORKER.newVideoUsecase();
+          const liveVideos = await vu.list({
+            limit: 100,
+            page: 0,
+            languageCode: lang,
+            videoType: "vspo_stream",
+            status: "live",
+            orderBy: "desc",
+          });
 
-        const results = await Promise.allSettled(
-          TargetLangSchema.options.map((lang) =>
-            step.do(
-              `fetch and ${lang} translate videos`,
-              {
-                retries: { limit: 3, delay: "5 second", backoff: "linear" },
-                timeout: "1 minutes",
-              },
-              async () => {
-                return withTracer(
-                  "video-workflow",
-                  `translate-videos-to-${lang}`,
-                  async (span) => {
-                    const vu = await env.APP_WORKER.newVideoUsecase();
-                    span.setAttribute("language", lang);
-                    span.setAttribute("videos_count", lv.val.length);
-                    await vu.translateVideoEnqueue({
-                      languageCode: lang,
-                      videos: lv.val,
-                    });
-                  },
-                );
-              },
-            ),
-          ),
-        );
+          if (liveVideos.err) {
+            throw liveVideos.err;
+          }
+
+          const upcomingVideos = await vu.list({
+            limit: 100,
+            page: 0,
+            languageCode: lang,
+            videoType: "vspo_stream",
+            status: "upcoming",
+            orderBy: "desc",
+          });
+
+          if (upcomingVideos.err) {
+            throw upcomingVideos.err;
+          }
+
+          const videos = liveVideos.val.videos.concat(
+            upcomingVideos.val.videos,
+          );
+
+          const notTranslatedVideos = lv.val.filter(
+            (v) => !videos.some((v2) => v2.rawId === v.rawId),
+          );
+
+          return step.do(
+            `fetch and ${lang} translate videos`,
+            {
+              retries: { limit: 3, delay: "5 second", backoff: "linear" },
+              timeout: "1 minutes",
+            },
+            async () => {
+              return withTracer(
+                "video-workflow",
+                `translate-videos-to-${lang}`,
+                async (span) => {
+                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  span.setAttribute("language", lang);
+                  span.setAttribute("videos_count", notTranslatedVideos.length);
+                  await vu.translateVideoEnqueue({
+                    languageCode: lang,
+                    videos: notTranslatedVideos,
+                  });
+                },
+              );
+            },
+          );
+        });
+        const results = await Promise.allSettled(target);
 
         const failedSteps = results.filter(
           (result) => result.status === "rejected",

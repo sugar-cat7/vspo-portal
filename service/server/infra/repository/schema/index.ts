@@ -134,6 +134,7 @@ export const discordChannelTable = pgTable(
       .references(() => discordServerTable.serverId, { onDelete: "cascade" }),
     name: text("name").notNull(), // Channel display name for internal management
     languageCode: text("lang_code").notNull(), // ISO 639-1 language code or [default]
+    memberType: text("member_type").notNull().default("vspo_all"), // Member type
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .notNull()
       .defaultNow(),

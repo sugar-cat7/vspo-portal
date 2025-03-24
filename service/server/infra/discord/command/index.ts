@@ -16,6 +16,15 @@ const MESSAGES = {
   BOT_ADD_BUTTON_LABEL: "Add Spodule Bot / すぽじゅーるBotを追加する",
   BOT_REMOVE_BUTTON_LABEL: "Stop Streaming Information / 配信情報の停止",
   LANG_SETTING_BUTTON_LABEL: "Language Settings / 言語設定",
+  MEMBER_TYPE_SETTING_BUTTON_LABEL: "Member Type Settings / メンバータイプ設定",
+
+  // memberTypeSettingComponent
+  MEMBER_TYPE_SETTING_LABEL:
+    "Select member type to display / 表示するメンバータイプを選択",
+  MEMBER_TYPE_SELECT_SUCCESS: (type: string) =>
+    `Member type set to ${type} / メンバータイプを${type}に設定しました`,
+  MEMBER_TYPE_SELECT_ERROR:
+    "An error occurred. Please try again later. / エラーが発生しました。時間をおいて再度試してください。",
 
   // botAddComponent
   BOT_ADD_ERROR:
@@ -52,6 +61,14 @@ const MESSAGES = {
   // bot
   BOT_ADD_SUCCESS:
     "すぽじゅーるは、ぶいすぽっ!メンバーの配信(Youtube/Twitch/ツイキャス/ニコニコ)や切り抜きを一覧で確認できる非公式サイトです。\nSpodule aggregates schedules for Japan's Vtuber group, Vspo.\n\nWeb版はこちら：https://www.vspo-schedule.com/schedule/all",
+} as const;
+
+const MemberTypeLabelMapping = {
+  vspo_jp: "VSPO JP Members / ぶいすぽっ！JPメンバー",
+  vspo_en: "VSPO EN Members / ぶいすぽっ！ENメンバー",
+  // vspo_ch: "VSPO CH Members / ぶいすぽっ！CHメンバー",
+  vspo_all: "All VSPO Members / すべてのぶいすぽっ！メンバー",
+  // general: "General / 一般",
 } as const;
 
 type Env = {
@@ -130,6 +147,14 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
           ),
         );
       }
+
+      buttons.push(
+        new Button(
+          memberTypeSettingComponent.name,
+          MESSAGES.MEMBER_TYPE_SETTING_BUTTON_LABEL,
+          "Primary",
+        ),
+      );
 
       return c.res({
         content: MESSAGES.SPODULE_SETTING_LABEL,
@@ -307,6 +332,77 @@ export const langSelectComponent: IDiscordComponentDefinition<DiscordCommandEnv>
       }
       return c.resUpdate({
         content: MESSAGES.LANG_SELECT_ERROR,
+        components: [],
+      });
+    },
+  };
+
+/**
+ * memberTypeSettingComponent - Allows users to set the member type.
+ */
+export const memberTypeSettingComponent: IDiscordComponentDefinition<DiscordCommandEnv> =
+  {
+    name: "member-type-setting",
+    handler: async (c) => {
+      return c.resUpdate({
+        content: MESSAGES.MEMBER_TYPE_SETTING_LABEL,
+        components: new Components().row(
+          new Select(memberTypeSelectComponent.name, "String").options(
+            ...Object.entries(MemberTypeLabelMapping).map(([value, label]) => ({
+              value,
+              label,
+            })),
+          ),
+        ),
+      });
+    },
+  };
+
+/**
+ * memberTypeSelectComponent - Allows users to select the member type.
+ */
+export const memberTypeSelectComponent: IDiscordComponentDefinition<DiscordCommandEnv> =
+  {
+    name: "member-type-select",
+    handler: async (c) => {
+      AppLogger.info("Member type select component", {
+        server_id: c.interaction.guild_id || c.interaction.guild?.id || "",
+        channel_id: c.interaction.channel.id,
+        selected_value: c.interaction.data,
+      });
+
+      if ("values" in c.interaction.data) {
+        const selectedValue = c.interaction.data.values.at(
+          0,
+        ) as keyof typeof MemberTypeLabelMapping;
+        const u = await c.env.APP_WORKER.newDiscordUsecase();
+
+        // Adjust the bot channel with the newly selected member type
+        const r = await u.adjustBotChannel({
+          type: "add",
+          serverId: c.interaction.guild_id || c.interaction.guild?.id || "",
+          targetChannelId: c.interaction.channel.id,
+          memberType: selectedValue,
+        });
+
+        if (r.err) {
+          return c.resUpdate({
+            content: MESSAGES.MEMBER_TYPE_SELECT_ERROR,
+            components: [],
+          });
+        }
+
+        await u.batchUpsertEnqueue([r.val]);
+        await u.deleteMessageInChannelEnqueue(c.interaction.channel.id);
+        return c.resUpdate({
+          content: MESSAGES.MEMBER_TYPE_SELECT_SUCCESS(
+            MemberTypeLabelMapping[selectedValue],
+          ),
+          components: [],
+        });
+      }
+      return c.resUpdate({
+        content: MESSAGES.MEMBER_TYPE_SELECT_ERROR,
         components: [],
       });
     },

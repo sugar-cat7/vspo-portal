@@ -2,7 +2,13 @@ import { z } from "zod";
 import { ChannelSchema } from "./channel";
 import { ThumbnailURLSchema } from "./thumbnail";
 
-const MemberTypeSchema = z.enum(["vspo_jp", "vspo_en", "vspo_ch", "general"]);
+const MemberTypeSchema = z.enum([
+  "vspo_jp",
+  "vspo_en",
+  "vspo_ch",
+  "vspo_all",
+  "general",
+]);
 
 const CreatorSchema = z
   .object({

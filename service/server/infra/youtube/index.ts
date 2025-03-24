@@ -113,11 +113,11 @@ export class YoutubeService implements IYoutubeService {
                 10,
               ),
               thumbnailURL:
-                video.snippet?.thumbnails?.medium?.url ||
+                video.snippet?.thumbnails?.high?.url ||
                 video.snippet?.thumbnails?.standard?.url ||
+                video.snippet?.thumbnails?.medium?.url ||
                 video.snippet?.thumbnails?.default?.url ||
                 video.snippet?.thumbnails?.maxres?.url ||
-                video.snippet?.thumbnails?.high?.url ||
                 "",
               videoType: "vspo_stream",
             }),

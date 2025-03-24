@@ -9,6 +9,7 @@ import {
   gte,
   inArray,
   lte,
+  or,
 } from "drizzle-orm";
 import { TargetLangSchema } from "../../domain/translate";
 import {
@@ -456,7 +457,9 @@ export class VideoRepository implements IVideoRepository {
     filters.push(eq(creatorTranslationTable.languageCode, languageCode));
 
     if (query.memberType) {
-      filters.push(eq(creatorTable.memberType, query.memberType));
+      if (query.memberType !== "vspo_all") {
+        filters.push(eq(creatorTable.memberType, query.memberType));
+      }
     }
     if (query.channelIds && query.channelIds.length > 0) {
       filters.push(inArray(videoTable.channelId, query.channelIds));

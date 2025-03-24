@@ -15,11 +15,7 @@ import {
 import type { IAIService } from "../../infra/ai";
 import { withTracerResult } from "../../infra/http/trace/cloudflare";
 import type { ICreatorRepository } from "../../infra/repository/creator";
-import {
-  convertToUTCDate,
-  getCurrentUTCDate,
-  getCurrentUTCString,
-} from "../../pkg/dayjs";
+import { convertToUTCDate, getCurrentUTCDate } from "../../pkg/dayjs";
 import {
   type AppError,
   Ok,
