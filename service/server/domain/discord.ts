@@ -1,5 +1,6 @@
 import type { DiscordEmbed } from "@discordeno/types";
 import { EmbedsBuilder } from "@discordeno/utils";
+import { t } from "i18next";
 import { z } from "zod";
 import { getCurrentUTCString } from "../pkg/dayjs";
 import { MemberTypeSchema } from "./creator";
@@ -13,6 +14,8 @@ export const discordChannel = z
     name: z.string(),
     languageCode: z.string().optional().default("default"),
     memberType: MemberTypeSchema.optional(),
+    // Flag to indicate if this is the initial addition of the channel
+    isInitialAdd: z.boolean().optional(),
     createdAt: z.string().datetime().optional(),
     updatedAt: z.string().datetime().optional(),
   })
@@ -128,13 +131,16 @@ export function createVideoEmbed(video: Video): DiscordEmbed {
     .newEmbed()
     .setTitle(video.title, video.link)
     .setColor(video.statusColor)
-    .addField("配信日時/Streaming Date", video.formattedStartedAt, true)
+    .addField(t("embedMessage.streamingDate"), video.formattedStartedAt, true)
     .setImage(video.thumbnailURL)
     .setAuthor(video.creatorName || "Unknown", {
       icon_url: video.creatorThumbnailURL || "",
     })
     .setFooter(
-      `${video.platform.charAt(0).toUpperCase() + video.platform.slice(1)} Powered by Spodule`,
+      t("embedMessage.poweredBySpodule", {
+        platform:
+          video.platform.charAt(0).toUpperCase() + video.platform.slice(1),
+      }),
       {
         icon_url: video.platformIconURL,
       },

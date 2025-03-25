@@ -39,6 +39,7 @@ import {
   type IDiscordInteractor,
 } from "../../usecase/discord";
 import { AIService, type IAIService } from "../ai";
+import { CloudflareKVCacheClient, type ICacheClient } from "../cache";
 import { DiscordClient, type IDiscordClient } from "../discord";
 
 export interface IRepositories {
@@ -69,13 +70,15 @@ export function createServices(
   twitchClient: ITwitchService,
   twitcastingClient: ITwitcastingService,
   aiService: IAIService,
-  discordClinet: IDiscordClient,
+  discordClient: IDiscordClient,
+  cacheClient: ICacheClient,
 ): IServices {
   return {
     creatorService: new CreatorService({
       youtubeClient,
       creatorRepository: repos.creatorRepository,
       aiService,
+      cacheClient,
     }),
     videoService: new VideoService({
       youtubeClient,
@@ -84,12 +87,14 @@ export function createServices(
       creatorRepository: repos.creatorRepository,
       videoRepository: repos.videoRepository,
       aiService,
+      cacheClient,
     }),
     discordService: new DiscordService({
       discordServerRepository: repos.discordServerRepository,
-      discordClient: discordClinet,
+      discordClient: discordClient,
       videoRepository: repos.videoRepository,
       discordMessageRepository: repos.discordMessageRepository,
+      cacheClient,
     }),
   };
 }
@@ -110,7 +115,8 @@ export class AppContext implements IAppContext {
     private readonly twitchClient: ITwitchService,
     private readonly twitcastingClient: ITwitcastingService,
     private readonly aiService: IAIService,
-    private readonly DiscordClinet: IDiscordClient,
+    private readonly discordClient: IDiscordClient,
+    private readonly cacheClient: ICacheClient,
   ) {}
 
   async runInTx<T>(
@@ -129,7 +135,8 @@ export class AppContext implements IAppContext {
         this.twitchClient,
         this.twitcastingClient,
         this.aiService,
-        this.DiscordClinet,
+        this.discordClient,
+        this.cacheClient,
       );
 
       return operation(repos, services);
@@ -141,14 +148,17 @@ export class Container {
   private readonly youtubeService: IYoutubeService;
   private readonly twitchService: ITwitchService;
   private readonly twitcastingService: ITwitcastingService;
-  private readonly DiscordClinet: IDiscordClient;
+  private readonly discordClient: IDiscordClient;
   private readonly aiService: IAIService;
   private readonly txManager: TxManager;
+  private readonly cacheClient: ICacheClient;
   creatorInteractor: ICreatorInteractor;
   videoInteractor: IVideoInteractor;
   discordInteractor: IDiscordInteractor;
 
   constructor(private readonly env: AppWorkerEnv) {
+    this.cacheClient = new CloudflareKVCacheClient(this.env.APP_KV);
+
     this.youtubeService = new YoutubeService(this.env.YOUTUBE_API_KEY);
     this.twitchService = new TwitchService({
       clientId: this.env.TWITCH_CLIENT_ID,
@@ -171,14 +181,15 @@ export class Container {
       baseURL: this.env.OPENAI_BASE_URL,
     });
 
-    this.DiscordClinet = new DiscordClient(this.env);
+    this.discordClient = new DiscordClient(this.env);
     const context = new AppContext(
       this.txManager,
       this.youtubeService,
       this.twitchService,
       this.twitcastingService,
       this.aiService,
-      this.DiscordClinet,
+      this.discordClient,
+      this.cacheClient,
     );
     this.creatorInteractor = new CreatorInteractor(context);
     this.videoInteractor = new VideoInteractor(context);

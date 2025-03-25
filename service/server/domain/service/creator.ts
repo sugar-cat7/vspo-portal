@@ -1,6 +1,7 @@
 import { type Creator, type Creators, createCreator } from "..";
 import type { ICreatorRepository, IYoutubeService } from "../../infra";
 import type { IAIService } from "../../infra/ai";
+import type { ICacheClient } from "../../infra/cache";
 import { withTracerResult } from "../../infra/http/trace/cloudflare";
 import { type AppError, Ok, type Result } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
@@ -33,6 +34,7 @@ export class CreatorService implements ICreatorService {
       youtubeClient: IYoutubeService;
       creatorRepository: ICreatorRepository;
       aiService: IAIService;
+      cacheClient: ICacheClient;
     },
   ) {}
 

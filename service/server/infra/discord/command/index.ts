@@ -6,62 +6,13 @@ import {
   Components,
   Select,
 } from "discord-hono";
+import { t } from "i18next";
 import type { ApplicationService } from "../../../cmd/server/internal/application";
+import type { DiscordServer } from "../../../domain";
 import { LangCodeLabelMapping } from "../../../domain/translate";
+import { initI18n } from "../../../infra/discord/command/i18n";
 import { AppLogger } from "../../../pkg/logging";
-
-const MESSAGES = {
-  // spoduleSettingCommand
-  SPODULE_SETTING_LABEL: "Spodule settings / すぽじゅーるの設定",
-  BOT_ADD_BUTTON_LABEL: "Add Spodule Bot / すぽじゅーるBotを追加する",
-  BOT_REMOVE_BUTTON_LABEL: "Stop Streaming Information / 配信情報の停止",
-  LANG_SETTING_BUTTON_LABEL: "Language Settings / 言語設定",
-  MEMBER_TYPE_SETTING_BUTTON_LABEL: "Member Type Settings / メンバータイプ設定",
-
-  // memberTypeSettingComponent
-  MEMBER_TYPE_SETTING_LABEL:
-    "Select member type to display / 表示するメンバータイプを選択",
-  MEMBER_TYPE_SELECT_SUCCESS: (type: string) =>
-    `Member type set to ${type} / メンバータイプを${type}に設定しました`,
-  MEMBER_TYPE_SELECT_ERROR:
-    "An error occurred. Please try again later. / エラーが発生しました。時間をおいて再度試してください。",
-
-  // botAddComponent
-  BOT_ADD_ERROR:
-    "An error occurred. Please try again later. / エラーが発生しました。時間をおいて再度試してください。",
-
-  // botRemoveComponent
-  BOT_REMOVE_LABEL:
-    "This channel's streaming will be stopped / このチャンネルへの配信が停止されます",
-  BOT_REMOVE_BUTTON_STOP: "Stop / 停止する",
-  BOT_REMOVE_BUTTON_CANCEL: "Cancel / キャンセル",
-
-  // yesBotRemoveComponent
-  YES_BOT_REMOVE_ERROR:
-    "An error occurred. Please try again later. / エラーが発生しました。時間をおいて再度試してください。",
-  YES_BOT_REMOVE_SUCCESS: (channelName: string) =>
-    `The Spodule bot's streaming has been stopped in this channel / ${channelName}のすぽじゅーるbotの配信が停止されました`,
-
-  // cancelComponent
-  CANCELLED: "Cancelled / キャンセルしました",
-
-  // langSettingComponent
-  LANG_SETTING_LABEL: "Channel Language settings / チャンネル言語設定",
-
-  // langSelectComponent
-  LANG_SELECT_ERROR:
-    "An error occurred. Please try again later. / エラーが発生しました。時間をおいて再度試してください。",
-  LANG_SELECT_SUCCESS: (langName: string) =>
-    `Language set to ${langName} / 言語を${langName}に設定しました`,
-
-  // announceCommand
-  ANNOUNCE_SENT:
-    "Announcement sent to all channels. / すべてのチャンネルにアナウンスが送信されました。",
-
-  // bot
-  BOT_ADD_SUCCESS:
-    "すぽじゅーるは、ぶいすぽっ!メンバーの配信(Youtube/Twitch/ツイキャス/ニコニコ)や切り抜きを一覧で確認できる非公式サイトです。\nSpodule aggregates schedules for Japan's Vtuber group, Vspo.\n\nWeb版はこちら：https://www.vspo-schedule.com/schedule/all",
-} as const;
+import { CloudflareKVCacheClient, cacheKey } from "../../cache";
 
 const MemberTypeLabelMapping = {
   vspo_jp: "VSPO JP Members / ぶいすぽっ！JPメンバー",
@@ -89,6 +40,7 @@ export type IDiscordComponentDefinition<T extends Env> = {
 export type DiscordCommandEnv = {
   Bindings: {
     APP_WORKER: Service<ApplicationService>;
+    APP_KV: KVNamespace;
   };
 };
 
@@ -103,23 +55,66 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
         server_id: c.interaction.guild_id || c.interaction.guild?.id || "",
         channel_id: c.interaction.channel.id,
       });
-      const u = await c.env.APP_WORKER.newDiscordUsecase();
-      const r = await u.existsChannel(c.interaction.channel.id);
-      if (r.err || !r.val) {
+      const discordUsecase = await c.env.APP_WORKER.newDiscordUsecase();
+      const channelExistsResult = await discordUsecase.existsChannel(
+        c.interaction.channel.id,
+      );
+      if (channelExistsResult.err || !channelExistsResult.val) {
+        await initI18n({ language: "default" });
         return c.res({
-          content: MESSAGES.SPODULE_SETTING_LABEL,
+          content: t("spoduleSettingCommand.label"),
           components: new Components().row(
             new Button(
               botAddComponent.name,
-              MESSAGES.BOT_ADD_BUTTON_LABEL,
+              t("spoduleSettingCommand.botAddButton"),
               "Success",
             ),
           ),
         });
       }
+      const cache = new CloudflareKVCacheClient(c.env.APP_KV);
+      const serverCacheResult = await cache.get<DiscordServer>(
+        cacheKey.discord(
+          c.interaction.guild_id || c.interaction.guild?.id || "",
+        ),
+      );
 
-      const client = OpenFeature.getClient();
-      const enabled = await client.getBooleanValue(
+      let server = serverCacheResult.val;
+
+      if (!server) {
+        const serverResult = await discordUsecase.get(
+          c.interaction.guild_id || c.interaction.guild?.id || "",
+        );
+        if (serverResult.err) {
+          AppLogger.error("Failed to get server", { error: serverResult.err });
+          return c.res({});
+        }
+        server = serverResult.val;
+      }
+
+      const targetChannel = server.discordChannels.find(
+        (channel) => channel.rawId === c.interaction.channel.id,
+      );
+
+      if (!targetChannel) {
+        AppLogger.error("Failed to get target channel", {
+          error: "Target channel not found",
+        });
+        return c.res({});
+      }
+      const language = targetChannel.languageCode;
+      if (!language) {
+        AppLogger.error("Failed to get language", {
+          error: "Language not found",
+        });
+        return c.res({});
+      }
+
+      AppLogger.info("Language", { language });
+      await initI18n({ language: language });
+
+      const featureClient = OpenFeature.getClient();
+      const translationEnabled = await featureClient.getBooleanValue(
         "discord-translation-setting",
         false,
       );
@@ -128,21 +123,21 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
       const buttons: Button<"Success" | "Danger" | "Primary">[] = [
         new Button(
           botAddComponent.name,
-          MESSAGES.BOT_ADD_BUTTON_LABEL,
+          t("spoduleSettingCommand.botAddButton"),
           "Success",
         ),
         new Button(
           botRemoveComponent.name,
-          MESSAGES.BOT_REMOVE_BUTTON_LABEL,
+          t("spoduleSettingCommand.botRemoveButton"),
           "Danger",
         ),
       ];
 
-      if (enabled) {
+      if (translationEnabled) {
         buttons.push(
           new Button(
             langSettingComponent.name,
-            MESSAGES.LANG_SETTING_BUTTON_LABEL,
+            t("spoduleSettingCommand.langSettingButton"),
             "Primary",
           ),
         );
@@ -151,13 +146,13 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
       buttons.push(
         new Button(
           memberTypeSettingComponent.name,
-          MESSAGES.MEMBER_TYPE_SETTING_BUTTON_LABEL,
+          t("spoduleSettingCommand.memberTypeSettingButton"),
           "Primary",
         ),
       );
 
       return c.res({
-        content: MESSAGES.SPODULE_SETTING_LABEL,
+        content: t("spoduleSettingCommand.label"),
         components: components.row(...buttons),
       });
     },
@@ -173,24 +168,24 @@ export const botAddComponent: IDiscordComponentDefinition<DiscordCommandEnv> = {
       server_id: c.interaction.guild_id || c.interaction.guild?.id || "",
       channel_id: c.interaction.channel.id,
     });
-    const u = await c.env.APP_WORKER.newDiscordUsecase();
-    const r = await u.adjustBotChannel({
+    const discordUsecase = await c.env.APP_WORKER.newDiscordUsecase();
+    const adjustResult = await discordUsecase.adjustBotChannel({
       type: "add",
       serverId: c.interaction.guild_id || c.interaction.guild?.id || "",
       targetChannelId: c.interaction.channel.id,
     });
 
-    if (r.err) {
+    if (adjustResult.err) {
       return c.resUpdate({
-        content: MESSAGES.BOT_ADD_ERROR,
+        content: t("botAddComponent.error"),
         components: [],
       });
     }
 
-    await u.batchUpsertEnqueue([r.val]);
+    await discordUsecase.batchUpsertEnqueue([adjustResult.val]);
 
     return c.resUpdate({
-      content: MESSAGES.BOT_ADD_SUCCESS,
+      content: t("bot.addSuccess"),
       components: [],
     });
   },
@@ -204,16 +199,16 @@ export const botRemoveComponent: IDiscordComponentDefinition<DiscordCommandEnv> 
     name: "bot-remove-setting",
     handler: async (c) => {
       return c.resUpdate({
-        content: MESSAGES.BOT_REMOVE_LABEL,
+        content: t("botRemoveComponent.label"),
         components: new Components().row(
           new Button(
             yesBotRemoveComponent.name,
-            MESSAGES.BOT_REMOVE_BUTTON_STOP,
+            t("botRemoveComponent.buttonStop"),
             "Danger",
           ),
           new Button(
             cancelComponent.name,
-            MESSAGES.BOT_REMOVE_BUTTON_CANCEL,
+            t("botRemoveComponent.buttonCancel"),
             "Primary",
           ),
         ),
@@ -228,23 +223,24 @@ export const yesBotRemoveComponent: IDiscordComponentDefinition<DiscordCommandEn
   {
     name: "yes-bot-remove-setting",
     handler: async (c) => {
-      const u = await c.env.APP_WORKER.newDiscordUsecase();
+      const discordUsecase = await c.env.APP_WORKER.newDiscordUsecase();
       let response: { content: string; components: [] };
 
-      const r = await u.batchDeleteChannelsByRowChannelIds([
-        c.interaction.channel.id,
-      ]);
+      const deleteResult =
+        await discordUsecase.batchDeleteChannelsByRowChannelIds([
+          c.interaction.channel.id,
+        ]);
 
-      if (r.err) {
+      if (deleteResult.err) {
         response = {
-          content: MESSAGES.YES_BOT_REMOVE_ERROR,
+          content: t("yesBotRemoveComponent.error"),
           components: [],
         };
       } else {
         response = {
-          content: MESSAGES.YES_BOT_REMOVE_SUCCESS(
-            c.interaction.channel.name ?? "",
-          ),
+          content: t("yesBotRemoveComponent.success", {
+            channelName: c.interaction.channel.name ?? "",
+          }),
           components: [],
         };
       }
@@ -260,7 +256,7 @@ export const cancelComponent: IDiscordComponentDefinition<DiscordCommandEnv> = {
   name: "cancel",
   handler: async (c) => {
     return c.resUpdate({
-      content: MESSAGES.CANCELLED,
+      content: t("cancelComponent.cancelled"),
       components: [],
     });
   },
@@ -274,7 +270,7 @@ export const langSettingComponent: IDiscordComponentDefinition<DiscordCommandEnv
     name: "lang-setting",
     handler: async (c) => {
       return c.resUpdate({
-        content: MESSAGES.LANG_SETTING_LABEL,
+        content: t("langSettingComponent.label"),
         components: new Components().row(
           new Select(langSelectComponent.name, "String").options(
             ...Object.entries(LangCodeLabelMapping).map(([value, label]) => ({
@@ -304,34 +300,36 @@ export const langSelectComponent: IDiscordComponentDefinition<DiscordCommandEnv>
         const selectedValue = c.interaction.data.values.at(
           0,
         ) as keyof typeof LangCodeLabelMapping;
-        const u = await c.env.APP_WORKER.newDiscordUsecase();
+        const discordUsecase = await c.env.APP_WORKER.newDiscordUsecase();
 
         // Adjust the bot channel with the newly selected language
-        const r = await u.adjustBotChannel({
+        const adjustResult = await discordUsecase.adjustBotChannel({
           type: "add",
           serverId: c.interaction.guild_id || c.interaction.guild?.id || "",
           targetChannelId: c.interaction.channel.id,
           channelLangaugeCode: selectedValue,
         });
 
-        if (r.err) {
+        if (adjustResult.err) {
           return c.resUpdate({
-            content: MESSAGES.LANG_SELECT_ERROR,
+            content: t("langSelectComponent.error"),
             components: [],
           });
         }
 
-        await u.batchUpsertEnqueue([r.val]);
-        await u.deleteMessageInChannelEnqueue(c.interaction.channel.id);
+        await discordUsecase.batchUpsertEnqueue([adjustResult.val]);
+        await discordUsecase.deleteMessageInChannelEnqueue(
+          c.interaction.channel.id,
+        );
         return c.resUpdate({
-          content: MESSAGES.LANG_SELECT_SUCCESS(
-            LangCodeLabelMapping[selectedValue],
-          ),
+          content: t("langSelectComponent.success", {
+            langName: LangCodeLabelMapping[selectedValue],
+          }),
           components: [],
         });
       }
       return c.resUpdate({
-        content: MESSAGES.LANG_SELECT_ERROR,
+        content: t("langSelectComponent.error"),
         components: [],
       });
     },
@@ -345,7 +343,7 @@ export const memberTypeSettingComponent: IDiscordComponentDefinition<DiscordComm
     name: "member-type-setting",
     handler: async (c) => {
       return c.resUpdate({
-        content: MESSAGES.MEMBER_TYPE_SETTING_LABEL,
+        content: t("memberTypeSettingComponent.label"),
         components: new Components().row(
           new Select(memberTypeSelectComponent.name, "String").options(
             ...Object.entries(MemberTypeLabelMapping).map(([value, label]) => ({
@@ -375,34 +373,36 @@ export const memberTypeSelectComponent: IDiscordComponentDefinition<DiscordComma
         const selectedValue = c.interaction.data.values.at(
           0,
         ) as keyof typeof MemberTypeLabelMapping;
-        const u = await c.env.APP_WORKER.newDiscordUsecase();
+        const discordUsecase = await c.env.APP_WORKER.newDiscordUsecase();
 
         // Adjust the bot channel with the newly selected member type
-        const r = await u.adjustBotChannel({
+        const adjustResult = await discordUsecase.adjustBotChannel({
           type: "add",
           serverId: c.interaction.guild_id || c.interaction.guild?.id || "",
           targetChannelId: c.interaction.channel.id,
           memberType: selectedValue,
         });
 
-        if (r.err) {
+        if (adjustResult.err) {
           return c.resUpdate({
-            content: MESSAGES.MEMBER_TYPE_SELECT_ERROR,
+            content: t("memberTypeSettingComponent.selectError"),
             components: [],
           });
         }
 
-        await u.batchUpsertEnqueue([r.val]);
-        await u.deleteMessageInChannelEnqueue(c.interaction.channel.id);
+        await discordUsecase.batchUpsertEnqueue([adjustResult.val]);
+        await discordUsecase.deleteMessageInChannelEnqueue(
+          c.interaction.channel.id,
+        );
         return c.resUpdate({
-          content: MESSAGES.MEMBER_TYPE_SELECT_SUCCESS(
-            MemberTypeLabelMapping[selectedValue],
-          ),
+          content: t("memberTypeSettingComponent.selectSuccess", {
+            type: MemberTypeLabelMapping[selectedValue],
+          }),
           components: [],
         });
       }
       return c.resUpdate({
-        content: MESSAGES.MEMBER_TYPE_SELECT_ERROR,
+        content: t("memberTypeSettingComponent.selectError"),
         components: [],
       });
     },
@@ -414,6 +414,6 @@ export const memberTypeSelectComponent: IDiscordComponentDefinition<DiscordComma
 export const announceCommand: IDiscordSlashDefinition<DiscordCommandEnv> = {
   name: "announce",
   handler: async (c) => {
-    return c.res(MESSAGES.ANNOUNCE_SENT);
+    return c.res(t("announceCommand.sent"));
   },
 };

@@ -31,6 +31,7 @@ export interface IAIService {
   translateText(
     text: string,
     targetLang: string,
+    prompt?: string,
   ): Promise<Result<{ translatedText: string }, AppError>>;
 }
 
@@ -59,6 +60,7 @@ export class AIService implements IAIService {
   async translateText(
     text: string,
     targetLang: string,
+    prompt?: string,
   ): Promise<Result<{ translatedText: string }, AppError>> {
     return withTracerResult("ai", "translateText", async (span) => {
       const parseResult = TargetLangSchema.safeParse(targetLang);
@@ -82,7 +84,9 @@ export class AIService implements IAIService {
         this.openai.chat.completions.create({
           model: "gpt-4o-mini",
           messages: [
-            { role: "system", content: systemPrompt },
+            prompt
+              ? { role: "system", content: prompt }
+              : { role: "system", content: systemPrompt },
             { role: "user", content: text },
           ],
           max_tokens: 3000,

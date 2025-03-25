@@ -5,6 +5,7 @@ import { zFeatureFlagEnv } from "./flag";
 export const zBindingAppWorkerEnv = z
   .object({
     APP_WORKER: z.custom<Service<ApplicationService>>(),
+    APP_KV: z.custom<KVNamespace>(),
   })
   .merge(zCommonEnv)
   .merge(zFeatureFlagEnv);
