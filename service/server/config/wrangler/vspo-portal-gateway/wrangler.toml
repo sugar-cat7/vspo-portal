@@ -23,3 +23,7 @@ LOG_HIDE_POSITION = "true"
 
 [observability]
 enabled = true
+
+[assets]
+directory = "./public"
+binding = "ASSETS"

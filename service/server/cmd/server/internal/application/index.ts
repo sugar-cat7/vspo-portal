@@ -619,6 +619,25 @@ export default createHandler({
           logger.error(`Failed to upsert discord servers: ${sv.err.message}`);
           throw sv.err;
         }
+
+        // inital add channel
+        const initialAddChannel = messages.flatMap((server) =>
+          server.discordChannels.filter((ch) => ch.isInitialAdd),
+        );
+        await Promise.allSettled(
+          initialAddChannel.map((ch) =>
+            c.discordInteractor.sendAdminMessage({
+              channelId: ch.id,
+              content: "Hello, world!",
+            }),
+          ),
+        );
+
+        if (initialAddChannel.length > 0) {
+          logger.info("Initial add channel", {
+            channels: initialAddChannel,
+          });
+        }
       }
 
       if (messageGroups["delete-message-in-channel"].length > 0) {

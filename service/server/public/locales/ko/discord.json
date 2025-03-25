@@ -1,0 +1,42 @@
+{
+  "spoduleSettingCommand": {
+    "label": "스포지줄의 설정",
+    "botAddButton": "스포지 유르 봇을 추가하세요.",
+    "botRemoveButton": "스트리밍 정보 중단",
+    "langSettingButton": "언어 설정",
+    "memberTypeSettingButton": "멤버 타입 설정"
+  },
+  "memberTypeSettingComponent": {
+    "label": "표시할 멤버 타입을 선택하세요.",
+    "selectSuccess": "메ンバー 타입을 {{type}}로 설정했습니다.",
+    "selectError": "오류가 발생했습니다. 잠시 후에 다시 시도해 주세요."
+  },
+  "botAddComponent": {
+    "error": "오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
+  },
+  "botRemoveComponent": {
+    "label": "이 채널의 방송이 중단됩니다.",
+    "buttonStop": "정지합니다.",
+    "buttonCancel": "취소"
+  },
+  "yesBotRemoveComponent": {
+    "error": "오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+    "success": "{{channelName}}의 스포쥬얼 봇의 방송이 중단되었습니다."
+  },
+  "cancelComponent": {
+    "cancelled": "취소했습니다."
+  },
+  "langSettingComponent": {
+    "label": "채널 언어 설정"
+  },
+  "langSelectComponent": {
+    "error": "오류가 발생했습니다. 잠시 후 다시 시도해 주세요.",
+    "success": "언어를 {{langName}}로 설정했습니다."
+  },
+  "announceCommand": {
+    "sent": "모든 채널에 공지가 전송되었습니다."
+  },
+  "bot": {
+    "addSuccess": "스포줄은 Vspo! 멤버의 방송(Youtube/Twitch/트위캐스/니코니코) 및 클립을一覧에서 확인할 수 있는 비공식 사이트입니다.\nSpodule은 일본의 V튜버 그룹 Vspo의 일정을 집계합니다.\n\n웹 버전はこちら：https://www.vspo-schedule.com/schedule/all"
+  }
+}

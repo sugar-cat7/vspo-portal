@@ -1,0 +1,42 @@
+{
+  "spoduleSettingCommand": {
+    "label": "すぽじゅーるの設定",
+    "botAddButton": "すぽじゅーるBotを追加する",
+    "botRemoveButton": "配信情報の停止",
+    "langSettingButton": "言語設定",
+    "memberTypeSettingButton": "メンバータイプ設定"
+  },
+  "memberTypeSettingComponent": {
+    "label": "表示するメンバータイプを選択",
+    "selectSuccess": "メンバータイプを{{type}}に設定しました",
+    "selectError": "エラーが発生しました。時間をおいて再度試してください。"
+  },
+  "botAddComponent": {
+    "error": "エラーが発生しました。時間をおいて再度試してください。"
+  },
+  "botRemoveComponent": {
+    "label": "このチャンネルへの配信が停止されます",
+    "buttonStop": "停止する",
+    "buttonCancel": "キャンセル"
+  },
+  "yesBotRemoveComponent": {
+    "error": "エラーが発生しました。時間をおいて再度試してください。",
+    "success": "{{channelName}}のすぽじゅーるbotの配信が停止されました"
+  },
+  "cancelComponent": {
+    "cancelled": "キャンセルしました"
+  },
+  "langSettingComponent": {
+    "label": "チャンネル言語設定"
+  },
+  "langSelectComponent": {
+    "error": "エラーが発生しました。時間をおいて再度試してください。",
+    "success": "言語を{{langName}}に設定しました"
+  },
+  "announceCommand": {
+    "sent": "すべてのチャンネルにアナウンスが送信されました。"
+  },
+  "bot": {
+    "addSuccess": "すぽじゅーるは、ぶいすぽっ!メンバーの配信(Youtube/Twitch/ツイキャス/ニコニコ)や切り抜きを一覧で確認できる非公式サイトです。\nSpodule aggregates schedules for Japan's Vtuber group, Vspo.\n\nWeb版はこちら：https://www.vspo-schedule.com/schedule/all"
+  }
+}

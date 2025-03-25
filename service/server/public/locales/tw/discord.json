@@ -1,0 +1,42 @@
+{
+  "spoduleSettingCommand": {
+    "label": "設定日曆",
+    "botAddButton": "添加すぽじゅーるBot",
+    "botRemoveButton": "配信信息的停止",
+    "langSettingButton": "語言設定",
+    "memberTypeSettingButton": "成員類型設定"
+  },
+  "memberTypeSettingComponent": {
+    "label": "選擇要顯示的成員類型",
+    "selectSuccess": "已將成員類型設置為{{type}}",
+    "selectError": "發生錯誤。請稍後再試。"
+  },
+  "botAddComponent": {
+    "error": "發生錯誤。請稍後再試。"
+  },
+  "botRemoveComponent": {
+    "label": "這個頻道的直播將會停止",
+    "buttonStop": "停止",
+    "buttonCancel": "取消"
+  },
+  "yesBotRemoveComponent": {
+    "error": "發生錯誤。請稍後再試。",
+    "success": "{{channelName}}的すぽじゅーる機器人已停止發送。"
+  },
+  "cancelComponent": {
+    "cancelled": "已取消"
+  },
+  "langSettingComponent": {
+    "label": "頻道語言設定"
+  },
+  "langSelectComponent": {
+    "error": "發生錯誤。請稍後再試。",
+    "success": "語言已設置為{{langName}}"
+  },
+  "announceCommand": {
+    "sent": "所有頻道均已發送公告。"
+  },
+  "bot": {
+    "addSuccess": "すぽじゅーる是非非官方網站，可以一目了然地確認ぶいすぽっ!成員的直播（Youtube/Twitch/ツイキャス/ニコニコ）以及剪輯的列表。\nSpodule彙總了日本虛擬主播團體Vspo的排程。\n\n網頁版在這裡：https://www.vspo-schedule.com/schedule/all"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "spoduleSettingCommand": {
+    "label": "Configuración de spojūru",
+    "botAddButton": "Agregar el bot de spojul.",
+    "botRemoveButton": "Detención de la información de transmisión",
+    "langSettingButton": "Configuración de idioma",
+    "memberTypeSettingButton": "Configuración del tipo de miembro"
+  },
+  "memberTypeSettingComponent": {
+    "label": "Seleccione el tipo de miembro a mostrar",
+    "selectSuccess": "He establecido el tipo de miembro en {{type}}.",
+    "selectError": "Se produjo un error. Por favor, inténtalo de nuevo más tarde."
+  },
+  "botAddComponent": {
+    "error": "Se ha producido un error. Por favor, inténtelo de nuevo más tarde."
+  },
+  "botRemoveComponent": {
+    "label": "La transmisión a este canal se detendrá.",
+    "buttonStop": "Detener",
+    "buttonCancel": "Cancelar"
+  },
+  "yesBotRemoveComponent": {
+    "error": "Se ha producido un error. Por favor, inténtelo de nuevo más tarde.",
+    "success": "{{channelName}} del bot de spojuru ha sido detenido."
+  },
+  "cancelComponent": {
+    "cancelled": "Cancelado"
+  },
+  "langSettingComponent": {
+    "label": "Configuración del idioma del canal"
+  },
+  "langSelectComponent": {
+    "error": "Se ha producido un error. Por favor, inténtelo de nuevo más tarde.",
+    "success": "He configurado el idioma a {{langName}}."
+  },
+  "announceCommand": {
+    "sent": "Se han enviado anuncios a todos los canales."
+  },
+  "bot": {
+    "addSuccess": "Spodule es un sitio no oficial donde puedes verificar una lista de transmisiones (Youtube/Twitch/TwitCasting/Niconico) y recortes de los miembros de Vspo!.\nLa versión web está aquí: https://www.vspo-schedule.com/schedule/all"
+  }
+}

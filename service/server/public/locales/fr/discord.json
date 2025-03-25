@@ -1,0 +1,42 @@
+{
+  "spoduleSettingCommand": {
+    "label": "Paramètres de Vspo!",
+    "botAddButton": "Ajouter le bot spojule.",
+    "botRemoveButton": "Arrêt des informations de diffusion",
+    "langSettingButton": "Paramètres de langue",
+    "memberTypeSettingButton": "Paramètres de type de membre"
+  },
+  "memberTypeSettingComponent": {
+    "label": "Sélectionnez le type de membre à afficher",
+    "selectSuccess": "Le type de membre a été défini sur {{type}}.",
+    "selectError": "Une erreur s'est produite. Veuillez réessayer après un moment."
+  },
+  "botAddComponent": {
+    "error": "Une erreur s'est produite. Veuillez réessayer plus tard."
+  },
+  "botRemoveComponent": {
+    "label": "La diffusion de cette chaîne sera interrompue.",
+    "buttonStop": "Arrêter",
+    "buttonCancel": "Annuler"
+  },
+  "yesBotRemoveComponent": {
+    "error": "Une erreur s'est produite. Veuillez réessayer plus tard.",
+    "success": "{{channelName}} le bot de spojule a été arrêté."
+  },
+  "cancelComponent": {
+    "cancelled": "J'ai annulé."
+  },
+  "langSettingComponent": {
+    "label": "Paramètres de langue de la chaîne"
+  },
+  "langSelectComponent": {
+    "error": "Une erreur s'est produite. Veuillez réessayer plus tard.",
+    "success": "La langue a été définie sur {{langName}}."
+  },
+  "announceCommand": {
+    "sent": "Une annonce a été envoyée à tous les canaux."
+  },
+  "bot": {
+    "addSuccess": "Spodule est un site non officiel où vous pouvez consulter la liste des diffusions (Youtube/Twitch/Tsuikyasu/Niconico) et des extraits des membres de Vspo!.\n\nLa version web est ici : https://www.vspo-schedule.com/schedule/all"
+  }
+}

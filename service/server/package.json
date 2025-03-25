@@ -20,7 +20,9 @@
     "tsc": "tsc --noEmit",
     "ci": "nx run vspo-portal-server:ci",
     "test": "vitest --mode test",
-    "register": "node --env-file=.env.local cmd/discord/interaction/register.ts"
+    "register": "node --env-file=.env.local cmd/discord/interaction/register.ts",
+    "tools:build": "tsup tools/**/*.ts",
+    "tools:generate-locales": "pnpm tools:build && node --env-file=.env.local dist/generate-locales.cjs"
   },
   "dependencies": {
     "@ai-sdk/openai": "^1.2.7",
@@ -45,6 +47,8 @@
     "drizzle-zod": "^0.7.0",
     "googleapis": "^144.0.0",
     "hono": "^4.7.5",
+    "i18next": "^24.2.3",
+    "i18next-resources-to-backend": "^1.2.1",
     "openai": "^4.89.0",
     "pg": "^8.14.1",
     "postgres": "^3.4.5",
@@ -65,6 +69,7 @@
     "miniflare": "3.20250214.0",
     "nx": "20.4.6",
     "testcontainers": "^10.21.0",
+    "tsup": "^8.4.0",
     "typescript": "^5.8.2",
     "vite": "^6.2.2",
     "vitest": "^3.0.9",

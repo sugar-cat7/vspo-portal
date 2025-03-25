@@ -15,8 +15,9 @@ import {
   yesBotRemoveComponent,
 } from "../../infra/discord/command";
 import { newApp } from "../../infra/http/hono/app";
-import { maintenanceMiddleware } from "../../infra/http/hono/middleware";
+import { maintenanceMiddleware } from "../../infra/http/hono/middleware/discord/maintenance";
 import { createHandler, withTracer } from "../../infra/http/trace";
+import { i18nMiddleware } from "../../infra/http/hono/middleware/discord/i18n";
 
 const app = newApp();
 app.notFound((c) => {
@@ -41,7 +42,7 @@ const discord = new DiscordHono<DiscordCommandEnv>()
   .component(memberTypeSelectComponent.name, memberTypeSelectComponent.handler)
   //common
   .component(cancelComponent.name, cancelComponent.handler);
-
+app.use("/interaction", i18nMiddleware);
 app.use("/interaction", maintenanceMiddleware);
 app.mount("/interaction", discord.fetch);
 

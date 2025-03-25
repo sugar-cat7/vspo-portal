@@ -226,4 +226,11 @@ export const vspoKeywordMap = {
       searchKeywords: ["甘結もか", "甘結 もか", "Amayui Moka", "Moka Amayui"],
     },
   ],
+  systems: [
+    {
+      nameJp: "すぽじゅーる",
+      nameEn: "Spodule",
+      searchKeywords: ["すぽじゅーる", "Spodule"],
+    },
+  ],
 } as const;

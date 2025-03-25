@@ -1,0 +1,42 @@
+{
+  "spoduleSettingCommand": {
+    "label": "すぽじゅーる的设置",
+    "botAddButton": "添加すぽじゅーるBot",
+    "botRemoveButton": "停止配信信息",
+    "langSettingButton": "语言设置",
+    "memberTypeSettingButton": "成员类型设置"
+  },
+  "memberTypeSettingComponent": {
+    "label": "选择要显示的成员类型",
+    "selectSuccess": "已将成员类型设置为{{type}}",
+    "selectError": "发生了错误。请稍后再试。"
+  },
+  "botAddComponent": {
+    "error": "发生了错误。请稍后再试。"
+  },
+  "botRemoveComponent": {
+    "label": "这个频道的直播将会停止。",
+    "buttonStop": "停止",
+    "buttonCancel": "取消"
+  },
+  "yesBotRemoveComponent": {
+    "error": "发生了错误。请稍后再试。",
+    "success": "{{channelName}}的随时播放机器人已停止直播"
+  },
+  "cancelComponent": {
+    "cancelled": "已取消"
+  },
+  "langSettingComponent": {
+    "label": "频道语言设置"
+  },
+  "langSelectComponent": {
+    "error": "发生了错误。请稍后再试。",
+    "success": "语言已设置为{{langName}}"
+  },
+  "announceCommand": {
+    "sent": "所有频道均已发送公告。"
+  },
+  "bot": {
+    "addSuccess": "Spodule是一个非正式网站，可以查看ぶいすぽっ!成员的直播（Youtube/Twitch/推特直播/哔哩哔哩）和剪辑列表。Web版在这里：https://www.vspo-schedule.com/schedule/all"
+  }
+}

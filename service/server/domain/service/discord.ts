@@ -409,6 +409,7 @@ export class DiscordService implements IDiscordService {
           channels.push({
             ...channelResult.val,
             memberType: options.memberType ?? "vspo_all",
+            isInitialAdd: true,
           });
         }
         break;

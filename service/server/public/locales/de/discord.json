@@ -1,0 +1,42 @@
+{
+  "spoduleSettingCommand": {
+    "label": "Einstellungen für das Spojuul",
+    "botAddButton": "Fügen Sie den Spodjūru-Bot hinzu.",
+    "botRemoveButton": "Einstellung der Streaming-Informationen",
+    "langSettingButton": "Spracheinstellung",
+    "memberTypeSettingButton": "Mitglieder-Typ-Einstellungen"
+  },
+  "memberTypeSettingComponent": {
+    "label": "Wählen Sie den Mitgliedertyp, der angezeigt werden soll.",
+    "selectSuccess": "Ich habe den Mitgliedstyp auf {{type}} gesetzt.",
+    "selectError": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
+  },
+  "botAddComponent": {
+    "error": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
+  },
+  "botRemoveComponent": {
+    "label": "Die Übertragung dieses Kanals wird eingestellt.",
+    "buttonStop": "Stoppen",
+    "buttonCancel": "Stornieren"
+  },
+  "yesBotRemoveComponent": {
+    "error": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+    "success": "{{channelName}}'s spojūru bot-Übertragung wurde gestoppt."
+  },
+  "cancelComponent": {
+    "cancelled": "Ich habe storniert."
+  },
+  "langSettingComponent": {
+    "label": "Spracheinstellungen des Kanals"
+  },
+  "langSelectComponent": {
+    "error": "Es ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+    "success": "Die Sprache wurde auf {{langName}} eingestellt."
+  },
+  "announceCommand": {
+    "sent": "Alle Kanäle wurden über die Ankündigung informiert."
+  },
+  "bot": {
+    "addSuccess": "Spodule ist eine inoffizielle Website, auf der die Streams (YouTube/Twitch/Twicas/Niconico) und Clips der Mitglieder von Vspo! in einer Übersicht angezeigt werden.\nDie Webversion finden Sie hier: https://www.vspo-schedule.com/schedule/all"
+  }
+}
