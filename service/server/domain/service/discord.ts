@@ -4,6 +4,7 @@ import type {
   IDiscordServerRepository,
   IVideoRepository,
 } from "../../infra";
+import { type ICacheClient, cacheKey } from "../../infra/cache";
 import type { IDiscordClient } from "../../infra/discord";
 import { withTracerResult } from "../../infra/http/trace/cloudflare";
 import {
@@ -15,14 +16,13 @@ import { type AppError, Err, Ok, type Result } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
 import {
-  DiscordMessage,
-  type DiscordMessages,
   type DiscordServer,
   createDiscordServer,
   createVideoEmbed,
   discordServer,
 } from "../discord";
-import type { Video, Videos } from "../video";
+import type { Video } from "../video";
+import { initI18n } from "./i18n";
 
 // Parameters for sending messages to multiple channels
 type ChannelMessageParams = {
@@ -79,6 +79,7 @@ export class DiscordService implements IDiscordService {
       discordServerRepository: IDiscordServerRepository;
       discordMessageRepository: IDiscordMessageRepository;
       videoRepository: IVideoRepository;
+      cacheClient: ICacheClient;
     },
   ) {}
   /**
@@ -88,6 +89,7 @@ export class DiscordService implements IDiscordService {
   async sendMessagesToChannel(
     options: ChannelMessageParams,
   ): Promise<Result<void, AppError>> {
+    await initI18n({ language: "default" });
     AppLogger.info("Sending messages to channels", {
       service: this.SERVICE_NAME,
       channelCount: options.channelIds.length,
@@ -409,6 +411,7 @@ export class DiscordService implements IDiscordService {
           channels.push({
             ...channelResult.val,
             memberType: options.memberType ?? "vspo_all",
+            isInitialAdd: true,
           });
         }
         break;
@@ -433,6 +436,22 @@ export class DiscordService implements IDiscordService {
       channelId: options.targetChannelId,
       updatedServer: updatedServer,
     });
+
+    // set channel list to cache
+    const r = await this.dependencies.cacheClient.set(
+      cacheKey.discord(options.serverId),
+      updatedServer,
+      // Limit
+      2147483647,
+    );
+    if (r.err) {
+      AppLogger.error("Failed to set channel list to cache", {
+        service: this.SERVICE_NAME,
+        serverId: options.serverId,
+        error: r.err,
+      });
+    }
+
     return Ok(updatedServer);
   }
 

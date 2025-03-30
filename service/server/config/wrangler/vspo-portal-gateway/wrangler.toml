@@ -5,6 +5,9 @@ compatibility_flags = ["nodejs_compat", "nodejs_als"]
 main = "cmd/server/gateway.ts"
 tail_consumers = [{ service = "api-tail" }]
 logpush = true
+kv_namespaces = [
+  { binding = "APP_KV", id = "796f80b67f7b41b4b4e78474c34d8598" }
+]
 
 [dev]
 port = 3000

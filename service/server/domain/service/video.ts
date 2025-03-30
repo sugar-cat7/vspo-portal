@@ -13,6 +13,7 @@ import {
   query,
 } from "../../infra";
 import type { IAIService } from "../../infra/ai";
+import type { ICacheClient } from "../../infra/cache";
 import { withTracerResult } from "../../infra/http/trace/cloudflare";
 import type { ICreatorRepository } from "../../infra/repository/creator";
 import { convertToUTCDate, getCurrentUTCDate } from "../../pkg/dayjs";
@@ -75,6 +76,7 @@ export class VideoService implements IVideoService {
       creatorRepository: ICreatorRepository;
       videoRepository: IVideoRepository;
       aiService: IAIService;
+      cacheClient: ICacheClient;
     },
   ) {}
 

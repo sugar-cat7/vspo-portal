@@ -1,4 +1,5 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
+import { t } from "i18next";
 import { z } from "zod";
 import {
   type AppWorkerEnv,
@@ -13,6 +14,7 @@ import {
   VideosSchema,
   discordServers,
 } from "../../../../domain";
+import { initI18n } from "../../../../domain/service/i18n";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { Container } from "../../../../infra/dependency";
 import { createHandler, withTracer } from "../../../../infra/http/trace";
@@ -618,6 +620,28 @@ export default createHandler({
         if (sv.err) {
           logger.error(`Failed to upsert discord servers: ${sv.err.message}`);
           throw sv.err;
+        }
+
+        // inital add channel
+        const initialAddChannel = messages.flatMap((server) =>
+          server.discordChannels.filter((ch) => ch.isInitialAdd),
+        );
+
+        if (initialAddChannel.length > 0) {
+          logger.info("Initial add channel", {
+            channels: initialAddChannel,
+          });
+
+          await initI18n({ language: "default" });
+
+          await Promise.allSettled(
+            initialAddChannel.map((ch) =>
+              c.discordInteractor.sendAdminMessage({
+                channelId: ch.rawId,
+                content: t("initialAddChannel.success"),
+              }),
+            ),
+          );
         }
       }
 

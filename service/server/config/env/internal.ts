@@ -14,6 +14,7 @@ export const zAppWorkerEnv = z
       .default("postgres://user:password@localhost:5432/vspo"),
     DB: z.custom<Hyperdrive>(),
     WRITE_QUEUE: z.custom<Queue>(),
+    APP_KV: z.custom<KVNamespace>(),
   })
   .merge(zCommonEnv)
   .merge(zAIEnv)

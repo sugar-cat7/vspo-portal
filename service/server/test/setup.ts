@@ -10,6 +10,7 @@ import { afterEach } from "vitest";
 import { vi } from "vitest";
 import { zAppWorkerEnv } from "../config/env/internal";
 import { AIService } from "../infra/ai";
+import { CloudflareKVCacheClient } from "../infra/cache";
 import { AppContext } from "../infra/dependency";
 import { DiscordClient } from "../infra/discord";
 import { channelTable, creatorTable } from "../infra/repository/schema";
@@ -18,7 +19,6 @@ import { testCreators } from "./fixtures/creator";
 import { testChannel } from "./fixtures/video";
 import { mockDiscordClient } from "./mock/discord";
 import { TestTxManager } from "./mock/transaction";
-
 let container: StartedPostgreSqlContainer;
 
 export const setupTxManager = async () => {
@@ -123,5 +123,6 @@ export const setupTxManager = async () => {
       baseURL: env.OPENAI_BASE_URL,
     }),
     new DiscordClient(env),
+    new CloudflareKVCacheClient(env.APP_KV),
   );
 };
