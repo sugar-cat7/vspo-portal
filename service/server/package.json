@@ -71,7 +71,7 @@
     "testcontainers": "^10.21.0",
     "tsup": "^8.4.0",
     "typescript": "^5.8.2",
-    "vite": "^6.2.2",
+    "vite": "^6.2.3",
     "vitest": "^3.0.9",
     "wrangler": "^3.114.2"
   },
