@@ -74,7 +74,7 @@
     "typescript": "^5.8.2",
     "vite": "^6.2.2",
     "vitest": "^3.0.9",
-    "wrangler": "^3.114.2"
+    "wrangler": "^3.114.3"
   },
   "nx": {}
 }
