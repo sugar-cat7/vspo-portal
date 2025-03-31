@@ -8,10 +8,10 @@ logpush = true
 [dev]
 port = 3002
 
-# [[services]]
-# binding = "APP_WORKER"
-# service = "prd-vspo-portal-app"
-# entrypoint = "ApplicationService"
+[[services]]
+binding = "APP_WORKER"
+service = "prd-vspo-portal-app"
+entrypoint = "ApplicationService"
 
 [triggers]
 crons = [ "0 0,7,18 * * *", "5 0,7,18 * * *", "*/2 * * * *", "*/30 * * * *", "*/1 * * * *" ]
