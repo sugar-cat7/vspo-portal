@@ -1,1 +1,0 @@
-ALTER TABLE "discord_channel" ADD COLUMN "member_type" text DEFAULT 'vspo_all' NOT NULL;

@@ -5,57 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1738174162658,
-      "tag": "0000_tough_venus",
+      "when": 1743427042141,
+      "tag": "0000_next_tony_stark",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1738174182638,
-      "tag": "0001_huge_captain_midlands",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1738174184688,
-      "tag": "0002_optimal_living_tribunal",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1739037344906,
-      "tag": "0003_large_midnight",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1740327711637,
-      "tag": "0004_fair_pestilence",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1742469731806,
-      "tag": "0005_puzzling_nehzno",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1742487752241,
-      "tag": "0006_white_bullseye",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1742834013745,
-      "tag": "0007_tricky_sentinel",
+      "when": 1743427101430,
+      "tag": "0001_quiet_blizzard",
       "breakpoints": true
     }
   ]

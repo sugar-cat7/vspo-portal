@@ -6,7 +6,7 @@
 
 - copy env vars
 ```bash
-for dir in config/wrangler/vspo-portal-gateway config/wrangler/vspo-portal-app config/wrangler/vspo-portal-cron; do cp .dev.example.vars "$dir/.dev.vars"; done
+for dir in config/wrangler/dev/vspo-portal-gateway config/wrangler/dev/vspo-portal-app config/wrangler/dev/vspo-portal-cron; do cp .dev.example.vars "$dir/.dev.vars"; done
 ```
 
 - install dependencies

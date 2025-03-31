@@ -1,12 +1,12 @@
-name = "vspo-portal-app"
+name = "prd-vspo-portal-app"
 compatibility_date = "2024-10-22"
 send_metrics = false
 compatibility_flags = ["nodejs_compat", "nodejs_als"]
 main = "cmd/server/internal/application/index.ts"
-tail_consumers = [{service = "vspo-portal-app-tail"}]
+# tail_consumers = [{service = "prd-vspo-portal-app-tail"}]
 logpush = true
 kv_namespaces = [
-  { binding = "APP_KV", id = "796f80b67f7b41b4b4e78474c34d8598" }
+  { binding = "APP_KV", id = "14bf3d407655490e9f377efbb4c3352b" }
 ]
 
 [dev]
@@ -14,21 +14,21 @@ port = 3001
 
 [[hyperdrive]]
 binding = "DB"
-id = "40d9651c25504280aae268d9870e3360"
+id = "3dcd12f5b90f40f492ba5e1e24c2d210"
 localConnectionString = "postgres://user:password@localhost:5432/vspo"
 
 [[queues.producers]]
- queue = "write-queue"
+ queue = "prd-write-queue"
  binding = "WRITE_QUEUE"
 
 [[queues.consumers]]
- queue = "write-queue"
+ queue = "prd-write-queue"
  max_batch_size = 100
  max_batch_timeout = 5
- dead_letter_queue = "write-queue-dead-letter"
+ dead_letter_queue = "prd-write-queue-dead-letter"
 
 [vars]
-SERVICE_NAME = "vspo-portal-app"
+SERVICE_NAME = "prd-vspo-portal-app"
 ENVIRONMENT = "production"
 LOG_TYPE = "json"
 LOG_MINLEVEL = "1"
