@@ -38,7 +38,7 @@
     "@openfeature/server-sdk": "^1.17.1",
     "@opentelemetry/api": "1.9.0",
     "@sentry/cloudflare": "^9.10.1",
-    "@tsndr/cloudflare-worker-jwt": "3.1.3",
+    "@tsndr/cloudflare-worker-jwt": "3.1.4",
     "@twurple/api": "^7.2.1",
     "@twurple/auth": "^7.2.1",
     "ai": "^4.2.9",
