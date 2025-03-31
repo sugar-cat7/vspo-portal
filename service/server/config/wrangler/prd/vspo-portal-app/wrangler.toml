@@ -14,7 +14,7 @@ port = 3001
 
 [[hyperdrive]]
 binding = "DB"
-id = "3dcd12f5b90f40f492ba5e1e24c2d210"
+id = "b823b342d2bd4990a6ab858629aa3ba4"
 localConnectionString = "postgres://user:password@localhost:5432/vspo"
 
 [[queues.producers]]
