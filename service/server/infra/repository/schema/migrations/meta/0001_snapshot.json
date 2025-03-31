@@ -68,13 +68,9 @@
         "channel_creator_id_creator_id_fk": {
           "name": "channel_creator_id_creator_id_fk",
           "tableFrom": "channel",
-          "columnsFrom": [
-            "creator_id"
-          ],
+          "columnsFrom": ["creator_id"],
           "tableTo": "creator",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -83,9 +79,7 @@
       "uniqueConstraints": {
         "channel_platform_channel_id_unique": {
           "name": "channel_platform_channel_id_unique",
-          "columns": [
-            "platform_channel_id"
-          ],
+          "columns": ["platform_channel_id"],
           "nullsNotDistinct": false
         }
       },
@@ -172,13 +166,9 @@
         "creator_translation_creator_id_creator_id_fk": {
           "name": "creator_translation_creator_id_creator_id_fk",
           "tableFrom": "creator_translation",
-          "columnsFrom": [
-            "creator_id"
-          ],
+          "columnsFrom": ["creator_id"],
           "tableTo": "creator",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -187,10 +177,7 @@
       "uniqueConstraints": {
         "creator_translation_creator_id_lang_code_unique": {
           "name": "creator_translation_creator_id_lang_code_unique",
-          "columns": [
-            "creator_id",
-            "lang_code"
-          ],
+          "columns": ["creator_id", "lang_code"],
           "nullsNotDistinct": false
         }
       },
@@ -246,26 +233,18 @@
         "discord_admin_message_channel_id_discord_channel_discord_channel_id_fk": {
           "name": "discord_admin_message_channel_id_discord_channel_discord_channel_id_fk",
           "tableFrom": "discord_admin_message",
-          "columnsFrom": [
-            "channel_id"
-          ],
+          "columnsFrom": ["channel_id"],
           "tableTo": "discord_channel",
-          "columnsTo": [
-            "discord_channel_id"
-          ],
+          "columnsTo": ["discord_channel_id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         },
         "discord_admin_message_message_id_discord_message_id_fk": {
           "name": "discord_admin_message_message_id_discord_message_id_fk",
           "tableFrom": "discord_admin_message",
-          "columnsFrom": [
-            "message_id"
-          ],
+          "columnsFrom": ["message_id"],
           "tableTo": "discord_message",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -274,10 +253,7 @@
       "uniqueConstraints": {
         "discord_admin_message_discord_admin_message_id_message_id_unique": {
           "name": "discord_admin_message_discord_admin_message_id_message_id_unique",
-          "columns": [
-            "discord_admin_message_id",
-            "message_id"
-          ],
+          "columns": ["discord_admin_message_id", "message_id"],
           "nullsNotDistinct": false
         }
       },
@@ -346,13 +322,9 @@
         "discord_channel_server_id_discord_server_discord_server_id_fk": {
           "name": "discord_channel_server_id_discord_server_discord_server_id_fk",
           "tableFrom": "discord_channel",
-          "columnsFrom": [
-            "server_id"
-          ],
+          "columnsFrom": ["server_id"],
           "tableTo": "discord_server",
-          "columnsTo": [
-            "discord_server_id"
-          ],
+          "columnsTo": ["discord_server_id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -361,17 +333,12 @@
       "uniqueConstraints": {
         "discord_channel_discord_channel_id_unique": {
           "name": "discord_channel_discord_channel_id_unique",
-          "columns": [
-            "discord_channel_id"
-          ],
+          "columns": ["discord_channel_id"],
           "nullsNotDistinct": false
         },
         "discord_channel_discord_channel_id_server_id_unique": {
           "name": "discord_channel_discord_channel_id_server_id_unique",
-          "columns": [
-            "discord_channel_id",
-            "server_id"
-          ],
+          "columns": ["discord_channel_id", "server_id"],
           "nullsNotDistinct": false
         }
       },
@@ -467,9 +434,7 @@
       "uniqueConstraints": {
         "discord_server_discord_server_id_unique": {
           "name": "discord_server_discord_server_id_unique",
-          "columns": [
-            "discord_server_id"
-          ],
+          "columns": ["discord_server_id"],
           "nullsNotDistinct": false
         }
       },
@@ -530,13 +495,9 @@
         "stream_status_video_id_video_raw_id_fk": {
           "name": "stream_status_video_id_video_raw_id_fk",
           "tableFrom": "stream_status",
-          "columnsFrom": [
-            "video_id"
-          ],
+          "columnsFrom": ["video_id"],
           "tableTo": "video",
-          "columnsTo": [
-            "raw_id"
-          ],
+          "columnsTo": ["raw_id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -545,9 +506,7 @@
       "uniqueConstraints": {
         "stream_status_video_id_unique": {
           "name": "stream_status_video_id_unique",
-          "columns": [
-            "video_id"
-          ],
+          "columns": ["video_id"],
           "nullsNotDistinct": false
         }
       },
@@ -626,13 +585,9 @@
         "video_channel_id_channel_platform_channel_id_fk": {
           "name": "video_channel_id_channel_platform_channel_id_fk",
           "tableFrom": "video",
-          "columnsFrom": [
-            "channel_id"
-          ],
+          "columnsFrom": ["channel_id"],
           "tableTo": "channel",
-          "columnsTo": [
-            "platform_channel_id"
-          ],
+          "columnsTo": ["platform_channel_id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -641,9 +596,7 @@
       "uniqueConstraints": {
         "video_raw_id_unique": {
           "name": "video_raw_id_unique",
-          "columns": [
-            "raw_id"
-          ],
+          "columns": ["raw_id"],
           "nullsNotDistinct": false
         }
       },
@@ -698,13 +651,9 @@
         "video_translation_video_id_video_raw_id_fk": {
           "name": "video_translation_video_id_video_raw_id_fk",
           "tableFrom": "video_translation",
-          "columnsFrom": [
-            "video_id"
-          ],
+          "columnsFrom": ["video_id"],
           "tableTo": "video",
-          "columnsTo": [
-            "raw_id"
-          ],
+          "columnsTo": ["raw_id"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -713,10 +662,7 @@
       "uniqueConstraints": {
         "video_translation_video_id_lang_code_unique": {
           "name": "video_translation_video_id_lang_code_unique",
-          "columns": [
-            "video_id",
-            "lang_code"
-          ],
+          "columns": ["video_id", "lang_code"],
           "nullsNotDistinct": false
         }
       },
