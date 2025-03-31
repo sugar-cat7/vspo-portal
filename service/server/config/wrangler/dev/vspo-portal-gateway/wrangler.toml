@@ -3,7 +3,7 @@ compatibility_date = "2024-10-22"
 send_metrics = false
 compatibility_flags = ["nodejs_compat", "nodejs_als"]
 main = "cmd/server/gateway.ts"
-tail_consumers = [{ service = "dev-vspo-portal-gateway-tail" }]
+# tail_consumers = [{ service = "dev-vspo-portal-gateway-tail" }]
 logpush = true
 kv_namespaces = [
   { binding = "APP_KV", id = "0b6b968c69fc406c8d55aaf2cd657c2b" }
