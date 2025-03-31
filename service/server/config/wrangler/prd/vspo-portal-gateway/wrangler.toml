@@ -12,10 +12,10 @@ kv_namespaces = [
 [dev]
 port = 3000
 
-# [[services]]
-# binding = "APP_WORKER"
-# service = "prd-vspo-portal-app"
-# entrypoint = "ApplicationService"
+[[services]]
+binding = "APP_WORKER"
+service = "prd-vspo-portal-app"
+entrypoint = "ApplicationService"
 
 [vars]
 SERVICE_NAME = "prd-vspo-portal-gateway"
