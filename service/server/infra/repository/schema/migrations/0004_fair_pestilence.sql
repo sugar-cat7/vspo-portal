@@ -1,1 +1,0 @@
-ALTER TABLE "video" ADD COLUMN "link" text;

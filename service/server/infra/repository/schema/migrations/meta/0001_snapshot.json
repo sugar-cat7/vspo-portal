@@ -1,6 +1,6 @@
 {
-  "id": "dde43fd2-dfe0-4e28-8170-8eeebc9d887d",
-  "prevId": "084db93b-5911-4329-8705-97c3999e3973",
+  "id": "5d8c4472-dc51-4aa4-bf96-e8a423f16054",
+  "prevId": "475b7049-5f0b-461e-98a8-03d023004f82",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -68,9 +68,13 @@
         "channel_creator_id_creator_id_fk": {
           "name": "channel_creator_id_creator_id_fk",
           "tableFrom": "channel",
-          "columnsFrom": ["creator_id"],
+          "columnsFrom": [
+            "creator_id"
+          ],
           "tableTo": "creator",
-          "columnsTo": ["id"],
+          "columnsTo": [
+            "id"
+          ],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -79,7 +83,9 @@
       "uniqueConstraints": {
         "channel_platform_channel_id_unique": {
           "name": "channel_platform_channel_id_unique",
-          "columns": ["platform_channel_id"],
+          "columns": [
+            "platform_channel_id"
+          ],
           "nullsNotDistinct": false
         }
       },
@@ -166,9 +172,13 @@
         "creator_translation_creator_id_creator_id_fk": {
           "name": "creator_translation_creator_id_creator_id_fk",
           "tableFrom": "creator_translation",
-          "columnsFrom": ["creator_id"],
+          "columnsFrom": [
+            "creator_id"
+          ],
           "tableTo": "creator",
-          "columnsTo": ["id"],
+          "columnsTo": [
+            "id"
+          ],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -177,7 +187,289 @@
       "uniqueConstraints": {
         "creator_translation_creator_id_lang_code_unique": {
           "name": "creator_translation_creator_id_lang_code_unique",
-          "columns": ["creator_id", "lang_code"],
+          "columns": [
+            "creator_id",
+            "lang_code"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.discord_admin_message": {
+      "name": "discord_admin_message",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "channel_id": {
+          "name": "channel_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "discord_admin_message_id": {
+          "name": "discord_admin_message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message_id": {
+          "name": "message_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "discord_admin_message_channel_id_discord_channel_discord_channel_id_fk": {
+          "name": "discord_admin_message_channel_id_discord_channel_discord_channel_id_fk",
+          "tableFrom": "discord_admin_message",
+          "columnsFrom": [
+            "channel_id"
+          ],
+          "tableTo": "discord_channel",
+          "columnsTo": [
+            "discord_channel_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        },
+        "discord_admin_message_message_id_discord_message_id_fk": {
+          "name": "discord_admin_message_message_id_discord_message_id_fk",
+          "tableFrom": "discord_admin_message",
+          "columnsFrom": [
+            "message_id"
+          ],
+          "tableTo": "discord_message",
+          "columnsTo": [
+            "id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "discord_admin_message_discord_admin_message_id_message_id_unique": {
+          "name": "discord_admin_message_discord_admin_message_id_message_id_unique",
+          "columns": [
+            "discord_admin_message_id",
+            "message_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.discord_channel": {
+      "name": "discord_channel",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "discord_channel_id": {
+          "name": "discord_channel_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "server_id": {
+          "name": "server_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lang_code": {
+          "name": "lang_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "member_type": {
+          "name": "member_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'vspo_all'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "discord_channel_server_id_discord_server_discord_server_id_fk": {
+          "name": "discord_channel_server_id_discord_server_discord_server_id_fk",
+          "tableFrom": "discord_channel",
+          "columnsFrom": [
+            "server_id"
+          ],
+          "tableTo": "discord_server",
+          "columnsTo": [
+            "discord_server_id"
+          ],
+          "onUpdate": "no action",
+          "onDelete": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "discord_channel_discord_channel_id_unique": {
+          "name": "discord_channel_discord_channel_id_unique",
+          "columns": [
+            "discord_channel_id"
+          ],
+          "nullsNotDistinct": false
+        },
+        "discord_channel_discord_channel_id_server_id_unique": {
+          "name": "discord_channel_discord_channel_id_server_id_unique",
+          "columns": [
+            "discord_channel_id",
+            "server_id"
+          ],
+          "nullsNotDistinct": false
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.discord_message": {
+      "name": "discord_message",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.discord_server": {
+      "name": "discord_server",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "discord_server_id": {
+          "name": "discord_server_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lang_code": {
+          "name": "lang_code",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "discord_server_discord_server_id_unique": {
+          "name": "discord_server_discord_server_id_unique",
+          "columns": [
+            "discord_server_id"
+          ],
           "nullsNotDistinct": false
         }
       },
@@ -238,9 +530,13 @@
         "stream_status_video_id_video_raw_id_fk": {
           "name": "stream_status_video_id_video_raw_id_fk",
           "tableFrom": "stream_status",
-          "columnsFrom": ["video_id"],
+          "columnsFrom": [
+            "video_id"
+          ],
           "tableTo": "video",
-          "columnsTo": ["raw_id"],
+          "columnsTo": [
+            "raw_id"
+          ],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -249,7 +545,9 @@
       "uniqueConstraints": {
         "stream_status_video_id_unique": {
           "name": "stream_status_video_id_unique",
-          "columns": ["video_id"],
+          "columns": [
+            "video_id"
+          ],
           "nullsNotDistinct": false
         }
       },
@@ -308,6 +606,19 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "link": {
+          "name": "link",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "deleted": {
+          "name": "deleted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
@@ -315,9 +626,13 @@
         "video_channel_id_channel_platform_channel_id_fk": {
           "name": "video_channel_id_channel_platform_channel_id_fk",
           "tableFrom": "video",
-          "columnsFrom": ["channel_id"],
+          "columnsFrom": [
+            "channel_id"
+          ],
           "tableTo": "channel",
-          "columnsTo": ["platform_channel_id"],
+          "columnsTo": [
+            "platform_channel_id"
+          ],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -326,7 +641,9 @@
       "uniqueConstraints": {
         "video_raw_id_unique": {
           "name": "video_raw_id_unique",
-          "columns": ["raw_id"],
+          "columns": [
+            "raw_id"
+          ],
           "nullsNotDistinct": false
         }
       },
@@ -381,9 +698,13 @@
         "video_translation_video_id_video_raw_id_fk": {
           "name": "video_translation_video_id_video_raw_id_fk",
           "tableFrom": "video_translation",
-          "columnsFrom": ["video_id"],
+          "columnsFrom": [
+            "video_id"
+          ],
           "tableTo": "video",
-          "columnsTo": ["raw_id"],
+          "columnsTo": [
+            "raw_id"
+          ],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -392,7 +713,10 @@
       "uniqueConstraints": {
         "video_translation_video_id_lang_code_unique": {
           "name": "video_translation_video_id_lang_code_unique",
-          "columns": ["video_id", "lang_code"],
+          "columns": [
+            "video_id",
+            "lang_code"
+          ],
           "nullsNotDistinct": false
         }
       },

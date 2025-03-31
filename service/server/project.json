@@ -5,9 +5,9 @@
         "executor": "nx:run-commands",
         "options": {
           "commands": [
-            "wrangler deploy --config config/wrangler/vspo-portal-gateway/wrangler.toml --dry-run --script cmd/server/gateway.ts",
-            "wrangler deploy --config config/wrangler/vspo-portal-app/wrangler.toml --dry-run --script cmd/server/internal/application/index.ts",
-            "wrangler deploy --config config/wrangler/vspo-portal-cron/wrangler.toml --dry-run --script cmd/cron/index.ts"
+            "wrangler deploy --config config/wrangler/dev/vspo-portal-gateway/wrangler.toml --dry-run --script cmd/server/gateway.ts",
+            "wrangler deploy --config config/wrangler/dev/vspo-portal-app/wrangler.toml --dry-run --script cmd/server/internal/application/index.ts",
+            "wrangler deploy --config config/wrangler/dev/vspo-portal-cron/wrangler.toml --dry-run --script cmd/cron/index.ts"
           ],
           "parallel": false
         }
