@@ -2,7 +2,7 @@ import { Command, Option, register } from "discord-hono";
 
 const registerCommands = [
   new Command("setting", "Allows users to configure the bot settings."),
-  new Command("help", "response help").options(new Option("text", "with text")),
+  // new Command("help", "response help").options(new Option("text", "with text")),
 ];
 
 register(

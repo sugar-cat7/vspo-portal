@@ -67,3 +67,4 @@ next-env.d.ts
 *ignore
 .cursor/*
 dist
+.env.*

@@ -21,7 +21,8 @@
     "tsc": "tsc --noEmit",
     "ci": "nx run vspo-portal-server:ci",
     "test": "vitest --mode test",
-    "register": "node --env-file=.env.local cmd/discord/interaction/register.ts",
+    "register:local": "node --env-file=.env.local cmd/discord/interaction/register.ts",
+    "register:prd": "node --env-file=.env.prd cmd/discord/interaction/register.ts",
     "tools:build": "tsup tools/**/*.ts",
     "tools:generate-locales": "pnpm tools:build && node --env-file=.env.local dist/generate-locales.cjs"
   },
