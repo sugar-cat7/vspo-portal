@@ -28,7 +28,7 @@ importers:
         version: 0.19.2(hono@4.7.5)(zod@3.24.2)
       '@langchain/cloudflare':
         specifier: ^0.1.0
-        version: 0.1.0(@langchain/core@0.3.43(openai@4.90.0(ws@8.18.1)(zod@3.24.2)))
+        version: 0.1.0(@langchain/core@0.3.43(openai@4.91.1(ws@8.18.1)(zod@3.24.2)))
       '@microlabs/otel-cf-workers':
         specifier: 1.0.0-rc.49
         version: 1.0.0-rc.49(@opentelemetry/api@1.9.0)
@@ -81,8 +81,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       openai:
-        specifier: ^4.90.0
-        version: 4.90.0(ws@8.18.1)(zod@3.24.2)
+        specifier: ^4.91.1
+        version: 4.91.1(ws@8.18.1)(zod@3.24.2)
       pg:
         specifier: ^8.14.1
         version: 8.14.1
@@ -143,10 +143,10 @@ importers:
         version: 5.8.2
       vite:
         specifier: ^6.2.4
-        version: 6.2.4(@types/node@22.13.14)(yaml@2.7.1)
+        version: 6.2.4(@types/node@22.13.17)(yaml@2.7.1)
       vitest:
         specifier: ^3.1.1
-        version: 3.1.1(@types/node@22.13.14)(msw@2.7.3(@types/node@22.13.14)(typescript@5.8.2))(yaml@2.7.1)
+        version: 3.1.1(@types/node@22.13.17)(msw@2.7.3(@types/node@22.13.17)(typescript@5.8.2))(yaml@2.7.1)
       wrangler:
         specifier: ^4.6.0
         version: 4.6.0(@cloudflare/workers-types@4.20250327.0)
@@ -1519,11 +1519,14 @@ packages:
   '@types/node-fetch@2.6.12':
     resolution: {integrity: sha512-8nneRWKCg3rMtF69nLQJnOYUcbafYeFSjqkw3jCRLsqkWFlHaoQrr5mXmofFGOx3DKn7UfmBMyov8ySvLRVldA==}
 
-  '@types/node@18.19.84':
-    resolution: {integrity: sha512-ACYy2HGcZPHxEeWTqowTF7dhXN+JU1o7Gr4b41klnn6pj2LD6rsiGqSZojMdk1Jh2ys3m76ap+ae1vvE4+5+vg==}
+  '@types/node@18.19.86':
+    resolution: {integrity: sha512-fifKayi175wLyKyc5qUfyENhQ1dCNI1UNjp653d8kuYcPQN5JhX3dGuP/XmvPTg/xRBn1VTLpbmi+H/Mr7tLfQ==}
 
   '@types/node@22.13.14':
     resolution: {integrity: sha512-Zs/Ollc1SJ8nKUAgc7ivOEdIBM8JAKgrqqUYi2J997JuKO7/tpQC+WCetQ1sypiKCQWHdvdg9wBNpUPEWZae7w==}
+
+  '@types/node@22.13.17':
+    resolution: {integrity: sha512-nAJuQXoyPj04uLgu+obZcSmsfOenUg6DxPKogeUy6yNCFwWaj5sBF8/G/pNo8EtBJjAfSVgfIlugR/BCOleO+g==}
 
   '@types/pg@8.11.11':
     resolution: {integrity: sha512-kGT1qKM8wJQ5qlawUrEkXgvMSXoV213KfMGXcwfDwUIfUHXqXYXOfS1nE1LINRJVVVx5wCm70XnFlMHaIcQAfw==}
@@ -1549,8 +1552,8 @@ packages:
   '@types/uuid@10.0.0':
     resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
 
-  '@types/ws@8.18.0':
-    resolution: {integrity: sha512-8svvI3hMyvN0kKCJMvTJP/x6Y/EoQbepff882wL+Sn5QsXb3etnamgrJq4isrBxSJj5L2AuXcI0+bgkoAXGUJw==}
+  '@types/ws@8.18.1':
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
   '@vitest/expect@3.1.1':
     resolution: {integrity: sha512-q/zjrW9lgynctNbwvFtQkGK9+vvHA5UzVi2V8APrp1C6fG6/MuYYkmlx4FubuqLycCeSdHD5aadWfua/Vr0EUA==}
@@ -2704,8 +2707,8 @@ packages:
     resolution: {integrity: sha512-7x81NCL719oNbsq/3mh+hVrAWmFuEYUqrq/Iw3kUzH8ReypT9QQ0BLoJS7/G9k6N81XjW4qHWtjWwe/9eLy1EQ==}
     engines: {node: '>=12'}
 
-  openai@4.90.0:
-    resolution: {integrity: sha512-YCuHMMycqtCg1B8G9ezkOF0j8UnBWD3Al/zYaelpuXwU1yhCEv+Y4n9G20MnyGy6cH4GsFwOMrgstQ+bgG1PtA==}
+  openai@4.91.1:
+    resolution: {integrity: sha512-DbjrR0hIMQFbxz8+3qBsfPJnh3+I/skPgoSlT7f9eiZuhGBUissPQULNgx6gHNkLoZ3uS0uYS6eXPUdtg4nHzw==}
     hasBin: true
     peerDependencies:
       ws: ^8.18.0
@@ -3280,8 +3283,8 @@ packages:
     resolution: {integrity: sha512-t0rzBq87m3fVcduHDUFhKmyyX+9eo6WQjZvf51Ea/M0Q7+T374Jp1aUiyUl0GKxp8M/OETVHSDvmkyPgvX+X2w==}
     engines: {node: '>=10'}
 
-  type-fest@4.38.0:
-    resolution: {integrity: sha512-2dBz5D5ycHIoliLYLi0Q2V7KRaDlH0uWIvmk7TYlAg5slqwiPv1ezJdZm1QEM0xgk29oYWMCbIG7E6gHpvChlg==}
+  type-fest@4.39.0:
+    resolution: {integrity: sha512-w2IGJU1tIgcrepg9ZJ82d8UmItNQtOFJG0HCUE3SzMokKkTsruVDALl2fAdiEzJlfduoU+VyXJWIIUZ+6jV+nw==}
     engines: {node: '>=16'}
 
   typescript@5.8.2:
@@ -4139,18 +4142,18 @@ snapshots:
   '@img/sharp-win32-x64@0.33.5':
     optional: true
 
-  '@inquirer/confirm@5.1.8(@types/node@22.13.14)':
+  '@inquirer/confirm@5.1.8(@types/node@22.13.17)':
     dependencies:
-      '@inquirer/core': 10.1.9(@types/node@22.13.14)
-      '@inquirer/type': 3.0.5(@types/node@22.13.14)
+      '@inquirer/core': 10.1.9(@types/node@22.13.17)
+      '@inquirer/type': 3.0.5(@types/node@22.13.17)
     optionalDependencies:
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
     optional: true
 
-  '@inquirer/core@10.1.9(@types/node@22.13.14)':
+  '@inquirer/core@10.1.9(@types/node@22.13.17)':
     dependencies:
       '@inquirer/figures': 1.0.11
-      '@inquirer/type': 3.0.5(@types/node@22.13.14)
+      '@inquirer/type': 3.0.5(@types/node@22.13.17)
       ansi-escapes: 4.3.2
       cli-width: 4.1.0
       mute-stream: 2.0.0
@@ -4158,15 +4161,15 @@ snapshots:
       wrap-ansi: 6.2.0
       yoctocolors-cjs: 2.1.2
     optionalDependencies:
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
     optional: true
 
   '@inquirer/figures@1.0.11':
     optional: true
 
-  '@inquirer/type@3.0.5(@types/node@22.13.14)':
+  '@inquirer/type@3.0.5(@types/node@22.13.17)':
     optionalDependencies:
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
     optional: true
 
   '@isaacs/cliui@8.0.2':
@@ -4206,19 +4209,19 @@ snapshots:
 
   '@js-sdsl/ordered-map@4.4.2': {}
 
-  '@langchain/cloudflare@0.1.0(@langchain/core@0.3.43(openai@4.90.0(ws@8.18.1)(zod@3.24.2)))':
+  '@langchain/cloudflare@0.1.0(@langchain/core@0.3.43(openai@4.91.1(ws@8.18.1)(zod@3.24.2)))':
     dependencies:
-      '@langchain/core': 0.3.43(openai@4.90.0(ws@8.18.1)(zod@3.24.2))
+      '@langchain/core': 0.3.43(openai@4.91.1(ws@8.18.1)(zod@3.24.2))
       uuid: 10.0.0
 
-  '@langchain/core@0.3.43(openai@4.90.0(ws@8.18.1)(zod@3.24.2))':
+  '@langchain/core@0.3.43(openai@4.91.1(ws@8.18.1)(zod@3.24.2))':
     dependencies:
       '@cfworker/json-schema': 4.1.1
       ansi-styles: 5.2.0
       camelcase: 6.3.0
       decamelize: 1.2.0
       js-tiktoken: 1.0.19
-      langsmith: 0.3.15(openai@4.90.0(ws@8.18.1)(zod@3.24.2))
+      langsmith: 0.3.15(openai@4.91.1(ws@8.18.1)(zod@3.24.2))
       mustache: 4.2.0
       p-queue: 6.6.2
       p-retry: 4.6.2
@@ -4557,27 +4560,31 @@ snapshots:
 
   '@types/docker-modem@3.0.6':
     dependencies:
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
       '@types/ssh2': 1.15.4
 
   '@types/dockerode@3.3.37':
     dependencies:
       '@types/docker-modem': 3.0.6
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
       '@types/ssh2': 1.15.4
 
   '@types/estree@1.0.7': {}
 
   '@types/node-fetch@2.6.12':
     dependencies:
-      '@types/node': 18.19.84
+      '@types/node': 22.13.17
       form-data: 4.0.2
 
-  '@types/node@18.19.84':
+  '@types/node@18.19.86':
     dependencies:
       undici-types: 5.26.5
 
   '@types/node@22.13.14':
+    dependencies:
+      undici-types: 6.20.0
+
+  '@types/node@22.13.17':
     dependencies:
       undici-types: 6.20.0
 
@@ -4591,16 +4598,16 @@ snapshots:
 
   '@types/ssh2-streams@0.1.12':
     dependencies:
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
 
   '@types/ssh2@0.5.52':
     dependencies:
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
       '@types/ssh2-streams': 0.1.12
 
   '@types/ssh2@1.15.4':
     dependencies:
-      '@types/node': 18.19.84
+      '@types/node': 18.19.86
 
   '@types/statuses@2.0.5':
     optional: true
@@ -4610,9 +4617,9 @@ snapshots:
 
   '@types/uuid@10.0.0': {}
 
-  '@types/ws@8.18.0':
+  '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
     optional: true
 
   '@vitest/expect@3.1.1':
@@ -4622,14 +4629,14 @@ snapshots:
       chai: 5.2.0
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.1.1(msw@2.7.3(@types/node@22.13.14)(typescript@5.8.2))(vite@6.2.4(@types/node@22.13.14)(yaml@2.7.1))':
+  '@vitest/mocker@3.1.1(msw@2.7.3(@types/node@22.13.17)(typescript@5.8.2))(vite@6.2.4(@types/node@22.13.17)(yaml@2.7.1))':
     dependencies:
       '@vitest/spy': 3.1.1
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
-      msw: 2.7.3(@types/node@22.13.14)(typescript@5.8.2)
-      vite: 6.2.4(@types/node@22.13.14)(yaml@2.7.1)
+      msw: 2.7.3(@types/node@22.13.17)(typescript@5.8.2)
+      vite: 6.2.4(@types/node@22.13.17)(yaml@2.7.1)
 
   '@vitest/pretty-format@3.1.1':
     dependencies:
@@ -4845,8 +4852,8 @@ snapshots:
 
   bun-types@1.2.7:
     dependencies:
-      '@types/node': 22.13.14
-      '@types/ws': 8.18.0
+      '@types/node': 22.13.17
+      '@types/ws': 8.18.1
     optional: true
 
   bundle-require@5.1.0(esbuild@0.25.2):
@@ -5565,7 +5572,7 @@ snapshots:
 
   klona@2.0.6: {}
 
-  langsmith@0.3.15(openai@4.90.0(ws@8.18.1)(zod@3.24.2)):
+  langsmith@0.3.15(openai@4.91.1(ws@8.18.1)(zod@3.24.2)):
     dependencies:
       '@types/uuid': 10.0.0
       chalk: 4.1.2
@@ -5575,7 +5582,7 @@ snapshots:
       semver: 7.7.1
       uuid: 10.0.0
     optionalDependencies:
-      openai: 4.90.0(ws@8.18.1)(zod@3.24.2)
+      openai: 4.91.1(ws@8.18.1)(zod@3.24.2)
 
   lazystream@1.0.1:
     dependencies:
@@ -5664,12 +5671,12 @@ snapshots:
 
   ms@2.1.3: {}
 
-  msw@2.7.3(@types/node@22.13.14)(typescript@5.8.2):
+  msw@2.7.3(@types/node@22.13.17)(typescript@5.8.2):
     dependencies:
       '@bundled-es-modules/cookie': 2.0.1
       '@bundled-es-modules/statuses': 1.0.1
       '@bundled-es-modules/tough-cookie': 0.1.6
-      '@inquirer/confirm': 5.1.8(@types/node@22.13.14)
+      '@inquirer/confirm': 5.1.8(@types/node@22.13.17)
       '@mswjs/interceptors': 0.37.6
       '@open-draft/deferred-promise': 2.2.0
       '@open-draft/until': 2.1.0
@@ -5682,7 +5689,7 @@ snapshots:
       path-to-regexp: 6.3.0
       picocolors: 1.1.1
       strict-event-emitter: 0.5.1
-      type-fest: 4.38.0
+      type-fest: 4.39.0
       yargs: 17.7.2
     optionalDependencies:
       typescript: 5.8.2
@@ -5800,9 +5807,9 @@ snapshots:
       is-docker: 2.2.1
       is-wsl: 2.2.0
 
-  openai@4.90.0(ws@8.18.1)(zod@3.24.2):
+  openai@4.91.1(ws@8.18.1)(zod@3.24.2):
     dependencies:
-      '@types/node': 18.19.84
+      '@types/node': 18.19.86
       '@types/node-fetch': 2.6.12
       abort-controller: 3.0.0
       agentkeepalive: 4.6.0
@@ -6004,7 +6011,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
       long: 5.3.1
 
   proxy-from-env@1.1.0: {}
@@ -6473,7 +6480,7 @@ snapshots:
   type-fest@0.21.3:
     optional: true
 
-  type-fest@4.38.0:
+  type-fest@4.39.0:
     optional: true
 
   typescript@5.8.2: {}
@@ -6523,13 +6530,13 @@ snapshots:
     optionalDependencies:
       typescript: 5.8.2
 
-  vite-node@3.1.1(@types/node@22.13.14)(yaml@2.7.1):
+  vite-node@3.1.1(@types/node@22.13.17)(yaml@2.7.1):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
       es-module-lexer: 1.6.0
       pathe: 2.0.3
-      vite: 6.2.4(@types/node@22.13.14)(yaml@2.7.1)
+      vite: 6.2.4(@types/node@22.13.17)(yaml@2.7.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -6544,20 +6551,20 @@ snapshots:
       - tsx
       - yaml
 
-  vite@6.2.4(@types/node@22.13.14)(yaml@2.7.1):
+  vite@6.2.4(@types/node@22.13.17)(yaml@2.7.1):
     dependencies:
       esbuild: 0.25.2
       postcss: 8.5.3
       rollup: 4.38.0
     optionalDependencies:
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
       fsevents: 2.3.3
       yaml: 2.7.1
 
-  vitest@3.1.1(@types/node@22.13.14)(msw@2.7.3(@types/node@22.13.14)(typescript@5.8.2))(yaml@2.7.1):
+  vitest@3.1.1(@types/node@22.13.17)(msw@2.7.3(@types/node@22.13.17)(typescript@5.8.2))(yaml@2.7.1):
     dependencies:
       '@vitest/expect': 3.1.1
-      '@vitest/mocker': 3.1.1(msw@2.7.3(@types/node@22.13.14)(typescript@5.8.2))(vite@6.2.4(@types/node@22.13.14)(yaml@2.7.1))
+      '@vitest/mocker': 3.1.1(msw@2.7.3(@types/node@22.13.17)(typescript@5.8.2))(vite@6.2.4(@types/node@22.13.17)(yaml@2.7.1))
       '@vitest/pretty-format': 3.1.1
       '@vitest/runner': 3.1.1
       '@vitest/snapshot': 3.1.1
@@ -6573,11 +6580,11 @@ snapshots:
       tinyexec: 0.3.2
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
-      vite: 6.2.4(@types/node@22.13.14)(yaml@2.7.1)
-      vite-node: 3.1.1(@types/node@22.13.14)(yaml@2.7.1)
+      vite: 6.2.4(@types/node@22.13.17)(yaml@2.7.1)
+      vite-node: 3.1.1(@types/node@22.13.17)(yaml@2.7.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
-      '@types/node': 22.13.14
+      '@types/node': 22.13.17
     transitivePeerDependencies:
       - jiti
       - less

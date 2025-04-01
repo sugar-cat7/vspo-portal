@@ -51,7 +51,7 @@
     "hono": "^4.7.5",
     "i18next": "^24.2.3",
     "i18next-resources-to-backend": "^1.2.1",
-    "openai": "^4.90.0",
+    "openai": "^4.91.1",
     "pg": "^8.14.1",
     "postgres": "^3.4.5",
     "tslog": "^4.9.3",
