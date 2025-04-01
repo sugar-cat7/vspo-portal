@@ -203,7 +203,7 @@ export class CreatorRepository implements ICreatorRepository {
 
         for (const c of creators) {
           const creator = dbCreatorss.find((creator) => creator.id === c.id);
-          if (!creator && c.languageCode === "default") {
+          if (!creator && c.languageCode === "default" && !c.translated) {
             dbCreatorss.push({
               id: c.id,
               memberType: c.memberType,
@@ -257,101 +257,91 @@ export class CreatorRepository implements ICreatorRepository {
           }
         }
 
-        const creatorResult = await wrap(
-          this.db
-            .insert(creatorTable)
-            .values(dbCreatorss)
-            .onConflictDoUpdate({
-              target: creatorTable.id,
-              set: buildConflictUpdateColumns(creatorTable, [
-                "representativeThumbnailUrl",
-                "updatedAt",
-              ]),
-            })
-            .returning()
-            .execute(),
-          (err) =>
-            new AppError({
-              message: `Database error during creator batch upsert: ${err.message}`,
-              code: "INTERNAL_SERVER_ERROR",
-            }),
-        );
+        if (dbCreatorss.length > 0) {
+          const creatorResult = await wrap(
+            this.db
+              .insert(creatorTable)
+              .values(dbCreatorss)
+              .onConflictDoUpdate({
+                target: creatorTable.id,
+                set: buildConflictUpdateColumns(creatorTable, [
+                  "representativeThumbnailUrl",
+                  "updatedAt",
+                ]),
+              })
+              .returning()
+              .execute(),
+            (err) =>
+              new AppError({
+                message: `Database error during creator batch upsert: ${err.message}`,
+                code: "INTERNAL_SERVER_ERROR",
+              }),
+          );
 
-        if (creatorResult.err) {
-          return Err(creatorResult.err);
+          if (creatorResult.err) {
+            return Err(creatorResult.err);
+          }
         }
 
-        const channelResult = await wrap(
-          this.db
-            .insert(channelTable)
-            .values(dbChannels)
-            .onConflictDoUpdate({
-              target: channelTable.platformChannelId,
-              set: buildConflictUpdateColumns(channelTable, [
-                "title",
-                "description",
-                "subscriberCount",
-                "thumbnailUrl",
-              ]),
-            })
-            .returning()
-            .execute(),
-          (err) =>
-            new AppError({
-              message: `Database error during channel batch upsert: ${err.message}`,
-              code: "INTERNAL_SERVER_ERROR",
-            }),
-        );
+        if (dbChannels.length > 0) {
+          const channelResult = await wrap(
+            this.db
+              .insert(channelTable)
+              .values(dbChannels)
+              .onConflictDoUpdate({
+                target: channelTable.platformChannelId,
+                set: buildConflictUpdateColumns(channelTable, [
+                  "title",
+                  "description",
+                  "subscriberCount",
+                  "thumbnailUrl",
+                ]),
+              })
+              .returning()
+              .execute(),
+            (err) =>
+              new AppError({
+                message: `Database error during channel batch upsert: ${err.message}`,
+                code: "INTERNAL_SERVER_ERROR",
+              }),
+          );
 
-        if (channelResult.err) {
-          return Err(channelResult.err);
+          if (channelResult.err) {
+            return Err(channelResult.err);
+          }
         }
 
-        const creatorTranslationResult = await wrap(
-          this.db
-            .insert(creatorTranslationTable)
-            .values(dbCreatorTranslations)
-            .onConflictDoUpdate({
-              target: [
-                creatorTranslationTable.creatorId,
-                creatorTranslationTable.languageCode,
-              ],
-              set: buildConflictUpdateColumns(creatorTranslationTable, [
-                "name",
-                "languageCode",
-                "updatedAt",
-              ]),
-            })
-            .returning()
-            .execute(),
-          (err) =>
-            new AppError({
-              message: `Database error during creator transaction batch upsert: ${err.message}`,
-              code: "INTERNAL_SERVER_ERROR",
-            }),
-        );
+        if (dbCreatorTranslations.length > 0) {
+          const translationResult = await wrap(
+            this.db
+              .insert(creatorTranslationTable)
+              .values(dbCreatorTranslations)
+              .onConflictDoUpdate({
+                target: [
+                  creatorTranslationTable.creatorId,
+                  creatorTranslationTable.languageCode,
+                ],
+                set: buildConflictUpdateColumns(creatorTranslationTable, [
+                  "name",
+                  "languageCode",
+                  "updatedAt",
+                ]),
+              })
+              .returning()
+              .execute(),
+            (err) =>
+              new AppError({
+                message: `Database error during creator transaction batch upsert: ${err.message}`,
+                code: "INTERNAL_SERVER_ERROR",
+              }),
+          );
 
-        if (creatorTranslationResult.err) {
-          return Err(creatorTranslationResult.err);
+          if (translationResult.err) {
+            return Err(translationResult.err);
+          }
         }
 
-        return Ok(
-          createCreators(
-            creatorResult.val.map((r) => {
-              const translation = creatorTranslationResult?.val?.find(
-                (t) => t.creatorId === r.id,
-              );
-              return {
-                id: r.id,
-                name: translation?.name ?? "",
-                languageCode: translation?.languageCode ?? "",
-                memberType: MemberTypeSchema.parse(r.memberType),
-                thumbnailURL: r.representativeThumbnailUrl,
-                channel: null,
-              };
-            }),
-          ),
-        );
+        return Ok(creators);
       },
     );
   }

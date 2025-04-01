@@ -1,7 +1,7 @@
 {
   "spoduleSettingCommand": {
     "label": "スケジュール設定",
-    "botAddButton": "spojuleボットを追加する",
+    "botAddButton": "spoduleボットを追加する",
     "botRemoveButton": "情報配信を停止する",
     "langSettingButton": "言語設定",
     "memberTypeSettingButton": "メンバータイプ設定"

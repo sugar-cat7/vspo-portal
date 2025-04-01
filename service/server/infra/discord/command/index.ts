@@ -120,18 +120,7 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
       );
 
       const components = new Components();
-      const buttons: Button<"Success" | "Danger" | "Primary">[] = [
-        new Button(
-          botAddComponent.name,
-          t("spoduleSettingCommand.botAddButton"),
-          "Success",
-        ),
-        new Button(
-          botRemoveComponent.name,
-          t("spoduleSettingCommand.botRemoveButton"),
-          "Danger",
-        ),
-      ];
+      const buttons: Button<"Success" | "Danger" | "Primary">[] = [];
 
       if (translationEnabled) {
         buttons.push(
@@ -148,6 +137,14 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
           memberTypeSettingComponent.name,
           t("spoduleSettingCommand.memberTypeSettingButton"),
           "Primary",
+        ),
+      );
+
+      buttons.push(
+        new Button(
+          botRemoveComponent.name,
+          t("spoduleSettingCommand.botRemoveButton"),
+          "Danger",
         ),
       );
 
