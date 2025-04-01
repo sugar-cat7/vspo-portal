@@ -1,7 +1,7 @@
 {
   "spoduleSettingCommand": {
     "label": "日程设置",
-    "botAddButton": "添加spojule机器人",
+    "botAddButton": "添加spodule机器人",
     "botRemoveButton": "停止信息广播",
     "langSettingButton": "语言设置",
     "memberTypeSettingButton": "成员类型设置"
