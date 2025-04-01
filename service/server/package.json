@@ -42,7 +42,7 @@
     "@tsndr/cloudflare-worker-jwt": "3.1.4",
     "@twurple/api": "^7.2.1",
     "@twurple/auth": "^7.2.1",
-    "ai": "^4.2.9",
+    "ai": "^4.2.10",
     "dayjs": "^1.11.13",
     "discord-hono": "^0.16.4",
     "drizzle-orm": "^0.41.0",
