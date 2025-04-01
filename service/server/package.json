@@ -27,7 +27,7 @@
     "tools:generate-locales": "pnpm tools:build && node --env-file=.env.local dist/generate-locales.cjs"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^1.3.5",
+    "@ai-sdk/openai": "^1.3.6",
     "@discordeno/rest": "^21.0.0",
     "@discordeno/types": "^21.0.0",
     "@discordeno/utils": "^21.0.0",
