@@ -17,7 +17,7 @@ export const createFlagConfiguration = (env: FeatureFlagEnv) => {
       disabled: false,
       defaultVariant: env.DISCORD_TRANSLATION_SETTING ? "on" : "off",
     },
-    "discort-bot-maintenance": {
+    "discord-bot-maintenance": {
       variants: {
         on: true,
         off: false,
