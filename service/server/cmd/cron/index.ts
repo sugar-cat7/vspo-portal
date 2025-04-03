@@ -30,7 +30,7 @@ export class SearchChannelsWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await searchChannelsWorkflow().handler()(this.env, _event, step);
   }
 }
@@ -40,7 +40,7 @@ export class SearchVideosWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await searchVideosWorkflow().handler()(this.env, _event, step);
   }
 }
@@ -50,7 +50,7 @@ export class TranslateCreatorsWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await translateCreatorsWorkflow().handler()(this.env, _event, step);
   }
 }
@@ -60,7 +60,7 @@ export class TranslateVideosWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await translateVideosWorkflow().handler()(this.env, _event, step);
   }
 }
@@ -70,7 +70,7 @@ export class DiscordSendMessagesWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await discordSendMessagesWorkflow().handler()(this.env, _event, step);
   }
 }
@@ -80,7 +80,7 @@ export class SearchMemberVideosByChannelWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await searchMemberVideosByChannelWorkflow().handler()(
       this.env,
       _event,
@@ -94,7 +94,7 @@ export class DeleteVideosWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await deleteVideosWorkflow().handler()(this.env, _event, step);
   }
 }
@@ -104,7 +104,7 @@ export class DiscordDeleteAllWorkflow extends WorkflowEntrypoint<
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await discordDeleteAllWorkflow().handler()(this.env, _event, step);
   }
 }
@@ -117,7 +117,7 @@ export class DiscordSendMessageAllChannelWorkflow extends WorkflowEntrypoint<
     event: WorkflowEvent<DiscordSendMessageAllChannelParams>,
     step: WorkflowStep,
   ) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await discordSendMessageAllChannelWorkflow().handler()(
       this.env,
       event,
@@ -134,7 +134,7 @@ export class DiscordSendMessageChannelsWorkflow extends WorkflowEntrypoint<
     event: WorkflowEvent<DiscordSendMessageChannelsParams>,
     step: WorkflowStep,
   ) {
-    setFeatureFlagProvider(this.env);
+    await setFeatureFlagProvider(this.env);
     await discordSendMessageChannelsWorkflow().handler()(this.env, event, step);
   }
 }
@@ -147,7 +147,7 @@ export default createHandler({
   ) => {
     return await withTracer("ScheduledHandler", "scheduled", async (span) => {
       span.setAttribute("cron", controller.cron);
-      setFeatureFlagProvider(env);
+      await setFeatureFlagProvider(env);
       switch (controller.cron) {
         case "0 0,7,18 * * *":
           span.setAttribute("workflow", "search-channels");
