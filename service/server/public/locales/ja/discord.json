@@ -2,7 +2,7 @@
   "spoduleSettingCommand": {
     "label": "スケジュール設定",
     "botAddButton": "spoduleボットを追加する",
-    "botRemoveButton": "情報配信を停止する",
+    "botRemoveButton": "配信を停止する",
     "langSettingButton": "言語設定",
     "memberTypeSettingButton": "メンバータイプ設定"
   },
@@ -40,7 +40,7 @@
     "addSuccess": "Botが追加されました。"
   },
   "initialAddChannel": {
-    "success": "Spoduleはぶいすぽっ！（Vtuberグループ）のメンバーのストリーム（Youtube/Twitch/ツイキャス/ニコニコ）やクリップのリストを見ることができる非公式サイトです。ウェブ版はこちら：https://www.vspo-schedule.com/schedule/all"
+    "success": "すぽじゅーるはぶいすぽっ！（Vtuberグループ）のメンバーのストリーム（Youtube/Twitch/ツイキャス/ニコニコ）やクリップのリストを見ることができる非公式サイトです。ウェブ版はこちら：https://www.vspo-schedule.com/schedule/all"
   },
   "embedMessage": {
     "streamingDate": "配信日時",
