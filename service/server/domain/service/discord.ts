@@ -89,7 +89,7 @@ export class DiscordService implements IDiscordService {
   async sendMessagesToChannel(
     options: ChannelMessageParams,
   ): Promise<Result<void, AppError>> {
-    await initI18n({ language: "default" });
+    await initI18n({ language: options.channelLangaugeCode });
     AppLogger.info("Sending messages to channels", {
       service: this.SERVICE_NAME,
       channelCount: options.channelIds.length,
@@ -306,6 +306,9 @@ export class DiscordService implements IDiscordService {
       service: this.SERVICE_NAME,
       successCount: p.filter((r) => r.status === "fulfilled").length,
       failureCount: p.filter((r) => r.status === "rejected").length,
+      failedMessages: p
+        .filter((r) => r.status === "rejected")
+        .map((r) => r.reason),
     });
     return Ok();
   }

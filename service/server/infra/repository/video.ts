@@ -255,85 +255,101 @@ export class VideoRepository implements IVideoRepository {
         }
       }
 
-      const videoResult = await wrap(
-        this.db
-          .insert(videoTable)
-          .values(dbVideos)
-          .onConflictDoUpdate({
-            target: videoTable.rawId,
-            set: buildConflictUpdateColumns(videoTable, [
-              "publishedAt",
-              "tags",
-              "thumbnailUrl",
-              "deleted",
-            ]),
-          })
-          .returning()
-          .execute(),
-        (err) =>
-          new AppError({
-            message: `Database error during video batch upsert: ${err.message}`,
-            code: "INTERNAL_SERVER_ERROR",
-          }),
-      );
+      let videoResult: Result<(typeof videoTable.$inferSelect)[], AppError> =
+        Ok([]);
+      if (dbVideos.length > 0) {
+        videoResult = await wrap(
+          this.db
+            .insert(videoTable)
+            .values(dbVideos)
+            .onConflictDoUpdate({
+              target: videoTable.rawId,
+              set: buildConflictUpdateColumns(videoTable, [
+                "publishedAt",
+                "tags",
+                "thumbnailUrl",
+                "deleted",
+              ]),
+            })
+            .returning()
+            .execute(),
+          (err) =>
+            new AppError({
+              message: `Database error during video batch upsert: ${err.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+            }),
+        );
 
-      if (videoResult.err) {
-        return Err(videoResult.err);
+        if (videoResult.err) {
+          return Err(videoResult.err);
+        }
       }
 
-      const streamStatusResult = await wrap(
-        this.db
-          .insert(streamStatusTable)
-          .values(dbStreamStatus)
-          .onConflictDoUpdate({
-            target: streamStatusTable.videoId,
-            set: buildConflictUpdateColumns(streamStatusTable, [
-              "status",
-              "startedAt",
-              "endedAt",
-              "viewCount",
-              "updatedAt",
-            ]),
-          })
-          .returning()
-          .execute(),
-        (err) =>
-          new AppError({
-            message: `Database error during stream status batch upsert: ${err.message}`,
-            code: "INTERNAL_SERVER_ERROR",
-          }),
-      );
+      let streamStatusResult: Result<
+        (typeof streamStatusTable.$inferSelect)[],
+        AppError
+      > = Ok([]);
+      if (dbStreamStatus.length > 0) {
+        streamStatusResult = await wrap(
+          this.db
+            .insert(streamStatusTable)
+            .values(dbStreamStatus)
+            .onConflictDoUpdate({
+              target: streamStatusTable.videoId,
+              set: buildConflictUpdateColumns(streamStatusTable, [
+                "status",
+                "startedAt",
+                "endedAt",
+                "viewCount",
+                "updatedAt",
+              ]),
+            })
+            .returning()
+            .execute(),
+          (err) =>
+            new AppError({
+              message: `Database error during stream status batch upsert: ${err.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+            }),
+        );
 
-      if (streamStatusResult.err) {
-        return Err(streamStatusResult.err);
+        if (streamStatusResult.err) {
+          return Err(streamStatusResult.err);
+        }
       }
 
-      const videoTranslationResult = await wrap(
-        this.db
-          .insert(videoTranslationTable)
-          .values(dbVideoTranslation)
-          .onConflictDoUpdate({
-            target: [
-              videoTranslationTable.videoId,
-              videoTranslationTable.languageCode,
-            ],
-            set: buildConflictUpdateColumns(videoTranslationTable, [
-              "title",
-              "description",
-              "updatedAt",
-            ]),
-          })
-          .returning()
-          .execute(),
-        (err) =>
-          new AppError({
-            message: `Database error during video transaction batch upsert: ${err.message}`,
-            code: "INTERNAL_SERVER_ERROR",
-          }),
-      );
+      let videoTranslationResult: Result<
+        (typeof videoTranslationTable.$inferSelect)[],
+        AppError
+      > = Ok([]);
+      if (dbVideoTranslation.length > 0) {
+        videoTranslationResult = await wrap(
+          this.db
+            .insert(videoTranslationTable)
+            .values(dbVideoTranslation)
+            .onConflictDoUpdate({
+              target: [
+                videoTranslationTable.videoId,
+                videoTranslationTable.languageCode,
+              ],
+              set: buildConflictUpdateColumns(videoTranslationTable, [
+                "title",
+                "description",
+                "updatedAt",
+              ]),
+            })
+            .returning()
+            .execute(),
+          (err) =>
+            new AppError({
+              message: `Database error during video transaction batch upsert: ${err.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+            }),
+        );
 
-      if (videoTranslationResult.err) {
-        return Err(videoTranslationResult.err);
+        if (videoTranslationResult.err) {
+          return Err(videoTranslationResult.err);
+        }
       }
 
       return Ok(
