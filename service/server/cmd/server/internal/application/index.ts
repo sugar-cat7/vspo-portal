@@ -1,5 +1,4 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { t } from "i18next";
 import { z } from "zod";
 import {
   type AppWorkerEnv,
@@ -14,7 +13,7 @@ import {
   VideosSchema,
   discordServers,
 } from "../../../../domain";
-import { initI18n } from "../../../../domain/service/i18n";
+import { t } from "../../../../domain/service/i18n";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { Container } from "../../../../infra/dependency";
 import { createHandler, withTracer } from "../../../../infra/http/trace";
@@ -631,8 +630,6 @@ export default createHandler({
           logger.info("Initial add channel", {
             channels: initialAddChannel,
           });
-
-          await initI18n({ language: "default" });
 
           await Promise.allSettled(
             initialAddChannel.map((ch) =>

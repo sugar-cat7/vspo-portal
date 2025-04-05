@@ -44,7 +44,7 @@
   },
   "embedMessage": {
     "streamingDate": "配信日時",
-    "poweredBySpodule": "{{platform}} スポジュール提供",
+    "poweredBySpodule": "{{platform}} すぽじゅーる提供",
     "spodule": "すぽじゅーる"
   }
 }

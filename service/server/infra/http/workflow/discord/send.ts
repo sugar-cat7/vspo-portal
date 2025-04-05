@@ -190,7 +190,7 @@ export const discordSendMessagesWorkflow = () => {
           );
         }
 
-        step.sleep("30 seconds", "30 seconds");
+        await step.sleep("30 seconds", "30 seconds");
 
         const results2 = await Promise.allSettled(
           discordChannelMap.map((group) =>
