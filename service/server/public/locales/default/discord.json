@@ -2,7 +2,7 @@
   "spoduleSettingCommand": {
     "label": "スケジュール設定 / Schedule settings",
     "botAddButton": "すぽじゅーるを追加する / Add the spodule Bot",
-    "botRemoveButton": "情報配信を停止する / Stop broadcasting information",
+    "botRemoveButton": "配信を停止する / Stop broadcasting information",
     "langSettingButton": "言語設定 / Language settings",
     "memberTypeSettingButton": "メンバータイプ設定 / Member type settings"
   },
