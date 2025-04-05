@@ -147,6 +147,12 @@ export const discordSendMessageAllChannelWorkflow = () => {
                       );
                       span.setAttribute("channel_id", channelId);
                       span.setAttribute("language", group.channelLangaugeCode);
+                      const randomSleepSeconds =
+                        Math.floor(Math.random() * 60) + 1; // Random value between 1-60
+                      await step.sleep(
+                        `${randomSleepSeconds} seconds`,
+                        `${randomSleepSeconds} seconds`,
+                      );
                       // Send message to the specified channel
                       await vu.sendAdminMessage({
                         channelId,

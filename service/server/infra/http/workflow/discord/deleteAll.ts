@@ -143,6 +143,12 @@ export const discordDeleteAllWorkflow = () => {
                       );
                       span.setAttribute("channel_id", channelId);
                       span.setAttribute("language", group.channelLangaugeCode);
+                      const randomSleepSeconds =
+                        Math.floor(Math.random() * 60) + 1; // Random value between 1-60
+                      await step.sleep(
+                        `${randomSleepSeconds} seconds`,
+                        `${randomSleepSeconds} seconds`,
+                      );
                       // Delete all messages in the specified channel
                       await vu.deleteAllMessagesInChannel(channelId);
                       logger.info(
