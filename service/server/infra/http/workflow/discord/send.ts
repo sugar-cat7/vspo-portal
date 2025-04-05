@@ -140,27 +140,10 @@ export const discordSendMessagesWorkflow = () => {
           })),
         });
 
-        // Function to split channels into batches of 50
-        const splitIntoBatches = (channelIds: string[], batchSize = 50) => {
-          const batches: string[][] = [];
-          for (let i = 0; i < channelIds.length; i += batchSize) {
-            batches.push(channelIds.slice(i, i + batchSize));
-          }
-          return batches;
-        };
-
-        // Process each language group
-        for (const group of discordChannelMap) {
-          const batches = splitIntoBatches(group.channelIds);
-          logger.info(
-            `Split ${group.channelIds.length} channels into ${batches.length} batches for language: ${group.channelLangaugeCode}`,
-          );
-
-          // First attempt - process each batch with 1-second delay between batches
-          for (let i = 0; i < batches.length; i++) {
-            const batch = batches[i];
-            await step.do(
-              `send videos to channels for ${group.channelLangaugeCode} (batch ${i + 1}/${batches.length})`,
+        const results = await Promise.allSettled(
+          discordChannelMap.map((group) =>
+            step.do(
+              `send videos to channels for ${group.channelLangaugeCode}`,
               {
                 retries: { limit: 3, delay: "5 second", backoff: "linear" },
                 timeout: "1 minutes",
@@ -168,55 +151,51 @@ export const discordSendMessagesWorkflow = () => {
               async () => {
                 return withTracer(
                   "discord-workflow",
-                  `send-videos-language-${group.channelLangaugeCode}-batch-${i + 1}`,
+                  `send-videos-language-${group.channelLangaugeCode}`,
                   async (span) => {
                     const vu = await env.APP_WORKER.newDiscordUsecase();
                     logger.info(
-                      `Sending videos to ${batch.length} channels with language: ${group.channelLangaugeCode} (batch ${i + 1}/${batches.length})`,
+                      `Sending videos to ${group.channelIds.length} channels with language: ${group.channelLangaugeCode}`,
                       {
-                        channelCount: batch.length,
+                        channelCount: group.channelIds.length,
                         language: group.channelLangaugeCode,
-                        batchNumber: i + 1,
-                        totalBatches: batches.length,
                       },
                     );
                     span.setAttribute("language", group.channelLangaugeCode);
-                    span.setAttribute("channels_count", batch.length);
-                    span.setAttribute("batch_number", i + 1);
-                    span.setAttribute("total_batches", batches.length);
-
+                    span.setAttribute(
+                      "channels_count",
+                      group.channelIds.length,
+                    );
                     await vu.sendVideosToMultipleChannels({
-                      channelIds: batch,
+                      channelIds: group.channelIds,
                       channelLangaugeCode: group.channelLangaugeCode,
                       channelMemberType: group.channelMemberType,
                     });
-
                     logger.info(
-                      `Successfully sent videos to channels with language: ${group.channelLangaugeCode} (batch ${i + 1}/${batches.length})`,
+                      `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
                     );
                   },
                 );
               },
-            );
+            ),
+          ),
+        );
 
-            // Add 1-second sleep between batches (except after the last batch)
-            if (i < batches.length - 1) {
-              await step.sleep("1 second", "1 second");
-            }
-          }
+        const failedSteps = results.filter(
+          (result) => result.status === "rejected",
+        );
+        if (failedSteps.length > 0) {
+          logger.error(
+            `${failedSteps.length} step(s) failed. Check logs for details.`,
+          );
         }
 
-        // Wait 30 seconds before the second attempt
         await step.sleep("30 seconds", "30 seconds");
 
-        // Second attempt - process each batch with 1-second delay between batches
-        for (const group of discordChannelMap) {
-          const batches = splitIntoBatches(group.channelIds);
-
-          for (let i = 0; i < batches.length; i++) {
-            const batch = batches[i];
-            await step.do(
-              `send videos to channels for ${group.channelLangaugeCode} 2 (batch ${i + 1}/${batches.length})`,
+        const results2 = await Promise.allSettled(
+          discordChannelMap.map((group) =>
+            step.do(
+              `send videos to channels for ${group.channelLangaugeCode} 2`,
               {
                 retries: { limit: 3, delay: "5 second", backoff: "linear" },
                 timeout: "1 minutes",
@@ -224,42 +203,43 @@ export const discordSendMessagesWorkflow = () => {
               async () => {
                 return withTracer(
                   "discord-workflow",
-                  `send-videos-language-${group.channelLangaugeCode}-2-batch-${i + 1}`,
+                  `send-videos-language-${group.channelLangaugeCode}-2`,
                   async (span) => {
                     const vu = await env.APP_WORKER.newDiscordUsecase();
                     logger.info(
-                      `Sending videos to ${batch.length} channels with language: ${group.channelLangaugeCode} (batch ${i + 1}/${batches.length})`,
+                      `Sending videos to ${group.channelIds.length} channels with language: ${group.channelLangaugeCode}`,
                       {
-                        channelCount: batch.length,
+                        channelCount: group.channelIds.length,
                         language: group.channelLangaugeCode,
-                        batchNumber: i + 1,
-                        totalBatches: batches.length,
                       },
                     );
                     span.setAttribute("language", group.channelLangaugeCode);
-                    span.setAttribute("channels_count", batch.length);
-                    span.setAttribute("batch_number", i + 1);
-                    span.setAttribute("total_batches", batches.length);
-
+                    span.setAttribute(
+                      "channels_count",
+                      group.channelIds.length,
+                    );
                     await vu.sendVideosToMultipleChannels({
-                      channelIds: batch,
+                      channelIds: group.channelIds,
                       channelLangaugeCode: group.channelLangaugeCode,
                       channelMemberType: group.channelMemberType,
                     });
-
                     logger.info(
-                      `Successfully sent videos to channels with language: ${group.channelLangaugeCode} (batch ${i + 1}/${batches.length})`,
+                      `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
                     );
                   },
                 );
               },
-            );
+            ),
+          ),
+        );
 
-            // Add 1-second sleep between batches (except after the last batch)
-            if (i < batches.length - 1) {
-              await step.sleep("1 second", "1 second");
-            }
-          }
+        const failedSteps2 = results2.filter(
+          (result) => result.status === "rejected",
+        );
+        if (failedSteps2.length > 0) {
+          logger.error(
+            `${failedSteps.length} step(s) failed. Check logs for details.`,
+          );
         }
       },
   };
