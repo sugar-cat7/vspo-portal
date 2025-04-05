@@ -1,9 +1,9 @@
 import type { DiscordEmbed } from "@discordeno/types";
 import { EmbedsBuilder } from "@discordeno/utils";
-import { t } from "i18next";
 import { z } from "zod";
 import { getCurrentUTCString } from "../pkg/dayjs";
 import { MemberTypeSchema } from "./creator";
+import { t } from "./service/i18n";
 import { StatusSchema, type Video } from "./video";
 
 export const discordChannel = z
@@ -131,15 +131,24 @@ export function createVideoEmbed(video: Video): DiscordEmbed {
     .newEmbed()
     .setTitle(video.title, video.link)
     .setColor(video.statusColor)
-    .addField(t("embedMessage.streamingDate"), video.formattedStartedAt, true)
+    .addField(
+      t("embedMessage.streamingDate", {
+        languageCode: video.languageCode,
+      }),
+      video.formattedStartedAt,
+      true,
+    )
     .setImage(video.thumbnailURL)
     .setAuthor(video.creatorName || "Unknown", {
       icon_url: video.creatorThumbnailURL || "",
     })
     .setFooter(
       t("embedMessage.poweredBySpodule", {
-        platform:
-          video.platform.charAt(0).toUpperCase() + video.platform.slice(1),
+        translationOptions: {
+          platform:
+            video.platform.charAt(0).toUpperCase() + video.platform.slice(1),
+        },
+        languageCode: video.languageCode,
       }),
       {
         icon_url: video.platformIconURL,
