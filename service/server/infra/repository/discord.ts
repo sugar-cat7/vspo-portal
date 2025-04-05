@@ -57,7 +57,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         this.db
           .select()
           .from(discordServerTable)
-          .innerJoin(
+          .leftJoin(
             discordChannelTable,
             eq(discordServerTable.serverId, discordChannelTable.serverId),
           )
@@ -84,7 +84,9 @@ export class DiscordServerRepository implements IDiscordServerRepository {
       for (const row of discordServerResult.val) {
         const serverId = row.discord_server.serverId;
         const channels = discordServersHasChannelIdsMap.get(serverId) ?? [];
-        channels.push(row.discord_channel);
+        if (row.discord_channel) {
+          channels.push(row.discord_channel);
+        }
         discordServersHasChannelIdsMap.set(serverId, channels);
       }
 
