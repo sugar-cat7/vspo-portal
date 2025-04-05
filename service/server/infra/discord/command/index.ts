@@ -6,11 +6,14 @@ import {
   Components,
   Select,
 } from "discord-hono";
-import { t } from "i18next";
 import type { ApplicationService } from "../../../cmd/server/internal/application";
 import type { DiscordServer } from "../../../domain";
+import {
+  type SupportedLanguage,
+  runWithLanguage,
+  t,
+} from "../../../domain/service/i18n";
 import { LangCodeLabelMapping } from "../../../domain/translate";
-import { initI18n } from "../../../infra/discord/command/i18n";
 import { AppLogger } from "../../../pkg/logging";
 import { CloudflareKVCacheClient, cacheKey } from "../../cache";
 
@@ -60,7 +63,6 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
         c.interaction.channel.id,
       );
       if (channelExistsResult.err || !channelExistsResult.val) {
-        await initI18n({ language: "default" });
         return c.res({
           content: t("spoduleSettingCommand.label"),
           components: new Components().row(
@@ -111,46 +113,48 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
       }
 
       AppLogger.info("Language", { language });
-      await initI18n({ language: language });
 
-      const featureClient = OpenFeature.getClient();
-      const translationEnabled = await featureClient.getBooleanValue(
-        "discord-translation-setting",
-        false,
-      );
+      // Use runWithLanguage to execute the rest of the handler with the channel's language
+      return runWithLanguage(language as SupportedLanguage, async () => {
+        const featureClient = OpenFeature.getClient();
+        const translationEnabled = await featureClient.getBooleanValue(
+          "discord-translation-setting",
+          false,
+        );
 
-      const components = new Components();
-      const buttons: Button<"Success" | "Danger" | "Primary">[] = [];
+        const components = new Components();
+        const buttons: Button<"Success" | "Danger" | "Primary">[] = [];
 
-      if (translationEnabled) {
+        if (translationEnabled) {
+          buttons.push(
+            new Button(
+              langSettingComponent.name,
+              t("spoduleSettingCommand.langSettingButton"),
+              "Primary",
+            ),
+          );
+        }
+
         buttons.push(
           new Button(
-            langSettingComponent.name,
-            t("spoduleSettingCommand.langSettingButton"),
+            memberTypeSettingComponent.name,
+            t("spoduleSettingCommand.memberTypeSettingButton"),
             "Primary",
           ),
         );
-      }
 
-      buttons.push(
-        new Button(
-          memberTypeSettingComponent.name,
-          t("spoduleSettingCommand.memberTypeSettingButton"),
-          "Primary",
-        ),
-      );
+        buttons.push(
+          new Button(
+            botRemoveComponent.name,
+            t("spoduleSettingCommand.botRemoveButton"),
+            "Danger",
+          ),
+        );
 
-      buttons.push(
-        new Button(
-          botRemoveComponent.name,
-          t("spoduleSettingCommand.botRemoveButton"),
-          "Danger",
-        ),
-      );
-
-      return c.res({
-        content: t("spoduleSettingCommand.label"),
-        components: components.row(...buttons),
+        return c.res({
+          content: t("spoduleSettingCommand.label"),
+          components: components.row(...buttons),
+        });
       });
     },
   };
@@ -236,7 +240,9 @@ export const yesBotRemoveComponent: IDiscordComponentDefinition<DiscordCommandEn
       } else {
         response = {
           content: t("yesBotRemoveComponent.success", {
-            channelName: c.interaction.channel.name ?? "",
+            translationOptions: {
+              channelName: c.interaction.channel.name ?? "",
+            },
           }),
           components: [],
         };
@@ -320,7 +326,9 @@ export const langSelectComponent: IDiscordComponentDefinition<DiscordCommandEnv>
         );
         return c.resUpdate({
           content: t("langSelectComponent.success", {
-            langName: LangCodeLabelMapping[selectedValue],
+            translationOptions: {
+              langName: LangCodeLabelMapping[selectedValue],
+            },
           }),
           components: [],
         });
@@ -393,7 +401,9 @@ export const memberTypeSelectComponent: IDiscordComponentDefinition<DiscordComma
         );
         return c.resUpdate({
           content: t("memberTypeSettingComponent.selectSuccess", {
-            type: MemberTypeLabelMapping[selectedValue],
+            translationOptions: {
+              type: MemberTypeLabelMapping[selectedValue],
+            },
           }),
           components: [],
         });

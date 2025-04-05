@@ -21,8 +21,8 @@ import {
   createVideoEmbed,
   discordServer,
 } from "../discord";
+import { runWithLanguage } from "../service/i18n";
 import type { Video } from "../video";
-import { initI18n } from "./i18n";
 
 // Parameters for sending messages to multiple channels
 type ChannelMessageParams = {
@@ -89,7 +89,6 @@ export class DiscordService implements IDiscordService {
   async sendMessagesToChannel(
     options: ChannelMessageParams,
   ): Promise<Result<void, AppError>> {
-    await initI18n({ language: "default" });
     AppLogger.info("Sending messages to channels", {
       service: this.SERVICE_NAME,
       channelCount: options.channelIds.length,
@@ -104,37 +103,9 @@ export class DiscordService implements IDiscordService {
       });
     }
 
-    const liveVideoListResult = await this.dependencies.videoRepository.list({
-      limit: 1000,
-      page: 0,
-      languageCode: options.channelLangaugeCode,
-      videoType: "vspo_stream",
-      startedAt: convertToUTCDate(
-        getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
-      ),
-      memberType: options.channelMemberType,
-      status: "live",
-      orderBy: "desc",
-    });
-    if (liveVideoListResult.err) {
-      AppLogger.error("Failed to fetch video list", {
-        service: this.SERVICE_NAME,
-        error: liveVideoListResult.err,
-      });
-      return Err(liveVideoListResult.err);
-    }
-
-    const liveVideos = liveVideoListResult.val;
-
-    liveVideos.sort((a, b) => {
-      return (
-        new Date(a.startedAt || "").getTime() -
-        new Date(b.startedAt || "").getTime()
-      );
-    });
-
-    const upcomingVideoListResult =
-      await this.dependencies.videoRepository.list({
+    // Use runWithLanguage to set the language context for the entire operation
+    return runWithLanguage(options.channelLangaugeCode, async () => {
+      const liveVideoListResult = await this.dependencies.videoRepository.list({
         limit: 1000,
         page: 0,
         languageCode: options.channelLangaugeCode,
@@ -143,171 +114,205 @@ export class DiscordService implements IDiscordService {
           getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
         ),
         memberType: options.channelMemberType,
-        status: "upcoming",
+        status: "live",
         orderBy: "desc",
       });
-    if (upcomingVideoListResult.err) {
-      AppLogger.error("Failed to fetch video list", {
-        service: this.SERVICE_NAME,
-        error: upcomingVideoListResult.err,
-      });
-      return Err(upcomingVideoListResult.err);
-    }
-    const upcomingVideos = upcomingVideoListResult.val;
-
-    // Sort upcoming videos by broadcast start time in ascending order
-    upcomingVideos.sort((a, b) => {
-      return (
-        new Date(a.startedAt || "").getTime() -
-        new Date(b.startedAt || "").getTime()
-      );
-    });
-
-    const promises = options.channelIds.map(async (channelId) => {
-      const latestMessagesResult =
-        await this.dependencies.discordClient.getLatestBotMessages(channelId);
-      if (latestMessagesResult.err) {
-        AppLogger.error("Failed to fetch latest bot messages", {
+      if (liveVideoListResult.err) {
+        AppLogger.error("Failed to fetch video list", {
           service: this.SERVICE_NAME,
-          channelId,
-          error: latestMessagesResult.err,
+          error: liveVideoListResult.err,
         });
-        return latestMessagesResult;
+        return Err(liveVideoListResult.err);
       }
 
-      const messagePromises: Promise<Result<string, AppError>>[] = [];
+      const liveVideos = liveVideoListResult.val;
 
-      // Find existing upcoming message (there should be at most one)
-      const upcomingMessage = latestMessagesResult.val.find((msg) =>
-        msg.embedVideos.some((video) => video.status === "upcoming"),
-      );
-
-      // Find all live messages
-      const liveMessages = latestMessagesResult.val.filter((msg) =>
-        msg.embedVideos.some((video) => video.status === "live"),
-      );
-
-      // Process upcoming message
-      if (upcomingMessage) {
-        const upcomingVideosInMessage = upcomingMessage.embedVideos;
-
-        // Check if there is a difference between the embedded upcoming videos and the latest upcoming videos
-        const hasDiff =
-          upcomingVideos.some((v) => {
-            return !upcomingVideosInMessage.some(
-              (v2) => v2.identifier === v.link,
-            );
-          }) ||
-          upcomingVideosInMessage.some((v) => {
-            return !upcomingVideos.some((v2) => v2.link === v.identifier);
-          });
-
-        if (hasDiff) {
-          messagePromises.push(
-            this.dependencies.discordClient.updateMessage({
-              channelId,
-              messageId: upcomingMessage.rawId,
-              embeds: upcomingVideos.map((video) => createVideoEmbed(video)),
-            }),
-          );
-        }
-      } else {
-        if (upcomingVideos.length > 0) {
-          messagePromises.push(
-            this.dependencies.discordClient.sendMessage({
-              channelId,
-              content: "",
-              embeds: upcomingVideos.map((video) => createVideoEmbed(video)),
-            }),
-          );
-        }
-      }
-
-      for (const liveVideo of liveVideos) {
-        const liveMessage = liveMessages.find(
-          (msg) => msg.embedVideos[0].identifier === liveVideo.link,
+      liveVideos.sort((a, b) => {
+        return (
+          new Date(a.startedAt || "").getTime() -
+          new Date(b.startedAt || "").getTime()
         );
-        const lm = liveMessage?.embedVideos[0];
+      });
 
-        if (lm && this.shouldUpdateEmbed(lm, liveVideo)) {
-          messagePromises.push(
-            this.dependencies.discordClient.updateMessage({
-              channelId,
-              messageId: liveMessage.rawId,
-              embeds: [createVideoEmbed(liveVideo)],
-            }),
-          );
-        }
-
-        if (!liveMessage) {
-          messagePromises.push(
-            this.dependencies.discordClient.sendMessage({
-              channelId,
-              content: "",
-              embeds: [createVideoEmbed(liveVideo)],
-            }),
-          );
-        }
+      const upcomingVideoListResult =
+        await this.dependencies.videoRepository.list({
+          limit: 1000,
+          page: 0,
+          languageCode: options.channelLangaugeCode,
+          videoType: "vspo_stream",
+          startedAt: convertToUTCDate(
+            getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
+          ),
+          memberType: options.channelMemberType,
+          status: "upcoming",
+          orderBy: "desc",
+        });
+      if (upcomingVideoListResult.err) {
+        AppLogger.error("Failed to fetch video list", {
+          service: this.SERVICE_NAME,
+          error: upcomingVideoListResult.err,
+        });
+        return Err(upcomingVideoListResult.err);
       }
+      const upcomingVideos = upcomingVideoListResult.val;
 
-      // Messages to be deleted
-      const deletedMessages = liveMessages.filter(
-        (msg) =>
-          !liveVideos.some((v) => v.link === msg.embedVideos[0].identifier),
-      );
-      for (const msg of deletedMessages) {
-        messagePromises.push(
-          this.dependencies.discordClient.deleteMessage({
+      // Sort upcoming videos by broadcast start time in ascending order
+      upcomingVideos.sort((a, b) => {
+        return (
+          new Date(a.startedAt || "").getTime() -
+          new Date(b.startedAt || "").getTime()
+        );
+      });
+
+      const promises = options.channelIds.map(async (channelId) => {
+        const latestMessagesResult =
+          await this.dependencies.discordClient.getLatestBotMessages(channelId);
+        if (latestMessagesResult.err) {
+          AppLogger.error("Failed to fetch latest bot messages", {
+            service: this.SERVICE_NAME,
             channelId,
-            messageId: msg.rawId,
-          }),
-        );
-      }
+            error: latestMessagesResult.err,
+          });
+          return latestMessagesResult;
+        }
 
-      if (upcomingVideos.length === 0) {
-        const deletedMessageId = upcomingMessage?.rawId;
-        if (deletedMessageId) {
+        const messagePromises: Promise<Result<string, AppError>>[] = [];
+
+        // Find existing upcoming message (there should be at most one)
+        const upcomingMessage = latestMessagesResult.val.find((msg) =>
+          msg.embedVideos.some((video) => video.status === "upcoming"),
+        );
+
+        // Find all live messages
+        const liveMessages = latestMessagesResult.val.filter((msg) =>
+          msg.embedVideos.some((video) => video.status === "live"),
+        );
+
+        // Process upcoming message
+        if (upcomingMessage) {
+          const upcomingVideosInMessage = upcomingMessage.embedVideos;
+
+          // Check if there is a difference between the embedded upcoming videos and the latest upcoming videos
+          const hasDiff =
+            upcomingVideos.some((v) => {
+              return !upcomingVideosInMessage.some(
+                (v2) => v2.identifier === v.link,
+              );
+            }) ||
+            upcomingVideosInMessage.some((v) => {
+              return !upcomingVideos.some((v2) => v2.link === v.identifier);
+            });
+
+          if (hasDiff) {
+            messagePromises.push(
+              this.dependencies.discordClient.updateMessage({
+                channelId,
+                messageId: upcomingMessage.rawId,
+                embeds: upcomingVideos.map((video) => createVideoEmbed(video)),
+              }),
+            );
+          }
+        } else {
+          if (upcomingVideos.length > 0) {
+            messagePromises.push(
+              this.dependencies.discordClient.sendMessage({
+                channelId,
+                content: "",
+                embeds: upcomingVideos.map((video) => createVideoEmbed(video)),
+              }),
+            );
+          }
+        }
+
+        for (const liveVideo of liveVideos) {
+          const liveMessage = liveMessages.find(
+            (msg) => msg.embedVideos[0].identifier === liveVideo.link,
+          );
+          const lm = liveMessage?.embedVideos[0];
+
+          if (lm && this.shouldUpdateEmbed(lm, liveVideo)) {
+            messagePromises.push(
+              this.dependencies.discordClient.updateMessage({
+                channelId,
+                messageId: liveMessage.rawId,
+                embeds: [createVideoEmbed(liveVideo)],
+              }),
+            );
+          }
+
+          if (!liveMessage) {
+            messagePromises.push(
+              this.dependencies.discordClient.sendMessage({
+                channelId,
+                content: "",
+                embeds: [createVideoEmbed(liveVideo)],
+              }),
+            );
+          }
+        }
+
+        // Messages to be deleted
+        const deletedMessages = liveMessages.filter(
+          (msg) =>
+            !liveVideos.some((v) => v.link === msg.embedVideos[0].identifier),
+        );
+        for (const msg of deletedMessages) {
           messagePromises.push(
             this.dependencies.discordClient.deleteMessage({
               channelId,
-              messageId: deletedMessageId,
+              messageId: msg.rawId,
             }),
           );
         }
-      }
 
-      const results = await Promise.allSettled(messagePromises);
-      const failedResults = results.filter(
-        (r): r is PromiseRejectedResult => r.status === "rejected",
-      );
+        if (upcomingVideos.length === 0) {
+          const deletedMessageId = upcomingMessage?.rawId;
+          if (deletedMessageId) {
+            messagePromises.push(
+              this.dependencies.discordClient.deleteMessage({
+                channelId,
+                messageId: deletedMessageId,
+              }),
+            );
+          }
+        }
 
-      if (failedResults.length > 0) {
-        AppLogger.warn("Some message operations failed", {
-          service: this.SERVICE_NAME,
-          channelId,
-          failedCount: failedResults.length,
-          errors: failedResults.map((r) => r.reason),
+        const results = await Promise.allSettled(messagePromises);
+        const failedResults = results.filter(
+          (r): r is PromiseRejectedResult => r.status === "rejected",
+        );
+
+        if (failedResults.length > 0) {
+          AppLogger.warn("Some message operations failed", {
+            service: this.SERVICE_NAME,
+            channelId,
+            failedCount: failedResults.length,
+            errors: failedResults.map((r) => r.reason),
+          });
+        }
+
+        return Ok();
+      });
+
+      const p = await Promise.allSettled(promises);
+      if (span) {
+        const error = p.filter((r) => r.status === "rejected");
+        span.setAttributes({
+          "error.count": error.length,
+          "error.messages": error.map((e) => e.reason).join(", "),
         });
       }
 
+      AppLogger.info("Successfully sent messages to all channels", {
+        service: this.SERVICE_NAME,
+        successCount: p.filter((r) => r.status === "fulfilled").length,
+        failureCount: p.filter((r) => r.status === "rejected").length,
+        failedMessages: p
+          .filter((r) => r.status === "rejected")
+          .map((r) => r.reason),
+      });
       return Ok();
     });
-
-    const p = await Promise.allSettled(promises);
-    if (span) {
-      const error = p.filter((r) => r.status === "rejected");
-      span.setAttributes({
-        "error.count": error.length,
-        "error.messages": error.map((e) => e.reason).join(", "),
-      });
-    }
-
-    AppLogger.info("Successfully sent messages to all channels", {
-      service: this.SERVICE_NAME,
-      successCount: p.filter((r) => r.status === "fulfilled").length,
-      failureCount: p.filter((r) => r.status === "rejected").length,
-    });
-    return Ok();
   }
 
   /**
