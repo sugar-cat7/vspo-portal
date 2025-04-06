@@ -162,7 +162,7 @@ export default createHandler({
           await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
           await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
           break;
-        case "*/1 * * * *":
+        case "*/2 * * * *":
           span.setAttribute("workflow", "discord-send-messages");
           await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
           break;
