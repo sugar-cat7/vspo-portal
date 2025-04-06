@@ -82,6 +82,38 @@ export class DiscordService implements IDiscordService {
       cacheClient: ICacheClient;
     },
   ) {}
+
+  /**
+   * Process promises in batches with a delay between batches
+   * @private
+   */
+  private async processBatchedPromises<T>(
+    promises: Promise<T>[],
+    batchSize = 50,
+    delayMs = 1500,
+  ): Promise<PromiseSettledResult<T>[]> {
+    const allResults: PromiseSettledResult<T>[] = [];
+
+    // Process a single batch
+    const processBatch = async (batch: Promise<T>[]) => {
+      const batchResults = await Promise.allSettled(batch);
+      allResults.push(...batchResults);
+
+      // Add delay between batches if there are more batches to process
+      if (batch.length === batchSize) {
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+      }
+    };
+
+    // Process all batches
+    for (let i = 0; i < promises.length; i += batchSize) {
+      const batch = promises.slice(i, i + batchSize);
+      await processBatch(batch);
+    }
+
+    return allResults;
+  }
+
   /**
    * Send messages to multiple channels.
    * This includes upcoming video messages and live diff messages.
@@ -277,8 +309,10 @@ export class DiscordService implements IDiscordService {
           }
         }
 
-        const results = await Promise.allSettled(messagePromises);
-        const failedResults = results.filter(
+        const processedResults =
+          await this.processBatchedPromises(messagePromises);
+
+        const failedResults = processedResults.filter(
           (r): r is PromiseRejectedResult => r.status === "rejected",
         );
 
@@ -294,22 +328,25 @@ export class DiscordService implements IDiscordService {
         return Ok();
       });
 
-      const p = await Promise.allSettled(promises);
-      if (span) {
-        const error = p.filter((r) => r.status === "rejected");
-        span.setAttributes({
-          "error.count": error.length,
-          "error.messages": error.map((e) => e.reason).join(", "),
+      const results = await this.processBatchedPromises(promises);
+
+      const failedResults = results.filter(
+        (r): r is PromiseRejectedResult => r.status === "rejected",
+      );
+
+      if (failedResults.length > 0) {
+        AppLogger.warn("Some message operations failed", {
+          service: this.SERVICE_NAME,
+          channelCount: options.channelIds.length,
+          failedCount: failedResults.length,
+          errors: failedResults.map((r) => r.reason),
         });
       }
 
       AppLogger.info("Successfully sent messages to all channels", {
         service: this.SERVICE_NAME,
-        successCount: p.filter((r) => r.status === "fulfilled").length,
-        failureCount: p.filter((r) => r.status === "rejected").length,
-        failedMessages: p
-          .filter((r) => r.status === "rejected")
-          .map((r) => r.reason),
+        successCount: results.filter((r) => r.status === "fulfilled").length,
+        failureCount: failedResults.length,
       });
       return Ok();
     });
@@ -511,8 +548,9 @@ export class DiscordService implements IDiscordService {
         }),
       );
 
-    const results = await Promise.allSettled(deletePromises);
-    const failedResults = results.filter(
+    const p = await this.processBatchedPromises(deletePromises);
+
+    const failedResults = p.filter(
       (r): r is PromiseRejectedResult => r.status === "rejected",
     );
 
@@ -528,7 +566,7 @@ export class DiscordService implements IDiscordService {
     AppLogger.info("Successfully deleted messages", {
       service: this.SERVICE_NAME,
       channelId,
-      successCount: results.filter((r) => r.status === "fulfilled").length,
+      successCount: p.filter((r) => r.status === "fulfilled").length,
       failureCount: failedResults.length,
     });
     return Ok();
