@@ -325,7 +325,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         this.db
           .select()
           .from(discordServerTable)
-          .innerJoin(
+          .leftJoin(
             discordChannelTable,
             eq(discordServerTable.serverId, discordChannelTable.serverId),
           )
@@ -351,20 +351,25 @@ export class DiscordServerRepository implements IDiscordServerRepository {
           }),
         );
       }
-      const dc = discordServerResult.val?.map((c) => ({
-        id: c.discord_channel.id,
-        rawId: c.discord_channel.channelId,
-        serverId: c.discord_channel.serverId,
-        name: c.discord_channel.name,
-        languageCode: c.discord_channel.languageCode,
-        memberType: c.discord_channel.memberType,
-        createdAt: convertToUTC(c.discord_channel.createdAt),
-        updatedAt: convertToUTC(c.discord_channel.updatedAt),
+
+      const dc = discordServerResult.val
+        ?.map((c) => c.discord_channel)
+        .filter((c) => c !== null);
+
+      const dcc = dc.map((c) => ({
+        id: c.id,
+        rawId: c.channelId,
+        serverId: c.serverId,
+        name: c.name,
+        languageCode: c.languageCode,
+        memberType: c.memberType,
+        createdAt: convertToUTC(c.createdAt),
+        updatedAt: convertToUTC(c.updatedAt),
       }));
       return Ok({
         id: discordServer.discord_server.id,
         rawId: discordServer.discord_server.serverId,
-        discordChannels: discordChannels.parse(dc),
+        discordChannels: discordChannels.parse(dcc),
         name: discordServer.discord_server.name,
         languageCode: discordServer.discord_server.languageCode,
         createdAt: convertToUTC(discordServer.discord_server.createdAt),
