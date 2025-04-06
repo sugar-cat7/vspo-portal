@@ -180,8 +180,8 @@ export const discordSendMessagesWorkflow = () => {
               step.do(
                 `send videos to channels for ${group.channelLangaugeCode} (chunk ${i + 1}/${chunkedChannelIds.length})`,
                 {
-                  retries: { limit: 3, delay: "5 second", backoff: "linear" },
-                  timeout: "1 minutes",
+                  retries: { limit: 1, delay: "5 second", backoff: "linear" },
+                  timeout: "2 minutes",
                 },
                 async () => {
                   return withTracer(
