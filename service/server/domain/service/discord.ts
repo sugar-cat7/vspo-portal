@@ -90,7 +90,7 @@ export class DiscordService implements IDiscordService {
   private async processBatchedPromises<T>(
     promises: Promise<T>[],
     batchSize = 50,
-    delayMs = 1000,
+    delayMs = 1500,
   ): Promise<PromiseSettledResult<T>[]> {
     const allResults: PromiseSettledResult<T>[] = [];
 
