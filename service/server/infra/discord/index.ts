@@ -209,7 +209,7 @@ export class DiscordClient implements IDiscordClient {
           id: createUUID(),
           rawId: channel.id,
           serverId,
-          name: channel.name,
+          name: channel.name ?? "unknown",
         }),
       );
     });

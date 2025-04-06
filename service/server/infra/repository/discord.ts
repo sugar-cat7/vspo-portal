@@ -225,7 +225,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             id: c.id || createUUID(),
             channelId: c.rawId,
             serverId: server.rawId,
-            name: c.name,
+            name: c.name || "",
             languageCode: c.languageCode,
             memberType: c.memberType,
             createdAt: convertToUTCDate(c.createdAt ?? getCurrentUTCDate()),
