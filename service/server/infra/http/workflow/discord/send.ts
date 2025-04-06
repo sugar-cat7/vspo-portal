@@ -27,6 +27,15 @@ type GroupedChannels = {
   };
 };
 
+// Function to chunk an array into smaller pieces
+const chunkArray = <T>(array: T[], chunkSize: number): T[][] => {
+  const chunks: T[][] = [];
+  for (let i = 0; i < array.length; i += chunkSize) {
+    chunks.push(array.slice(i, i + chunkSize));
+  }
+  return chunks;
+};
+
 export const discordSendMessagesWorkflow = () => {
   return {
     handler:
@@ -140,106 +149,200 @@ export const discordSendMessagesWorkflow = () => {
           })),
         });
 
-        const results = await Promise.allSettled(
-          discordChannelMap.map((group) =>
-            step.do(
-              `send videos to channels for ${group.channelLangaugeCode}`,
-              {
-                retries: { limit: 3, delay: "5 second", backoff: "linear" },
-                timeout: "1 minutes",
-              },
-              async () => {
-                return withTracer(
-                  "discord-workflow",
-                  `send-videos-language-${group.channelLangaugeCode}`,
-                  async (span) => {
-                    const vu = await env.APP_WORKER.newDiscordUsecase();
-                    logger.info(
-                      `Sending videos to ${group.channelIds.length} channels with language: ${group.channelLangaugeCode}`,
-                      {
-                        channelCount: group.channelIds.length,
-                        language: group.channelLangaugeCode,
-                      },
-                    );
-                    span.setAttribute("language", group.channelLangaugeCode);
-                    span.setAttribute(
-                      "channels_count",
-                      group.channelIds.length,
-                    );
-                    await vu.sendVideosToMultipleChannels({
-                      channelIds: group.channelIds,
-                      channelLangaugeCode: group.channelLangaugeCode,
-                      channelMemberType: group.channelMemberType,
-                    });
-                    logger.info(
-                      `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        );
+        // Process the first batch for each language group
+        for (const group of discordChannelMap) {
+          // Split channelIds into chunks of maximum 100
+          const chunkedChannelIds = chunkArray(group.channelIds, 100);
 
-        const failedSteps = results.filter(
-          (result) => result.status === "rejected",
-        );
-        if (failedSteps.length > 0) {
-          logger.error(
-            `${failedSteps.length} step(s) failed. Check logs for details.`,
+          logger.info(
+            `Processing ${chunkedChannelIds.length} chunks for language: ${group.channelLangaugeCode}`,
+            {
+              totalChannels: group.channelIds.length,
+              numberOfChunks: chunkedChannelIds.length,
+              chunkSize: Math.min(100, group.channelIds.length),
+            },
           );
+
+          // Process each chunk
+          for (let i = 0; i < chunkedChannelIds.length; i++) {
+            const channelIdsChunk = chunkedChannelIds[i];
+
+            logger.info(
+              `Processing chunk ${i + 1}/${chunkedChannelIds.length} for language: ${group.channelLangaugeCode}`,
+              {
+                chunkSize: channelIdsChunk.length,
+                language: group.channelLangaugeCode,
+              },
+            );
+
+            // Process this chunk
+            const results = await Promise.allSettled([
+              step.do(
+                `send videos to channels for ${group.channelLangaugeCode} (chunk ${i + 1}/${chunkedChannelIds.length})`,
+                {
+                  retries: { limit: 3, delay: "5 second", backoff: "linear" },
+                  timeout: "1 minutes",
+                },
+                async () => {
+                  return withTracer(
+                    "discord-workflow",
+                    `send-videos-language-${group.channelLangaugeCode}-chunk-${i + 1}`,
+                    async (span) => {
+                      const vu = await env.APP_WORKER.newDiscordUsecase();
+                      logger.info(
+                        `Sending videos to ${channelIdsChunk.length} channels with language: ${group.channelLangaugeCode}`,
+                        {
+                          channelCount: channelIdsChunk.length,
+                          language: group.channelLangaugeCode,
+                          chunkIndex: i + 1,
+                          totalChunks: chunkedChannelIds.length,
+                        },
+                      );
+                      span.setAttribute("language", group.channelLangaugeCode);
+                      span.setAttribute(
+                        "channels_count",
+                        channelIdsChunk.length,
+                      );
+                      span.setAttribute("chunk_index", i + 1);
+                      span.setAttribute(
+                        "total_chunks",
+                        chunkedChannelIds.length,
+                      );
+
+                      await vu.sendVideosToMultipleChannels({
+                        channelIds: channelIdsChunk,
+                        channelLangaugeCode: group.channelLangaugeCode,
+                        channelMemberType: group.channelMemberType,
+                      });
+
+                      logger.info(
+                        `Successfully sent videos to chunk ${i + 1}/${chunkedChannelIds.length} with language: ${group.channelLangaugeCode}`,
+                      );
+                    },
+                  );
+                },
+              ),
+            ]);
+
+            const failedSteps = results.filter(
+              (result) => result.status === "rejected",
+            );
+
+            if (failedSteps.length > 0) {
+              logger.error(
+                `${failedSteps.length} step(s) failed for chunk ${i + 1}/${chunkedChannelIds.length}. Check logs for details.`,
+              );
+            }
+
+            // Sleep for 3 seconds between chunks, but not after the last chunk
+            if (i < chunkedChannelIds.length - 1) {
+              logger.info(
+                "Sleeping for 3 seconds before processing next chunk",
+              );
+              await step.sleep("3 seconds", "3 seconds");
+            }
+          }
         }
 
+        // Sleep for 30 seconds before second batch
+        logger.info("Sleeping for 30 seconds before processing second batch");
         await step.sleep("30 seconds", "30 seconds");
 
-        const results2 = await Promise.allSettled(
-          discordChannelMap.map((group) =>
-            step.do(
-              `send videos to channels for ${group.channelLangaugeCode} 2`,
-              {
-                retries: { limit: 3, delay: "5 second", backoff: "linear" },
-                timeout: "1 minutes",
-              },
-              async () => {
-                return withTracer(
-                  "discord-workflow",
-                  `send-videos-language-${group.channelLangaugeCode}-2`,
-                  async (span) => {
-                    const vu = await env.APP_WORKER.newDiscordUsecase();
-                    logger.info(
-                      `Sending videos to ${group.channelIds.length} channels with language: ${group.channelLangaugeCode}`,
-                      {
-                        channelCount: group.channelIds.length,
-                        language: group.channelLangaugeCode,
-                      },
-                    );
-                    span.setAttribute("language", group.channelLangaugeCode);
-                    span.setAttribute(
-                      "channels_count",
-                      group.channelIds.length,
-                    );
-                    await vu.sendVideosToMultipleChannels({
-                      channelIds: group.channelIds,
-                      channelLangaugeCode: group.channelLangaugeCode,
-                      channelMemberType: group.channelMemberType,
-                    });
-                    logger.info(
-                      `Successfully sent videos to channels with language: ${group.channelLangaugeCode}`,
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        );
+        // Process the second batch for each language group
+        for (const group of discordChannelMap) {
+          // Split channelIds into chunks of maximum 100
+          const chunkedChannelIds = chunkArray(group.channelIds, 100);
 
-        const failedSteps2 = results2.filter(
-          (result) => result.status === "rejected",
-        );
-        if (failedSteps2.length > 0) {
-          logger.error(
-            `${failedSteps.length} step(s) failed. Check logs for details.`,
+          logger.info(
+            `Processing second batch: ${chunkedChannelIds.length} chunks for language: ${group.channelLangaugeCode}`,
+            {
+              totalChannels: group.channelIds.length,
+              numberOfChunks: chunkedChannelIds.length,
+              chunkSize: Math.min(100, group.channelIds.length),
+            },
           );
+
+          // Process each chunk
+          for (let i = 0; i < chunkedChannelIds.length; i++) {
+            const channelIdsChunk = chunkedChannelIds[i];
+
+            logger.info(
+              `Processing second batch chunk ${i + 1}/${chunkedChannelIds.length} for language: ${group.channelLangaugeCode}`,
+              {
+                chunkSize: channelIdsChunk.length,
+                language: group.channelLangaugeCode,
+              },
+            );
+
+            // Process this chunk
+            const results = await Promise.allSettled([
+              step.do(
+                `send videos to channels for ${group.channelLangaugeCode} (second batch, chunk ${i + 1}/${chunkedChannelIds.length})`,
+                {
+                  retries: { limit: 3, delay: "5 second", backoff: "linear" },
+                  timeout: "1 minutes",
+                },
+                async () => {
+                  return withTracer(
+                    "discord-workflow",
+                    `send-videos-language-${group.channelLangaugeCode}-batch2-chunk-${i + 1}`,
+                    async (span) => {
+                      const vu = await env.APP_WORKER.newDiscordUsecase();
+                      logger.info(
+                        `Sending videos to ${channelIdsChunk.length} channels with language: ${group.channelLangaugeCode} (second batch)`,
+                        {
+                          channelCount: channelIdsChunk.length,
+                          language: group.channelLangaugeCode,
+                          chunkIndex: i + 1,
+                          totalChunks: chunkedChannelIds.length,
+                          batch: 2,
+                        },
+                      );
+                      span.setAttribute("language", group.channelLangaugeCode);
+                      span.setAttribute(
+                        "channels_count",
+                        channelIdsChunk.length,
+                      );
+                      span.setAttribute("chunk_index", i + 1);
+                      span.setAttribute(
+                        "total_chunks",
+                        chunkedChannelIds.length,
+                      );
+                      span.setAttribute("batch", 2);
+
+                      await vu.sendVideosToMultipleChannels({
+                        channelIds: channelIdsChunk,
+                        channelLangaugeCode: group.channelLangaugeCode,
+                        channelMemberType: group.channelMemberType,
+                      });
+
+                      logger.info(
+                        `Successfully sent videos to second batch chunk ${i + 1}/${chunkedChannelIds.length} with language: ${group.channelLangaugeCode}`,
+                      );
+                    },
+                  );
+                },
+              ),
+            ]);
+
+            const failedSteps = results.filter(
+              (result) => result.status === "rejected",
+            );
+
+            if (failedSteps.length > 0) {
+              logger.error(
+                `${failedSteps.length} step(s) failed for second batch chunk ${i + 1}/${chunkedChannelIds.length}. Check logs for details.`,
+              );
+            }
+
+            // Sleep for 3 seconds between chunks, but not after the last chunk
+            if (i < chunkedChannelIds.length - 1) {
+              logger.info(
+                "Sleeping for 3 seconds before processing next chunk",
+              );
+              await step.sleep("3 seconds", "3 seconds");
+            }
+          }
         }
       },
   };
