@@ -72,6 +72,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
             new AppError({
               message: `Database error during discord message save: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -96,6 +97,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
               new AppError({
                 message: `Database error during discord admin message save: ${err.message}`,
                 code: "INTERNAL_SERVER_ERROR",
+                cause: err,
               }),
           );
 
@@ -143,6 +145,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
             new AppError({
               message: `Database error during discord message retrieval: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -203,6 +206,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
             new AppError({
               message: `Database error during discord messages list query: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -245,6 +249,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
             new AppError({
               message: `Database error during discord messages count query: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 

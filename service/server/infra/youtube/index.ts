@@ -7,6 +7,7 @@ import {
 import { type Videos, createVideo, createVideos } from "../../domain/video";
 import { getCurrentUTCString } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
+import { AppLogger } from "../../pkg/logging";
 import { withTracerResult } from "../http/trace/cloudflare";
 
 type GetVideosParams = {
@@ -65,6 +66,9 @@ export class YoutubeService implements IYoutubeService {
 
   async getVideos(params: GetVideosParams): Promise<Result<Videos, AppError>> {
     return withTracerResult("YoutubeService", "getVideos", async (span) => {
+      AppLogger.info("getVideos", {
+        videoIds: params.videoIds,
+      });
       const chunks = this.chunkArray(params.videoIds, 50);
       const videos: youtube_v3.Schema$Video[] = [];
       for (const chunk of chunks) {

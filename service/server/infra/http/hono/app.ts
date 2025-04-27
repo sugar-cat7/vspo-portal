@@ -22,13 +22,14 @@ export const newApp = () => {
       title: "api",
       description: "API",
     },
+    servers: [{ url: "api" }],
   });
   app.get("/swagger-ui", swaggerUI({ url: "/doc" }));
 
-  app.openAPIRegistry.registerComponent("securitySchemes", "bearerAuth", {
-    bearerFormat: "root key",
-    type: "http",
-    scheme: "bearer",
+  app.openAPIRegistry.registerComponent("securitySchemes", "apiKeyAuth", {
+    type: "apiKey",
+    in: "header",
+    name: "x-api-key",
   });
   return app;
 };

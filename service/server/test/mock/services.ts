@@ -10,7 +10,6 @@ import type {
   TwitcastingMovie,
 } from "../../infra/twitcasting";
 import { type AppError, Ok, type Result } from "../../pkg/errors";
-import { testChannel } from "../fixtures/video";
 
 export class MockYoutubeService implements IYoutubeService {
   youtube = null;
@@ -19,7 +18,7 @@ export class MockYoutubeService implements IYoutubeService {
   async getChannels(params: { channelIds: string[] }): Promise<
     Result<Channel[], AppError>
   > {
-    return Ok([testChannel]);
+    return Ok([]);
   }
 
   async getVideos(params: { videoIds: string[] }): Promise<

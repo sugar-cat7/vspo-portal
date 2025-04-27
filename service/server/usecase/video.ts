@@ -37,6 +37,10 @@ export type TranslateVideoParam = {
   videos: Videos;
 };
 
+export type SearchByVideoIdsAndCreateParam = {
+  videoIds: string[];
+};
+
 export interface IVideoInteractor {
   batchUpsert(
     params: BatchUpsertVideosParam,
@@ -53,6 +57,9 @@ export interface IVideoInteractor {
   ): Promise<Result<Videos, AppError>>;
   getMemberVideos(): Promise<Result<Videos, AppError>>;
   deletedListIds(): Promise<Result<string[], AppError>>;
+  searchByVideosIdsAndCreate(
+    params: SearchByVideoIdsAndCreateParam,
+  ): Promise<Result<Videos, AppError>>;
 }
 
 export class VideoInteractor implements IVideoInteractor {
@@ -213,6 +220,32 @@ export class VideoInteractor implements IVideoInteractor {
             videoIds: sv.val,
           });
           return Ok(sv.val);
+        });
+      },
+    );
+  }
+
+  async searchByVideosIdsAndCreate(
+    params: SearchByVideoIdsAndCreateParam,
+  ): Promise<Result<Videos, AppError>> {
+    return await withTracerResult(
+      "VideoInteractor",
+      "searchByVideosIdAndCreate",
+      async () => {
+        return this.context.runInTx(async (repos, services) => {
+          const vs = await services.videoService.getVideosByVideoIds(params);
+          if (vs.err) {
+            return vs;
+          }
+
+          const upsertedVideos = await repos.videoRepository.batchUpsert(
+            vs.val,
+          );
+          if (upsertedVideos.err) {
+            return upsertedVideos;
+          }
+
+          return Ok(upsertedVideos.val);
         });
       },
     );
