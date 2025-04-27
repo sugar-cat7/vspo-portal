@@ -70,6 +70,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
           new AppError({
             message: `Database error during discordServer list query: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
+            cause: err,
           }),
       );
 
@@ -136,6 +137,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             new AppError({
               message: `Database error during discordServer count query: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -213,6 +215,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             new AppError({
               message: `Database error during discord server batch upsert: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -254,6 +257,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             new AppError({
               message: `Database error during discord channel batch upsert: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -307,6 +311,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             new AppError({
               message: `Database error during discord channel batch delete: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
         if (discordChannelResult.err) {
@@ -335,6 +340,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
           new AppError({
             message: `Database error during discordServer get query: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
+            cause: err,
           }),
       );
 
@@ -395,6 +401,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             new AppError({
               message: `Database error during discordServer exists query: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -424,6 +431,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
             new AppError({
               message: `Database error during discord channel exists query: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 

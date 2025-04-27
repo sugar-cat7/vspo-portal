@@ -3,6 +3,7 @@ import {
   PostgreSqlContainer,
   type StartedPostgreSqlContainer,
 } from "@testcontainers/postgresql";
+import { inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
 import { Client } from "pg";
@@ -13,12 +14,32 @@ import { AIService } from "../infra/ai";
 import { CloudflareKVCacheClient } from "../infra/cache";
 import { AppContext } from "../infra/dependency";
 import { DiscordClient } from "../infra/discord";
-import { channelTable, creatorTable } from "../infra/repository/schema";
+import {
+  type InsertVideo,
+  channelTable,
+  creatorTable,
+  creatorTranslationTable,
+  discordChannelTable,
+  discordServerTable,
+  streamStatusTable,
+  videoTable,
+  videoTranslationTable,
+} from "../infra/repository/schema";
 import { Ok } from "../pkg/errors";
-import { testCreators } from "./fixtures/creator";
-import { testChannel } from "./fixtures/video";
+import {
+  VSPO_MEMBER_CHANNEL_IDS,
+  VSPO_MEMBER_NAMES,
+  batchInsert,
+  createCreatorTranslations,
+  createDiscordChannels,
+  createDiscordServers,
+  createStreamStatuses,
+  createVideoTranslations,
+  createVideosForChannel,
+} from "./fixtures";
 import { mockDiscordClient } from "./mock/discord";
 import { TestTxManager } from "./mock/transaction";
+
 let container: StartedPostgreSqlContainer;
 
 export const setupTxManager = async () => {
@@ -54,21 +75,83 @@ export const setupTxManager = async () => {
     ),
   });
 
-  // Insert test data
-  for (const creator of testCreators) {
-    await db.insert(creatorTable).values(creator);
+  // Fetch existing channels from the database
+  console.log("Fetching existing channels...");
+  const channels = await db.select().from(channelTable).execute();
+
+  console.log(`Found ${channels.length} channels. Creating videos...`);
+
+  // Get list of VSPO member creator IDs
+  console.log("Fetching creator IDs for VSPO members...");
+  const vspoCreators = await db
+    .select()
+    .from(creatorTable)
+    .where(inArray(creatorTable.id, Object.keys(VSPO_MEMBER_NAMES)))
+    .execute();
+
+  console.log(
+    `Found ${vspoCreators.length} VSPO creators. Creating translations...`,
+  );
+  const creatorTranslations = createCreatorTranslations(
+    vspoCreators.map((c) => c.id),
+  );
+
+  console.log(
+    `Created ${creatorTranslations.length} creator translations. Inserting into database...`,
+  );
+  await batchInsert(db, creatorTranslationTable, creatorTranslations);
+
+  let allVideos: InsertVideo[] = [];
+
+  // Create videos for each channel
+  for (const channel of channels) {
+    const isVspoMember = VSPO_MEMBER_CHANNEL_IDS.includes(
+      channel.platformChannelId,
+    );
+    const videos = createVideosForChannel(channel, isVspoMember);
+    allVideos = [...allVideos, ...videos];
   }
-  await db.insert(channelTable).values({
-    id: testChannel.id,
-    platformChannelId: testChannel.youtube?.rawId ?? "",
-    creatorId: testChannel.creatorID,
-    platformType: "youtube",
-    title: testChannel.youtube?.name ?? "",
-    description: testChannel.youtube?.description ?? "",
-    publishedAt: new Date(testChannel.youtube?.publishedAt ?? new Date()),
-    subscriberCount: testChannel.youtube?.subscriberCount ?? 0,
-    thumbnailUrl: testChannel.youtube?.thumbnailURL ?? "",
-  });
+
+  console.log(
+    `Created ${allVideos.length} videos. Generating stream statuses...`,
+  );
+  const streamStatuses = createStreamStatuses(allVideos);
+
+  console.log(
+    `Generated ${streamStatuses.length} stream statuses. Creating translations...`,
+  );
+  const videoTranslations = createVideoTranslations(allVideos);
+
+  console.log(
+    `Created ${videoTranslations.length} video translations. Inserting into database...`,
+  );
+
+  // Insert data in the correct order with batching
+  console.log("Inserting videos...");
+  await batchInsert(db, videoTable, allVideos);
+
+  console.log("Inserting stream statuses...");
+  await batchInsert(db, streamStatusTable, streamStatuses);
+
+  console.log("Inserting video translations...");
+  await batchInsert(db, videoTranslationTable, videoTranslations);
+
+  // Create and insert Discord server test data
+  console.log("Generating Discord servers and channels...");
+  const discordServers = createDiscordServers();
+  const discordChannels = createDiscordChannels(discordServers);
+
+  console.log(
+    `Created ${discordServers.length} Discord servers. Inserting into database...`,
+  );
+  await batchInsert(db, discordServerTable, discordServers);
+
+  console.log(
+    `Created ${discordChannels.length} Discord channels. Inserting into database...`,
+  );
+  await batchInsert(db, discordChannelTable, discordChannels);
+
+  console.log("Seed completed successfully!");
 
   const env = zAppWorkerEnv.parse(process.env);
 
@@ -76,7 +159,7 @@ export const setupTxManager = async () => {
   const youtubeService = {
     youtube: null,
     chunkArray: () => [],
-    getChannels: async () => Ok([testChannel]),
+    getChannels: async () => Ok([]),
     getVideos: async () => Ok([]),
     searchVideos: async () => Ok([]),
     getVideosByChannel: async () => Ok([]),

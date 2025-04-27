@@ -76,6 +76,7 @@ export class CreatorRepository implements ICreatorRepository {
           new AppError({
             message: `Database error during creator list query: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
+            cause: err,
           }),
       );
 
@@ -181,6 +182,7 @@ export class CreatorRepository implements ICreatorRepository {
           new AppError({
             message: `Database error during creator count query: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
+            cause: err,
           }),
       );
 
@@ -275,6 +277,7 @@ export class CreatorRepository implements ICreatorRepository {
               new AppError({
                 message: `Database error during creator batch upsert: ${err.message}`,
                 code: "INTERNAL_SERVER_ERROR",
+                cause: err,
               }),
           );
 
@@ -303,6 +306,7 @@ export class CreatorRepository implements ICreatorRepository {
               new AppError({
                 message: `Database error during channel batch upsert: ${err.message}`,
                 code: "INTERNAL_SERVER_ERROR",
+                cause: err,
               }),
           );
 
@@ -331,8 +335,9 @@ export class CreatorRepository implements ICreatorRepository {
               .execute(),
             (err) =>
               new AppError({
-                message: `Database error during creator transaction batch upsert: ${err.message}`,
+                message: `Database error during creator translation batch upsert: ${err.message}`,
                 code: "INTERNAL_SERVER_ERROR",
+                cause: err,
               }),
           );
 
@@ -360,6 +365,7 @@ export class CreatorRepository implements ICreatorRepository {
             new AppError({
               message: `Database error during creator batch delete: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 

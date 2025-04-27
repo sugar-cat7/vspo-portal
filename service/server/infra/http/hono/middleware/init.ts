@@ -16,10 +16,15 @@ export const init = createMiddleware<HonoEnv>(async (c, next) => {
       message: e.error.message,
     });
   }
+  const apiKey = c.req.header();
+  console.log(apiKey);
+  if (e.data.API_KEY !== c.req.header("x-api-key")) {
+    throw new AppError({
+      code: ErrorCodeSchema.Enum.UNAUTHORIZED,
+      message: "Invalid API key",
+    });
+  }
   const logger = AppLogger.getInstance(e.data);
-  c.set("services", {
-    logger: logger,
-  });
   logger.info("[Request started]");
   await next();
 });

@@ -24,6 +24,7 @@ import {
   type Result,
 } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
+import { SearchByVideoIdsAndCreateParam } from "../../usecase/video";
 import { TargetLangSchema } from "../translate";
 
 export interface IVideoService {
@@ -63,6 +64,9 @@ export interface IVideoService {
       | "viewCount";
   }): Promise<Result<Videos, AppError>>;
   getMemberVideos(): Promise<Result<Videos, AppError>>;
+  getVideosByVideoIds(params: {
+    videoIds: string[];
+  }): Promise<Result<Videos, AppError>>;
 }
 
 export class VideoService implements IVideoService {
@@ -628,7 +632,7 @@ export class VideoService implements IVideoService {
     const existingVideos = existingLiveVideos.val;
 
     const promises = channelIds.map((id) =>
-      this.getVideosByChannel({ channelId: id, maxResults: 5 }),
+      this.getVideosByChannel({ channelId: id, maxResults: 50 }),
     );
     const results = await Promise.allSettled(promises);
     const videos = results
@@ -717,6 +721,14 @@ export class VideoService implements IVideoService {
         return Ok(yt.val);
       },
     );
+  }
+
+  async getVideosByVideoIds(params: {
+    videoIds: string[];
+  }): Promise<Result<Videos, AppError>> {
+    return this.deps.youtubeClient.getVideos({
+      videoIds: params.videoIds,
+    });
   }
 
   private async masterCreators(): Promise<

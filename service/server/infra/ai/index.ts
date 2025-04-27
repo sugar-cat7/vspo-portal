@@ -27,12 +27,32 @@ const openAIResponseSchema = z.object({
   content: z.string(),
 });
 
+const urlSummaryResponseSchema = z.object({
+  talents: z.array(z.string()),
+  type: z.enum(["merchandise", "event", "other"]),
+  details: z
+    .object({
+      releaseDate: z.string().optional(),
+      price: z.string().optional(),
+      eventDate: z.string().optional(),
+      location: z.string().optional(),
+      access: z.string().optional(),
+    })
+    .optional(),
+  websiteUrl: z.string().optional(),
+  summary: z.string(),
+});
+
+export type URLSummaryResponse = z.infer<typeof urlSummaryResponseSchema>;
+
 export interface IAIService {
   translateText(
     text: string,
     targetLang: string,
     prompt?: string,
   ): Promise<Result<{ translatedText: string }, AppError>>;
+
+  summarizeURL(url: string): Promise<Result<string, AppError>>;
 }
 
 export class AIService implements IAIService {
@@ -82,7 +102,7 @@ export class AIService implements IAIService {
       const systemPrompt = `Please translate the following user message into ${targetLanguage}. Ensure consistency in name translations according to the following mapping: ${keywordMapString}. Return the translation in a JSON object with the key \"content\".`;
       const responseResult = await wrap(
         this.openai.chat.completions.create({
-          model: "gpt-4o-mini",
+          model: "gpt-4o-mini-2024-07-18",
           messages: [
             prompt
               ? { role: "system", content: prompt }
@@ -127,5 +147,64 @@ export class AIService implements IAIService {
 
       return Ok({ translatedText: parsedResponse.data.content });
     });
+  }
+
+  async summarizeURL(url: string): Promise<Result<string, AppError>> {
+    const keywordMapString = JSON.stringify(vspoKeywordMap, null, 2);
+    const prompt = `
+    Please extract information from the following URL and output it as structured data in Japanese.
+
+    ## Output Format
+    Please include the following information:
+    - talents: Array of related VTuber names from VSPO! members
+    - type: Either "merchandise", "event", or "other"
+    - details: Detailed information
+      - releaseDate: Release date (for merchandise)
+      - price: Price information (for merchandise)
+      - eventDate: Event date (for events)
+      - location: Venue location (for events)
+      - access: Access information (location/transportation)
+    - websiteUrl: The original website URL
+    - summary: Brief summary of the content (within 100 characters)
+
+    ## Notes
+    - If information is not found, please leave the corresponding field empty
+    - Please use the following official names for talents
+
+    ## Name Dictionary
+    ${keywordMapString}
+
+    ## Important
+    Please respond in Japanese.
+    `;
+    const responseResult = await wrap(
+      this.openai.responses.create({
+        input: url,
+        instructions: prompt,
+        model: "gpt-4o-2024-08-06",
+        tools: [{ type: "web_search_preview" }],
+      }),
+      (err) =>
+        new AppError({
+          message: `OpenAI API error: ${err.message}`,
+          code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+        }),
+    );
+
+    if (responseResult.err) {
+      return Err(responseResult.err);
+    }
+
+    const response = responseResult.val.output_text;
+    if (!response) {
+      return Err(
+        new AppError({
+          message: "Empty AI response",
+          code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+        }),
+      );
+    }
+
+    return Ok(response);
   }
 }
