@@ -60,6 +60,7 @@ jobs:
             SENTRY_DSN
             DISCORD_TRANSLATION_SETTING
             DISCORD_BOT_MAINTENANCE
+            API_KEY
         env:
           ENVIRONMENT: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
           OPENAI_ORGANIZATION: ${{ secrets.OPENAI_ORGANIZATION }}
@@ -78,3 +79,4 @@ jobs:
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           DISCORD_TRANSLATION_SETTING: ${{ secrets.DISCORD_TRANSLATION_SETTING }}
           DISCORD_BOT_MAINTENANCE: ${{ secrets.DISCORD_BOT_MAINTENANCE }}
+          API_KEY: ${{ secrets.API_KEY }}
