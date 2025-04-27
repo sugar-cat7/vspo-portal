@@ -32,6 +32,7 @@ import type {
   ListParam,
   SearchByChannelIdsParam,
   SearchByMemberTypeParam,
+  SearchByVideoIdsAndCreateParam,
   SendAdminMessageParams,
   SendMessageParams,
   TranslateCreatorParam,
@@ -116,6 +117,10 @@ export class VideoService extends RpcTarget {
 
   async deletedListIds() {
     return this.#usecase.deletedListIds();
+  }
+
+  async searchByVideosIdsAndCreate(params: SearchByVideoIdsAndCreateParam) {
+    return this.#usecase.searchByVideosIdsAndCreate(params);
   }
 }
 

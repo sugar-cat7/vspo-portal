@@ -2,7 +2,6 @@ import { vi } from "vitest";
 import type { Channel, Video } from "../../domain";
 import type { IYoutubeService } from "../../infra/youtube";
 import { type AppError, Ok, type Result } from "../../pkg/errors";
-import { testChannel } from "../fixtures/video";
 
 export type MockResponse =
   | {
@@ -143,7 +142,7 @@ export const mockYoutubeService: IYoutubeService = {
   getChannels: async (params: { channelIds: string[] }): Promise<
     Result<Channel[], AppError>
   > => {
-    return Ok([testChannel]);
+    return Ok([]);
   },
 
   getVideos: async (params: { videoIds: string[] }): Promise<

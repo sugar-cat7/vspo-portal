@@ -111,6 +111,7 @@ export class VideoRepository implements IVideoRepository {
           new AppError({
             message: `Database error during video list query: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
+            cause: err,
           }),
       );
 
@@ -184,6 +185,7 @@ export class VideoRepository implements IVideoRepository {
           new AppError({
             message: `Database error during video count query: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
+            cause: err,
           }),
       );
 
@@ -277,6 +279,7 @@ export class VideoRepository implements IVideoRepository {
             new AppError({
               message: `Database error during video batch upsert: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -310,6 +313,7 @@ export class VideoRepository implements IVideoRepository {
             new AppError({
               message: `Database error during stream status batch upsert: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -342,8 +346,9 @@ export class VideoRepository implements IVideoRepository {
             .execute(),
           (err) =>
             new AppError({
-              message: `Database error during video transaction batch upsert: ${err.message}`,
+              message: `Database error during video translation batch upsert: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 
@@ -403,6 +408,7 @@ export class VideoRepository implements IVideoRepository {
           new AppError({
             message: `Database error during video batch delete: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
+            cause: err,
           }),
       );
 
@@ -428,6 +434,7 @@ export class VideoRepository implements IVideoRepository {
             new AppError({
               message: `Database error during video deleted list: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
+              cause: err,
             }),
         );
 

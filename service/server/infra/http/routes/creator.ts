@@ -1,17 +1,15 @@
 import { createRoute } from "@hono/zod-openapi";
-import type { App } from "../infra/http/hono/app";
-import { openApiErrorResponses } from "../pkg/errors";
-import {
-  ListCreatorRequestSchema,
-  ListCreatorResponseSchema,
-} from "./schema/http";
+
+import { openApiErrorResponses } from "../../../pkg/errors";
+import type { App } from "../hono";
+import { ListCreatorRequestSchema, ListCreatorResponseSchema } from "./schema";
 
 const listCreatorRoute = createRoute({
   tags: ["Creator"],
   operationId: "listCreators",
   method: "get" as const,
-  path: "/creators",
-  security: [{ bearerAuth: [] }],
+  path: "/api/creators",
+  security: [{ apiKeyAuth: [] }],
   request: {
     query: ListCreatorRequestSchema,
   },

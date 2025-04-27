@@ -60,6 +60,7 @@ export class TxManager implements ITxManager {
         new AppError({
           message: `Failed to execute transaction: ${e}`,
           code: ErrorCodeSchema.Enum.INTERNAL_SERVER_ERROR,
+          cause: e,
         }),
     );
     if (result.err) {
