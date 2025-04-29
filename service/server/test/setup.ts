@@ -160,9 +160,9 @@ export const setupTxManager = async () => {
     youtube: null,
     chunkArray: () => [],
     getChannels: async () => Ok([]),
-    getVideos: async () => Ok([]),
-    searchVideos: async () => Ok([]),
-    getVideosByChannel: async () => Ok([]),
+    getStreams: async () => Ok([]),
+    searchStreams: async () => Ok([]),
+    getStreamsByChannel: async () => Ok([]),
   };
 
   const twitchService = {
@@ -172,10 +172,8 @@ export const setupTxManager = async () => {
     getAccessToken: async () => "",
     fetchFromTwitch: async () => ({}),
     getChannels: async () => Ok([]),
-    getVideos: async () => Ok([]),
-    searchVideos: async () => Ok([]),
     getStreams: async () => Ok([]),
-    getVideosByIDs: async () => Ok([]),
+    getStreamsByIDs: async () => Ok([]),
     getArchive: async () => Ok([]),
   };
 
@@ -185,8 +183,9 @@ export const setupTxManager = async () => {
     mapToTwitCastingVideo: async () => ({}),
     createVideoModel: async () => ({}),
     getChannels: async () => Ok([]),
-    getVideos: async () => Ok([]),
-    searchVideos: async () => Ok([]),
+    getStreams: async () => Ok([]),
+    searchStreams: async () => Ok([]),
+    getStreamsByIDs: async () => Ok([]),
     getArchive: async () => Ok([]),
   };
 

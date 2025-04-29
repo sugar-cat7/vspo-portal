@@ -1,13 +1,12 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import type { Page } from "../domain/pagination";
-import { TargetLangSchema } from "../domain/translate";
 import {
   PlatformSchema,
   StatusSchema,
-  VideoTypeSchema,
-  type Videos,
-  createVideos,
-} from "../domain/video";
+  type Streams,
+  createStreams,
+} from "../domain";
+import type { Page } from "../domain/pagination";
+import { TargetLangSchema } from "../domain/translate";
 import type { IAppContext } from "../infra/dependency";
 import { createUUID } from "../pkg/uuid";
 import {
@@ -16,19 +15,19 @@ import {
   JP_YOUTUBE_CHANNELS,
 } from "../test/fixtures";
 import { setupTxManager } from "../test/setup";
-import { type ListParam, VideoInteractor } from "./video";
+import { type ListParam, StreamInteractor } from "./stream";
 
-describe.concurrent("VideoInteractor", () => {
+describe.concurrent("StreamInteractor", () => {
   let context: IAppContext;
-  let interactor: VideoInteractor;
+  let interactor: StreamInteractor;
 
   beforeEach(async () => {
     context = await setupTxManager();
-    interactor = new VideoInteractor(context);
+    interactor = new StreamInteractor(context);
   });
 
   describe.concurrent("searchLive", () => {
-    it.concurrent("should return live videos successfully", async () => {
+    it.concurrent("should return live streams successfully", async () => {
       const result = await interactor.searchLive();
       expect(result.err).toBeFalsy();
       if (!result.err) {
@@ -38,7 +37,7 @@ describe.concurrent("VideoInteractor", () => {
   });
 
   describe.concurrent("searchExist", () => {
-    it.concurrent("should return existing videos successfully", async () => {
+    it.concurrent("should return existing streams successfully", async () => {
       const result = await interactor.searchExist();
       expect(result.err).toBeFalsy();
       if (!result.err) {
@@ -48,73 +47,71 @@ describe.concurrent("VideoInteractor", () => {
   });
 
   describe.concurrent("batchUpsert", () => {
-    it.concurrent("should upsert videos successfully", async () => {
-      // Create test video data
-      const testVideos = createVideos([
+    it.concurrent("should upsert streams successfully", async () => {
+      // Create test stream data
+      const testStreams = createStreams([
         {
           id: createUUID(),
-          rawId: `test-video-${Date.now()}`,
+          rawId: `test-stream-${Date.now()}`,
           rawChannelID: JP_YOUTUBE_CHANNELS[0], // Use actual YouTube channel ID
-          title: "Test Video Title",
-          description: "Test video description",
+          title: "Test Stream Title",
+          description: "Test stream description",
           languageCode: TargetLangSchema.Enum.en,
           publishedAt: new Date().toISOString(),
           startedAt: new Date().toISOString(),
           endedAt: null,
           platform: PlatformSchema.Enum.youtube,
           status: StatusSchema.Enum.upcoming,
-          tags: ["test", "video"],
+          tags: ["test", "stream"],
           viewCount: 0,
           thumbnailURL: "https://example.com/thumbnail.jpg",
-          videoType: VideoTypeSchema.Enum.vspo_stream,
-          link: "https://www.youtube.com/watch?v=test-video-id",
+
+          link: "https://www.youtube.com/watch?v=test-stream-id",
         },
       ]);
 
       // Call batchUpsert
-      const result = await interactor.batchUpsert(testVideos);
+      const result = await interactor.batchUpsert(testStreams);
 
       // Verify result
       expect(result.err).toBeFalsy();
       if (result.err) return;
 
-      // Check returned videos
+      // Check returned streams
       expect(Array.isArray(result.val)).toBeTruthy();
       expect(result.val.length).toBeGreaterThan(0);
 
-      // Verify the video was correctly stored by fetching it
+      // Verify the stream was correctly stored by fetching it
       const listResult = await interactor.list({
         limit: 10,
         page: 0,
         languageCode: TargetLangSchema.Enum.en,
-        // Use specific properties to search for our test video
+        // Use specific properties to search for our test stream
         platform: PlatformSchema.Enum.youtube,
-        videoType: VideoTypeSchema.Enum.vspo_stream,
       });
 
       expect(listResult.err).toBeFalsy();
       if (listResult.err) return;
 
-      // Try to find our video in the results
-      const upsertedVideo = listResult.val.videos.find(
-        (v) => v.rawId === testVideos[0].rawId,
+      // Try to find our stream in the results
+      const upsertedStream = listResult.val.streams.find(
+        (v) => v.rawId === testStreams[0].rawId,
       );
 
-      // Because of test DB state, the video might not be found, so we just check the direct result
-      if (upsertedVideo) {
-        expect(upsertedVideo.title).toBe(testVideos[0].title);
-        expect(upsertedVideo.platform).toBe(testVideos[0].platform);
-        expect(upsertedVideo.status).toBe(testVideos[0].status);
-        expect(upsertedVideo.videoType).toBe(testVideos[0].videoType);
+      // Because of test DB state, the stream might not be found, so we just check the direct result
+      if (upsertedStream) {
+        expect(upsertedStream.title).toBe(testStreams[0].title);
+        expect(upsertedStream.platform).toBe(testStreams[0].platform);
+        expect(upsertedStream.status).toBe(testStreams[0].status);
       }
     });
 
-    it.concurrent("should update existing videos if they exist", async () => {
-      // First create a video
-      const originalVideos = createVideos([
+    it.concurrent("should update existing streams if they exist", async () => {
+      // First create a stream
+      const originalStreams = createStreams([
         {
           id: createUUID(),
-          rawId: `test-video-update-${Date.now()}`,
+          rawId: `test-stream-update-${Date.now()}`,
           rawChannelID: JP_YOUTUBE_CHANNELS[1], // Use a different YouTube channel ID
           title: "Original Title",
           description: "Original description",
@@ -124,44 +121,42 @@ describe.concurrent("VideoInteractor", () => {
           endedAt: null,
           platform: PlatformSchema.Enum.youtube,
           status: StatusSchema.Enum.upcoming,
-          tags: ["test", "video"],
+          tags: ["test", "stream"],
           viewCount: 0,
           thumbnailURL: "https://example.com/thumbnail.jpg",
-          videoType: VideoTypeSchema.Enum.vspo_stream,
-          link: "https://www.youtube.com/watch?v=test-video-id",
+          link: "https://www.youtube.com/watch?v=test-stream-id",
         },
       ]);
 
-      // Insert the original video
-      const originalResult = await interactor.batchUpsert(originalVideos);
+      // Insert the original stream
+      const originalResult = await interactor.batchUpsert(originalStreams);
 
       expect(originalResult.err).toBeFalsy();
       if (originalResult.err) return;
 
       // Now create an updated version with the same rawId but different data
-      const updatedVideos = createVideos([
+      const updatedStreams = createStreams([
         {
-          id: originalVideos[0].id,
-          rawId: originalVideos[0].rawId,
-          rawChannelID: originalVideos[0].rawChannelID,
+          id: originalStreams[0].id,
+          rawId: originalStreams[0].rawId,
+          rawChannelID: originalStreams[0].rawChannelID,
           title: "Updated Title",
           description: "Updated description",
           languageCode: TargetLangSchema.Enum.en,
-          publishedAt: originalVideos[0].publishedAt,
-          startedAt: originalVideos[0].startedAt,
+          publishedAt: originalStreams[0].publishedAt,
+          startedAt: originalStreams[0].startedAt,
           endedAt: new Date().toISOString(), // Now it has ended
-          platform: originalVideos[0].platform,
+          platform: originalStreams[0].platform,
           status: StatusSchema.Enum.ended, // Status changed to ended
-          tags: ["test", "video", "updated"],
+          tags: ["test", "stream", "updated"],
           viewCount: 100, // Views increased
-          thumbnailURL: originalVideos[0].thumbnailURL,
-          videoType: originalVideos[0].videoType,
-          link: originalVideos[0].link,
+          thumbnailURL: originalStreams[0].thumbnailURL,
+          link: originalStreams[0].link,
         },
       ]);
 
-      // Update the video
-      const updateResult = await interactor.batchUpsert(updatedVideos);
+      // Update the stream
+      const updateResult = await interactor.batchUpsert(updatedStreams);
 
       expect(updateResult.err).toBeFalsy();
       if (updateResult.err) return;
@@ -169,30 +164,30 @@ describe.concurrent("VideoInteractor", () => {
       // Verify the returned data reflects our updates
       expect(updateResult.val.length).toBeGreaterThan(0);
 
-      // Find the updated video in the result
-      const updatedVideo = updateResult.val.find(
-        (v) => v.rawId === originalVideos[0].rawId,
+      // Find the updated stream in the result
+      const updatedStream = updateResult.val.find(
+        (v) => v.rawId === originalStreams[0].rawId,
       );
 
-      if (updatedVideo) {
-        expect(updatedVideo.title).toBe("Updated Title");
-        expect(updatedVideo.description).toBe("Updated description");
-        expect(updatedVideo.status).toBe(StatusSchema.Enum.ended);
-        expect(updatedVideo.viewCount).toBe(100);
-        expect(updatedVideo.endedAt).not.toBeNull();
+      if (updatedStream) {
+        expect(updatedStream.title).toBe("Updated Title");
+        expect(updatedStream.description).toBe("Updated description");
+        expect(updatedStream.status).toBe(StatusSchema.Enum.ended);
+        expect(updatedStream.viewCount).toBe(100);
+        expect(updatedStream.endedAt).not.toBeNull();
       }
     });
 
     it.concurrent(
-      "should handle multiple videos in a single batch",
+      "should handle multiple streams in a single batch",
       async () => {
-        // Create test videos with different platforms
-        const testVideos = createVideos([
+        // Create test streams with different platforms
+        const testStreams = createStreams([
           {
             id: createUUID(),
             rawId: `test-youtube-${Date.now()}`,
             rawChannelID: EN_YOUTUBE_CHANNELS[0], // Use English YouTube channel ID
-            title: "YouTube Test Video",
+            title: "YouTube Test Stream",
             description: "YouTube test description",
             languageCode: TargetLangSchema.Enum.en,
             publishedAt: new Date().toISOString(),
@@ -203,14 +198,13 @@ describe.concurrent("VideoInteractor", () => {
             tags: ["youtube", "test"],
             viewCount: 0,
             thumbnailURL: "https://example.com/youtube-thumbnail.jpg",
-            videoType: VideoTypeSchema.Enum.vspo_stream,
             link: "https://www.youtube.com/watch?v=youtube-test-id",
           },
           {
             id: createUUID(),
             rawId: `test-twitch-${Date.now()}`,
             rawChannelID: JP_TWITCH_CHANNELS[0], // Use Japanese Twitch channel ID
-            title: "Twitch Test Video",
+            title: "Twitch Test Stream",
             description: "Twitch test description",
             languageCode: TargetLangSchema.Enum.en,
             publishedAt: new Date().toISOString(),
@@ -221,44 +215,44 @@ describe.concurrent("VideoInteractor", () => {
             tags: ["twitch", "test"],
             viewCount: 100,
             thumbnailURL: "https://example.com/twitch-thumbnail.jpg",
-            videoType: VideoTypeSchema.Enum.vspo_stream,
+
             link: "https://www.twitch.tv/test-twitch-channel",
           },
         ]);
 
-        // Call batchUpsert with multiple videos
-        const result = await interactor.batchUpsert(testVideos);
+        // Call batchUpsert with multiple streams
+        const result = await interactor.batchUpsert(testStreams);
 
         // Verify result
         expect(result.err).toBeFalsy();
         if (result.err) return;
 
-        // Check returned videos
+        // Check returned streams
         expect(Array.isArray(result.val)).toBeTruthy();
         expect(result.val.length).toBe(2);
 
         // Verify both types are in the result
-        const youtubeVideo = result.val.find(
+        const youtubeStream = result.val.find(
           (v) => v.platform === PlatformSchema.Enum.youtube,
         );
-        const twitchVideo = result.val.find(
+        const twitchStream = result.val.find(
           (v) => v.platform === PlatformSchema.Enum.twitch,
         );
 
-        expect(youtubeVideo).toBeDefined();
-        expect(twitchVideo).toBeDefined();
+        expect(youtubeStream).toBeDefined();
+        expect(twitchStream).toBeDefined();
 
-        if (youtubeVideo && twitchVideo) {
-          expect(youtubeVideo.title).toBe("YouTube Test Video");
-          expect(twitchVideo.title).toBe("Twitch Test Video");
+        if (youtubeStream && twitchStream) {
+          expect(youtubeStream.title).toBe("YouTube Test Stream");
+          expect(twitchStream.title).toBe("Twitch Test Stream");
         }
       },
     );
 
-    it.concurrent("should handle translated videos correctly", async () => {
-      // Create a video with both English and Japanese translations
+    it.concurrent("should handle translated streams correctly", async () => {
+      // Create a stream with both English and Japanese translations
       const rawId = `test-translation-${Date.now()}`;
-      const originalVideo = createVideos([
+      const originalStream = createStreams([
         {
           id: createUUID(),
           rawId,
@@ -274,7 +268,7 @@ describe.concurrent("VideoInteractor", () => {
           tags: ["test", "translation"],
           viewCount: 0,
           thumbnailURL: "https://example.com/thumbnail.jpg",
-          videoType: VideoTypeSchema.Enum.vspo_stream,
+
           link: "https://www.youtube.com/watch?v=translation-test-id",
         },
         {
@@ -292,14 +286,14 @@ describe.concurrent("VideoInteractor", () => {
           tags: ["test", "translation"],
           viewCount: 0,
           thumbnailURL: "https://example.com/thumbnail.jpg",
-          videoType: VideoTypeSchema.Enum.vspo_stream,
+
           link: "https://www.youtube.com/watch?v=translation-test-id",
           translated: true,
         },
       ]);
 
-      // Insert the original English video
-      const originalResult = await interactor.batchUpsert(originalVideo);
+      // Insert the original English stream
+      const originalResult = await interactor.batchUpsert(originalStream);
 
       expect(originalResult.err).toBeFalsy();
       if (originalResult.err) return;
@@ -315,7 +309,6 @@ describe.concurrent("VideoInteractor", () => {
         minCount?: number;
         platform?: (typeof PlatformSchema.Enum)[keyof typeof PlatformSchema.Enum];
         status?: (typeof StatusSchema.Enum)[keyof typeof StatusSchema.Enum];
-        videoType?: (typeof VideoTypeSchema.Enum)[keyof typeof VideoTypeSchema.Enum];
         memberType?: string;
         dateRange?: boolean;
         ordering?: "asc" | "desc";
@@ -328,11 +321,11 @@ describe.concurrent("VideoInteractor", () => {
 
     // Common assertion function for checking response structure
     const assertResponseStructure = (result: {
-      videos: Videos;
+      streams: Streams;
       pagination: Page;
     }): void => {
-      const { videos, pagination } = result;
-      expect(Array.isArray(videos)).toBeTruthy();
+      const { streams, pagination } = result;
+      expect(Array.isArray(streams)).toBeTruthy();
       expect(pagination).toBeDefined();
       expect(typeof pagination.totalCount).toBe("number");
       expect(typeof pagination.totalPage).toBe("number");
@@ -340,51 +333,41 @@ describe.concurrent("VideoInteractor", () => {
     };
 
     // Common assertion function for checking platform
-    const assertVideoPlatform = (
-      videos: Videos,
+    const assertStreamPlatform = (
+      streams: Streams,
       platform: (typeof PlatformSchema.Enum)[keyof typeof PlatformSchema.Enum],
     ): void => {
-      for (const video of videos) {
-        expect(video.platform).toBe(platform);
+      for (const stream of streams) {
+        expect(stream.platform).toBe(platform);
       }
     };
 
     // Common assertion function for checking status
-    const assertVideoStatus = (
-      videos: Videos,
+    const assertStreamStatus = (
+      streams: Streams,
       status: (typeof StatusSchema.Enum)[keyof typeof StatusSchema.Enum],
     ): void => {
-      for (const video of videos) {
-        expect(video.status).toBe(status);
-      }
-    };
-
-    // Common assertion function for checking video type
-    const assertVideoType = (
-      videos: Videos,
-      videoType: (typeof VideoTypeSchema.Enum)[keyof typeof VideoTypeSchema.Enum],
-    ): void => {
-      for (const video of videos) {
-        expect(video.videoType).toBe(videoType);
+      for (const stream of streams) {
+        expect(stream.status).toBe(status);
       }
     };
 
     // Common assertion function for checking date range
     const assertDateRange = (
-      videos: Videos,
+      streams: Streams,
       startDate: Date,
       endDate: Date,
     ): void => {
-      for (const video of videos) {
-        if (video.startedAt) {
-          const videoStartDate = new Date(video.startedAt);
-          expect(videoStartDate.getTime()).toBeGreaterThanOrEqual(
+      for (const stream of streams) {
+        if (stream.startedAt) {
+          const streamStartDate = new Date(stream.startedAt);
+          expect(streamStartDate.getTime()).toBeGreaterThanOrEqual(
             startDate.getTime(),
           );
 
-          if (video.endedAt) {
-            const videoEndDate = new Date(video.endedAt);
-            expect(videoEndDate.getTime()).toBeLessThanOrEqual(
+          if (stream.endedAt) {
+            const streamEndDate = new Date(stream.endedAt);
+            expect(streamEndDate.getTime()).toBeLessThanOrEqual(
               endDate.getTime(),
             );
           }
@@ -393,11 +376,11 @@ describe.concurrent("VideoInteractor", () => {
     };
 
     // Common assertion function for checking ordering
-    const assertVideoOrdering = (
-      videos: Videos,
+    const assertStreamOrdering = (
+      streams: Streams,
       ordering: "asc" | "desc",
     ): void => {
-      const timestamps = videos
+      const timestamps = streams
         .map((v) => (v.startedAt ? new Date(v.startedAt).getTime() : 0))
         .filter((t) => t > 0);
 
@@ -525,24 +508,20 @@ describe.concurrent("VideoInteractor", () => {
         params: {
           limit: 10,
           page: 0,
-          videoType: VideoTypeSchema.Enum.vspo_stream,
+
           languageCode: TargetLangSchema.Enum.en,
         },
-        expectations: {
-          videoType: VideoTypeSchema.Enum.vspo_stream,
-        },
+        expectations: {},
       },
       {
         name: "with clip video type filter",
         params: {
           limit: 10,
           page: 0,
-          videoType: VideoTypeSchema.Enum.clip,
+
           languageCode: TargetLangSchema.Enum.en,
         },
-        expectations: {
-          videoType: VideoTypeSchema.Enum.clip,
-        },
+        expectations: {},
       },
       {
         name: "with date range filter",
@@ -627,67 +606,63 @@ describe.concurrent("VideoInteractor", () => {
           page: 0,
           platform: PlatformSchema.Enum.youtube,
           status: StatusSchema.Enum.ended,
-          videoType: VideoTypeSchema.Enum.vspo_stream,
+
           orderBy: "desc",
           languageCode: TargetLangSchema.Enum.en,
         },
         expectations: {
           platform: PlatformSchema.Enum.youtube,
           status: StatusSchema.Enum.ended,
-          videoType: VideoTypeSchema.Enum.vspo_stream,
+
           ordering: "desc",
         },
       },
     ];
 
     for (const tc of testCases) {
-      it.concurrent(`should list videos with ${tc.name}`, async () => {
+      it.concurrent(`should list streams with ${tc.name}`, async () => {
         const result = await interactor.list(tc.params);
 
         // Check for successful response
         expect(result.err).toBeFalsy();
         if (result.err) return;
 
-        const { videos, pagination } = result.val;
+        const { streams, pagination } = result.val;
 
         // Basic structure checks
         assertResponseStructure(result.val);
 
         // Filter checks
         if (tc.expectations.minCount !== undefined) {
-          expect(videos.length).toBeGreaterThanOrEqual(
+          expect(streams.length).toBeGreaterThanOrEqual(
             tc.expectations.minCount,
           );
         }
 
         if (tc.expectations.platform) {
-          assertVideoPlatform(videos, tc.expectations.platform);
+          assertStreamPlatform(streams, tc.expectations.platform);
         }
 
         if (tc.expectations.status) {
-          assertVideoStatus(videos, tc.expectations.status);
-        }
-
-        if (tc.expectations.videoType) {
-          assertVideoType(videos, tc.expectations.videoType);
+          assertStreamStatus(streams, tc.expectations.status);
         }
 
         if (
           tc.expectations.dateRange &&
-          videos.length > 0 &&
+          streams.length > 0 &&
           tc.params.startedAt &&
           tc.params.endedAt
         ) {
-          assertDateRange(videos, tc.params.startedAt, tc.params.endedAt);
+          assertDateRange(streams, tc.params.startedAt, tc.params.endedAt);
         }
 
-        if (tc.expectations.ordering && videos.length > 1) {
-          assertVideoOrdering(videos, tc.expectations.ordering);
+        if (tc.expectations.ordering && streams.length > 1) {
+          assertStreamOrdering(streams, tc.expectations.ordering);
         }
 
         if (tc.expectations.pagination) {
           // Check if number of items doesn't exceed the limit
-          expect(videos.length).toBeLessThanOrEqual(tc.params.limit);
+          expect(streams.length).toBeLessThanOrEqual(tc.params.limit);
 
           // Based on pagination.ts, currentPage is ensured to be at least 1
           expect(pagination.currentPage).toBe(Math.max(tc.params.page, 1));
@@ -710,7 +685,7 @@ describe.concurrent("VideoInteractor", () => {
         expect(result.err).toBeFalsy();
         if (result.err) return;
 
-        const { videos, pagination } = result.val;
+        const { streams, pagination } = result.val;
 
         // Get total count of items for pagination calculation
         const countResult = await interactor.list({
@@ -724,7 +699,7 @@ describe.concurrent("VideoInteractor", () => {
         // Validate pagination properties
         expect(pagination.currentPage).toBe(1); // 1-indexed in API
         expect(pagination.prevPage).toBe(0); // No previous page
-        expect(videos.length).toBeLessThanOrEqual(params.limit);
+        expect(streams.length).toBeLessThanOrEqual(params.limit);
 
         // Expected next page - using the actual logic from pagination.ts
         const hasNext = params.page * params.limit < totalItems;
@@ -769,14 +744,14 @@ describe.concurrent("VideoInteractor", () => {
         expect(result.err).toBeFalsy();
         if (result.err) return;
 
-        const { videos, pagination } = result.val;
+        const { streams, pagination } = result.val;
 
         // Validate pagination
         expect(pagination.currentPage).toBe(1); // Based on createPage implementation
         expect(pagination.prevPage).toBe(0); // Previous page
         expect(pagination.hasNext).toBe(true);
         expect(pagination.nextPage).toBe(2); // Next page should be 2
-        expect(videos.length).toBeLessThanOrEqual(pageSize);
+        expect(streams.length).toBeLessThanOrEqual(pageSize);
       });
     });
 
@@ -789,7 +764,7 @@ describe.concurrent("VideoInteractor", () => {
           page: 0,
           platform: PlatformSchema.Enum.youtube,
           status: StatusSchema.Enum.live,
-          videoType: VideoTypeSchema.Enum.vspo_stream,
+
           startedAt: new Date("2099-01-01"),
           languageCode: TargetLangSchema.Enum.en,
         };
@@ -798,8 +773,8 @@ describe.concurrent("VideoInteractor", () => {
 
         expect(result.err).toBeFalsy();
         if (!result.err) {
-          expect(Array.isArray(result.val.videos)).toBeTruthy();
-          expect(result.val.videos.length).toBe(0);
+          expect(Array.isArray(result.val.streams)).toBeTruthy();
+          expect(result.val.streams.length).toBe(0);
           expect(result.val.pagination.totalCount).toBe(0);
           expect(result.val.pagination.totalPage).toBe(0);
           // Even with no results, currentPage should be at least 1 since we're using Math.max(page, 1)
@@ -826,8 +801,8 @@ describe.concurrent("VideoInteractor", () => {
 
         expect(result.err).toBeFalsy();
         if (!result.err) {
-          expect(Array.isArray(result.val.videos)).toBeTruthy();
-          expect(result.val.videos.length).toBe(0);
+          expect(Array.isArray(result.val.streams)).toBeTruthy();
+          expect(result.val.streams.length).toBe(0);
           // Even with invalid platform, currentPage should be at least 1
           expect(result.val.pagination.currentPage).toBe(1);
           expect(result.val.pagination.prevPage).toBe(0);

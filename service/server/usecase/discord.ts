@@ -2,7 +2,6 @@ import {
   type DiscordMessage,
   type DiscordServer,
   type DiscordServers,
-  type Videos,
   createDiscordMessage,
 } from "../domain";
 import { type Page, createPage } from "../domain/pagination";
@@ -257,7 +256,7 @@ export class DiscordInteractor implements IDiscordInteractor {
               rawId: sv.val,
               channelId: message.channelId,
               content: message.content,
-              embedVideos: [],
+              embedStreams: [],
               createdAt: now,
               updatedAt: now,
             }),

@@ -19,9 +19,9 @@ import { newApp } from "../../infra/http/hono/app";
 import { maintenanceMiddleware } from "../../infra/http/hono/middleware/discord/maintenance";
 import { registerCreatorListApi } from "../../infra/http/routes";
 import {
-  registerVideoListApi,
-  registerVideoPostApi,
-} from "../../infra/http/routes/video";
+  registerStreamListApi,
+  registerStreamPostApi,
+} from "../../infra/http/routes/stream";
 import { createHandler, withTracer } from "../../infra/http/trace";
 
 const app = newApp();
@@ -61,9 +61,9 @@ app.use(
   }),
   init,
 );
-registerVideoListApi(app);
+registerStreamListApi(app);
 registerCreatorListApi(app);
-registerVideoPostApi(app);
+registerStreamPostApi(app);
 
 export default createHandler({
   fetch: async (req: Request, env: ApiEnv, executionCtx: ExecutionContext) => {

@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { Channel, Video } from "../../domain";
+import type { Channel, Stream } from "../../domain";
 import type { IYoutubeService } from "../../infra/youtube";
 import { type AppError, Ok, type Result } from "../../pkg/errors";
 
@@ -14,8 +14,8 @@ export type TestCase<T> = {
   name: string;
   mockResponses: MockResponse[];
   expectedError?: string;
-  expectedResult?: T extends { videoIds: string[] } | { query: string }
-    ? Partial<Video>
+  expectedResult?: T extends { streamIds: string[] } | { query: string }
+    ? Partial<Stream>
     : T extends { channelIds: string[] }
       ? Channel
       : never;
@@ -23,7 +23,7 @@ export type TestCase<T> = {
 
 // Mock responses
 export const mockYoutubeResponses = {
-  validVideos: {
+  validStreams: {
     body: {
       items: [
         {
@@ -106,7 +106,7 @@ export const mockYoutubeClient = {
       if (id?.includes("error")) {
         throw mockYoutubeResponses.networkError;
       }
-      return { data: mockYoutubeResponses.validVideos.body };
+      return { data: mockYoutubeResponses.validStreams.body };
     }),
   },
   search: {
@@ -145,20 +145,20 @@ export const mockYoutubeService: IYoutubeService = {
     return Ok([]);
   },
 
-  getVideos: async (params: { videoIds: string[] }): Promise<
-    Result<Video[], AppError>
+  getStreams: async (params: { streamIds: string[] }): Promise<
+    Result<Stream[], AppError>
   > => {
     return Ok([]);
   },
 
-  searchVideos: async (params: {
+  searchStreams: async (params: {
     query: string;
     eventType: "completed" | "live" | "upcoming";
-  }): Promise<Result<Video[], AppError>> => {
+  }): Promise<Result<Stream[], AppError>> => {
     return Ok([]);
   },
 
-  getVideosByChannel: async (params: {
+  getStreamsByChannel: async (params: {
     channelId: string;
     maxResults?: number;
     order?:
@@ -168,7 +168,7 @@ export const mockYoutubeService: IYoutubeService = {
       | "title"
       | "videoCount"
       | "viewCount";
-  }): Promise<Result<Video[], AppError>> => {
+  }): Promise<Result<Stream[], AppError>> => {
     return Ok([]);
   },
 };

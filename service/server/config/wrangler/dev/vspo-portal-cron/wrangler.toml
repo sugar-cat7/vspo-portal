@@ -18,9 +18,9 @@ entrypoint = "ApplicationService"
 crons = [ "5 2 * * *" ]
 
 [[workflows]]
-name = "dev-search-videos-workflow"
-binding = "SEARCH_VIDEOS_WORKFLOW"
-class_name = "SearchVideosWorkflow"
+name = "dev-search-streams-workflow"
+binding = "SEARCH_STREAMS_WORKFLOW"
+class_name = "SearchStreamsWorkflow"
 
 [[workflows]]
 name = "dev-search-channels-workflow"
@@ -28,9 +28,9 @@ binding = "SEARCH_CHANNELS_WORKFLOW"
 class_name = "SearchChannelsWorkflow"
 
 [[workflows]]
-name = "dev-translate-videos-workflow"
-binding = "TRANSLATE_VIDEOS_WORKFLOW"
-class_name = "TranslateVideosWorkflow"
+name = "dev-translate-streams-workflow"
+binding = "TRANSLATE_STREAMS_WORKFLOW"
+class_name = "TranslateStreamsWorkflow"
 
 [[workflows]]
 name = "dev-translate-creators-workflow"
@@ -43,14 +43,14 @@ binding = "DISCORD_SEND_MESSAGES_WORKFLOW"
 class_name = "DiscordSendMessagesWorkflow"
 
 [[workflows]]
-name = "dev-search-member-videos-by-channel-workflow"
-binding = "SEARCH_MEMBER_VIDEOS_BY_CHANNEL_WORKFLOW"
-class_name = "SearchMemberVideosByChannelWorkflow"
+name = "dev-search-member-streams-by-channel-workflow"
+binding = "SEARCH_MEMBER_STREAMS_BY_CHANNEL_WORKFLOW"
+class_name = "SearchMemberStreamsByChannelWorkflow"
 
 [[workflows]]
-name = "dev-delete-videos-workflow"
-binding = "DELETE_VIDEOS_WORKFLOW"
-class_name = "DeleteVideosWorkflow"
+name = "dev-delete-streams-workflow"
+binding = "DELETE_STREAMS_WORKFLOW"
+class_name = "DeleteStreamsWorkflow"
 
 [[workflows]]
 name = "dev-discord-delete-all-workflow"

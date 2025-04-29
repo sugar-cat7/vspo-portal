@@ -3,12 +3,12 @@ import {
   MemberTypeSchema,
   PlatformSchema,
   StatusSchema,
-  type Videos,
+  type Streams,
 } from "..";
 import {
+  type IStreamRepository,
   type ITwitcastingService,
   type ITwitchService,
-  type IVideoRepository,
   type IYoutubeService,
   query,
 } from "../../infra";
@@ -24,31 +24,31 @@ import {
   type Result,
 } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
-import { SearchByVideoIdsAndCreateParam } from "../../usecase/video";
+import { SearchByStreamIdsAndCreateParam } from "../../usecase/stream";
 import { TargetLangSchema } from "../translate";
 
-export interface IVideoService {
-  searchLiveYoutubeVideos(): Promise<Result<Videos, AppError>>;
-  searchLiveTwitchVideos(): Promise<Result<Videos, AppError>>;
-  searchLiveTwitCastingVideos(): Promise<Result<Videos, AppError>>;
-  searchAllLiveVideos(): Promise<Result<Videos, AppError>>;
-  searchExistVideos(): Promise<Result<Videos, AppError>>;
-  getVideosByIDs({
-    youtubeVideoIds,
-    twitchVideoIds,
+export interface IStreamService {
+  searchLiveYoutubeStreams(): Promise<Result<Streams, AppError>>;
+  searchLiveTwitchStreams(): Promise<Result<Streams, AppError>>;
+  searchLiveTwitCastingStreams(): Promise<Result<Streams, AppError>>;
+  searchAllLiveStreams(): Promise<Result<Streams, AppError>>;
+  searchExistStreams(): Promise<Result<Streams, AppError>>;
+  getStreamsByIDs({
+    youtubeStreamIds,
+    twitchStreamIds,
   }: {
-    youtubeVideoIds: string[];
-    twitchVideoIds: string[];
-  }): Promise<Result<Videos, AppError>>;
-  searchDeletedVideos(): Promise<Result<Videos, AppError>>;
-  translateVideos({
+    youtubeStreamIds: string[];
+    twitchStreamIds: string[];
+  }): Promise<Result<Streams, AppError>>;
+  searchDeletedStreams(): Promise<Result<Streams, AppError>>;
+  translateStreams({
     languageCode,
-    videos,
+    streams,
   }: {
     languageCode: string;
-    videos: Videos;
-  }): Promise<Result<Videos, AppError>>;
-  getVideosByChannel({
+    streams: Streams;
+  }): Promise<Result<Streams, AppError>>;
+  getStreamsByChannel({
     channelId,
     maxResults,
     order,
@@ -62,15 +62,15 @@ export interface IVideoService {
       | "title"
       | "videoCount"
       | "viewCount";
-  }): Promise<Result<Videos, AppError>>;
-  getMemberVideos(): Promise<Result<Videos, AppError>>;
-  getVideosByVideoIds(params: {
-    videoIds: string[];
-  }): Promise<Result<Videos, AppError>>;
+  }): Promise<Result<Streams, AppError>>;
+  getMemberStreams(): Promise<Result<Streams, AppError>>;
+  getStreamsByStreamIds(params: {
+    streamIds: string[];
+  }): Promise<Result<Streams, AppError>>;
 }
 
-export class VideoService implements IVideoService {
-  private readonly SERVICE_NAME = "VideoService";
+export class StreamService implements IStreamService {
+  private readonly SERVICE_NAME = "StreamService";
 
   constructor(
     private readonly deps: {
@@ -78,18 +78,18 @@ export class VideoService implements IVideoService {
       twitchClient: ITwitchService;
       twitCastingClient: ITwitcastingService;
       creatorRepository: ICreatorRepository;
-      videoRepository: IVideoRepository;
+      streamRepository: IStreamRepository;
       aiService: IAIService;
       cacheClient: ICacheClient;
     },
   ) {}
 
-  async searchLiveYoutubeVideos(): Promise<Result<Videos, AppError>> {
+  async searchLiveYoutubeStreams(): Promise<Result<Streams, AppError>> {
     return withTracerResult(
       this.SERVICE_NAME,
-      "searchLiveYoutubeVideos",
+      "searchLiveYoutubeStreams",
       async (span) => {
-        AppLogger.info("Searching live YouTube videos", {
+        AppLogger.info("Searching live YouTube streams", {
           service: this.SERVICE_NAME,
         });
 
@@ -107,28 +107,28 @@ export class VideoService implements IVideoService {
         });
 
         const promises = [
-          this.deps.youtubeClient.searchVideos({
+          this.deps.youtubeClient.searchStreams({
             query: query.VSPO_JP,
             eventType: "live",
           }),
-          this.deps.youtubeClient.searchVideos({
+          this.deps.youtubeClient.searchStreams({
             query: query.VSPO_EN,
             eventType: "live",
           }),
-          this.deps.youtubeClient.searchVideos({
+          this.deps.youtubeClient.searchStreams({
             query: query.VSPO_JP,
             eventType: "upcoming",
           }),
-          this.deps.youtubeClient.searchVideos({
+          this.deps.youtubeClient.searchStreams({
             query: query.VSPO_EN,
             eventType: "upcoming",
           }),
         ];
 
         const results = await Promise.allSettled(promises);
-        const videos = results
+        const streams = results
           .filter(
-            (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
+            (r): r is PromiseFulfilledResult<OkResult<Streams>> =>
               r.status === "fulfilled" && !r.value.err,
           )
           .flatMap((r) => r.value.val);
@@ -137,17 +137,17 @@ export class VideoService implements IVideoService {
         );
 
         if (failedResults.length > 0) {
-          AppLogger.warn("Some YouTube video searches failed", {
+          AppLogger.warn("Some YouTube stream searches failed", {
             service: this.SERVICE_NAME,
             failedCount: failedResults.length,
             errors: failedResults.map((r) => r.reason),
           });
         }
 
-        AppLogger.info("Successfully fetched Raw YouTube videos", {
+        AppLogger.info("Successfully fetched Raw YouTube streams", {
           service: this.SERVICE_NAME,
-          count: videos.length,
-          videoTitles: videos.map((v) => v.title),
+          count: streams.length,
+          streamTitles: streams.map((v) => v.title),
         });
 
         const channelIds = c.val.jp
@@ -161,9 +161,9 @@ export class VideoService implements IVideoService {
           channelTitles: c.val.jp.map((c) => c.channel?.youtube?.name),
         });
 
-        const videoIds = Array.from(
+        const streamIds = Array.from(
           new Set(
-            videos
+            streams
               .map((v) => {
                 const channelId = v.rawChannelID;
                 if (channelIds.includes(channelId)) {
@@ -175,42 +175,42 @@ export class VideoService implements IVideoService {
           ),
         );
 
-        AppLogger.info("Successfully fetched Filtered YouTube videos", {
+        AppLogger.info("Successfully fetched Filtered YouTube streams", {
           service: this.SERVICE_NAME,
-          count: videoIds.length,
-          videoTitles: videoIds.map(
-            (id) => videos.find((v) => v.rawId === id)?.title,
+          count: streamIds.length,
+          streamTitles: streamIds.map(
+            (id) => streams.find((v) => v.rawId === id)?.title,
           ),
         });
 
-        const fetchedVideos = await this.getVideosByIDs({
-          youtubeVideoIds: videoIds,
-          twitchVideoIds: [],
+        const fetchedStreams = await this.getStreamsByIDs({
+          youtubeStreamIds: streamIds,
+          twitchStreamIds: [],
         });
-        if (fetchedVideos.err) {
-          AppLogger.error("Failed to fetch videos by IDs", {
+        if (fetchedStreams.err) {
+          AppLogger.error("Failed to fetch streams by IDs", {
             service: this.SERVICE_NAME,
-            error: fetchedVideos.err,
+            error: fetchedStreams.err,
           });
-          return fetchedVideos;
+          return fetchedStreams;
         }
 
-        AppLogger.info("Successfully fetched YouTube videos", {
+        AppLogger.info("Successfully fetched YouTube streams", {
           service: this.SERVICE_NAME,
-          count: fetchedVideos.val.length,
-          videos: fetchedVideos.val.map((v) => ({
+          count: fetchedStreams.val.length,
+          streams: fetchedStreams.val.map((v) => ({
             rawId: v.rawId,
             title: v.title,
             status: v.status,
           })),
         });
-        return Ok(fetchedVideos.val);
+        return Ok(fetchedStreams.val);
       },
     );
   }
 
-  async searchLiveTwitchVideos(): Promise<Result<Videos, AppError>> {
-    AppLogger.info("Searching live Twitch videos", {
+  async searchLiveTwitchStreams(): Promise<Result<Streams, AppError>> {
+    AppLogger.info("Searching live Twitch streams", {
       service: this.SERVICE_NAME,
     });
 
@@ -239,9 +239,9 @@ export class VideoService implements IVideoService {
     const archives =
       results[1].status === "fulfilled" ? results[1].value.val : [];
 
-    const videos = liveStreams?.concat(archives ?? []);
+    const streams = liveStreams?.concat(archives ?? []);
 
-    if (!videos) {
+    if (!streams) {
       return Ok([]);
     }
 
@@ -275,10 +275,10 @@ export class VideoService implements IVideoService {
       });
     }
 
-    // Get the current live stream IDs to check against existing videos
-    const ids = new Set(videos.map((video) => video.rawId));
-    // Get existing videos that are marked as live from Twitch
-    const existingLiveVideosResult = await this.deps.videoRepository.list({
+    // Get the current live stream IDs to check against existing streams
+    const ids = new Set(streams.map((stream) => stream.rawId));
+    // Get existing streams that are marked as live from Twitch
+    const existingLiveStreamsResult = await this.deps.streamRepository.list({
       limit: 500,
       page: 0,
       status: StatusSchema.Enum.live,
@@ -287,39 +287,39 @@ export class VideoService implements IVideoService {
       orderBy: "desc",
     });
 
-    // Process ended videos in parallel with other operations
+    // Process ended streams in parallel with other operations
     if (
-      !existingLiveVideosResult.err &&
-      existingLiveVideosResult.val.length > 0
+      !existingLiveStreamsResult.err &&
+      existingLiveStreamsResult.val.length > 0
     ) {
-      const endedVideoIds = existingLiveVideosResult.val
-        .filter((video) => !ids.has(video.rawId))
-        .map((video) => video.id);
+      const endedStreamIds = existingLiveStreamsResult.val
+        .filter((stream) => !ids.has(stream.rawId))
+        .map((stream) => stream.id);
 
-      // Delete videos that are no longer live
-      if (endedVideoIds.length > 0) {
+      // Delete streams that are no longer live
+      if (endedStreamIds.length > 0) {
         AppLogger.info(
-          `Deleting ${endedVideoIds.length} Twitch videos that have ended`,
+          `Deleting ${endedStreamIds.length} Twitch streams that have ended`,
           {
             service: this.SERVICE_NAME,
-            endedVideoIds: endedVideoIds,
+            endedStreamIds: endedStreamIds,
             streamIds: ids,
           },
         );
-        // Delete videos that have ended using batchDelete (don't await here)
-        await this.deps.videoRepository.batchDelete(endedVideoIds);
+        // Delete streams that have ended using batchDelete (don't await here)
+        await this.deps.streamRepository.batchDelete(endedStreamIds);
       }
     }
 
-    AppLogger.info("Successfully fetched Twitch videos", {
+    AppLogger.info("Successfully fetched Twitch streams", {
       service: this.SERVICE_NAME,
-      count: videos.length,
+      count: streams.length,
     });
-    return Ok(videos);
+    return Ok(streams);
   }
 
-  async searchLiveTwitCastingVideos(): Promise<Result<Videos, AppError>> {
-    AppLogger.info("Searching live TwitCasting videos", {
+  async searchLiveTwitCastingStreams(): Promise<Result<Streams, AppError>> {
+    AppLogger.info("Searching live TwitCasting streams", {
       service: this.SERVICE_NAME,
     });
 
@@ -337,38 +337,38 @@ export class VideoService implements IVideoService {
       .concat(c.val.en.map((c) => c.channel?.twitCasting?.rawId))
       .filter((id) => id !== undefined);
 
-    const result = await this.deps.twitCastingClient.getVideos({
+    const result = await this.deps.twitCastingClient.getStreams({
       userIds: userIds,
     });
     if (result.err) {
-      AppLogger.error("Failed to get TwitCasting videos", {
+      AppLogger.error("Failed to get TwitCasting streams", {
         service: this.SERVICE_NAME,
         error: result.err,
       });
       return result;
     }
 
-    AppLogger.info("Successfully fetched TwitCasting videos", {
+    AppLogger.info("Successfully fetched TwitCasting streams", {
       service: this.SERVICE_NAME,
       count: result.val.length,
     });
     return Ok(result.val);
   }
 
-  async searchAllLiveVideos(): Promise<Result<Videos, AppError>> {
-    AppLogger.info("Searching all live videos", {
+  async searchAllLiveStreams(): Promise<Result<Streams, AppError>> {
+    AppLogger.info("Searching all live streams", {
       service: this.SERVICE_NAME,
     });
 
     const results = await Promise.allSettled([
-      this.searchLiveYoutubeVideos(),
-      this.searchLiveTwitchVideos(),
-      this.searchLiveTwitCastingVideos(),
+      this.searchLiveYoutubeStreams(),
+      this.searchLiveTwitchStreams(),
+      this.searchLiveTwitCastingStreams(),
     ]);
 
-    const videos = results
+    const streams = results
       .filter(
-        (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
+        (r): r is PromiseFulfilledResult<OkResult<Streams>> =>
           r.status === "fulfilled" && !r.value.err,
       )
       .flatMap((r) => r.value.val);
@@ -378,28 +378,28 @@ export class VideoService implements IVideoService {
     );
 
     if (failedResults.length > 0) {
-      AppLogger.warn("Some video searches failed", {
+      AppLogger.warn("Some stream searches failed", {
         service: this.SERVICE_NAME,
         failedCount: failedResults.length,
         errors: failedResults.map((r) => r.reason),
       });
     }
 
-    AppLogger.info("Successfully fetched all live videos", {
+    AppLogger.info("Successfully fetched all live streams", {
       service: this.SERVICE_NAME,
-      count: videos.length,
-      videos: videos.map((v) => ({
+      count: streams.length,
+      streams: streams.map((v) => ({
         rawId: v.rawId,
         title: v.title,
         status: v.status,
       })),
     });
-    return Ok(videos);
+    return Ok(streams);
   }
 
-  // Get videos that have differences from existing videos
-  async searchExistVideos(): Promise<Result<Videos, AppError>> {
-    const liveVideos = await this.deps.videoRepository.list({
+  // Get streams that have differences from existing streams
+  async searchExistStreams(): Promise<Result<Streams, AppError>> {
+    const liveStreams = await this.deps.streamRepository.list({
       limit: 1000,
       page: 0,
       status: StatusSchema.Enum.live,
@@ -409,7 +409,7 @@ export class VideoService implements IVideoService {
       languageCode: "default",
       orderBy: "desc",
     });
-    const upcomingVideos = await this.deps.videoRepository.list({
+    const upcomingStreams = await this.deps.streamRepository.list({
       limit: 1000,
       page: 0,
       status: StatusSchema.Enum.upcoming,
@@ -419,47 +419,47 @@ export class VideoService implements IVideoService {
       languageCode: "default",
       orderBy: "desc",
     });
-    if (liveVideos.err) {
-      return liveVideos;
+    if (liveStreams.err) {
+      return liveStreams;
     }
-    if (upcomingVideos.err) {
-      return upcomingVideos;
+    if (upcomingStreams.err) {
+      return upcomingStreams;
     }
 
-    const existingVideos = liveVideos.val.concat(upcomingVideos.val);
-    const youtubeVideoIds = existingVideos
+    const existingStreams = liveStreams.val.concat(upcomingStreams.val);
+    const youtubeStreamIds = existingStreams
       .filter((v) => v.platform === PlatformSchema.Enum.youtube)
       .map((v) => v.rawId);
 
-    const twitchVideoIds = existingVideos
+    const twitchStreamIds = existingStreams
       .filter((v) => v.platform === PlatformSchema.Enum.twitch)
       .map((v) => v.rawId);
 
-    const fetchedVideos = await this.getVideosByIDs({
-      youtubeVideoIds,
-      twitchVideoIds,
+    const fetchedStreams = await this.getStreamsByIDs({
+      youtubeStreamIds,
+      twitchStreamIds,
     });
 
-    if (fetchedVideos.err) {
-      return fetchedVideos;
+    if (fetchedStreams.err) {
+      return fetchedStreams;
     }
 
-    AppLogger.debug("Successfully fetched videos", {
+    AppLogger.debug("Successfully fetched streams", {
       service: this.SERVICE_NAME,
-      count: fetchedVideos.val.length,
-      videos: fetchedVideos.val.map((v) => ({
+      count: fetchedStreams.val.length,
+      streams: fetchedStreams.val.map((v) => ({
         rawId: v.rawId,
         title: v.title,
         status: v.status,
       })),
     });
 
-    const diff = this.getVideoDifferences(fetchedVideos.val, existingVideos);
+    const diff = this.getStreamDifferences(fetchedStreams.val, existingStreams);
 
-    AppLogger.debug("Successfully fetched videos", {
+    AppLogger.debug("Successfully fetched streams", {
       service: this.SERVICE_NAME,
       count: diff.length,
-      videos: diff.map((v) => ({
+      streams: diff.map((v) => ({
         rawId: v.rawId,
         title: v.title,
         status: v.status,
@@ -469,58 +469,58 @@ export class VideoService implements IVideoService {
     return Ok(diff);
   }
 
-  async searchDeletedVideos(): Promise<Result<Videos, AppError>> {
-    const existingVideos = await this.deps.videoRepository.list({
+  async searchDeletedStreams(): Promise<Result<Streams, AppError>> {
+    const existingStreams = await this.deps.streamRepository.list({
       limit: 500,
       page: 0,
       platform: PlatformSchema.Enum.youtube,
       languageCode: "default",
       orderBy: "desc",
     });
-    if (existingVideos.err) {
-      return existingVideos;
+    if (existingStreams.err) {
+      return existingStreams;
     }
 
-    const youtubeVideoIds = existingVideos.val
+    const youtubeStreamIds = existingStreams.val
       .filter((v) => v.platform === PlatformSchema.Enum.youtube)
       .map((v) => v.rawId);
 
-    const ytFetchedVideos = await this.getVideosByIDs({
-      youtubeVideoIds,
-      twitchVideoIds: [],
+    const ytFetchedStreams = await this.getStreamsByIDs({
+      youtubeStreamIds,
+      twitchStreamIds: [],
     });
 
-    if (ytFetchedVideos.err) {
-      return ytFetchedVideos;
+    if (ytFetchedStreams.err) {
+      return ytFetchedStreams;
     }
 
-    // const existTwitchVideos = existingVideos.val.filter(
+    // const existTwitchStreams = existingStreams.val.filter(
     //   (v) => v.platform === PlatformSchema.Enum.twitch,
     // );
 
-    // const liveTwitchVideos = await this.searchLiveTwitchVideos();
-    // if (liveTwitchVideos.err) {
-    //   return liveTwitchVideos;
+    // const liveTwitchStreams = await this.searchLiveTwitchStreams();
+    // if (liveTwitchStreams.err) {
+    //   return liveTwitchStreams;
     // }
 
-    // const liveTwitchVideoIds = liveTwitchVideos.val
+    // const liveTwitchStreamIds = liveTwitchStreams.val
     //   .filter((v) => v.platform === PlatformSchema.Enum.twitch)
     //   .map((v) => v.rawId);
 
-    // const deletedTwitchVideos = existTwitchVideos.filter(
-    //   (v) => !liveTwitchVideoIds.includes(v.rawId),
+    // const deletedTwitchStreams = existTwitchStreams.filter(
+    //   (v) => !liveTwitchStreamIds.includes(v.rawId),
     // );
 
-    const deletedYtVideos = existingVideos.val.filter(
-      (v) => !ytFetchedVideos.val.find((fv) => fv.rawId === v.rawId),
+    const deletedYtStreams = existingStreams.val.filter(
+      (v) => !ytFetchedStreams.val.find((fv) => fv.rawId === v.rawId),
     );
 
-    const deletedVideos = deletedYtVideos;
+    const deletedStreams = deletedYtStreams;
 
-    AppLogger.info("Successfully fetched deleted videos", {
+    AppLogger.info("Successfully fetched deleted streams", {
       service: this.SERVICE_NAME,
-      count: deletedVideos.length,
-      videos: deletedVideos.map((v) => ({
+      count: deletedStreams.length,
+      streams: deletedStreams.map((v) => ({
         rawId: v.rawId,
         title: v.title,
         status: v.status,
@@ -528,81 +528,85 @@ export class VideoService implements IVideoService {
     });
 
     return Ok(
-      deletedVideos.map((video) => ({
-        ...video,
+      deletedStreams.map((stream) => ({
+        ...stream,
         deleted: true,
       })),
     );
   }
 
-  async getVideosByIDs({
-    youtubeVideoIds,
-    twitchVideoIds,
+  async getStreamsByIDs({
+    youtubeStreamIds,
+    twitchStreamIds,
   }: {
-    youtubeVideoIds: string[];
-    twitchVideoIds: string[];
-  }): Promise<Result<Videos, AppError>> {
-    const results: PromiseSettledResult<Result<Videos, AppError>>[] =
+    youtubeStreamIds: string[];
+    twitchStreamIds: string[];
+  }): Promise<Result<Streams, AppError>> {
+    const results: PromiseSettledResult<Result<Streams, AppError>>[] =
       await Promise.allSettled([
-        ...(youtubeVideoIds.length > 0
-          ? [this.deps.youtubeClient.getVideos({ videoIds: youtubeVideoIds })]
-          : []),
-        ...(twitchVideoIds.length > 0
+        ...(youtubeStreamIds.length > 0
           ? [
-              this.deps.twitchClient.getVideosByIDs({
-                videoIds: twitchVideoIds,
+              this.deps.youtubeClient.getStreams({
+                streamIds: youtubeStreamIds,
+              }),
+            ]
+          : []),
+        ...(twitchStreamIds.length > 0
+          ? [
+              this.deps.twitchClient.getStreamsByIDs({
+                streamIds: twitchStreamIds,
               }),
             ]
           : []),
       ]);
-    const videos = results
+    const streams = results
       .filter(
-        (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
+        (r): r is PromiseFulfilledResult<OkResult<Streams>> =>
           r.status === "fulfilled" && !r.value.err,
       )
       .flatMap((r) => r.value.val);
 
-    return Ok(videos);
+    return Ok(streams);
   }
 
-  async translateVideos({
+  async translateStreams({
     languageCode,
-    videos,
+    streams,
   }: {
     languageCode: string;
-    videos: Videos;
-  }): Promise<Result<Videos, AppError>> {
-    AppLogger.info("Translating videos", {
+    streams: Streams;
+  }): Promise<Result<Streams, AppError>> {
+    AppLogger.info("Translating streams", {
       service: this.SERVICE_NAME,
       languageCode,
-      videoCount: videos.length,
+      streamCount: streams.length,
     });
 
-    const translatePromises = videos.map((video) =>
-      this.deps.aiService.translateText(video.title, languageCode),
+    const translatePromises = streams.map((stream) =>
+      this.deps.aiService.translateText(stream.title, languageCode),
     );
     const translatedResults = await Promise.allSettled(translatePromises);
-    const translatedVideos = videos.map((video, i) => {
+    const translatedStreams = streams.map((stream, i) => {
       const translatedText =
         translatedResults[i].status === "fulfilled"
-          ? (translatedResults[i].value.val?.translatedText ?? video.title)
-          : video.title;
+          ? (translatedResults[i].value.val?.translatedText ?? stream.title)
+          : stream.title;
       return {
-        ...video,
+        ...stream,
         title: translatedText,
         languageCode: TargetLangSchema.parse(languageCode),
         translated: true,
       };
     });
 
-    AppLogger.info("Successfully translated videos", {
+    AppLogger.info("Successfully translated streams", {
       service: this.SERVICE_NAME,
-      count: translatedVideos.length,
+      count: translatedStreams.length,
     });
-    return Ok(translatedVideos);
+    return Ok(translatedStreams);
   }
 
-  async getMemberVideos(): Promise<Result<Videos, AppError>> {
+  async getMemberStreams(): Promise<Result<Streams, AppError>> {
     // Check if the channel exists in our creators
     const creators = await this.masterCreators();
     if (creators.err) {
@@ -617,7 +621,7 @@ export class VideoService implements IVideoService {
       .concat(creators.val.en.map((c) => c.channel?.youtube?.rawId))
       .filter((id) => id !== undefined);
 
-    const existingLiveVideos = await this.deps.videoRepository.list({
+    const existingLiveStreams = await this.deps.streamRepository.list({
       limit: 500,
       page: 0,
       languageCode: "default",
@@ -625,38 +629,38 @@ export class VideoService implements IVideoService {
       channelIds: channelIds,
       orderBy: "desc",
     });
-    if (existingLiveVideos.err) {
-      return existingLiveVideos;
+    if (existingLiveStreams.err) {
+      return existingLiveStreams;
     }
 
-    const existingVideos = existingLiveVideos.val;
+    const existingStreams = existingLiveStreams.val;
 
     const promises = channelIds.map((id) =>
-      this.getVideosByChannel({ channelId: id, maxResults: 50 }),
+      this.getStreamsByChannel({ channelId: id, maxResults: 50 }),
     );
     const results = await Promise.allSettled(promises);
-    const videos = results
+    const streams = results
       .filter(
-        (r): r is PromiseFulfilledResult<OkResult<Videos>> =>
+        (r): r is PromiseFulfilledResult<OkResult<Streams>> =>
           r.status === "fulfilled" && !r.value.err,
       )
       .flatMap((r) => r.value.val);
 
-    const videosWithDiff = this.getVideoDifferences(videos, existingVideos);
+    const streamsWithDiff = this.getStreamDifferences(streams, existingStreams);
 
-    AppLogger.info("Successfully fetched member videos", {
+    AppLogger.info("Successfully fetched member streams", {
       service: this.SERVICE_NAME,
-      count: videosWithDiff.length,
-      videos: videosWithDiff.map((v) => ({
+      count: streamsWithDiff.length,
+      streams: streamsWithDiff.map((v) => ({
         rawId: v.rawId,
         title: v.title,
         status: v.status,
       })),
     });
-    return Ok(videosWithDiff);
+    return Ok(streamsWithDiff);
   }
 
-  async getVideosByChannel({
+  async getStreamsByChannel({
     channelId,
     maxResults,
     order,
@@ -672,18 +676,18 @@ export class VideoService implements IVideoService {
       | "videoCount"
       | "viewCount";
     eventType?: "completed" | "live" | "upcoming";
-  }): Promise<Result<Videos, AppError>> {
+  }): Promise<Result<Streams, AppError>> {
     return withTracerResult(
       this.SERVICE_NAME,
-      "getVideosByChannel",
+      "getStreamsByChannel",
       async (span) => {
-        AppLogger.info("Fetching videos by channel ID", {
+        AppLogger.info("Fetching streams by channel ID", {
           service: this.SERVICE_NAME,
           channelId,
         });
 
-        // Fetch videos from the channel
-        const result = await this.deps.youtubeClient.getVideosByChannel({
+        // Fetch streams from the channel
+        const result = await this.deps.youtubeClient.getStreamsByChannel({
           channelId,
           maxResults,
           order,
@@ -691,7 +695,7 @@ export class VideoService implements IVideoService {
         });
 
         if (result.err) {
-          AppLogger.error("Failed to fetch videos by channel", {
+          AppLogger.error("Failed to fetch streams by channel", {
             service: this.SERVICE_NAME,
             channelId,
             error: result.err,
@@ -699,19 +703,19 @@ export class VideoService implements IVideoService {
           return result;
         }
 
-        const yt = await this.deps.youtubeClient.getVideos({
-          videoIds: result.val.map((v) => v.rawId),
+        const yt = await this.deps.youtubeClient.getStreams({
+          streamIds: result.val.map((v) => v.rawId),
         });
 
         if (yt.err) {
           return yt;
         }
 
-        AppLogger.info("Successfully fetched videos by channel", {
+        AppLogger.info("Successfully fetched streams by channel", {
           service: this.SERVICE_NAME,
           channelId,
           count: yt.val.length,
-          videos: yt.val.map((v) => ({
+          streams: yt.val.map((v) => ({
             rawId: v.rawId,
             title: v.title,
             status: v.status,
@@ -723,11 +727,11 @@ export class VideoService implements IVideoService {
     );
   }
 
-  async getVideosByVideoIds(params: {
-    videoIds: string[];
-  }): Promise<Result<Videos, AppError>> {
-    return this.deps.youtubeClient.getVideos({
-      videoIds: params.videoIds,
+  async getStreamsByStreamIds(params: {
+    streamIds: string[];
+  }): Promise<Result<Streams, AppError>> {
+    return this.deps.youtubeClient.getStreams({
+      streamIds: params.streamIds,
     });
   }
 
@@ -757,21 +761,21 @@ export class VideoService implements IVideoService {
     return Ok({ jp: jpCreators.val, en: enCreators.val });
   }
 
-  private getVideoDifferences(
-    fetchedVideos: Videos,
-    existingVideos: Videos,
-  ): Videos {
-    return fetchedVideos.filter((fetchedVideo) => {
-      const existingVideo = existingVideos.find(
-        (v) => v.rawId === fetchedVideo.rawId,
+  private getStreamDifferences(
+    fetchedStreams: Streams,
+    existingStreams: Streams,
+  ): Streams {
+    return fetchedStreams.filter((fetchedStream) => {
+      const existingStream = existingStreams.find(
+        (v) => v.rawId === fetchedStream.rawId,
       );
-      if (!existingVideo) return true;
+      if (!existingStream) return true;
       return (
-        existingVideo.title !== fetchedVideo.title ||
-        existingVideo.status !== fetchedVideo.status ||
-        existingVideo.description !== fetchedVideo.description ||
-        existingVideo.startedAt !== fetchedVideo.startedAt ||
-        existingVideo.endedAt !== fetchedVideo.endedAt
+        existingStream.title !== fetchedStream.title ||
+        existingStream.status !== fetchedStream.status ||
+        existingStream.description !== fetchedStream.description ||
+        existingStream.startedAt !== fetchedStream.startedAt ||
+        existingStream.endedAt !== fetchedStream.endedAt
       );
     });
   }

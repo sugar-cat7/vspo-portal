@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Channel, Video } from "../../domain";
+import type { Channel } from "../../domain";
 import {
   type TestCase,
   mockYoutubeClient,
@@ -22,12 +22,12 @@ describe("YoutubeService", () => {
     vi.clearAllMocks();
   });
 
-  describe("getVideos", () => {
-    const testCases: TestCase<{ videoIds: string[] }>[] = [
+  describe("getStreams", () => {
+    const testCases: TestCase<{ streamIds: string[] }>[] = [
       {
         name: "should fetch videos by IDs successfully",
-        videoIds: ["archive_video_id"],
-        mockResponses: [mockYoutubeResponses.validVideos],
+        streamIds: ["archive_video_id"],
+        mockResponses: [mockYoutubeResponses.validStreams],
         expectedResult: {
           rawId: "archive_video_id",
           rawChannelID: "channel_id_1",
@@ -48,13 +48,13 @@ describe("YoutubeService", () => {
       },
       {
         name: "should handle API error",
-        videoIds: ["invalid_id"],
+        streamIds: ["invalid_id"],
         mockResponses: [mockYoutubeResponses.invalidRequest],
         expectedError: "Network error while fetching videos",
       },
       {
         name: "should handle network error",
-        videoIds: ["error"],
+        streamIds: ["error"],
         mockResponses: [mockYoutubeResponses.networkError],
         expectedError: "Network error",
       },
@@ -62,8 +62,10 @@ describe("YoutubeService", () => {
 
     it.concurrent.each(testCases)(
       "$name",
-      async ({ videoIds, expectedError, expectedResult }) => {
-        const result = await youtubeService.getVideos({ videoIds });
+      async ({ streamIds, expectedError, expectedResult }) => {
+        const result = await youtubeService.getStreams({
+          streamIds: streamIds,
+        });
 
         if (expectedError) {
           expect(result.err).toBeDefined();
@@ -82,7 +84,7 @@ describe("YoutubeService", () => {
     );
   });
 
-  describe("searchVideos", () => {
+  describe("searchStreams", () => {
     const testCases: TestCase<{
       query: typeof query.VSPO_JP;
       eventType: QueryEventType;
@@ -114,7 +116,7 @@ describe("YoutubeService", () => {
     it.concurrent.each(testCases)(
       "$name",
       async ({ query, eventType, expectedError, expectedResult }) => {
-        const result = await youtubeService.searchVideos({ query, eventType });
+        const result = await youtubeService.searchStreams({ query, eventType });
 
         if (expectedError) {
           expect(result.err).toBeDefined();

@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { Video } from "../../domain";
+import type { Stream } from "../../domain";
 
 export type MockResponse =
   | {
@@ -13,7 +13,7 @@ export type TestCase<T> = {
   name: string;
   mockResponses: MockResponse[];
   expectedError?: string;
-  expectedResult?: Partial<Video>;
+  expectedResult?: Partial<Stream>;
 } & T;
 
 // Mock responses
