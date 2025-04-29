@@ -22,7 +22,6 @@ export const newApp = () => {
       title: "api",
       description: "API",
     },
-    servers: [{ url: "api" }],
   });
   app.get("/swagger-ui", swaggerUI({ url: "/doc" }));
 

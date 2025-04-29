@@ -9,8 +9,8 @@ import {
   type Creator,
   CreatorsSchema,
   type DiscordServer,
-  type Video,
-  VideosSchema,
+  type Stream,
+  StreamsSchema,
   discordServers,
 } from "../../../../domain";
 import { t } from "../../../../domain/service/i18n";
@@ -20,23 +20,23 @@ import { createHandler, withTracer } from "../../../../infra/http/trace";
 import { AppLogger } from "../../../../pkg/logging";
 import type {
   AdjustBotChannelParams,
-  BatchDeleteByVideoIdsParam,
+  BatchDeleteByStreamIdsParam,
   BatchUpsertCreatorsParam,
   BatchUpsertDiscordServersParam,
-  BatchUpsertVideosParam,
+  BatchUpsertStreamsParam,
   ICreatorInteractor,
   IDiscordInteractor,
-  IVideoInteractor,
+  IStreamInteractor,
   ListByMemberTypeParam,
   ListDiscordServerParam,
   ListParam,
   SearchByChannelIdsParam,
   SearchByMemberTypeParam,
-  SearchByVideoIdsAndCreateParam,
+  SearchByStreamIdsAndCreateParam,
   SendAdminMessageParams,
   SendMessageParams,
   TranslateCreatorParam,
-  TranslateVideoParam,
+  TranslateStreamParam,
 } from "../../../../usecase";
 async function batchEnqueueWithChunks<T, U extends MessageParam>(
   items: T[],
@@ -54,25 +54,25 @@ async function batchEnqueueWithChunks<T, U extends MessageParam>(
   );
 }
 
-export class VideoService extends RpcTarget {
-  #usecase: IVideoInteractor;
-  #queue: Queue<VideoMessage>;
-  constructor(usecase: IVideoInteractor, queue: Queue) {
+export class StreamService extends RpcTarget {
+  #usecase: IStreamInteractor;
+  #queue: Queue<StreamMessage>;
+  constructor(usecase: IStreamInteractor, queue: Queue) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
   }
 
-  async batchUpsertEnqueue(params: BatchUpsertVideosParam) {
+  async batchUpsertEnqueue(params: BatchUpsertStreamsParam) {
     return batchEnqueueWithChunks(
       params,
       100,
-      (video) => ({ body: { ...video, kind: "upsert-video" } }),
+      (stream) => ({ body: { ...stream, kind: "upsert-stream" } }),
       this.#queue,
     );
   }
 
-  async batchUpsert(params: BatchUpsertVideosParam) {
+  async batchUpsert(params: BatchUpsertStreamsParam) {
     return this.#usecase.batchUpsert(params);
   }
 
@@ -92,35 +92,35 @@ export class VideoService extends RpcTarget {
     return this.#usecase.searchDeletedCheck();
   }
 
-  async batchDeleteByVideoIds(params: BatchDeleteByVideoIdsParam) {
-    return this.#usecase.batchDeleteByVideoIds(params);
+  async batchDeleteByStreamIds(params: BatchDeleteByStreamIdsParam) {
+    return this.#usecase.batchDeleteByStreamIds(params);
   }
 
-  async translateVideoEnqueue(params: TranslateVideoParam) {
+  async translateStreamEnqueue(params: TranslateStreamParam) {
     return batchEnqueueWithChunks(
-      params.videos,
+      params.streams,
       100,
-      (video) => ({
+      (stream) => ({
         body: {
-          ...video,
+          ...stream,
           languageCode: TargetLangSchema.parse(params.languageCode),
-          kind: "translate-video",
+          kind: "translate-stream",
         },
       }),
       this.#queue,
     );
   }
 
-  async getMemberVideos() {
-    return this.#usecase.getMemberVideos();
+  async getMemberStreams() {
+    return this.#usecase.getMemberStreams();
   }
 
   async deletedListIds() {
     return this.#usecase.deletedListIds();
   }
 
-  async searchByVideosIdsAndCreate(params: SearchByVideoIdsAndCreateParam) {
-    return this.#usecase.searchByVideosIdsAndCreate(params);
+  async searchByStreamsIdsAndCreate(params: SearchByStreamIdsAndCreateParam) {
+    return this.#usecase.searchByStreamsIdsAndCreate(params);
   }
 }
 
@@ -179,7 +179,7 @@ export class DiscordService extends RpcTarget {
     this.#queue = queue;
   }
 
-  async sendVideosToMultipleChannels(params: SendMessageParams) {
+  async sendStreamsToMultipleChannels(params: SendMessageParams) {
     return this.#usecase.batchSendMessages(params);
   }
 
@@ -237,9 +237,9 @@ export class DiscordService extends RpcTarget {
 }
 
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
-  newVideoUsecase() {
+  newStreamUsecase() {
     const d = this.setup();
-    return new VideoService(d.videoInteractor, this.env.WRITE_QUEUE);
+    return new StreamService(d.streamInteractor, this.env.WRITE_QUEUE);
   }
 
   newCreatorUsecase() {
@@ -262,8 +262,8 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
 }
 
 type Kind =
-  | "translate-video"
-  | "upsert-video"
+  | "translate-stream"
+  | "upsert-stream"
   | "upsert-creator"
   | "translate-creator"
   | "discord-send-message"
@@ -272,11 +272,11 @@ type Kind =
 
 type BaseMessageParam<T, K extends Kind> = T & { kind: K };
 
-type TranslateVideo = BaseMessageParam<Video, "translate-video">;
+type TranslateStream = BaseMessageParam<Stream, "translate-stream">;
 type TranslateCreator = BaseMessageParam<Creator, "translate-creator">;
-type UpsertVideo = BaseMessageParam<Video, "upsert-video">;
+type UpsertStream = BaseMessageParam<Stream, "upsert-stream">;
 type UpsertCreator = BaseMessageParam<Creator, "upsert-creator">;
-type DiscordSend = BaseMessageParam<Video, "discord-send-message">;
+type DiscordSend = BaseMessageParam<Stream, "discord-send-message">;
 type UpsertDiscordServer = BaseMessageParam<
   DiscordServer,
   "upsert-discord-server"
@@ -287,7 +287,7 @@ type DeleteMessageInChannel = BaseMessageParam<
 >;
 
 type CreatorMessage = TranslateCreator | UpsertCreator;
-type VideoMessage = TranslateVideo | UpsertVideo;
+type StreamMessage = TranslateStream | UpsertStream;
 type DiscordMessage =
   | DiscordSend
   | UpsertDiscordServer
@@ -295,27 +295,27 @@ type DiscordMessage =
 
 type MessageParam =
   | CreatorMessage
-  | VideoMessage
+  | StreamMessage
   | DiscordMessage
   | UpsertDiscordServer
   | DeleteMessageInChannel;
 
 // Type guard functions for each message type
-function isTranslateVideo(message: unknown): message is TranslateVideo {
+function isTranslateStream(message: unknown): message is TranslateStream {
   return (
     typeof message === "object" &&
     message !== null &&
     "kind" in message &&
-    message.kind === "translate-video"
+    message.kind === "translate-stream"
   );
 }
 
-function isUpsertVideo(message: unknown): message is UpsertVideo {
+function isUpsertStream(message: unknown): message is UpsertStream {
   return (
     typeof message === "object" &&
     message !== null &&
     "kind" in message &&
-    message.kind === "upsert-video"
+    message.kind === "upsert-stream"
   );
 }
 
@@ -386,8 +386,8 @@ export default createHandler({
 
       // Define type-safe message storage
       const messageGroups = {
-        "translate-video": [] as TranslateVideo[],
-        "upsert-video": [] as UpsertVideo[],
+        "translate-stream": [] as TranslateStream[],
+        "upsert-stream": [] as UpsertStream[],
         "upsert-creator": [] as UpsertCreator[],
         "translate-creator": [] as TranslateCreator[],
         "discord-send-message": [] as DiscordSend[],
@@ -400,10 +400,10 @@ export default createHandler({
         const body = message.body;
         if (!body) continue;
 
-        if (isTranslateVideo(body)) {
-          messageGroups["translate-video"].push(body);
-        } else if (isUpsertVideo(body)) {
-          messageGroups["upsert-video"].push(body);
+        if (isTranslateStream(body)) {
+          messageGroups["translate-stream"].push(body);
+        } else if (isUpsertStream(body)) {
+          messageGroups["upsert-stream"].push(body);
         } else if (isUpsertCreator(body)) {
           messageGroups["upsert-creator"].push(body);
         } else if (isTranslateCreator(body)) {
@@ -427,19 +427,19 @@ export default createHandler({
       );
 
       // Process each kind of message
-      if (messageGroups["upsert-video"].length > 0) {
-        const messages = messageGroups["upsert-video"];
+      if (messageGroups["upsert-stream"].length > 0) {
+        const messages = messageGroups["upsert-stream"];
         logger.info(
-          `Processing ${messages.length} messages of kind: upsert-video`,
+          `Processing ${messages.length} messages of kind: upsert-stream`,
         );
         span.setAttributes({
           queue: batch.queue,
-          kind: "upsert-video",
+          kind: "upsert-stream",
           count: messages.length,
         });
 
-        logger.debug("Upserting Queued videos", {
-          videos: messages.map((v) => ({
+        logger.debug("Upserting Queued streams", {
+          streams: messages.map((v) => ({
             rawId: v.rawId,
             title: v.title,
             status: v.status,
@@ -447,13 +447,13 @@ export default createHandler({
           })),
         });
 
-        const videos = VideosSchema.safeParse(messages);
-        if (!videos.success) {
-          logger.error(`Invalid videos: ${videos.error.message}`);
+        const streams = StreamsSchema.safeParse(messages);
+        if (!streams.success) {
+          logger.error(`Invalid streams: ${streams.error.message}`);
         } else {
-          const v = await c.videoInteractor.batchUpsert(videos.data);
+          const v = await c.streamInteractor.batchUpsert(streams.data);
           if (v.err) {
-            logger.error(`Failed to upsert videos: ${v.err.message}`);
+            logger.error(`Failed to upsert streams: ${v.err.message}`);
             throw v.err;
           }
         }
@@ -482,56 +482,56 @@ export default createHandler({
         }
       }
 
-      if (messageGroups["translate-video"].length > 0) {
-        const messages = messageGroups["translate-video"];
+      if (messageGroups["translate-stream"].length > 0) {
+        const messages = messageGroups["translate-stream"];
         logger.info(
-          `Processing ${messages.length} messages of kind: translate-video`,
+          `Processing ${messages.length} messages of kind: translate-stream`,
         );
         span.setAttributes({
           queue: batch.queue,
-          kind: "translate-video",
+          kind: "translate-stream",
           count: messages.length,
         });
 
-        const v = VideosSchema.safeParse(messages);
+        const v = StreamsSchema.safeParse(messages);
         if (!v.success) {
-          logger.error(`Invalid videos: ${v.error.message}`);
+          logger.error(`Invalid streams: ${v.error.message}`);
         } else {
-          // Group videos by language code
-          const videosByLang = v.data.reduce(
-            (acc, video) => {
-              const langCode = video.languageCode;
+          // Group streams by language code
+          const streamsByLang = v.data.reduce(
+            (acc, stream) => {
+              const langCode = stream.languageCode;
               if (!acc[langCode]) {
                 acc[langCode] = [];
               }
-              acc[langCode].push(video);
+              acc[langCode].push(stream);
               return acc;
             },
             {} as Record<string, typeof v.data>,
           );
 
           // Process each language group separately
-          for (const [langCode, videos] of Object.entries(videosByLang)) {
-            const tv = await c.videoInteractor.translateVideo({
+          for (const [langCode, streams] of Object.entries(streamsByLang)) {
+            const tv = await c.streamInteractor.translateStream({
               languageCode: langCode,
-              videos: videos,
+              streams: streams,
             });
 
             if (tv.err) {
               logger.error(
-                `Failed to translate videos for ${langCode}: ${tv.err.message}`,
+                `Failed to translate streams for ${langCode}: ${tv.err.message}`,
               );
               continue;
             }
 
             if (!tv.val?.length || tv.val.length === 0) {
-              logger.info(`No videos to translate for ${langCode}`);
+              logger.info(`No streams to translate for ${langCode}`);
               continue;
             }
 
             await env.WRITE_QUEUE.sendBatch(
-              tv.val.map((video) => ({
-                body: { ...video, kind: "upsert-video" },
+              tv.val.map((stream) => ({
+                body: { ...stream, kind: "upsert-stream" },
               })),
             );
           }

@@ -76,14 +76,14 @@ describe("TwitchService", () => {
     );
   });
 
-  describe("getVideosByIDs", () => {
-    const testCases: TestCase<{ videoIds: string[] }>[] = [
+  describe("getStreamsByIDs", () => {
+    const testCases: TestCase<{ streamIds: string[] }>[] = [
       {
         name: "should fetch videos by IDs successfully",
-        videoIds: ["video_id_1"],
+        streamIds: ["video_id_1"],
         mockResponses: [
           mockTwitchResponses.validToken,
-          mockTwitchResponses.validVideos,
+          mockTwitchResponses.validStreams,
         ],
         expectedResult: {
           rawId: "video_id_1",
@@ -105,13 +105,13 @@ describe("TwitchService", () => {
       },
       {
         name: "should handle API error - invalid token",
-        videoIds: ["invalid"],
+        streamIds: ["invalid"],
         mockResponses: [mockTwitchResponses.invalidToken],
         expectedError: "Twitch API error: invalid_client",
       },
       {
         name: "should handle network error",
-        videoIds: ["error"],
+        streamIds: ["error"],
         mockResponses: [mockTwitchResponses.networkError],
         expectedError: "Network error",
       },
@@ -119,8 +119,8 @@ describe("TwitchService", () => {
 
     it.concurrent.each(testCases)(
       "$name",
-      async ({ videoIds, expectedError, expectedResult }) => {
-        const result = await twitchService.getVideosByIDs({ videoIds });
+      async ({ streamIds, expectedError, expectedResult }) => {
+        const result = await twitchService.getStreamsByIDs({ streamIds });
 
         if (expectedError) {
           expect(result.err).toBeDefined();

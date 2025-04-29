@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { Video } from "../../domain";
+import type { Stream } from "../../domain";
 import type { paths } from "../../infra/twitch/twitch-api.generated";
 type StreamsResponse =
   paths["/streams"]["get"]["responses"]["200"]["content"]["application/json"];
@@ -17,7 +17,7 @@ export type TestCase<T> = {
   name: string;
   mockResponses: MockResponse[];
   expectedError?: string;
-  expectedResult?: Partial<Video>;
+  expectedResult?: Partial<Stream>;
 } & T;
 
 // Mock responses

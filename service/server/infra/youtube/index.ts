@@ -4,14 +4,14 @@ import {
   createChannel,
   createChannels,
 } from "../../domain/channel";
-import { type Videos, createVideo, createVideos } from "../../domain/video";
+import { type Streams, createStream, createStreams } from "../../domain/stream";
 import { getCurrentUTCString } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
 import { withTracerResult } from "../http/trace/cloudflare";
 
-type GetVideosParams = {
-  videoIds: string[];
+type GetStreamsParams = {
+  streamIds: string[];
 };
 
 export const query = {
@@ -23,7 +23,7 @@ export const query = {
 
 export type QueryKeys = (typeof query)[keyof typeof query];
 
-export type SearchVideosParams = {
+export type SearchStreamsParams = {
   query: QueryKeys;
   eventType: "completed" | "live" | "upcoming";
 };
@@ -32,7 +32,7 @@ export type GetChannelsParams = {
   channelIds: string[];
 };
 
-export type GetVideosByChannelParams = {
+export type GetStreamsByChannelParams = {
   channelId: string;
   maxResults?: number;
   order?:
@@ -46,12 +46,14 @@ export type GetVideosByChannelParams = {
 };
 
 export interface IYoutubeService {
-  getVideos(params: GetVideosParams): Promise<Result<Videos, AppError>>;
-  searchVideos(params: SearchVideosParams): Promise<Result<Videos, AppError>>;
+  getStreams(params: GetStreamsParams): Promise<Result<Streams, AppError>>;
+  searchStreams(
+    params: SearchStreamsParams,
+  ): Promise<Result<Streams, AppError>>;
   getChannels(params: GetChannelsParams): Promise<Result<Channels, AppError>>;
-  getVideosByChannel(
-    params: GetVideosByChannelParams,
-  ): Promise<Result<Videos, AppError>>;
+  getStreamsByChannel(
+    params: GetStreamsByChannelParams,
+  ): Promise<Result<Streams, AppError>>;
 }
 
 export class YoutubeService implements IYoutubeService {
@@ -64,12 +66,14 @@ export class YoutubeService implements IYoutubeService {
     });
   }
 
-  async getVideos(params: GetVideosParams): Promise<Result<Videos, AppError>> {
-    return withTracerResult("YoutubeService", "getVideos", async (span) => {
-      AppLogger.info("getVideos", {
-        videoIds: params.videoIds,
+  async getStreams(
+    params: GetStreamsParams,
+  ): Promise<Result<Streams, AppError>> {
+    return withTracerResult("YoutubeService", "getStreams", async (span) => {
+      AppLogger.info("getStreams", {
+        streamIds: params.streamIds,
       });
-      const chunks = this.chunkArray(params.videoIds, 50);
+      const chunks = this.chunkArray(params.streamIds, 50);
       const videos: youtube_v3.Schema$Video[] = [];
       for (const chunk of chunks) {
         const responseResult = await wrap(
@@ -91,9 +95,9 @@ export class YoutubeService implements IYoutubeService {
         videos.push(...(response.data.items || []));
       }
       return Ok(
-        createVideos(
+        createStreams(
           videos.map((video) =>
-            createVideo({
+            createStream({
               id: "",
               rawId: video.id || "",
               rawChannelID: video.snippet?.channelId || "",
@@ -110,7 +114,7 @@ export class YoutubeService implements IYoutubeService {
                 video.liveStreamingDetails?.scheduledEndTime ||
                 null,
               platform: "youtube",
-              status: this.determineVideoStatus(video),
+              status: this.determineStreamStatus(video),
               tags: video.snippet?.tags || [],
               viewCount: Number.parseInt(
                 video.statistics?.viewCount || "0",
@@ -123,7 +127,6 @@ export class YoutubeService implements IYoutubeService {
                 video.snippet?.thumbnails?.default?.url ||
                 video.snippet?.thumbnails?.maxres?.url ||
                 "",
-              videoType: "vspo_stream",
             }),
           ),
         ),
@@ -131,10 +134,10 @@ export class YoutubeService implements IYoutubeService {
     });
   }
 
-  async searchVideos(
-    params: SearchVideosParams,
-  ): Promise<Result<Videos, AppError>> {
-    return withTracerResult("YoutubeService", "searchVideos", async (span) => {
+  async searchStreams(
+    params: SearchStreamsParams,
+  ): Promise<Result<Streams, AppError>> {
+    return withTracerResult("YoutubeService", "searchStreams", async (span) => {
       const responseResult = await wrap(
         this.youtube.search.list({
           part: ["snippet"],
@@ -158,9 +161,9 @@ export class YoutubeService implements IYoutubeService {
 
       const response = responseResult.val;
       return Ok(
-        createVideos(
+        createStreams(
           response.data.items?.map((video) =>
-            createVideo({
+            createStream({
               id: "",
               rawId: video.id?.videoId || "",
               languageCode: "default",
@@ -179,7 +182,6 @@ export class YoutubeService implements IYoutubeService {
                 video.snippet?.thumbnails?.default?.url ||
                 video.snippet?.thumbnails?.standard?.url ||
                 "",
-              videoType: "vspo_stream",
             }),
           ) || [],
         ),
@@ -242,12 +244,12 @@ export class YoutubeService implements IYoutubeService {
     });
   }
 
-  async getVideosByChannel(
-    params: GetVideosByChannelParams,
-  ): Promise<Result<Videos, AppError>> {
+  async getStreamsByChannel(
+    params: GetStreamsByChannelParams,
+  ): Promise<Result<Streams, AppError>> {
     return withTracerResult(
       "YoutubeService",
-      "getVideosByChannel",
+      "getStreamsByChannel",
       async (span) => {
         const option: youtube_v3.Params$Resource$Search$List = {
           part: ["snippet"],
@@ -284,9 +286,9 @@ export class YoutubeService implements IYoutubeService {
 
         const response = responseResult.val;
         return Ok(
-          createVideos(
+          createStreams(
             response.data.items?.map((video) =>
-              createVideo({
+              createStream({
                 id: "",
                 rawId: video.id?.videoId || "",
                 languageCode: "default",
@@ -298,7 +300,7 @@ export class YoutubeService implements IYoutubeService {
                 startedAt: null,
                 endedAt: null,
                 platform: "youtube",
-                status: this.determineVideoStatus(video),
+                status: this.determineStreamStatus(video),
                 tags: [],
                 viewCount: 0,
                 thumbnailURL:
@@ -308,7 +310,6 @@ export class YoutubeService implements IYoutubeService {
                   video.snippet?.thumbnails?.maxres?.url ||
                   video.snippet?.thumbnails?.high?.url ||
                   "",
-                videoType: "vspo_stream",
               }),
             ) || [],
           ),
@@ -325,7 +326,7 @@ export class YoutubeService implements IYoutubeService {
     return result;
   }
 
-  private determineVideoStatus(
+  private determineStreamStatus(
     video: youtube_v3.Schema$Video | youtube_v3.Schema$SearchResult,
   ): "live" | "upcoming" | "ended" | "unknown" {
     if (video?.snippet?.liveBroadcastContent) {

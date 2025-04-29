@@ -2,8 +2,8 @@ import type { PgTransactionConfig } from "drizzle-orm/pg-core";
 import {
   CreatorService,
   type ICreatorService,
-  type IVideoService,
-  VideoService,
+  type IStreamService,
+  StreamService,
 } from "../../domain";
 import type { AppError, Result } from "../../pkg/errors";
 import {
@@ -14,10 +14,10 @@ import {
   type ICreatorRepository,
   type IDiscordMessageRepository,
   type IDiscordServerRepository,
+  type IStreamRepository,
   type ITxManager,
-  type IVideoRepository,
+  StreamRepository,
   TxManager,
-  VideoRepository,
 } from "../repository";
 import { type ITwitcastingService, TwitcastingService } from "../twitcasting";
 import { type ITwitchService, TwitchService } from "../twitch";
@@ -31,8 +31,8 @@ import {
 import {
   CreatorInteractor,
   type ICreatorInteractor,
-  type IVideoInteractor,
-  VideoInteractor,
+  type IStreamInteractor,
+  StreamInteractor,
 } from "../../usecase";
 import {
   DiscordInteractor,
@@ -44,7 +44,7 @@ import { DiscordClient, type IDiscordClient } from "../discord";
 
 export interface IRepositories {
   creatorRepository: ICreatorRepository;
-  videoRepository: IVideoRepository;
+  streamRepository: IStreamRepository;
   discordServerRepository: IDiscordServerRepository;
   discordMessageRepository: IDiscordMessageRepository;
 }
@@ -52,7 +52,7 @@ export interface IRepositories {
 export function createRepositories(tx: DB): IRepositories {
   return {
     creatorRepository: new CreatorRepository(tx),
-    videoRepository: new VideoRepository(tx),
+    streamRepository: new StreamRepository(tx),
     discordServerRepository: new DiscordServerRepository(tx),
     discordMessageRepository: new DiscordMessageRepository(tx),
   };
@@ -60,7 +60,7 @@ export function createRepositories(tx: DB): IRepositories {
 
 export interface IServices {
   creatorService: ICreatorService;
-  videoService: IVideoService;
+  streamService: IStreamService;
   discordService: IDiscordService;
 }
 
@@ -80,19 +80,19 @@ export function createServices(
       aiService,
       cacheClient,
     }),
-    videoService: new VideoService({
+    streamService: new StreamService({
       youtubeClient,
       twitchClient,
       twitCastingClient: twitcastingClient,
       creatorRepository: repos.creatorRepository,
-      videoRepository: repos.videoRepository,
+      streamRepository: repos.streamRepository,
       aiService,
       cacheClient,
     }),
     discordService: new DiscordService({
       discordServerRepository: repos.discordServerRepository,
       discordClient: discordClient,
-      videoRepository: repos.videoRepository,
+      streamRepository: repos.streamRepository,
       discordMessageRepository: repos.discordMessageRepository,
       cacheClient,
     }),
@@ -153,7 +153,7 @@ export class Container {
   private readonly txManager: TxManager;
   private readonly cacheClient: ICacheClient;
   creatorInteractor: ICreatorInteractor;
-  videoInteractor: IVideoInteractor;
+  streamInteractor: IStreamInteractor;
   discordInteractor: IDiscordInteractor;
 
   constructor(private readonly env: AppWorkerEnv) {
@@ -192,7 +192,7 @@ export class Container {
       this.cacheClient,
     );
     this.creatorInteractor = new CreatorInteractor(context);
-    this.videoInteractor = new VideoInteractor(context);
+    this.streamInteractor = new StreamInteractor(context);
     this.discordInteractor = new DiscordInteractor(context);
   }
 }
