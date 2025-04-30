@@ -3,7 +3,6 @@ import {
   type BindingAppWorkerEnv,
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
-import { AppLogger } from "../../../../pkg/logging";
 import { withTracer } from "../../trace/cloudflare";
 
 export const searchClipsWorkflow = () => {
@@ -24,7 +23,7 @@ export const searchClipsWorkflow = () => {
           "fetch and send clips",
           {
             retries: { limit: 1, delay: "5 second", backoff: "linear" },
-            timeout: "1 minutes",
+            timeout: "5 minutes",
           },
           async () => {
             return withTracer(

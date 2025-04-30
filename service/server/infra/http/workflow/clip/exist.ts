@@ -41,21 +41,22 @@ export const existClipsWorkflow = () => {
                 const maxClips = 5000;
 
                 while (hasNext && allClips.length < maxClips) {
-                  const result = await cu.list({
+                  const r1 = await cu.list({
                     limit: pageSize,
                     page: currentPage,
                     languageCode: "default",
                     orderBy: "desc",
                     includeDeleted: true,
+                    clipType: "clip",
                   });
 
-                  if (result.err) {
-                    throw result.err;
+                  if (r1.err) {
+                    throw r1.err;
                   }
 
-                  allClips.push(...result.val.clips);
+                  allClips.push(...r1.val.clips);
                   currentPage++;
-                  hasNext = result.val.pagination.hasNext;
+                  hasNext = r1.val.pagination.hasNext;
 
                   // Break if we've reached our max clips limit
                   if (allClips.length >= maxClips) {
@@ -68,14 +69,69 @@ export const existClipsWorkflow = () => {
                 logger.info(
                   `Retrieved ${allClips.length} clips with pagination`,
                 );
-                return { allClips };
+                return { clips: allClips };
               },
             );
           },
         );
 
+        const sv = await step.do(
+          "fetch clips with pagination",
+          {
+            retries: { limit: 3, delay: "5 second", backoff: "linear" },
+            timeout: "3 minutes",
+          },
+          async () => {
+            return withTracer(
+              "clip-workflow",
+              "list-clips-paginated",
+              async (span) => {
+                const cu = await env.APP_WORKER.newClipUsecase();
+                const allClips = [];
+                let currentPage = 0;
+                let hasNext = true;
+                const pageSize = 500;
+                const maxClips = 5000;
+
+                while (hasNext && allClips.length < maxClips) {
+                  const r1 = await cu.list({
+                    limit: pageSize,
+                    page: currentPage,
+                    languageCode: "default",
+                    orderBy: "desc",
+                    includeDeleted: true,
+                    clipType: "short",
+                  });
+
+                  if (r1.err) {
+                    throw r1.err;
+                  }
+
+                  allClips.push(...r1.val.clips);
+                  currentPage++;
+                  hasNext = r1.val.pagination.hasNext;
+
+                  // Break if we've reached our max clips limit
+                  if (allClips.length >= maxClips) {
+                    allClips.length = maxClips; // Trim to exactly maxClips
+                    break;
+                  }
+                }
+
+                span.setAttribute("clips_count", allClips.length);
+                logger.info(
+                  `Retrieved ${allClips.length} clips with pagination`,
+                );
+                return { shorts: allClips };
+              },
+            );
+          },
+        );
+
+        const combinedClips = [...lv.clips, ...sv.shorts];
+
         // Now we have all clips in lv.allClips for further processing
-        if (lv.allClips.length === 0) {
+        if (combinedClips.length === 0) {
           logger.info("No clips found to process");
           return;
         }
@@ -94,7 +150,7 @@ export const existClipsWorkflow = () => {
                 const cu = await env.APP_WORKER.newClipUsecase();
 
                 // Example: Get the clipIds from all clips
-                const clipIds = lv.allClips.map((clip) => clip.id);
+                const clipIds = combinedClips.map((clip) => clip.id);
                 span.setAttribute("clips_to_process", clipIds.length);
 
                 // Example of what you might do with the clips
@@ -118,7 +174,7 @@ export const existClipsWorkflow = () => {
           async () => {
             return withTracer("clip-workflow", "delete-clips", async (span) => {
               const cu = await env.APP_WORKER.newClipUsecase();
-              const deletedClips = lv.allClips.filter((clip) => clip.deleted);
+              const deletedClips = combinedClips.filter((clip) => clip.deleted);
               await cu.deleteClips({
                 clipIds: deletedClips.map((clip) => clip.id),
               });
@@ -157,7 +213,7 @@ export const existClipsWorkflow = () => {
                 "batch-upsert-clips",
                 async (span) => {
                   const cu = await env.APP_WORKER.newClipUsecase();
-                  const deletedClips = lv.allClips
+                  const deletedClips = combinedClips
                     .filter((clip) =>
                       r1.result.notExistsClipIds.includes(clip.id),
                     )

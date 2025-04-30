@@ -10,7 +10,7 @@ const getClipLink = (
 ): string => {
   switch (platform) {
     case "youtube": // YouTube clips might have /clip/ path, needs verification
-      return `https://www.youtube.com/watch?v=/${rawId}`; // Example structure
+      return `https://www.youtube.com/watch?v=${rawId}`; // Example structure
     case "twitch": // Twitch clips have a specific structure
       return `https://clips.twitch.tv/${rawId}`; // Standard Twitch clip URL
     // Add cases for twitcasting, niconico if they have distinct clip URLs

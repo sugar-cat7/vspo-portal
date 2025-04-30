@@ -390,7 +390,7 @@ export class CreatorRepository implements ICreatorRepository {
           this.db
             .select({ count: count() })
             .from(channelTable)
-            .where(eq(channelTable.id, channelId))
+            .where(eq(channelTable.platformChannelId, channelId))
             .execute(),
           (err) =>
             new AppError({

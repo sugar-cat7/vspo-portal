@@ -386,7 +386,7 @@ export class YoutubeService implements IYoutubeService {
       for (const chunk of chunks) {
         const responseResult = await wrap(
           this.youtube.videos.list({
-            part: ["snippet"],
+            part: ["snippet", "contentDetails", "statistics"],
             id: chunk,
           }),
           (err) =>
@@ -405,32 +405,13 @@ export class YoutubeService implements IYoutubeService {
         items.push(...(response.data.items || []));
       }
 
-      // Check if each video is a short or normal clip using Promise.allSettled
-      const videoTypeChecks = await Promise.allSettled(
-        items.map((item) => {
-          const videoId = item.id || "";
-          return this.isYoutubeShort(videoId).then((isShort) => ({
-            videoId,
-            isShort,
-          }));
-        }),
-      );
-
       // Create a map of videoId to isShort status
       const shortStatusMap = new Map<string, boolean>();
-      for (const result of videoTypeChecks) {
-        if (result.status === "fulfilled") {
-          const { videoId, isShort } = result.value;
-          shortStatusMap.set(videoId, isShort);
-        }
-      }
 
       return Ok(
         createClips(
           items.map((item) => {
             const videoId = item.id || "";
-            const isShort = shortStatusMap.get(videoId) || false;
-
             return createClip({
               id: "",
               rawId: videoId,
@@ -440,10 +421,10 @@ export class YoutubeService implements IYoutubeService {
               description: item.snippet?.description || "",
               publishedAt: item.snippet?.publishedAt || getCurrentUTCString(),
               platform: "youtube",
-              tags: [],
-              viewCount: 0,
+              tags: item.snippet?.tags || [],
+              viewCount: Number.parseInt(item.statistics?.viewCount || "0", 10),
               thumbnailURL: item.snippet?.thumbnails?.default?.url || "",
-              type: isShort ? "short" : "clip",
+              type: this.isYoutubeShort(item) ? "short" : "clip",
             });
           }) ?? [],
         ),
@@ -455,25 +436,40 @@ export class YoutubeService implements IYoutubeService {
    * Checks if a YouTube video is a short by attempting to access the shorts URL
    * If the URL redirects to watch?v=, it's a normal video; if not, it's a short
    */
-  private async isYoutubeShort(videoId: string): Promise<boolean> {
-    if (!videoId) return false;
+  private isYoutubeShort(v: youtube_v3.Schema$Video): boolean {
+    if (!v.id) return false;
 
-    try {
-      const shortsUrl = `https://youtube.com/shorts/${videoId}`;
-      const response = await fetch(shortsUrl, {
-        method: "HEAD",
-        redirect: "manual",
-      });
-
-      // If response URL is the same as request URL, it's a short
-      // If it would redirect to watch?v=, it's a normal video
-      return !response.headers.get("location")?.includes("watch?v=");
-    } catch (error) {
-      AppLogger.error(`Failed to check if video ${videoId} is a short`, {
-        error,
-      });
-      return false;
+    // tag
+    const tags = v.snippet?.tags || [];
+    if (tags.includes("shorts")) {
+      return true;
     }
+
+    // title
+    const title = v.snippet?.title || "";
+    if (title.includes("#shorts")) {
+      return true;
+    }
+
+    // duration < 60s
+    const duration = v.contentDetails?.duration || "";
+    const durationInSeconds = this.parseYoutubeDuration(duration);
+    if (durationInSeconds <= 60) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private parseYoutubeDuration(duration: string): number {
+    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+    if (!match) return 0;
+
+    const hours = match[1] ? Number.parseInt(match[1], 10) : 0;
+    const minutes = match[2] ? Number.parseInt(match[2], 10) : 0;
+    const seconds = match[3] ? Number.parseInt(match[3], 10) : 0;
+
+    return hours * 3600 + minutes * 60 + seconds;
   }
 
   private chunkArray<T>(array: T[], size: number): T[][] {
