@@ -163,6 +163,8 @@ export const setupTxManager = async () => {
     getStreams: async () => Ok([]),
     searchStreams: async () => Ok([]),
     getStreamsByChannel: async () => Ok([]),
+    searchClips: async () => Ok([]),
+    getClips: async () => Ok([]),
   };
 
   const twitchService = {

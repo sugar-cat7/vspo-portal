@@ -4,6 +4,7 @@ import {
   createChannel,
   createChannels,
 } from "../../domain/channel";
+import { type Clips, createClip, createClips } from "../../domain/clip";
 import { type Streams, createStream, createStreams } from "../../domain/stream";
 import { getCurrentUTCString } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
@@ -45,6 +46,16 @@ export type GetStreamsByChannelParams = {
   eventType?: "completed" | "live" | "upcoming";
 };
 
+export type SearchClipsParams = {
+  query: QueryKeys;
+  maxResults?: number;
+  order: "relevance" | "date" | "rating" | "title" | "videoCount" | "viewCount";
+};
+
+export type GetClipsParams = {
+  videoIds: string[];
+};
+
 export interface IYoutubeService {
   getStreams(params: GetStreamsParams): Promise<Result<Streams, AppError>>;
   searchStreams(
@@ -54,6 +65,8 @@ export interface IYoutubeService {
   getStreamsByChannel(
     params: GetStreamsByChannelParams,
   ): Promise<Result<Streams, AppError>>;
+  searchClips(params: SearchClipsParams): Promise<Result<Clips, AppError>>;
+  getClips(params: GetClipsParams): Promise<Result<Clips, AppError>>;
 }
 
 export class YoutubeService implements IYoutubeService {
@@ -316,6 +329,147 @@ export class YoutubeService implements IYoutubeService {
         );
       },
     );
+  }
+
+  async searchClips(
+    params: SearchClipsParams,
+  ): Promise<Result<Clips, AppError>> {
+    return withTracerResult("YoutubeService", "searchClips", async (span) => {
+      const responseResult = await wrap(
+        this.youtube.search.list({
+          part: ["snippet"],
+          q: params.query,
+          maxResults: params.maxResults || 50,
+          type: ["video"],
+          safeSearch: "none",
+          order: params.order,
+        }),
+        (err) =>
+          new AppError({
+            message: `Network error while fetching clips: ${err.message}`,
+            code: "INTERNAL_SERVER_ERROR",
+            cause: err,
+          }),
+      );
+      if (responseResult.err) {
+        return Err(responseResult.err);
+      }
+
+      return Ok(
+        createClips(
+          responseResult.val.data.items?.map((item) => {
+            return {
+              id: "",
+              rawId: item.id?.videoId || "",
+              title: item.snippet?.title || "",
+              languageCode: "default",
+              rawChannelID: item.snippet?.channelId || "",
+              description: item.snippet?.description || "",
+              publishedAt: item.snippet?.publishedAt || getCurrentUTCString(),
+              platform: "youtube",
+              tags: [],
+              viewCount: 0,
+              thumbnailURL: item.snippet?.thumbnails?.default?.url || "",
+              type: "clip",
+            };
+          }) ?? [],
+        ),
+      );
+    });
+  }
+
+  async getClips(params: GetClipsParams): Promise<Result<Clips, AppError>> {
+    return withTracerResult("YoutubeService", "getClips", async (span) => {
+      const chunks = this.chunkArray(params.videoIds, 50);
+      const items: youtube_v3.Schema$Video[] = [];
+
+      for (const chunk of chunks) {
+        const responseResult = await wrap(
+          this.youtube.videos.list({
+            part: ["snippet", "contentDetails", "statistics"],
+            id: chunk,
+          }),
+          (err) =>
+            new AppError({
+              message: `Network error while fetching clips: ${err.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+              cause: err,
+            }),
+        );
+
+        if (responseResult.err) {
+          return Err(responseResult.err);
+        }
+
+        const response = responseResult.val;
+        items.push(...(response.data.items || []));
+      }
+
+      // Create a map of videoId to isShort status
+      const shortStatusMap = new Map<string, boolean>();
+
+      return Ok(
+        createClips(
+          items.map((item) => {
+            const videoId = item.id || "";
+            return createClip({
+              id: "",
+              rawId: videoId,
+              title: item.snippet?.title || "",
+              languageCode: "default",
+              rawChannelID: item.snippet?.channelId || "",
+              description: item.snippet?.description || "",
+              publishedAt: item.snippet?.publishedAt || getCurrentUTCString(),
+              platform: "youtube",
+              tags: item.snippet?.tags || [],
+              viewCount: Number.parseInt(item.statistics?.viewCount || "0", 10),
+              thumbnailURL: item.snippet?.thumbnails?.default?.url || "",
+              type: this.isYoutubeShort(item) ? "short" : "clip",
+            });
+          }) ?? [],
+        ),
+      );
+    });
+  }
+
+  /**
+   * Checks if a YouTube video is a short by attempting to access the shorts URL
+   * If the URL redirects to watch?v=, it's a normal video; if not, it's a short
+   */
+  private isYoutubeShort(v: youtube_v3.Schema$Video): boolean {
+    if (!v.id) return false;
+
+    // tag
+    const tags = v.snippet?.tags || [];
+    if (tags.includes("shorts")) {
+      return true;
+    }
+
+    // title
+    const title = v.snippet?.title || "";
+    if (title.includes("#shorts")) {
+      return true;
+    }
+
+    // duration < 60s
+    const duration = v.contentDetails?.duration || "";
+    const durationInSeconds = this.parseYoutubeDuration(duration);
+    if (durationInSeconds <= 60) {
+      return true;
+    }
+
+    return false;
+  }
+
+  private parseYoutubeDuration(duration: string): number {
+    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+    if (!match) return 0;
+
+    const hours = match[1] ? Number.parseInt(match[1], 10) : 0;
+    const minutes = match[2] ? Number.parseInt(match[2], 10) : 0;
+    const seconds = match[3] ? Number.parseInt(match[3], 10) : 0;
+
+    return hours * 3600 + minutes * 60 + seconds;
   }
 
   private chunkArray<T>(array: T[], size: number): T[][] {

@@ -1,6 +1,7 @@
 import { vi } from "vitest";
 import type { Channel, Stream } from "../../domain";
-import type { IYoutubeService } from "../../infra/youtube";
+import type { Clip } from "../../domain/clip";
+import type { IYoutubeService, SearchClipsParams } from "../../infra/youtube";
 import { type AppError, Ok, type Result } from "../../pkg/errors";
 
 export type MockResponse =
@@ -169,6 +170,18 @@ export const mockYoutubeService: IYoutubeService = {
       | "videoCount"
       | "viewCount";
   }): Promise<Result<Stream[], AppError>> => {
+    return Ok([]);
+  },
+
+  searchClips: async (
+    params: SearchClipsParams,
+  ): Promise<Result<Clip[], AppError>> => {
+    return Ok([]);
+  },
+
+  getClips: async (params: { videoIds: string[] }): Promise<
+    Result<Clip[], AppError>
+  > => {
     return Ok([]);
   },
 };

@@ -24,7 +24,6 @@ import {
   type Result,
 } from "../../pkg/errors";
 import { AppLogger } from "../../pkg/logging";
-import { SearchByStreamIdsAndCreateParam } from "../../usecase/stream";
 import { TargetLangSchema } from "../translate";
 
 export interface IStreamService {

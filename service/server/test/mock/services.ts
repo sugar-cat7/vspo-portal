@@ -1,9 +1,11 @@
 import type { Channel } from "../../domain/channel";
+import type { Clip } from "../../domain/clip";
 import type { Stream } from "../../domain/stream";
 import type {
   ITwitcastingService,
   ITwitchService,
   IYoutubeService,
+  SearchClipsParams,
 } from "../../infra";
 import type {
   TwitCastingStream,
@@ -45,6 +47,18 @@ export class MockYoutubeService implements IYoutubeService {
       | "videoCount"
       | "viewCount";
   }): Promise<Result<Stream[], AppError>> {
+    return Ok([]);
+  }
+
+  async searchClips(
+    params: SearchClipsParams,
+  ): Promise<Result<Clip[], AppError>> {
+    return Ok([]);
+  }
+
+  async getClips(params: { videoIds: string[] }): Promise<
+    Result<Clip[], AppError>
+  > {
     return Ok([]);
   }
 }

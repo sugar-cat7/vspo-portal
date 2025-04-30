@@ -57,7 +57,7 @@ export const videoTable = pgTable("video", {
     .notNull()
     .references(() => channelTable.platformChannelId, { onDelete: "cascade" }), // Channel ID
   platformType: text("platform_type").notNull(), // Platform type
-  videoType: text("video_type").notNull(), // Type of video
+  videoType: text("video_type").notNull(), // Type of video(vspo_stream, clip(short, clip))
   publishedAt: timestamp("published_at", {
     withTimezone: true,
     mode: "date",
@@ -66,6 +66,19 @@ export const videoTable = pgTable("video", {
   thumbnailUrl: text("thumbnail_url").notNull(), // Video's thumbnail URL
   link: text("link"), // Video's link
   deleted: boolean("deleted").notNull().default(false), // Deleted flag
+});
+
+// Clip statistics and metadata table
+export const clipStatsTable = pgTable("clip_stats", {
+  id: text("id").primaryKey(), // Unique identifier
+  videoId: text("video_id")
+    .notNull()
+    .references(() => videoTable.rawId, { onDelete: "cascade" })
+    .unique(), // Video ID
+  viewCount: integer("view_count").notNull(), // View count
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow(), // Last updated date and time
 });
 
 // Stream status table
@@ -199,6 +212,9 @@ export type SelectVideo = typeof videoTable.$inferSelect;
 export type InsertStreamStatus = typeof streamStatusTable.$inferInsert;
 export type SelectStreamStatus = typeof streamStatusTable.$inferSelect;
 
+export type InsertClipStats = typeof clipStatsTable.$inferInsert;
+export type SelectClipStats = typeof clipStatsTable.$inferSelect;
+
 export type InsertCreatorTranslation =
   typeof creatorTranslationTable.$inferInsert;
 export type SelectCreatorTranslation =
@@ -236,6 +252,11 @@ export const insertStreamStatusSchema = createInsertSchema(streamStatusTable);
 export const selectStreamStatusSchema = createSelectSchema(streamStatusTable);
 export const createInsertStreamStatus = (data: InsertStreamStatus) =>
   insertStreamStatusSchema.parse(data);
+
+export const insertClipStatsSchema = createInsertSchema(clipStatsTable);
+export const selectClipStatsSchema = createSelectSchema(clipStatsTable);
+export const createInsertClipStats = (data: InsertClipStats) =>
+  insertClipStatsSchema.parse(data);
 
 export const insertCreatorTranslationSchema = createInsertSchema(
   creatorTranslationTable,
