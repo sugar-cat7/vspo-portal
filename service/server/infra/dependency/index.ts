@@ -24,6 +24,7 @@ import { type ITwitchService, TwitchService } from "../twitch";
 import { type IYoutubeService, YoutubeService } from "../youtube";
 
 import type { AppWorkerEnv } from "../../config/env/internal";
+import { ClipService, type IClipService } from "../../domain/service/clip";
 import {
   DiscordService,
   type IDiscordService,
@@ -34,6 +35,7 @@ import {
   type IStreamInteractor,
   StreamInteractor,
 } from "../../usecase";
+import { ClipInteractor, type IClipInteractor } from "../../usecase/clip";
 import {
   DiscordInteractor,
   type IDiscordInteractor,
@@ -41,12 +43,14 @@ import {
 import { AIService, type IAIService } from "../ai";
 import { CloudflareKVCacheClient, type ICacheClient } from "../cache";
 import { DiscordClient, type IDiscordClient } from "../discord";
+import { ClipRepository, type IClipRepository } from "../repository/clip";
 
 export interface IRepositories {
   creatorRepository: ICreatorRepository;
   streamRepository: IStreamRepository;
   discordServerRepository: IDiscordServerRepository;
   discordMessageRepository: IDiscordMessageRepository;
+  clipRepository: IClipRepository;
 }
 
 export function createRepositories(tx: DB): IRepositories {
@@ -55,6 +59,7 @@ export function createRepositories(tx: DB): IRepositories {
     streamRepository: new StreamRepository(tx),
     discordServerRepository: new DiscordServerRepository(tx),
     discordMessageRepository: new DiscordMessageRepository(tx),
+    clipRepository: new ClipRepository(tx),
   };
 }
 
@@ -62,6 +67,7 @@ export interface IServices {
   creatorService: ICreatorService;
   streamService: IStreamService;
   discordService: IDiscordService;
+  clipService: IClipService;
 }
 
 export function createServices(
@@ -95,6 +101,11 @@ export function createServices(
       streamRepository: repos.streamRepository,
       discordMessageRepository: repos.discordMessageRepository,
       cacheClient,
+    }),
+    clipService: new ClipService({
+      youtubeClient,
+      twitchClient,
+      creatorRepository: repos.creatorRepository,
     }),
   };
 }
@@ -154,6 +165,7 @@ export class Container {
   private readonly cacheClient: ICacheClient;
   creatorInteractor: ICreatorInteractor;
   streamInteractor: IStreamInteractor;
+  clipInteractor: IClipInteractor;
   discordInteractor: IDiscordInteractor;
 
   constructor(private readonly env: AppWorkerEnv) {
@@ -194,5 +206,6 @@ export class Container {
     this.creatorInteractor = new CreatorInteractor(context);
     this.streamInteractor = new StreamInteractor(context);
     this.discordInteractor = new DiscordInteractor(context);
+    this.clipInteractor = new ClipInteractor(context);
   }
 }

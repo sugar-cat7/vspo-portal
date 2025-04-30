@@ -13,6 +13,7 @@ import {
   StreamsSchema,
   discordServers,
 } from "../../../../domain";
+import { type Clip, ClipsSchema } from "../../../../domain/clip";
 import { t } from "../../../../domain/service/i18n";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { Container } from "../../../../infra/dependency";
@@ -38,6 +39,12 @@ import type {
   TranslateCreatorParam,
   TranslateStreamParam,
 } from "../../../../usecase";
+import type {
+  BatchUpsertClipsParam,
+  IClipInteractor,
+  ListClipsQuery,
+} from "../../../../usecase/clip";
+
 async function batchEnqueueWithChunks<T, U extends MessageParam>(
   items: T[],
   chunkSize: number,
@@ -121,6 +128,45 @@ export class StreamService extends RpcTarget {
 
   async searchByStreamsIdsAndCreate(params: SearchByStreamIdsAndCreateParam) {
     return this.#usecase.searchByStreamsIdsAndCreate(params);
+  }
+}
+
+export class ClipService extends RpcTarget {
+  #usecase: IClipInteractor;
+  #queue: Queue<UpsertClip>;
+  constructor(usecase: IClipInteractor, queue: Queue) {
+    super();
+    this.#usecase = usecase;
+    this.#queue = queue;
+  }
+
+  async batchUpsertEnqueue(params: BatchUpsertClipsParam) {
+    return batchEnqueueWithChunks(
+      params,
+      100,
+      (clip) => ({ body: { ...clip, kind: "upsert-clip" } }),
+      this.#queue,
+    );
+  }
+
+  async batchUpsert(params: BatchUpsertClipsParam) {
+    return this.#usecase.batchUpsert(params);
+  }
+
+  async list(params: ListClipsQuery) {
+    return this.#usecase.list(params);
+  }
+
+  async searchNewVspoClipsAndNewCreators() {
+    return this.#usecase.searchNewVspoClipsAndNewCreators();
+  }
+
+  async searchExistVspoClips({ clipIds }: { clipIds: string[] }) {
+    return this.#usecase.searchExistVspoClips({ clipIds });
+  }
+
+  async deleteClips({ clipIds }: { clipIds: string[] }) {
+    return this.#usecase.deleteClips({ clipIds });
   }
 }
 
@@ -252,6 +298,11 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
     return new DiscordService(d.discordInteractor, this.env.WRITE_QUEUE);
   }
 
+  newClipUsecase() {
+    const d = this.setup();
+    return new ClipService(d.clipInteractor, this.env.WRITE_QUEUE);
+  }
+
   private setup() {
     const e = zAppWorkerEnv.safeParse(this.env);
     if (!e.success) {
@@ -268,7 +319,8 @@ type Kind =
   | "translate-creator"
   | "discord-send-message"
   | "upsert-discord-server"
-  | "delete-message-in-channel";
+  | "delete-message-in-channel"
+  | "upsert-clip";
 
 type BaseMessageParam<T, K extends Kind> = T & { kind: K };
 
@@ -286,6 +338,8 @@ type DeleteMessageInChannel = BaseMessageParam<
   "delete-message-in-channel"
 >;
 
+type UpsertClip = BaseMessageParam<Clip, "upsert-clip">;
+
 type CreatorMessage = TranslateCreator | UpsertCreator;
 type StreamMessage = TranslateStream | UpsertStream;
 type DiscordMessage =
@@ -298,7 +352,8 @@ type MessageParam =
   | StreamMessage
   | DiscordMessage
   | UpsertDiscordServer
-  | DeleteMessageInChannel;
+  | DeleteMessageInChannel
+  | UpsertClip;
 
 // Type guard functions for each message type
 function isTranslateStream(message: unknown): message is TranslateStream {
@@ -368,6 +423,15 @@ function isDeleteMessageInChannel(
   );
 }
 
+function isUpsertClip(message: unknown): message is UpsertClip {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "upsert-clip"
+  );
+}
+
 export default createHandler({
   queue: async (
     batch: MessageBatch<MessageParam>,
@@ -393,13 +457,13 @@ export default createHandler({
         "discord-send-message": [] as DiscordSend[],
         "upsert-discord-server": [] as UpsertDiscordServer[],
         "delete-message-in-channel": [] as DeleteMessageInChannel[],
+        "upsert-clip": [] as UpsertClip[],
       };
 
       // Group messages by kind without type assertions
       for (const message of batch.messages) {
         const body = message.body;
         if (!body) continue;
-
         if (isTranslateStream(body)) {
           messageGroups["translate-stream"].push(body);
         } else if (isUpsertStream(body)) {
@@ -414,6 +478,8 @@ export default createHandler({
           messageGroups["upsert-discord-server"].push(body);
         } else if (isDeleteMessageInChannel(body)) {
           messageGroups["delete-message-in-channel"].push(body);
+        } else if (isUpsertClip(body)) {
+          messageGroups["upsert-clip"].push(body);
         }
       }
 
@@ -426,7 +492,81 @@ export default createHandler({
         `Processing message groups: ${nonEmptyGroupNames.join(", ")}`,
       );
 
-      // Process each kind of message
+      /**
+       * Processing order:
+       * 1. Creators/Channels/Discord servers
+       * 2. Streams/Clips
+       * 3. Translations
+       * 4. Others
+       */
+
+      // FIXME: Implement parallel processing using DO to distribute tasks to separate Workers while maintaining order for independent processes
+
+      if (messageGroups["upsert-creator"].length > 0) {
+        const messages = messageGroups["upsert-creator"];
+        logger.info(
+          `Processing ${messages.length} messages of kind: upsert-creator`,
+        );
+        span.setAttributes({
+          queue: batch.queue,
+          kind: "upsert-creator",
+          count: messages.length,
+        });
+
+        const creators = CreatorsSchema.safeParse(messages);
+        if (!creators.success) {
+          logger.error(`Invalid creators: ${creators.error.message}`);
+        } else {
+          const r = await c.creatorInteractor.batchUpsert(creators.data);
+          if (r.err) {
+            logger.error(`Failed to upsert creators: ${r.err.message}`);
+            throw r.err;
+          }
+        }
+      }
+
+      if (messageGroups["upsert-discord-server"].length > 0) {
+        const messages = messageGroups["upsert-discord-server"];
+        logger.info(
+          `Processing ${messages.length} messages of kind: upsert-discord-server`,
+        );
+        span.setAttributes({
+          queue: batch.queue,
+          kind: "upsert-discord-server",
+          count: messages.length,
+        });
+
+        logger.info(`Upserting Discord servers: ${messages.length}`);
+        logger.debug("Discord servers", {
+          servers: messages,
+        });
+        const sv = await c.discordInteractor.batchUpsert(messages);
+        if (sv.err) {
+          logger.error(`Failed to upsert discord servers: ${sv.err.message}`);
+          throw sv.err;
+        }
+
+        // inital add channel
+        const initialAddChannel = messages.flatMap((server) =>
+          server.discordChannels.filter((ch) => ch.isInitialAdd),
+        );
+
+        if (initialAddChannel.length > 0) {
+          logger.info("Initial add channel", {
+            channels: initialAddChannel,
+          });
+
+          await Promise.allSettled(
+            initialAddChannel.map((ch) =>
+              c.discordInteractor.sendAdminMessage({
+                channelId: ch.rawId,
+                content: t("initialAddChannel.success"),
+              }),
+            ),
+          );
+        }
+      }
+
       if (messageGroups["upsert-stream"].length > 0) {
         const messages = messageGroups["upsert-stream"];
         logger.info(
@@ -459,25 +599,25 @@ export default createHandler({
         }
       }
 
-      if (messageGroups["upsert-creator"].length > 0) {
-        const messages = messageGroups["upsert-creator"];
+      if (messageGroups["upsert-clip"].length > 0) {
+        const messages = messageGroups["upsert-clip"];
         logger.info(
-          `Processing ${messages.length} messages of kind: upsert-creator`,
+          `Processing ${messages.length} messages of kind: upsert-clip`,
         );
         span.setAttributes({
           queue: batch.queue,
-          kind: "upsert-creator",
+          kind: "upsert-clip",
           count: messages.length,
         });
 
-        const creators = CreatorsSchema.safeParse(messages);
-        if (!creators.success) {
-          logger.error(`Invalid creators: ${creators.error.message}`);
+        const clips = ClipsSchema.safeParse(messages);
+        if (!clips.success) {
+          logger.error(`Invalid clips: ${clips.error.message}`);
         } else {
-          const r = await c.creatorInteractor.batchUpsert(creators.data);
-          if (r.err) {
-            logger.error(`Failed to upsert creators: ${r.err.message}`);
-            throw r.err;
+          const v = await c.clipInteractor.batchUpsert(clips.data);
+          if (v.err) {
+            logger.error(`Failed to upsert clips: ${v.err.message}`);
+            throw v.err;
           }
         }
       }
@@ -602,48 +742,6 @@ export default createHandler({
               })),
             );
           }
-        }
-      }
-
-      if (messageGroups["upsert-discord-server"].length > 0) {
-        const messages = messageGroups["upsert-discord-server"];
-        logger.info(
-          `Processing ${messages.length} messages of kind: upsert-discord-server`,
-        );
-        span.setAttributes({
-          queue: batch.queue,
-          kind: "upsert-discord-server",
-          count: messages.length,
-        });
-
-        logger.info(`Upserting Discord servers: ${messages.length}`);
-        logger.debug("Discord servers", {
-          servers: messages,
-        });
-        const sv = await c.discordInteractor.batchUpsert(messages);
-        if (sv.err) {
-          logger.error(`Failed to upsert discord servers: ${sv.err.message}`);
-          throw sv.err;
-        }
-
-        // inital add channel
-        const initialAddChannel = messages.flatMap((server) =>
-          server.discordChannels.filter((ch) => ch.isInitialAdd),
-        );
-
-        if (initialAddChannel.length > 0) {
-          logger.info("Initial add channel", {
-            channels: initialAddChannel,
-          });
-
-          await Promise.allSettled(
-            initialAddChannel.map((ch) =>
-              c.discordInteractor.sendAdminMessage({
-                channelId: ch.rawId,
-                content: t("initialAddChannel.success"),
-              }),
-            ),
-          );
         }
       }
 

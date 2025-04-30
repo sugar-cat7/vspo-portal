@@ -67,6 +67,16 @@ name = "dev-discord-send-message-channels-workflow"
 binding = "DISCORD_SEND_MESSAGE_CHANNELS_WORKFLOW"
 class_name = "DiscordSendMessageChannelsWorkflow"
 
+[[workflows]]
+name = "dev-exist-clips-workflow"
+binding = "EXIST_CLIPS_WORKFLOW"
+class_name = "ExistClipsWorkflow"
+
+[[workflows]]
+name = "dev-search-clips-workflow"
+binding = "SEARCH_CLIPS_WORKFLOW"
+class_name = "SearchClipsWorkflow"
+
 [vars]
 SERVICE_NAME = "dev-vspo-portal-cron"
 ENVIRONMENT = "development"

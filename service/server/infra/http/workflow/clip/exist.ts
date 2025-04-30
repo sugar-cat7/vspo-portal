@@ -1,0 +1,178 @@
+import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
+import {
+  type BindingAppWorkerEnv,
+  zBindingAppWorkerEnv,
+} from "../../../../config/env/worker";
+import { AppLogger } from "../../../../pkg/logging";
+import { withTracer } from "../../trace/cloudflare";
+
+export const existClipsWorkflow = () => {
+  return {
+    handler:
+      () =>
+      async (
+        env: BindingAppWorkerEnv,
+        _event: WorkflowEvent<Params>,
+        step: WorkflowStep,
+      ) => {
+        const e = zBindingAppWorkerEnv.safeParse(env);
+        if (!e.success) {
+          console.error(e.error.message);
+          return;
+        }
+        const logger = AppLogger.getInstance(e.data);
+
+        const lv = await step.do(
+          "fetch clips with pagination",
+          {
+            retries: { limit: 3, delay: "5 second", backoff: "linear" },
+            timeout: "3 minutes",
+          },
+          async () => {
+            return withTracer(
+              "clip-workflow",
+              "list-clips-paginated",
+              async (span) => {
+                const cu = await env.APP_WORKER.newClipUsecase();
+                const allClips = [];
+                let currentPage = 0;
+                let hasNext = true;
+                const pageSize = 500;
+                const maxClips = 5000;
+
+                while (hasNext && allClips.length < maxClips) {
+                  const result = await cu.list({
+                    limit: pageSize,
+                    page: currentPage,
+                    languageCode: "default",
+                    orderBy: "desc",
+                    includeDeleted: true,
+                  });
+
+                  if (result.err) {
+                    throw result.err;
+                  }
+
+                  allClips.push(...result.val.clips);
+                  currentPage++;
+                  hasNext = result.val.pagination.hasNext;
+
+                  // Break if we've reached our max clips limit
+                  if (allClips.length >= maxClips) {
+                    allClips.length = maxClips; // Trim to exactly maxClips
+                    break;
+                  }
+                }
+
+                span.setAttribute("clips_count", allClips.length);
+                logger.info(
+                  `Retrieved ${allClips.length} clips with pagination`,
+                );
+                return { allClips };
+              },
+            );
+          },
+        );
+
+        // Now we have all clips in lv.allClips for further processing
+        if (lv.allClips.length === 0) {
+          logger.info("No clips found to process");
+          return;
+        }
+
+        const r1 = await step.do(
+          "process clips",
+          {
+            retries: { limit: 3, delay: "5 second", backoff: "linear" },
+            timeout: "2 minutes",
+          },
+          async () => {
+            return withTracer(
+              "clip-workflow",
+              "process-clips",
+              async (span) => {
+                const cu = await env.APP_WORKER.newClipUsecase();
+
+                // Example: Get the clipIds from all clips
+                const clipIds = lv.allClips.map((clip) => clip.id);
+                span.setAttribute("clips_to_process", clipIds.length);
+
+                // Example of what you might do with the clips
+                const result = await cu.searchExistVspoClips({ clipIds });
+                if (result.err) {
+                  throw result.err;
+                }
+
+                return { result: result.val };
+              },
+            );
+          },
+        );
+
+        await step.do(
+          "delete clips",
+          {
+            retries: { limit: 3, delay: "5 second", backoff: "linear" },
+            timeout: "2 minutes",
+          },
+          async () => {
+            return withTracer("clip-workflow", "delete-clips", async (span) => {
+              const cu = await env.APP_WORKER.newClipUsecase();
+              const deletedClips = lv.allClips.filter((clip) => clip.deleted);
+              await cu.deleteClips({
+                clipIds: deletedClips.map((clip) => clip.id),
+              });
+            });
+          },
+        );
+
+        await Promise.allSettled([
+          step.do(
+            "batch upsert clips",
+            {
+              retries: { limit: 3, delay: "5 second", backoff: "linear" },
+              timeout: "2 minutes",
+            },
+            async () => {
+              return withTracer(
+                "clip-workflow",
+                "batch-upsert-clips",
+                async (span) => {
+                  const cu = await env.APP_WORKER.newClipUsecase();
+
+                  await cu.batchUpsertEnqueue(r1.result.clips);
+                },
+              );
+            },
+          ),
+          step.do(
+            "logical deletion",
+            {
+              retries: { limit: 3, delay: "5 second", backoff: "linear" },
+              timeout: "2 minutes",
+            },
+            async () => {
+              return withTracer(
+                "clip-workflow",
+                "batch-upsert-clips",
+                async (span) => {
+                  const cu = await env.APP_WORKER.newClipUsecase();
+                  const deletedClips = lv.allClips
+                    .filter((clip) =>
+                      r1.result.notExistsClipIds.includes(clip.id),
+                    )
+                    .map((clip) => {
+                      return {
+                        ...clip,
+                        deleted: true,
+                      };
+                    });
+                  await cu.batchUpsertEnqueue(deletedClips);
+                },
+              );
+            },
+          ),
+        ]);
+      },
+  };
+};

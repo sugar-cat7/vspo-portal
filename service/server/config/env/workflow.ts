@@ -12,6 +12,8 @@ export const zBindingWorkflowEnv = z
     DISCORD_DELETE_ALL_WORKFLOW: z.custom<Workflow>(),
     DISCORD_SEND_MESSAGE_ALL_CHANNEL_WORKFLOW: z.custom<Workflow>(),
     DISCORD_SEND_MESSAGE_CHANNELS_WORKFLOW: z.custom<Workflow>(),
+    EXIST_CLIPS_WORKFLOW: z.custom<Workflow>(),
+    SEARCH_CLIPS_WORKFLOW: z.custom<Workflow>(),
   })
   .merge(zFeatureFlagEnv);
 export type BindingWorkflowEnv = z.infer<typeof zBindingWorkflowEnv>;

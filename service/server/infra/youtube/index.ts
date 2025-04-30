@@ -4,6 +4,7 @@ import {
   createChannel,
   createChannels,
 } from "../../domain/channel";
+import { type Clips, createClip, createClips } from "../../domain/clip";
 import { type Streams, createStream, createStreams } from "../../domain/stream";
 import { getCurrentUTCString } from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
@@ -45,6 +46,16 @@ export type GetStreamsByChannelParams = {
   eventType?: "completed" | "live" | "upcoming";
 };
 
+export type SearchClipsParams = {
+  query: QueryKeys;
+  maxResults?: number;
+  order: "relevance" | "date" | "rating" | "title" | "videoCount" | "viewCount";
+};
+
+export type GetClipsParams = {
+  videoIds: string[];
+};
+
 export interface IYoutubeService {
   getStreams(params: GetStreamsParams): Promise<Result<Streams, AppError>>;
   searchStreams(
@@ -54,6 +65,8 @@ export interface IYoutubeService {
   getStreamsByChannel(
     params: GetStreamsByChannelParams,
   ): Promise<Result<Streams, AppError>>;
+  searchClips(params: SearchClipsParams): Promise<Result<Clips, AppError>>;
+  getClips(params: GetClipsParams): Promise<Result<Clips, AppError>>;
 }
 
 export class YoutubeService implements IYoutubeService {
@@ -316,6 +329,151 @@ export class YoutubeService implements IYoutubeService {
         );
       },
     );
+  }
+
+  async searchClips(
+    params: SearchClipsParams,
+  ): Promise<Result<Clips, AppError>> {
+    return withTracerResult("YoutubeService", "searchClips", async (span) => {
+      const responseResult = await wrap(
+        this.youtube.search.list({
+          part: ["snippet"],
+          q: params.query,
+          maxResults: params.maxResults || 50,
+          type: ["video"],
+          safeSearch: "none",
+          order: params.order,
+        }),
+        (err) =>
+          new AppError({
+            message: `Network error while fetching clips: ${err.message}`,
+            code: "INTERNAL_SERVER_ERROR",
+            cause: err,
+          }),
+      );
+      if (responseResult.err) {
+        return Err(responseResult.err);
+      }
+
+      return Ok(
+        createClips(
+          responseResult.val.data.items?.map((item) => {
+            return {
+              id: "",
+              rawId: item.id?.videoId || "",
+              title: item.snippet?.title || "",
+              languageCode: "default",
+              rawChannelID: item.snippet?.channelId || "",
+              description: item.snippet?.description || "",
+              publishedAt: item.snippet?.publishedAt || getCurrentUTCString(),
+              platform: "youtube",
+              tags: [],
+              viewCount: 0,
+              thumbnailURL: item.snippet?.thumbnails?.default?.url || "",
+              type: "clip",
+            };
+          }) ?? [],
+        ),
+      );
+    });
+  }
+
+  async getClips(params: GetClipsParams): Promise<Result<Clips, AppError>> {
+    return withTracerResult("YoutubeService", "getClips", async (span) => {
+      const chunks = this.chunkArray(params.videoIds, 50);
+      const items: youtube_v3.Schema$Video[] = [];
+
+      for (const chunk of chunks) {
+        const responseResult = await wrap(
+          this.youtube.videos.list({
+            part: ["snippet"],
+            id: chunk,
+          }),
+          (err) =>
+            new AppError({
+              message: `Network error while fetching clips: ${err.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+              cause: err,
+            }),
+        );
+
+        if (responseResult.err) {
+          return Err(responseResult.err);
+        }
+
+        const response = responseResult.val;
+        items.push(...(response.data.items || []));
+      }
+
+      // Check if each video is a short or normal clip using Promise.allSettled
+      const videoTypeChecks = await Promise.allSettled(
+        items.map((item) => {
+          const videoId = item.id || "";
+          return this.isYoutubeShort(videoId).then((isShort) => ({
+            videoId,
+            isShort,
+          }));
+        }),
+      );
+
+      // Create a map of videoId to isShort status
+      const shortStatusMap = new Map<string, boolean>();
+      for (const result of videoTypeChecks) {
+        if (result.status === "fulfilled") {
+          const { videoId, isShort } = result.value;
+          shortStatusMap.set(videoId, isShort);
+        }
+      }
+
+      return Ok(
+        createClips(
+          items.map((item) => {
+            const videoId = item.id || "";
+            const isShort = shortStatusMap.get(videoId) || false;
+
+            return createClip({
+              id: "",
+              rawId: videoId,
+              title: item.snippet?.title || "",
+              languageCode: "default",
+              rawChannelID: item.snippet?.channelId || "",
+              description: item.snippet?.description || "",
+              publishedAt: item.snippet?.publishedAt || getCurrentUTCString(),
+              platform: "youtube",
+              tags: [],
+              viewCount: 0,
+              thumbnailURL: item.snippet?.thumbnails?.default?.url || "",
+              type: isShort ? "short" : "clip",
+            });
+          }) ?? [],
+        ),
+      );
+    });
+  }
+
+  /**
+   * Checks if a YouTube video is a short by attempting to access the shorts URL
+   * If the URL redirects to watch?v=, it's a normal video; if not, it's a short
+   */
+  private async isYoutubeShort(videoId: string): Promise<boolean> {
+    if (!videoId) return false;
+
+    try {
+      const shortsUrl = `https://youtube.com/shorts/${videoId}`;
+      const response = await fetch(shortsUrl, {
+        method: "HEAD",
+        redirect: "manual",
+      });
+
+      // If response URL is the same as request URL, it's a short
+      // If it would redirect to watch?v=, it's a normal video
+      return !response.headers.get("location")?.includes("watch?v=");
+    } catch (error) {
+      AppLogger.error(`Failed to check if video ${videoId} is a short`, {
+        error,
+      });
+      return false;
+    }
   }
 
   private chunkArray<T>(array: T[], size: number): T[][] {

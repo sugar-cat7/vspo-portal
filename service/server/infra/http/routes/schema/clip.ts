@@ -1,10 +1,11 @@
 import { z } from "@hono/zod-openapi";
 import { PlatformSchema } from "../../../../domain";
-import { StatusSchema, StreamSchema } from "../../../../domain/stream";
+import { ClipSchema } from "../../../../domain/clip";
+import { StatusSchema } from "../../../../domain/stream";
 import { PaginationQuerySchema, PaginationResponseSchema } from "./common";
 
-const StreamResponseSchema = StreamSchema.openapi({
-  description: "Stream",
+const ClipResponseSchema = ClipSchema.openapi({
+  description: "Clip",
   example: {
     id: "O0XCK3NhzqE",
     rawId: "O0XCK3NhzqE",
@@ -15,10 +16,7 @@ const StreamResponseSchema = StreamSchema.openapi({
     description:
       "ぶいすぽっ！所属の藍沢エマです！\nApexの配信をします！\nチャンネル登録、高評価よろしくお願いします！",
     publishedAt: "2023-05-20T12:00:00.000Z",
-    startedAt: "2023-05-20T12:00:00.000Z",
-    endedAt: "2023-05-20T15:30:00.000Z",
     platform: "youtube",
-    status: "ended",
     tags: ["APEX", "ぶいすぽっ！", "藍沢エマ", "三清傑"],
     viewCount: 125000,
     thumbnailURL: "https://i.ytimg.com/vi/O0XCK3NhzqE/hqdefault_live.jpg",
@@ -27,10 +25,11 @@ const StreamResponseSchema = StreamSchema.openapi({
       "https://yt3.googleusercontent.com/oIps6UVvqtpJykcdjYYyRvhdcyVoR1wAdH8CnTp4msMaKYdn8XMLj4FHsLoqfWaJzbLJKSPjCg=s176-c-k-c0x00ffffff-no-rj",
     deleted: false,
     translated: false,
+    type: "clip",
   },
 });
 
-const ListStreamRequestSchema = PaginationQuerySchema.merge(
+const ListClipRequestSchema = PaginationQuerySchema.merge(
   z.object({
     platform: PlatformSchema.optional().openapi({
       description: "Platform",
@@ -48,28 +47,10 @@ const ListStreamRequestSchema = PaginationQuerySchema.merge(
         in: "query",
       },
     }),
-    startedAt: z
-      .string()
-      .optional()
-      .openapi({
-        description: "Started At",
-        example: "2022-01-01T00:00:00.000Z",
-        param: {
-          name: "startedAt",
-          in: "query",
-        },
-      }),
-    endedAt: z
-      .string()
-      .optional()
-      .openapi({
-        description: "Ended At",
-        example: "2022-01-01T00:00:00.000Z",
-        param: {
-          name: "endedAt",
-          in: "query",
-        },
-      }),
+    clipType: z.enum(["clip", "short"]).default("clip").openapi({
+      description: "Clip Type",
+      example: "clip",
+    }),
     languageCode: z
       .string()
       .default("default")
@@ -95,18 +76,18 @@ const ListStreamRequestSchema = PaginationQuerySchema.merge(
   }),
 );
 
-const ListStreamResponseSchema = z.object({
-  streams: z.array(StreamResponseSchema),
+const ListClipResponseSchema = z.object({
+  streams: z.array(ClipResponseSchema),
   pagination: PaginationResponseSchema,
 });
 
-type ListStreamResponse = z.infer<typeof ListStreamResponseSchema>;
-type ListStreamRequest = z.infer<typeof ListStreamRequestSchema>;
+type ListClipResponse = z.infer<typeof ListClipResponseSchema>;
+type ListClipRequest = z.infer<typeof ListClipRequestSchema>;
 
 export {
-  ListStreamRequestSchema,
-  ListStreamResponseSchema,
-  type ListStreamRequest,
-  type ListStreamResponse,
-  StreamResponseSchema,
+  ListClipRequestSchema,
+  ListClipResponseSchema,
+  type ListClipRequest,
+  type ListClipResponse,
+  ClipResponseSchema,
 };

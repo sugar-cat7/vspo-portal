@@ -18,6 +18,7 @@ import { init } from "../../infra/http/hono";
 import { newApp } from "../../infra/http/hono/app";
 import { maintenanceMiddleware } from "../../infra/http/hono/middleware/discord/maintenance";
 import { registerCreatorListApi } from "../../infra/http/routes";
+import { registerClipListApi } from "../../infra/http/routes/clip";
 import {
   registerStreamListApi,
   registerStreamPostApi,
@@ -64,6 +65,7 @@ app.use(
 registerStreamListApi(app);
 registerCreatorListApi(app);
 registerStreamPostApi(app);
+registerClipListApi(app);
 
 export default createHandler({
   fetch: async (req: Request, env: ApiEnv, executionCtx: ExecutionContext) => {

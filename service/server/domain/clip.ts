@@ -32,11 +32,11 @@ const formatTwitchThumbnail = (url: string): string =>
     .replace("-{width}x{height}", "-400x220")
     .replace("http://", "https://");
 
+const ClipTypeSchema = z.enum(["short", "clip"]);
+
 // Clip Schema (extends Base, may add clip-specific fields later)
 const ClipSchema = BaseVideoSchema.extend({
-  // Potential Clip specific fields:
-  // duration: z.number().optional(),
-  // viewCount: z.number().int().nonnegative().optional(), // Clips might have view counts too
+  type: ClipTypeSchema,
 }).transform((clip) => {
   const getPlatformIconURL = (platform: Platform): string => {
     const platformIconURLs: Record<Platform, string> = {
@@ -90,10 +90,20 @@ const createClips = (clips: ClipInput[]): Clips => {
   return ClipsSchema.parse(clips);
 };
 
+const vspoClipKeywords = ["ぶいすぽっ！許諾番号", "Vspo! License Number"];
+
+const isVspoClip = (clip: Clip): boolean => {
+  return vspoClipKeywords.some(
+    (keyword) =>
+      clip.title.includes(keyword) || clip.description.includes(keyword),
+  );
+};
+
 export {
   // Schemas
   ClipSchema,
   ClipsSchema,
+  ClipTypeSchema,
   // Types
   type ClipInput,
   type Clip,
@@ -103,4 +113,5 @@ export {
   createClips,
   // Helper functions
   getClipLink,
+  isVspoClip,
 };
