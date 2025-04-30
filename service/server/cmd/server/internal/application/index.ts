@@ -1,24 +1,14 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
-import { z } from "zod";
 import {
   type AppWorkerEnv,
   zAppWorkerEnv,
 } from "../../../../config/env/internal";
-import { setFeatureFlagProvider } from "../../../../config/featureFlag";
-import {
-  type Creator,
-  CreatorsSchema,
-  type DiscordServer,
-  type Stream,
-  StreamsSchema,
-  discordServers,
-} from "../../../../domain";
-import { type Clip, ClipsSchema } from "../../../../domain/clip";
-import { t } from "../../../../domain/service/i18n";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { Container } from "../../../../infra/dependency";
-import { createHandler, withTracer } from "../../../../infra/http/trace";
-import { AppLogger } from "../../../../pkg/logging";
+import {
+  type MessageParam,
+  queueHandler,
+} from "../../../../infra/queue/handler";
 import type {
   AdjustBotChannelParams,
   BatchDeleteByStreamIdsParam,
@@ -45,7 +35,7 @@ import type {
   ListClipsQuery,
 } from "../../../../usecase/clip";
 
-async function batchEnqueueWithChunks<T, U extends MessageParam>(
+async function batchEnqueueWithChunks<T, U>(
   items: T[],
   chunkSize: number,
   transform: (item: T) => { body: U },
@@ -63,8 +53,8 @@ async function batchEnqueueWithChunks<T, U extends MessageParam>(
 
 export class StreamService extends RpcTarget {
   #usecase: IStreamInteractor;
-  #queue: Queue<StreamMessage>;
-  constructor(usecase: IStreamInteractor, queue: Queue) {
+  #queue: Queue<MessageParam>;
+  constructor(usecase: IStreamInteractor, queue: Queue<MessageParam>) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
@@ -74,7 +64,7 @@ export class StreamService extends RpcTarget {
     return batchEnqueueWithChunks(
       params,
       100,
-      (stream) => ({ body: { ...stream, kind: "upsert-stream" } }),
+      (stream) => ({ body: { ...stream, kind: "upsert-stream" as const } }),
       this.#queue,
     );
   }
@@ -111,7 +101,7 @@ export class StreamService extends RpcTarget {
         body: {
           ...stream,
           languageCode: TargetLangSchema.parse(params.languageCode),
-          kind: "translate-stream",
+          kind: "translate-stream" as const,
         },
       }),
       this.#queue,
@@ -133,8 +123,8 @@ export class StreamService extends RpcTarget {
 
 export class ClipService extends RpcTarget {
   #usecase: IClipInteractor;
-  #queue: Queue<UpsertClip>;
-  constructor(usecase: IClipInteractor, queue: Queue) {
+  #queue: Queue<MessageParam>;
+  constructor(usecase: IClipInteractor, queue: Queue<MessageParam>) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
@@ -144,7 +134,7 @@ export class ClipService extends RpcTarget {
     return batchEnqueueWithChunks(
       params,
       100,
-      (clip) => ({ body: { ...clip, kind: "upsert-clip" } }),
+      (clip) => ({ body: { ...clip, kind: "upsert-clip" as const } }),
       this.#queue,
     );
   }
@@ -172,8 +162,8 @@ export class ClipService extends RpcTarget {
 
 export class CreatorService extends RpcTarget {
   #usecase: ICreatorInteractor;
-  #queue: Queue<CreatorMessage>;
-  constructor(usecase: ICreatorInteractor, queue: Queue) {
+  #queue: Queue<MessageParam>;
+  constructor(usecase: ICreatorInteractor, queue: Queue<MessageParam>) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
@@ -183,7 +173,7 @@ export class CreatorService extends RpcTarget {
     return batchEnqueueWithChunks(
       params,
       100,
-      (creator) => ({ body: { ...creator, kind: "upsert-creator" } }),
+      (creator) => ({ body: { ...creator, kind: "upsert-creator" as const } }),
       this.#queue,
     );
   }
@@ -196,7 +186,7 @@ export class CreatorService extends RpcTarget {
         body: {
           ...creator,
           languageCode: params.languageCode,
-          kind: "translate-creator",
+          kind: "translate-creator" as const,
         },
       }),
       this.#queue,
@@ -218,8 +208,8 @@ export class CreatorService extends RpcTarget {
 
 export class DiscordService extends RpcTarget {
   #usecase: IDiscordInteractor;
-  #queue: Queue<DiscordMessage>;
-  constructor(usecase: IDiscordInteractor, queue: Queue) {
+  #queue: Queue<MessageParam>;
+  constructor(usecase: IDiscordInteractor, queue: Queue<MessageParam>) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
@@ -241,7 +231,9 @@ export class DiscordService extends RpcTarget {
     return batchEnqueueWithChunks(
       params,
       100,
-      (server) => ({ body: { ...server, kind: "upsert-discord-server" } }),
+      (server) => ({
+        body: { ...server, kind: "upsert-discord-server" as const },
+      }),
       this.#queue,
     );
   }
@@ -275,7 +267,7 @@ export class DiscordService extends RpcTarget {
       [channelId],
       100,
       (channelId) => ({
-        body: { channelId, kind: "delete-message-in-channel" },
+        body: { channelId, kind: "delete-message-in-channel" as const },
       }),
       this.#queue,
     );
@@ -312,463 +304,4 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   }
 }
 
-type Kind =
-  | "translate-stream"
-  | "upsert-stream"
-  | "upsert-creator"
-  | "translate-creator"
-  | "discord-send-message"
-  | "upsert-discord-server"
-  | "delete-message-in-channel"
-  | "upsert-clip";
-
-type BaseMessageParam<T, K extends Kind> = T & { kind: K };
-
-type TranslateStream = BaseMessageParam<Stream, "translate-stream">;
-type TranslateCreator = BaseMessageParam<Creator, "translate-creator">;
-type UpsertStream = BaseMessageParam<Stream, "upsert-stream">;
-type UpsertCreator = BaseMessageParam<Creator, "upsert-creator">;
-type DiscordSend = BaseMessageParam<Stream, "discord-send-message">;
-type UpsertDiscordServer = BaseMessageParam<
-  DiscordServer,
-  "upsert-discord-server"
->;
-type DeleteMessageInChannel = BaseMessageParam<
-  { channelId: string },
-  "delete-message-in-channel"
->;
-
-type UpsertClip = BaseMessageParam<Clip, "upsert-clip">;
-
-type CreatorMessage = TranslateCreator | UpsertCreator;
-type StreamMessage = TranslateStream | UpsertStream;
-type DiscordMessage =
-  | DiscordSend
-  | UpsertDiscordServer
-  | DeleteMessageInChannel;
-
-type MessageParam =
-  | CreatorMessage
-  | StreamMessage
-  | DiscordMessage
-  | UpsertDiscordServer
-  | DeleteMessageInChannel
-  | UpsertClip;
-
-// Type guard functions for each message type
-function isTranslateStream(message: unknown): message is TranslateStream {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "kind" in message &&
-    message.kind === "translate-stream"
-  );
-}
-
-function isUpsertStream(message: unknown): message is UpsertStream {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "kind" in message &&
-    message.kind === "upsert-stream"
-  );
-}
-
-function isUpsertCreator(message: unknown): message is UpsertCreator {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "kind" in message &&
-    message.kind === "upsert-creator"
-  );
-}
-
-function isTranslateCreator(message: unknown): message is TranslateCreator {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "kind" in message &&
-    message.kind === "translate-creator"
-  );
-}
-
-function isDiscordSend(message: unknown): message is DiscordSend {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "kind" in message &&
-    message.kind === "discord-send-message"
-  );
-}
-
-function isUpsertDiscordServer(
-  message: unknown,
-): message is UpsertDiscordServer {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "kind" in message &&
-    message.kind === "upsert-discord-server"
-  );
-}
-
-function isDeleteMessageInChannel(
-  message: unknown,
-): message is DeleteMessageInChannel {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "kind" in message &&
-    message.kind === "delete-message-in-channel"
-  );
-}
-
-function isUpsertClip(message: unknown): message is UpsertClip {
-  return (
-    typeof message === "object" &&
-    message !== null &&
-    "kind" in message &&
-    message.kind === "upsert-clip"
-  );
-}
-
-export default createHandler({
-  queue: async (
-    batch: MessageBatch<MessageParam>,
-    env: AppWorkerEnv,
-    _executionContext: ExecutionContext,
-  ) => {
-    setFeatureFlagProvider(env);
-    return await withTracer("QueueHandler", "queue.consumer", async (span) => {
-      const e = zAppWorkerEnv.safeParse(env);
-      if (!e.success) {
-        console.log(e.error.message);
-        return;
-      }
-      const c = new Container(e.data);
-      const logger = AppLogger.getInstance(e.data);
-
-      // Define type-safe message storage
-      const messageGroups = {
-        "translate-stream": [] as TranslateStream[],
-        "upsert-stream": [] as UpsertStream[],
-        "upsert-creator": [] as UpsertCreator[],
-        "translate-creator": [] as TranslateCreator[],
-        "discord-send-message": [] as DiscordSend[],
-        "upsert-discord-server": [] as UpsertDiscordServer[],
-        "delete-message-in-channel": [] as DeleteMessageInChannel[],
-        "upsert-clip": [] as UpsertClip[],
-      };
-
-      // Group messages by kind without type assertions
-      for (const message of batch.messages) {
-        const body = message.body;
-        if (!body) continue;
-        if (isTranslateStream(body)) {
-          messageGroups["translate-stream"].push(body);
-        } else if (isUpsertStream(body)) {
-          messageGroups["upsert-stream"].push(body);
-        } else if (isUpsertCreator(body)) {
-          messageGroups["upsert-creator"].push(body);
-        } else if (isTranslateCreator(body)) {
-          messageGroups["translate-creator"].push(body);
-        } else if (isDiscordSend(body)) {
-          messageGroups["discord-send-message"].push(body);
-        } else if (isUpsertDiscordServer(body)) {
-          messageGroups["upsert-discord-server"].push(body);
-        } else if (isDeleteMessageInChannel(body)) {
-          messageGroups["delete-message-in-channel"].push(body);
-        } else if (isUpsertClip(body)) {
-          messageGroups["upsert-clip"].push(body);
-        }
-      }
-
-      // Get non-empty message groups for logging
-      const nonEmptyGroupNames = Object.entries(messageGroups)
-        .filter(([_, messages]) => messages.length > 0)
-        .map(([kind]) => kind);
-
-      logger.info(
-        `Processing message groups: ${nonEmptyGroupNames.join(", ")}`,
-      );
-
-      /**
-       * Processing order:
-       * 1. Creators/Channels/Discord servers
-       * 2. Streams/Clips
-       * 3. Translations
-       * 4. Others
-       */
-
-      // FIXME: Implement parallel processing using DO to distribute tasks to separate Workers while maintaining order for independent processes
-
-      if (messageGroups["upsert-creator"].length > 0) {
-        const messages = messageGroups["upsert-creator"];
-        logger.info(
-          `Processing ${messages.length} messages of kind: upsert-creator`,
-        );
-        span.setAttributes({
-          queue: batch.queue,
-          kind: "upsert-creator",
-          count: messages.length,
-        });
-
-        const creators = CreatorsSchema.safeParse(messages);
-        if (!creators.success) {
-          logger.error(`Invalid creators: ${creators.error.message}`);
-        } else {
-          const r = await c.creatorInteractor.batchUpsert(creators.data);
-          if (r.err) {
-            logger.error(`Failed to upsert creators: ${r.err.message}`);
-            throw r.err;
-          }
-        }
-      }
-
-      if (messageGroups["upsert-discord-server"].length > 0) {
-        const messages = messageGroups["upsert-discord-server"];
-        logger.info(
-          `Processing ${messages.length} messages of kind: upsert-discord-server`,
-        );
-        span.setAttributes({
-          queue: batch.queue,
-          kind: "upsert-discord-server",
-          count: messages.length,
-        });
-
-        logger.info(`Upserting Discord servers: ${messages.length}`);
-        logger.debug("Discord servers", {
-          servers: messages,
-        });
-        const sv = await c.discordInteractor.batchUpsert(messages);
-        if (sv.err) {
-          logger.error(`Failed to upsert discord servers: ${sv.err.message}`);
-          throw sv.err;
-        }
-
-        // inital add channel
-        const initialAddChannel = messages.flatMap((server) =>
-          server.discordChannels.filter((ch) => ch.isInitialAdd),
-        );
-
-        if (initialAddChannel.length > 0) {
-          logger.info("Initial add channel", {
-            channels: initialAddChannel,
-          });
-
-          await Promise.allSettled(
-            initialAddChannel.map((ch) =>
-              c.discordInteractor.sendAdminMessage({
-                channelId: ch.rawId,
-                content: t("initialAddChannel.success"),
-              }),
-            ),
-          );
-        }
-      }
-
-      if (messageGroups["upsert-stream"].length > 0) {
-        const messages = messageGroups["upsert-stream"];
-        logger.info(
-          `Processing ${messages.length} messages of kind: upsert-stream`,
-        );
-        span.setAttributes({
-          queue: batch.queue,
-          kind: "upsert-stream",
-          count: messages.length,
-        });
-
-        logger.debug("Upserting Queued streams", {
-          streams: messages.map((v) => ({
-            rawId: v.rawId,
-            title: v.title,
-            status: v.status,
-            languageCode: v.languageCode,
-          })),
-        });
-
-        const streams = StreamsSchema.safeParse(messages);
-        if (!streams.success) {
-          logger.error(`Invalid streams: ${streams.error.message}`);
-        } else {
-          const v = await c.streamInteractor.batchUpsert(streams.data);
-          if (v.err) {
-            logger.error(`Failed to upsert streams: ${v.err.message}`);
-            throw v.err;
-          }
-        }
-      }
-
-      if (messageGroups["upsert-clip"].length > 0) {
-        const messages = messageGroups["upsert-clip"];
-        logger.info(
-          `Processing ${messages.length} messages of kind: upsert-clip`,
-        );
-        span.setAttributes({
-          queue: batch.queue,
-          kind: "upsert-clip",
-          count: messages.length,
-        });
-
-        const clips = ClipsSchema.safeParse(messages);
-        if (!clips.success) {
-          logger.error(`Invalid clips: ${clips.error.message}`);
-        } else {
-          const v = await c.clipInteractor.batchUpsert(clips.data);
-          if (v.err) {
-            logger.error(`Failed to upsert clips: ${v.err.message}`);
-            throw v.err;
-          }
-        }
-      }
-
-      if (messageGroups["translate-stream"].length > 0) {
-        const messages = messageGroups["translate-stream"];
-        logger.info(
-          `Processing ${messages.length} messages of kind: translate-stream`,
-        );
-        span.setAttributes({
-          queue: batch.queue,
-          kind: "translate-stream",
-          count: messages.length,
-        });
-
-        const v = StreamsSchema.safeParse(messages);
-        if (!v.success) {
-          logger.error(`Invalid streams: ${v.error.message}`);
-        } else {
-          // Group streams by language code
-          const streamsByLang = v.data.reduce(
-            (acc, stream) => {
-              const langCode = stream.languageCode;
-              if (!acc[langCode]) {
-                acc[langCode] = [];
-              }
-              acc[langCode].push(stream);
-              return acc;
-            },
-            {} as Record<string, typeof v.data>,
-          );
-
-          // Process each language group separately
-          for (const [langCode, streams] of Object.entries(streamsByLang)) {
-            const tv = await c.streamInteractor.translateStream({
-              languageCode: langCode,
-              streams: streams,
-            });
-
-            if (tv.err) {
-              logger.error(
-                `Failed to translate streams for ${langCode}: ${tv.err.message}`,
-              );
-              continue;
-            }
-
-            if (!tv.val?.length || tv.val.length === 0) {
-              logger.info(`No streams to translate for ${langCode}`);
-              continue;
-            }
-
-            await env.WRITE_QUEUE.sendBatch(
-              tv.val.map((stream) => ({
-                body: { ...stream, kind: "upsert-stream" },
-              })),
-            );
-          }
-        }
-      }
-
-      if (messageGroups["translate-creator"].length > 0) {
-        const messages = messageGroups["translate-creator"];
-        logger.info(
-          `Processing ${messages.length} messages of kind: translate-creator`,
-        );
-        span.setAttributes({
-          queue: batch.queue,
-          kind: "translate-creator",
-          count: messages.length,
-        });
-
-        const cr = CreatorsSchema.safeParse(messages);
-        if (!cr.success) {
-          logger.error(`Invalid creators: ${cr.error.message}`);
-        } else {
-          // Group creators by language code more efficiently
-          const creatorsByLang = new Map<string, typeof cr.data>();
-
-          for (const creator of cr.data) {
-            const langCode = creator.languageCode;
-            if (!langCode) {
-              logger.warn(
-                `Creator missing language code, skipping: ${creator.id || "unknown"}`,
-              );
-              continue;
-            }
-
-            if (!creatorsByLang.has(langCode)) {
-              creatorsByLang.set(langCode, []);
-            }
-            creatorsByLang.get(langCode)?.push(creator);
-          }
-
-          logger.info(`Grouped creators by ${creatorsByLang.size} languages`);
-
-          // Process each language group separately
-          for (const [langCode, creators] of creatorsByLang.entries()) {
-            logger.info(
-              `Processing ${creators.length} creators for language: ${langCode}`,
-            );
-
-            const tc = await c.creatorInteractor.translateCreator({
-              languageCode: langCode,
-              creators: creators,
-            });
-
-            if (tc.err) {
-              logger.error(
-                `Failed to translate creators for ${langCode}: ${tc.err.message}`,
-              );
-              continue;
-            }
-
-            if (!tc.val?.length || tc.val.length === 0) {
-              logger.info(`No creators to translate for ${langCode}`);
-              continue;
-            }
-
-            await env.WRITE_QUEUE.sendBatch(
-              tc.val.map((creator) => ({
-                body: { ...creator, kind: "upsert-creator" },
-              })),
-            );
-          }
-        }
-      }
-
-      if (messageGroups["delete-message-in-channel"].length > 0) {
-        const messages = messageGroups["delete-message-in-channel"];
-        logger.info(
-          `Processing ${messages.length} messages of kind: delete-message-in-channel`,
-        );
-        span.setAttributes({
-          queue: batch.queue,
-          kind: "delete-message-in-channel",
-          count: messages.length,
-        });
-
-        if (!messages.length) {
-          logger.error("Invalid delete message in channel");
-        } else {
-          logger.info("Deleting messages in channels", {
-            channelIds: messages,
-          });
-          await Promise.allSettled(
-            messages.map((msg) =>
-              c.discordInteractor.deleteAllMessagesInChannel(msg.channelId),
-            ),
-          );
-        }
-      }
-    });
-  },
-});
+export default queueHandler;
