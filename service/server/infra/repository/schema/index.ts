@@ -200,6 +200,27 @@ export const discordAdminMessageTable = pgTable(
   (t) => [unique().on(t.adminMessageId, t.messageId)],
 );
 
+/**
+ * Event information table
+ * - Stores basic information about events
+ * - Detailed content is stored in external storage files
+ */
+export const eventTable = pgTable("event", {
+  id: text("id").primaryKey(), // Unique identifier for the event
+  title: text("title").notNull(), // Event title
+  storageFileId: text("storage_file_id"), // ID of the storage file containing event details
+  startAt: timestamp("start_at", { withTimezone: true, mode: "date" }), // Event start date and time
+  endAt: timestamp("end_at", { withTimezone: true, mode: "date" }), // Event end date and time
+  visibility: text("visibility").notNull().default("private"), // Visibility: public, private, or internal
+  tags: text("tags"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+    .notNull()
+    .defaultNow(),
+});
+
 export type InsertCreator = typeof creatorTable.$inferInsert;
 export type SelectCreator = typeof creatorTable.$inferSelect;
 
@@ -236,6 +257,9 @@ export type SelectDiscordAdminMessage =
 
 export type InsertDiscordMessage = typeof discordMessageTable.$inferInsert;
 export type SelectDiscordMessage = typeof discordMessageTable.$inferSelect;
+
+export type InsertEvent = typeof eventTable.$inferInsert;
+export type SelectEvent = typeof eventTable.$inferSelect;
 
 export const insertVideoSchema = createInsertSchema(videoTable);
 export const selectVideoSchema = createSelectSchema(videoTable);
@@ -301,3 +325,8 @@ export const selectDiscordMessageSchema =
 
 export const createInsertDiscordMessage = (data: InsertDiscordMessage) =>
   insertDiscordMessageSchema.parse(data);
+
+export const insertEventSchema = createInsertSchema(eventTable);
+export const selectEventSchema = createSelectSchema(eventTable);
+export const createInsertEvent = (data: InsertEvent) =>
+  insertEventSchema.parse(data);

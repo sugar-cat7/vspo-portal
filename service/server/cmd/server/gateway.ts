@@ -20,6 +20,11 @@ import { maintenanceMiddleware } from "../../infra/http/hono/middleware/discord/
 import { registerCreatorListApi } from "../../infra/http/routes";
 import { registerClipListApi } from "../../infra/http/routes/clip";
 import {
+  registerEventCreateApi,
+  registerEventGetApi,
+  registerEventListApi,
+} from "../../infra/http/routes/event";
+import {
   registerStreamListApi,
   registerStreamPostApi,
 } from "../../infra/http/routes/stream";
@@ -66,6 +71,9 @@ registerStreamListApi(app);
 registerCreatorListApi(app);
 registerStreamPostApi(app);
 registerClipListApi(app);
+registerEventListApi(app);
+registerEventGetApi(app);
+registerEventCreateApi(app);
 
 export default createHandler({
   fetch: async (req: Request, env: ApiEnv, executionCtx: ExecutionContext) => {

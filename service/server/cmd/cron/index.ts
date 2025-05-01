@@ -25,6 +25,7 @@ import { deleteStreamsWorkflow } from "../../infra/http/workflow/stream/delete";
 import { searchStreamsWorkflow } from "../../infra/http/workflow/stream/search";
 import { searchMemberStreamsByChannelWorkflow } from "../../infra/http/workflow/stream/searchMemberStreamByChannel";
 import { translateStreamsWorkflow } from "../../infra/http/workflow/stream/trasnlate";
+import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
 
 export class SearchChannelsWorkflow extends WorkflowEntrypoint<
@@ -172,31 +173,37 @@ export default createHandler({
       await setFeatureFlagProvider(env);
       switch (controller.cron) {
         case "0 0,7,18 * * *":
+          AppLogger.info("search-channels");
           span.setAttribute("workflow", "search-channels");
           await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
           break;
         case "5 0,7,18 * * *":
+          AppLogger.info("translate-creators");
           span.setAttribute("workflow", "translate-creators");
           await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
           break;
         case "*/1 * * * *":
+          AppLogger.info("search-streams");
           span.setAttribute("workflow", "search-streams");
           await env.SEARCH_STREAMS_WORKFLOW.create({ id: createUUID() });
           break;
         case "*/2 * * * *":
+          AppLogger.info("discord-send-messages");
           span.setAttribute("workflow", "search-streams");
           await env.TRANSLATE_STREAMS_WORKFLOW.create({ id: createUUID() });
           await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
           break;
         case "*/30 * * * *":
+          AppLogger.info("search-member-streams-by-channel");
           span.setAttribute("workflow", "search-member-streams-by-channel");
           await env.SEARCH_MEMBER_STREAMS_BY_CHANNEL_WORKFLOW.create({
             id: createUUID(),
           });
           await env.DELETE_STREAMS_WORKFLOW.create({ id: createUUID() });
           break;
-        case "0 * * * *":
-          span.setAttribute("workflow", "clips");
+        case "15 * * * *":
+          AppLogger.info("exist-clips");
+          span.setAttribute("workflow", "clips-hourly");
           await env.EXIST_CLIPS_WORKFLOW.create({ id: createUUID() });
           await env.SEARCH_CLIPS_WORKFLOW.create({ id: createUUID() });
           break;
