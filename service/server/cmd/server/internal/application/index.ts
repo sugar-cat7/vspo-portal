@@ -14,12 +14,15 @@ import type {
   BatchDeleteByStreamIdsParam,
   BatchUpsertCreatorsParam,
   BatchUpsertDiscordServersParam,
+  BatchUpsertEventParam,
   BatchUpsertStreamsParam,
   ICreatorInteractor,
   IDiscordInteractor,
+  IEventInteractor,
   IStreamInteractor,
   ListByMemberTypeParam,
   ListDiscordServerParam,
+  ListEventsQuery,
   ListParam,
   SearchByChannelIdsParam,
   SearchByMemberTypeParam,
@@ -28,6 +31,7 @@ import type {
   SendMessageParams,
   TranslateCreatorParam,
   TranslateStreamParam,
+  UpsertEventParam,
 } from "../../../../usecase";
 import type {
   BatchUpsertClipsParam,
@@ -274,6 +278,38 @@ export class DiscordService extends RpcTarget {
   }
 }
 
+export class EventService extends RpcTarget {
+  #usecase: IEventInteractor;
+  constructor(usecase: IEventInteractor) {
+    super();
+    this.#usecase = usecase;
+  }
+
+  async list(params: ListEventsQuery) {
+    return this.#usecase.list(params);
+  }
+
+  async upsert(params: UpsertEventParam) {
+    return this.#usecase.upsert(params);
+  }
+
+  async get(id: string) {
+    return this.#usecase.get(id);
+  }
+
+  async delete(id: string) {
+    return this.#usecase.delete(id);
+  }
+
+  async batchDelete(ids: string[]) {
+    return this.#usecase.batchDelete(ids);
+  }
+
+  async batchUpsert(params: BatchUpsertEventParam) {
+    return this.#usecase.batchUpsert(params);
+  }
+}
+
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   newStreamUsecase() {
     const d = this.setup();
@@ -293,6 +329,11 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   newClipUsecase() {
     const d = this.setup();
     return new ClipService(d.clipInteractor, this.env.WRITE_QUEUE);
+  }
+
+  newEventUsecase() {
+    const d = this.setup();
+    return new EventService(d.eventInteractor);
   }
 
   private setup() {
