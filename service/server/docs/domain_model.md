@@ -41,6 +41,27 @@ classDiagram
         link: string
     }
 
+    class VspoEventSchema {
+        id: string
+        title: string
+        storageFileId: string
+        publicPath: string (optional)
+        startAt: datetime (optional)
+        endAt: datetime (optional)
+        visibility: EventVisibility
+        createdAt: datetime
+        updatedAt: datetime
+        -- Transformed --
+        publicUrl: string (optional)
+    }
+
+    class EventVisibility {
+        <<enum>>
+        public
+        private
+        internal
+    }
+
     class Platform {
         <<enum>>
         youtube
@@ -85,6 +106,7 @@ classDiagram
     StreamSchema --|> BaseVideoSchema : extends
     ClipSchema --|> BaseVideoSchema : extends
     StreamSchema --> Status : uses
+    VspoEventSchema --> EventVisibility : uses
 
     Creator "1" -- "many" Channel : has
     Channel "1" -- "many" BaseVideoSchema : produces

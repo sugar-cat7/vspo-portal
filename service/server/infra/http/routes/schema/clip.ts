@@ -39,14 +39,6 @@ const ListClipRequestSchema = PaginationQuerySchema.merge(
         in: "query",
       },
     }),
-    status: StatusSchema.optional().openapi({
-      description: "Status",
-      example: "live",
-      param: {
-        name: "status",
-        in: "query",
-      },
-    }),
     clipType: z.enum(["clip", "short"]).default("clip").openapi({
       description: "Clip Type",
       example: "clip",
@@ -77,7 +69,7 @@ const ListClipRequestSchema = PaginationQuerySchema.merge(
 );
 
 const ListClipResponseSchema = z.object({
-  streams: z.array(ClipResponseSchema),
+  clips: z.array(ClipResponseSchema),
   pagination: PaginationResponseSchema,
 });
 

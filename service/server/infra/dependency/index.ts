@@ -31,7 +31,9 @@ import {
 } from "../../domain/service/discord";
 import {
   CreatorInteractor,
+  EventInteractor,
   type ICreatorInteractor,
+  type IEventInteractor,
   type IStreamInteractor,
   StreamInteractor,
 } from "../../usecase";
@@ -44,6 +46,7 @@ import { AIService, type IAIService } from "../ai";
 import { CloudflareKVCacheClient, type ICacheClient } from "../cache";
 import { DiscordClient, type IDiscordClient } from "../discord";
 import { ClipRepository, type IClipRepository } from "../repository/clip";
+import { EventRepository, type IEventRepository } from "../repository/event";
 
 export interface IRepositories {
   creatorRepository: ICreatorRepository;
@@ -51,6 +54,7 @@ export interface IRepositories {
   discordServerRepository: IDiscordServerRepository;
   discordMessageRepository: IDiscordMessageRepository;
   clipRepository: IClipRepository;
+  eventRepository: IEventRepository;
 }
 
 export function createRepositories(tx: DB): IRepositories {
@@ -60,6 +64,7 @@ export function createRepositories(tx: DB): IRepositories {
     discordServerRepository: new DiscordServerRepository(tx),
     discordMessageRepository: new DiscordMessageRepository(tx),
     clipRepository: new ClipRepository(tx),
+    eventRepository: new EventRepository(tx),
   };
 }
 
@@ -167,6 +172,7 @@ export class Container {
   streamInteractor: IStreamInteractor;
   clipInteractor: IClipInteractor;
   discordInteractor: IDiscordInteractor;
+  eventInteractor: IEventInteractor;
 
   constructor(private readonly env: AppWorkerEnv) {
     this.cacheClient = new CloudflareKVCacheClient(this.env.APP_KV);
@@ -207,5 +213,6 @@ export class Container {
     this.streamInteractor = new StreamInteractor(context);
     this.discordInteractor = new DiscordInteractor(context);
     this.clipInteractor = new ClipInteractor(context);
+    this.eventInteractor = new EventInteractor(context);
   }
 }
