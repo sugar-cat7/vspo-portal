@@ -65,7 +65,7 @@
     "discord-api-types": "^0.37.119",
     "drizzle-kit": "^0.30.6",
     "drizzle-seed": "^0.3.1",
-    "miniflare": "4.20250404.0",
+    "miniflare": "4.20250428.1",
     "nx": "20.7.1",
     "testcontainers": "^10.24.0",
     "tsup": "^8.4.0",
