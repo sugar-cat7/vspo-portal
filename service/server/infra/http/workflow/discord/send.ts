@@ -186,7 +186,7 @@ export const discordSendMessagesWorkflow = () => {
                 async () => {
                   return withTracer(
                     "discord-workflow",
-                    `send-videos-language-${group.channelLangaugeCode}-chunk-${i + 1}`,
+                    `send-streams-language-${group.channelLangaugeCode}-chunk-${i + 1}`,
                     async (span) => {
                       const vu = await env.APP_WORKER.newDiscordUsecase();
                       logger.info(
@@ -209,7 +209,7 @@ export const discordSendMessagesWorkflow = () => {
                         chunkedChannelIds.length,
                       );
 
-                      await vu.sendVideosToMultipleChannels({
+                      await vu.sendStreamsToMultipleChannels({
                         channelIds: channelIdsChunk,
                         channelLangaugeCode: group.channelLangaugeCode,
                         channelMemberType: group.channelMemberType,

@@ -9,6 +9,8 @@ import { setFeatureFlagProvider } from "../../config/featureFlag";
 import { createHandler, withTracer } from "../../infra/http/trace";
 import { searchChannelsWorkflow } from "../../infra/http/workflow/channel/search";
 import { translateCreatorsWorkflow } from "../../infra/http/workflow/channel/trasnlate";
+import { existClipsWorkflow } from "../../infra/http/workflow/clip/exist";
+import { searchClipsWorkflow } from "../../infra/http/workflow/clip/search";
 import { discordDeleteAllWorkflow } from "../../infra/http/workflow/discord/deleteAll";
 import { discordSendMessagesWorkflow } from "../../infra/http/workflow/discord/send";
 import {
@@ -19,10 +21,10 @@ import {
   type DiscordSendMessageChannelsParams,
   discordSendMessageChannelsWorkflow,
 } from "../../infra/http/workflow/discord/sendMessageChannels";
-import { deleteVideosWorkflow } from "../../infra/http/workflow/video/delete";
-import { searchVideosWorkflow } from "../../infra/http/workflow/video/search";
-import { searchMemberVideosByChannelWorkflow } from "../../infra/http/workflow/video/searchMemberVideoByChannel";
-import { translateVideosWorkflow } from "../../infra/http/workflow/video/trasnlate";
+import { deleteStreamsWorkflow } from "../../infra/http/workflow/stream/delete";
+import { searchStreamsWorkflow } from "../../infra/http/workflow/stream/search";
+import { searchMemberStreamsByChannelWorkflow } from "../../infra/http/workflow/stream/searchMemberStreamByChannel";
+import { translateStreamsWorkflow } from "../../infra/http/workflow/stream/trasnlate";
 import { createUUID } from "../../pkg/uuid";
 
 export class SearchChannelsWorkflow extends WorkflowEntrypoint<
@@ -35,13 +37,13 @@ export class SearchChannelsWorkflow extends WorkflowEntrypoint<
   }
 }
 
-export class SearchVideosWorkflow extends WorkflowEntrypoint<
+export class SearchStreamsWorkflow extends WorkflowEntrypoint<
   BindingAppWorkerEnv,
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
     await setFeatureFlagProvider(this.env);
-    await searchVideosWorkflow().handler()(this.env, _event, step);
+    await searchStreamsWorkflow().handler()(this.env, _event, step);
   }
 }
 
@@ -55,13 +57,13 @@ export class TranslateCreatorsWorkflow extends WorkflowEntrypoint<
   }
 }
 
-export class TranslateVideosWorkflow extends WorkflowEntrypoint<
+export class TranslateStreamsWorkflow extends WorkflowEntrypoint<
   BindingAppWorkerEnv,
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
     await setFeatureFlagProvider(this.env);
-    await translateVideosWorkflow().handler()(this.env, _event, step);
+    await translateStreamsWorkflow().handler()(this.env, _event, step);
   }
 }
 
@@ -75,13 +77,13 @@ export class DiscordSendMessagesWorkflow extends WorkflowEntrypoint<
   }
 }
 
-export class SearchMemberVideosByChannelWorkflow extends WorkflowEntrypoint<
+export class SearchMemberStreamsByChannelWorkflow extends WorkflowEntrypoint<
   BindingAppWorkerEnv,
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
     await setFeatureFlagProvider(this.env);
-    await searchMemberVideosByChannelWorkflow().handler()(
+    await searchMemberStreamsByChannelWorkflow().handler()(
       this.env,
       _event,
       step,
@@ -89,13 +91,13 @@ export class SearchMemberVideosByChannelWorkflow extends WorkflowEntrypoint<
   }
 }
 
-export class DeleteVideosWorkflow extends WorkflowEntrypoint<
+export class DeleteStreamsWorkflow extends WorkflowEntrypoint<
   BindingAppWorkerEnv,
   Params
 > {
   async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
     await setFeatureFlagProvider(this.env);
-    await deleteVideosWorkflow().handler()(this.env, _event, step);
+    await deleteStreamsWorkflow().handler()(this.env, _event, step);
   }
 }
 
@@ -139,6 +141,26 @@ export class DiscordSendMessageChannelsWorkflow extends WorkflowEntrypoint<
   }
 }
 
+export class ExistClipsWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  Params
+> {
+  async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await setFeatureFlagProvider(this.env);
+    await existClipsWorkflow().handler()(this.env, _event, step);
+  }
+}
+
+export class SearchClipsWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  Params
+> {
+  async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await setFeatureFlagProvider(this.env);
+    await searchClipsWorkflow().handler()(this.env, _event, step);
+  }
+}
+
 export default createHandler({
   scheduled: async (
     controller: ScheduledController,
@@ -158,20 +180,25 @@ export default createHandler({
           await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
           break;
         case "*/1 * * * *":
-          span.setAttribute("workflow", "search-videos");
-          await env.SEARCH_VIDEOS_WORKFLOW.create({ id: createUUID() });
+          span.setAttribute("workflow", "search-streams");
+          await env.SEARCH_STREAMS_WORKFLOW.create({ id: createUUID() });
           break;
         case "*/2 * * * *":
-          span.setAttribute("workflow", "search-videos");
-          await env.TRANSLATE_VIDEOS_WORKFLOW.create({ id: createUUID() });
+          span.setAttribute("workflow", "search-streams");
+          await env.TRANSLATE_STREAMS_WORKFLOW.create({ id: createUUID() });
           await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
           break;
         case "*/30 * * * *":
-          span.setAttribute("workflow", "search-member-videos-by-channel");
-          await env.SEARCH_MEMBER_VIDEOS_BY_CHANNEL_WORKFLOW.create({
+          span.setAttribute("workflow", "search-member-streams-by-channel");
+          await env.SEARCH_MEMBER_STREAMS_BY_CHANNEL_WORKFLOW.create({
             id: createUUID(),
           });
-          await env.DELETE_VIDEOS_WORKFLOW.create({ id: createUUID() });
+          await env.DELETE_STREAMS_WORKFLOW.create({ id: createUUID() });
+          break;
+        case "0 * * * *":
+          span.setAttribute("workflow", "clips");
+          await env.EXIST_CLIPS_WORKFLOW.create({ id: createUUID() });
+          await env.SEARCH_CLIPS_WORKFLOW.create({ id: createUUID() });
           break;
         default:
           console.error("Unknown cron", controller.cron);

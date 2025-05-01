@@ -4,9 +4,9 @@ import {
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
 import { AppLogger } from "../../../../pkg/logging";
-import { withTracer } from "../../../http/trace/cloudflare";
+import { withTracer } from "../../trace/cloudflare";
 
-export const deleteVideosWorkflow = () => {
+export const deleteStreamsWorkflow = () => {
   return {
     handler:
       () =>
@@ -30,27 +30,27 @@ export const deleteVideosWorkflow = () => {
             },
             async () => {
               return withTracer(
-                "video-workflow",
-                "delete-deleted-videos",
+                "stream-workflow",
+                "delete-deleted-streams",
                 async (span) => {
-                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const vu = await env.APP_WORKER.newStreamUsecase();
                   const result = await vu.deletedListIds();
                   if (result.err) {
                     throw result.err;
                   }
                   AppLogger.info("after deletedListIds", {
-                    videoIds: result.val,
+                    streamIds: result.val,
                   });
                   if (result.val.length === 0) {
                     span.setAttribute("videos_count", 0);
                     return;
                   }
                   AppLogger.info("batchDeleteByVideoIds", {
-                    videoIds: result.val,
+                    streamIds: result.val,
                   });
                   span.setAttribute("videos_count", result.val.length);
-                  const _ = await vu.batchDeleteByVideoIds({
-                    videoIds: result.val,
+                  const _ = await vu.batchDeleteByStreamIds({
+                    streamIds: result.val,
                   });
                 },
               );

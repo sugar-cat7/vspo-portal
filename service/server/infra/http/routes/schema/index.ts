@@ -1,3 +1,4 @@
 export * from "./common";
-export * from "./video";
+export * from "./stream";
 export * from "./creator";
+export * from "./clip";

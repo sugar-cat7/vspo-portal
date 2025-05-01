@@ -1,14 +1,10 @@
 import { z } from "@hono/zod-openapi";
-import {
-  PlatformSchema,
-  StatusSchema,
-  VideoSchema,
-  VideoTypeSchema,
-} from "../../../../domain/video";
+import { PlatformSchema } from "../../../../domain";
+import { StatusSchema, StreamSchema } from "../../../../domain/stream";
 import { PaginationQuerySchema, PaginationResponseSchema } from "./common";
 
-const VideoResponseSchema = VideoSchema.openapi({
-  description: "Video",
+const StreamResponseSchema = StreamSchema.openapi({
+  description: "Stream",
   example: {
     id: "O0XCK3NhzqE",
     rawId: "O0XCK3NhzqE",
@@ -26,7 +22,6 @@ const VideoResponseSchema = VideoSchema.openapi({
     tags: ["APEX", "ぶいすぽっ！", "藍沢エマ", "三清傑"],
     viewCount: 125000,
     thumbnailURL: "https://i.ytimg.com/vi/O0XCK3NhzqE/hqdefault_live.jpg",
-    videoType: "vspo_stream",
     creatorName: "藍沢エマ",
     creatorThumbnailURL:
       "https://yt3.googleusercontent.com/oIps6UVvqtpJykcdjYYyRvhdcyVoR1wAdH8CnTp4msMaKYdn8XMLj4FHsLoqfWaJzbLJKSPjCg=s176-c-k-c0x00ffffff-no-rj",
@@ -35,7 +30,7 @@ const VideoResponseSchema = VideoSchema.openapi({
   },
 });
 
-const ListVideoRequestSchema = PaginationQuerySchema.merge(
+const ListStreamRequestSchema = PaginationQuerySchema.merge(
   z.object({
     platform: PlatformSchema.optional().openapi({
       description: "Platform",
@@ -50,14 +45,6 @@ const ListVideoRequestSchema = PaginationQuerySchema.merge(
       example: "live",
       param: {
         name: "status",
-        in: "query",
-      },
-    }),
-    videoType: VideoTypeSchema.optional().openapi({
-      description: "Video Type",
-      example: "vspo_stream",
-      param: {
-        name: "videoType",
         in: "query",
       },
     }),
@@ -108,18 +95,18 @@ const ListVideoRequestSchema = PaginationQuerySchema.merge(
   }),
 );
 
-const ListVideoResponseSchema = z.object({
-  videos: z.array(VideoResponseSchema),
+const ListStreamResponseSchema = z.object({
+  streams: z.array(StreamResponseSchema),
   pagination: PaginationResponseSchema,
 });
 
-type ListVideoResponse = z.infer<typeof ListVideoResponseSchema>;
-type ListVideoRequest = z.infer<typeof ListVideoRequestSchema>;
+type ListStreamResponse = z.infer<typeof ListStreamResponseSchema>;
+type ListStreamRequest = z.infer<typeof ListStreamRequestSchema>;
 
 export {
-  ListVideoRequestSchema,
-  ListVideoResponseSchema,
-  type ListVideoRequest,
-  type ListVideoResponse,
-  VideoResponseSchema,
+  ListStreamRequestSchema,
+  ListStreamResponseSchema,
+  type ListStreamRequest,
+  type ListStreamResponse,
+  StreamResponseSchema,
 };

@@ -1,3 +1,3 @@
 export * from "./creator";
-export * from "./video";
+export * from "./stream";
 export * from "./discord";

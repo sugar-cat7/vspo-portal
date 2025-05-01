@@ -46,6 +46,7 @@ export interface ICreatorRepository {
   count(query: ListQuery): Promise<Result<number, AppError>>;
   batchUpsert(creators: Creators): Promise<Result<Creators, AppError>>;
   batchDelete(creatorIds: string[]): Promise<Result<void, AppError>>;
+  existsByChannelId(channelId: string): Promise<Result<boolean, AppError>>;
 }
 
 export class CreatorRepository implements ICreatorRepository {
@@ -377,6 +378,37 @@ export class CreatorRepository implements ICreatorRepository {
       },
     );
   }
+
+  async existsByChannelId(
+    channelId: string,
+  ): Promise<Result<boolean, AppError>> {
+    return withTracerResult(
+      "CreatorRepository",
+      "existsByChannelId",
+      async (span) => {
+        const result = await wrap(
+          this.db
+            .select({ count: count() })
+            .from(channelTable)
+            .where(eq(channelTable.platformChannelId, channelId))
+            .execute(),
+          (err) =>
+            new AppError({
+              message: `Database error during channel existence check: ${err.message}`,
+              code: "INTERNAL_SERVER_ERROR",
+              cause: err,
+            }),
+        );
+
+        if (result.err) {
+          return Err(result.err);
+        }
+
+        return Ok((result.val.at(0)?.count ?? 0) > 0);
+      },
+    );
+  }
+
   private buildFilters(query: ListQuery): SQL[] {
     const filters: SQL[] = [];
     const languageCode = query.languageCode || "default";

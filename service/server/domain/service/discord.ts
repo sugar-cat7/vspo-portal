@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/cloudflare";
 import type {
   IDiscordMessageRepository,
   IDiscordServerRepository,
-  IVideoRepository,
+  IStreamRepository,
 } from "../../infra";
 import { type ICacheClient, cacheKey } from "../../infra/cache";
 import type { IDiscordClient } from "../../infra/discord";
@@ -18,11 +18,11 @@ import { createUUID } from "../../pkg/uuid";
 import {
   type DiscordServer,
   createDiscordServer,
-  createVideoEmbed,
+  createStreamEmbed,
   discordServer,
 } from "../discord";
 import { runWithLanguage } from "../service/i18n";
-import type { Video } from "../video";
+import type { Stream } from "../stream";
 
 // Parameters for sending messages to multiple channels
 type ChannelMessageParams = {
@@ -78,7 +78,7 @@ export class DiscordService implements IDiscordService {
       discordClient: IDiscordClient;
       discordServerRepository: IDiscordServerRepository;
       discordMessageRepository: IDiscordMessageRepository;
-      videoRepository: IVideoRepository;
+      streamRepository: IStreamRepository;
       cacheClient: ICacheClient;
     },
   ) {}
@@ -116,7 +116,7 @@ export class DiscordService implements IDiscordService {
 
   /**
    * Send messages to multiple channels.
-   * This includes upcoming video messages and live diff messages.
+   * This includes upcoming stream messages and live diff messages.
    */
   async sendMessagesToChannel(
     options: ChannelMessageParams,
@@ -137,41 +137,40 @@ export class DiscordService implements IDiscordService {
 
     // Use runWithLanguage to set the language context for the entire operation
     return runWithLanguage(options.channelLangaugeCode, async () => {
-      const liveVideoListResult = await this.dependencies.videoRepository.list({
-        limit: 1000,
-        page: 0,
-        languageCode: options.channelLangaugeCode,
-        videoType: "vspo_stream",
-        startedAt: convertToUTCDate(
-          getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
-        ),
-        memberType: options.channelMemberType,
-        status: "live",
-        orderBy: "desc",
-      });
-      if (liveVideoListResult.err) {
-        AppLogger.error("Failed to fetch video list", {
-          service: this.SERVICE_NAME,
-          error: liveVideoListResult.err,
+      const liveStreamListResult =
+        await this.dependencies.streamRepository.list({
+          limit: 1000,
+          page: 0,
+          languageCode: options.channelLangaugeCode,
+          startedAt: convertToUTCDate(
+            getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
+          ),
+          memberType: options.channelMemberType,
+          status: "live",
+          orderBy: "desc",
         });
-        return Err(liveVideoListResult.err);
+      if (liveStreamListResult.err) {
+        AppLogger.error("Failed to fetch stream list", {
+          service: this.SERVICE_NAME,
+          error: liveStreamListResult.err,
+        });
+        return Err(liveStreamListResult.err);
       }
 
-      const liveVideos = liveVideoListResult.val;
+      const liveStreams = liveStreamListResult.val;
 
-      liveVideos.sort((a, b) => {
+      liveStreams.sort((a, b) => {
         return (
           new Date(a.startedAt || "").getTime() -
           new Date(b.startedAt || "").getTime()
         );
       });
 
-      const upcomingVideoListResult =
-        await this.dependencies.videoRepository.list({
+      const upcomingStreamListResult =
+        await this.dependencies.streamRepository.list({
           limit: 1000,
           page: 0,
           languageCode: options.channelLangaugeCode,
-          videoType: "vspo_stream",
           startedAt: convertToUTCDate(
             getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
           ),
@@ -179,17 +178,17 @@ export class DiscordService implements IDiscordService {
           status: "upcoming",
           orderBy: "desc",
         });
-      if (upcomingVideoListResult.err) {
-        AppLogger.error("Failed to fetch video list", {
+      if (upcomingStreamListResult.err) {
+        AppLogger.error("Failed to fetch stream list", {
           service: this.SERVICE_NAME,
-          error: upcomingVideoListResult.err,
+          error: upcomingStreamListResult.err,
         });
-        return Err(upcomingVideoListResult.err);
+        return Err(upcomingStreamListResult.err);
       }
-      const upcomingVideos = upcomingVideoListResult.val;
+      const upcomingStreams = upcomingStreamListResult.val;
 
-      // Sort upcoming videos by broadcast start time in ascending order
-      upcomingVideos.sort((a, b) => {
+      // Sort upcoming streams by broadcast start time in ascending order
+      upcomingStreams.sort((a, b) => {
         return (
           new Date(a.startedAt || "").getTime() -
           new Date(b.startedAt || "").getTime()
@@ -212,27 +211,27 @@ export class DiscordService implements IDiscordService {
 
         // Find existing upcoming message (there should be at most one)
         const upcomingMessage = latestMessagesResult.val.find((msg) =>
-          msg.embedVideos.some((video) => video.status === "upcoming"),
+          msg.embedStreams.some((stream) => stream.status === "upcoming"),
         );
 
         // Find all live messages
         const liveMessages = latestMessagesResult.val.filter((msg) =>
-          msg.embedVideos.some((video) => video.status === "live"),
+          msg.embedStreams.some((stream) => stream.status === "live"),
         );
 
         // Process upcoming message
         if (upcomingMessage) {
-          const upcomingVideosInMessage = upcomingMessage.embedVideos;
+          const upcomingStreamsInMessage = upcomingMessage.embedStreams;
 
-          // Check if there is a difference between the embedded upcoming videos and the latest upcoming videos
+          // Check if there is a difference between the embedded upcoming streams and the latest upcoming streams
           const hasDiff =
-            upcomingVideos.some((v) => {
-              return !upcomingVideosInMessage.some(
+            upcomingStreams.some((v) => {
+              return !upcomingStreamsInMessage.some(
                 (v2) => v2.identifier === v.link,
               );
             }) ||
-            upcomingVideosInMessage.some((v) => {
-              return !upcomingVideos.some((v2) => v2.link === v.identifier);
+            upcomingStreamsInMessage.some((v) => {
+              return !upcomingStreams.some((v2) => v2.link === v.identifier);
             });
 
           if (hasDiff) {
@@ -240,34 +239,38 @@ export class DiscordService implements IDiscordService {
               this.dependencies.discordClient.updateMessage({
                 channelId,
                 messageId: upcomingMessage.rawId,
-                embeds: upcomingVideos.map((video) => createVideoEmbed(video)),
+                embeds: upcomingStreams.map((stream) =>
+                  createStreamEmbed(stream),
+                ),
               }),
             );
           }
         } else {
-          if (upcomingVideos.length > 0) {
+          if (upcomingStreams.length > 0) {
             messagePromises.push(
               this.dependencies.discordClient.sendMessage({
                 channelId,
                 content: "",
-                embeds: upcomingVideos.map((video) => createVideoEmbed(video)),
+                embeds: upcomingStreams.map((stream) =>
+                  createStreamEmbed(stream),
+                ),
               }),
             );
           }
         }
 
-        for (const liveVideo of liveVideos) {
+        for (const liveStream of liveStreams) {
           const liveMessage = liveMessages.find(
-            (msg) => msg.embedVideos[0].identifier === liveVideo.link,
+            (msg) => msg.embedStreams[0].identifier === liveStream.link,
           );
-          const lm = liveMessage?.embedVideos[0];
+          const lm = liveMessage?.embedStreams[0];
 
-          if (lm && this.shouldUpdateEmbed(lm, liveVideo)) {
+          if (lm && this.shouldUpdateEmbed(lm, liveStream)) {
             messagePromises.push(
               this.dependencies.discordClient.updateMessage({
                 channelId,
                 messageId: liveMessage.rawId,
-                embeds: [createVideoEmbed(liveVideo)],
+                embeds: [createStreamEmbed(liveStream)],
               }),
             );
           }
@@ -277,7 +280,7 @@ export class DiscordService implements IDiscordService {
               this.dependencies.discordClient.sendMessage({
                 channelId,
                 content: "",
-                embeds: [createVideoEmbed(liveVideo)],
+                embeds: [createStreamEmbed(liveStream)],
               }),
             );
           }
@@ -286,7 +289,7 @@ export class DiscordService implements IDiscordService {
         // Messages to be deleted
         const deletedMessages = liveMessages.filter(
           (msg) =>
-            !liveVideos.some((v) => v.link === msg.embedVideos[0].identifier),
+            !liveStreams.some((v) => v.link === msg.embedStreams[0].identifier),
         );
         for (const msg of deletedMessages) {
           messagePromises.push(
@@ -297,7 +300,7 @@ export class DiscordService implements IDiscordService {
           );
         }
 
-        if (upcomingVideos.length === 0) {
+        if (upcomingStreams.length === 0) {
           const deletedMessageId = upcomingMessage?.rawId;
           if (deletedMessageId) {
             messagePromises.push(
@@ -642,12 +645,12 @@ export class DiscordService implements IDiscordService {
    */
   private shouldUpdateEmbed(
     embed: { title: string; thumbnail: string; startedAt: string },
-    video: Video,
+    stream: Stream,
   ): boolean {
     return (
-      embed.title !== video.title ||
-      embed.thumbnail !== video.thumbnailURL ||
-      embed.startedAt !== video.formattedStartedAt
+      embed.title !== stream.title ||
+      embed.thumbnail !== stream.thumbnailURL ||
+      embed.startedAt !== stream.formattedStartedAt
     );
   }
 }

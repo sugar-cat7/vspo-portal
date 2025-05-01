@@ -1,5 +1,10 @@
-import { type Videos, createVideo, createVideos } from "../../domain/video";
-import { convertToUTC } from "../../pkg/dayjs";
+import { type Clips, createClip, createClips } from "../../domain/clip";
+import { type Streams, createStream, createStreams } from "../../domain/stream";
+import {
+  convertToUTC,
+  getCurrentUTCDate,
+  getCurrentUTCString,
+} from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
 import { withTracerResult } from "../http/trace/cloudflare";
 import type { paths } from "./twitch-api.generated";
@@ -10,14 +15,17 @@ type TwitchServiceConfig = {
 };
 
 type GetStreamsParams = { userIds: string[] };
-type GetVideosByIDsParams = { videoIds: string[] };
+type GetStreamsByIDsParams = { streamIds: string[] };
 type GetArchiveParams = { userIds: string[] };
+type GetClipsParams = { userId: string };
+
 export interface ITwitchService {
-  getStreams(params: GetStreamsParams): Promise<Result<Videos, AppError>>;
-  getVideosByIDs(
-    params: GetVideosByIDsParams,
-  ): Promise<Result<Videos, AppError>>;
-  getArchive(params: GetArchiveParams): Promise<Result<Videos, AppError>>;
+  getStreams(params: GetStreamsParams): Promise<Result<Streams, AppError>>;
+  getStreamsByIDs(
+    params: GetStreamsByIDsParams,
+  ): Promise<Result<Streams, AppError>>;
+  getArchive(params: GetArchiveParams): Promise<Result<Streams, AppError>>;
+  getClipsByUserID(params: GetClipsParams): Promise<Result<Clips, AppError>>;
 }
 
 export class TwitchService implements ITwitchService {
@@ -140,7 +148,7 @@ export class TwitchService implements ITwitchService {
 
   async getStreams(
     params: GetStreamsParams,
-  ): Promise<Result<Videos, AppError>> {
+  ): Promise<Result<Streams, AppError>> {
     return withTracerResult("TwitchService", "getStreams", async (span) => {
       type StreamsResponse =
         paths["/streams"]["get"]["responses"]["200"]["content"]["application/json"];
@@ -152,9 +160,9 @@ export class TwitchService implements ITwitchService {
       if (result.err) return Err(result.err);
 
       return Ok(
-        createVideos(
+        createStreams(
           result.val.data.map((stream) =>
-            createVideo({
+            createStream({
               id: "",
               rawId: stream.id,
               rawChannelID: stream.user_id,
@@ -169,7 +177,6 @@ export class TwitchService implements ITwitchService {
               tags: stream.tags || [],
               viewCount: stream.viewer_count,
               thumbnailURL: stream.thumbnail_url,
-              videoType: "vspo_stream",
               link: `https://www.twitch.tv/${stream.user_login}`,
             }),
           ),
@@ -178,47 +185,50 @@ export class TwitchService implements ITwitchService {
     });
   }
 
-  async getVideosByIDs(
-    params: GetVideosByIDsParams,
-  ): Promise<Result<Videos, AppError>> {
-    return withTracerResult("TwitchService", "getVideosByIDs", async (span) => {
-      type VideosResponse =
-        paths["/videos"]["get"]["responses"]["200"]["content"]["application/json"];
-      const result = await this.fetchFromTwitch<VideosResponse>("/videos", {
-        id: params.videoIds,
-      });
+  async getStreamsByIDs(
+    params: GetStreamsByIDsParams,
+  ): Promise<Result<Streams, AppError>> {
+    return withTracerResult(
+      "TwitchService",
+      "getStreamsByIDs",
+      async (span) => {
+        type StreamsResponse =
+          paths["/videos"]["get"]["responses"]["200"]["content"]["application/json"];
+        const result = await this.fetchFromTwitch<StreamsResponse>("/videos", {
+          id: params.streamIds,
+        });
 
-      if (result.err) return Err(result.err);
+        if (result.err) return Err(result.err);
 
-      return Ok(
-        createVideos(
-          result.val.data.map((video) =>
-            createVideo({
-              id: "",
-              rawId: video.id,
-              rawChannelID: video.user_id,
-              languageCode: "default",
-              title: video.title,
-              description: video.description,
-              publishedAt: convertToUTC(video.published_at),
-              startedAt: convertToUTC(video.created_at),
-              endedAt: null,
-              platform: "twitch",
-              status: "ended",
-              tags: [],
-              viewCount: 0,
-              thumbnailURL: video.thumbnail_url,
-              videoType: "vspo_stream",
-            }),
+        return Ok(
+          createStreams(
+            result.val.data.map((video) =>
+              createStream({
+                id: "",
+                rawId: video.id,
+                rawChannelID: video.user_id,
+                languageCode: "default",
+                title: video.title,
+                description: video.description,
+                publishedAt: convertToUTC(video.published_at),
+                startedAt: convertToUTC(video.created_at),
+                endedAt: null,
+                platform: "twitch",
+                status: "ended",
+                tags: [],
+                viewCount: 0,
+                thumbnailURL: video.thumbnail_url,
+              }),
+            ),
           ),
-        ),
-      );
-    });
+        );
+      },
+    );
   }
 
   async getArchive(
     params: GetArchiveParams,
-  ): Promise<Result<Videos, AppError>> {
+  ): Promise<Result<Streams, AppError>> {
     return withTracerResult("TwitchService", "getArchive", async (span) => {
       type ArchiveResponse =
         paths["/videos"]["get"]["responses"]["200"]["content"]["application/json"];
@@ -234,7 +244,7 @@ export class TwitchService implements ITwitchService {
       const settledResults = await Promise.allSettled(promises);
 
       // Collect only successful results
-      const successfulVideos = settledResults
+      const successfulStreams = settledResults
         .filter(
           (
             result,
@@ -249,7 +259,7 @@ export class TwitchService implements ITwitchService {
         })
         .filter((video) => video.type === "archive")
         .map((video) =>
-          createVideo({
+          createStream({
             id: "",
             rawId: video.id,
             rawChannelID: video.user_id,
@@ -264,12 +274,57 @@ export class TwitchService implements ITwitchService {
             tags: [],
             viewCount: 0,
             thumbnailURL: video.thumbnail_url,
-            videoType: "vspo_stream",
             link: `https://www.twitch.tv/videos/${video.id}`,
           }),
         );
 
-      return Ok(createVideos(successfulVideos));
+      return Ok(createStreams(successfulStreams));
+    });
+  }
+
+  async getClipsByUserID(
+    params: GetClipsParams,
+  ): Promise<Result<Clips, AppError>> {
+    return withTracerResult("TwitchService", "getClips", async (span) => {
+      // Calculate dates for the 7-day window
+      const current = getCurrentUTCString();
+      const sevenDaysAgo = convertToUTC(
+        getCurrentUTCDate().getTime() - 7 * 24 * 60 * 60 * 1000,
+      );
+
+      type ClipsResponse =
+        paths["/clips"]["get"]["responses"]["200"]["content"]["application/json"];
+
+      const result = await this.fetchFromTwitch<ClipsResponse>("/clips", {
+        broadcaster_id: params.userId,
+        first: "100",
+        started_at: sevenDaysAgo,
+        ended_at: current,
+      });
+
+      if (result.err) return Err(result.err);
+
+      return Ok(
+        createClips(
+          result.val.data.map((clip) =>
+            createClip({
+              id: "",
+              rawId: clip.id,
+              rawChannelID: clip.broadcaster_id,
+              languageCode: "default",
+              title: clip.title,
+              description: clip.title,
+              publishedAt: convertToUTC(clip.created_at),
+              platform: "twitch",
+              type: "clip",
+              tags: [],
+              viewCount: clip.view_count,
+              thumbnailURL: clip.thumbnail_url,
+              link: clip.url,
+            }),
+          ),
+        ),
+      );
     });
   }
 }

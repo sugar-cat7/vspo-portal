@@ -376,7 +376,7 @@ export class DiscordClient implements IDiscordClient {
             content: m.content ?? "",
             createdAt: getCurrentUTCString(),
             updatedAt: getCurrentUTCString(),
-            embedVideos:
+            embedStreams:
               m.embeds.map((e) => ({
                 identifier: e.url,
                 title: e.title,
@@ -435,7 +435,7 @@ export class DiscordClient implements IDiscordClient {
           content: message.content ?? "",
           createdAt: getCurrentUTCString(),
           updatedAt: getCurrentUTCString(),
-          embedVideos: message.embeds.map((e) => ({
+          embedStreams: message.embeds.map((e) => ({
             identifier: e.url,
             title: e.title,
             url: e.url,

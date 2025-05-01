@@ -4,9 +4,9 @@ import {
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
 import { AppLogger } from "../../../../pkg/logging";
-import { withTracer } from "../../../http/trace/cloudflare";
+import { withTracer } from "../../trace/cloudflare";
 
-export const searchMemberVideosByChannelWorkflow = () => {
+export const searchMemberStreamsByChannelWorkflow = () => {
   return {
     handler:
       () =>
@@ -30,11 +30,11 @@ export const searchMemberVideosByChannelWorkflow = () => {
             },
             async () => {
               return withTracer(
-                "video-workflow",
-                "search-member-videos",
+                "stream-workflow",
+                "search-member-streams",
                 async (span) => {
-                  const vu = await env.APP_WORKER.newVideoUsecase();
-                  const result = await vu.getMemberVideos();
+                  const vu = await env.APP_WORKER.newStreamUsecase();
+                  const result = await vu.getMemberStreams();
                   if (result.err) {
                     throw result.err;
                   }

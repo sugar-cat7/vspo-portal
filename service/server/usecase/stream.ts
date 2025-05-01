@@ -1,21 +1,20 @@
 import { type Page, createPage } from "../domain/pagination";
-import type { Videos } from "../domain/video";
+import type { Streams } from "../domain/stream";
 import type { IAppContext } from "../infra/dependency";
 import { withTracerResult } from "../infra/http/trace";
 import { type AppError, Ok, type Result } from "../pkg/errors";
 import { AppLogger } from "../pkg/logging";
 
-export type BatchUpsertVideosParam = Videos;
+export type BatchUpsertStreamsParam = Streams;
 export type BatchUpsertByIdsParam = {
-  youtubeVideoIds: string[];
-  twitchVideoIds: string[];
+  youtubeStreamIds: string[];
+  twitchStreamIds: string[];
 };
 export type ListParam = {
   limit: number;
   page: number;
   platform?: string;
   status?: string;
-  videoType?: string;
   memberType?: string;
   startedAt?: Date;
   endedAt?: Date;
@@ -24,68 +23,72 @@ export type ListParam = {
 };
 
 export type ListResponse = {
-  videos: Videos;
+  streams: Streams;
   pagination: Page;
 };
 
-export type BatchDeleteByVideoIdsParam = {
-  videoIds: string[];
+export type BatchDeleteByStreamIdsParam = {
+  streamIds: string[];
 };
 
-export type TranslateVideoParam = {
+export type TranslateStreamParam = {
   languageCode: string;
-  videos: Videos;
+  streams: Streams;
 };
 
-export type SearchByVideoIdsAndCreateParam = {
-  videoIds: string[];
+export type SearchByStreamIdsAndCreateParam = {
+  streamIds: string[];
 };
 
-export interface IVideoInteractor {
+export interface IStreamInteractor {
   batchUpsert(
-    params: BatchUpsertVideosParam,
-  ): Promise<Result<Videos, AppError>>;
-  searchLive(): Promise<Result<Videos, AppError>>;
-  searchExist(): Promise<Result<Videos, AppError>>;
+    params: BatchUpsertStreamsParam,
+  ): Promise<Result<Streams, AppError>>;
+  searchLive(): Promise<Result<Streams, AppError>>;
+  searchExist(): Promise<Result<Streams, AppError>>;
   list(params: ListParam): Promise<Result<ListResponse, AppError>>;
-  searchDeletedCheck(): Promise<Result<Videos, AppError>>;
-  batchDeleteByVideoIds(
-    params: BatchDeleteByVideoIdsParam,
+  searchDeletedCheck(): Promise<Result<Streams, AppError>>;
+  batchDeleteByStreamIds(
+    params: BatchDeleteByStreamIdsParam,
   ): Promise<Result<void, AppError>>;
-  translateVideo(
-    params: TranslateVideoParam,
-  ): Promise<Result<Videos, AppError>>;
-  getMemberVideos(): Promise<Result<Videos, AppError>>;
+  translateStream(
+    params: TranslateStreamParam,
+  ): Promise<Result<Streams, AppError>>;
+  getMemberStreams(): Promise<Result<Streams, AppError>>;
   deletedListIds(): Promise<Result<string[], AppError>>;
-  searchByVideosIdsAndCreate(
-    params: SearchByVideoIdsAndCreateParam,
-  ): Promise<Result<Videos, AppError>>;
+  searchByStreamsIdsAndCreate(
+    params: SearchByStreamIdsAndCreateParam,
+  ): Promise<Result<Streams, AppError>>;
 }
 
-export class VideoInteractor implements IVideoInteractor {
+export class StreamInteractor implements IStreamInteractor {
   constructor(private readonly context: IAppContext) {}
 
-  // Fetch new videos from external APIs
-  async searchLive(): Promise<Result<Videos, AppError>> {
-    return await withTracerResult("VideoInteractor", "searchLive", async () => {
-      return this.context.runInTx(async (_repos, services) => {
-        const sv = await services.videoService.searchAllLiveVideos();
-        if (sv.err) {
-          return sv;
-        }
-        return Ok(sv.val);
-      });
-    });
+  // Fetch new streams from external APIs
+  async searchLive(): Promise<Result<Streams, AppError>> {
+    return await withTracerResult(
+      "StreamInteractor",
+      "searchLive",
+      async () => {
+        return this.context.runInTx(async (_repos, services) => {
+          const sv = await services.streamService.searchAllLiveStreams();
+          if (sv.err) {
+            return sv;
+          }
+          return Ok(sv.val);
+        });
+      },
+    );
   }
 
-  // Fetch videos from database and external APIs
-  async searchExist(): Promise<Result<Videos, AppError>> {
+  // Fetch streams from database and external APIs
+  async searchExist(): Promise<Result<Streams, AppError>> {
     return await withTracerResult(
-      "VideoInteractor",
+      "StreamInteractor",
       "searchExist",
       async () => {
         return this.context.runInTx(async (_repos, services) => {
-          const sv = await services.videoService.searchExistVideos();
+          const sv = await services.streamService.searchExistStreams();
           if (sv.err) {
             return sv;
           }
@@ -96,14 +99,14 @@ export class VideoInteractor implements IVideoInteractor {
   }
 
   async batchUpsert(
-    params: BatchUpsertVideosParam,
-  ): Promise<Result<Videos, AppError>> {
+    params: BatchUpsertStreamsParam,
+  ): Promise<Result<Streams, AppError>> {
     return await withTracerResult(
-      "VideoInteractor",
+      "StreamInteractor",
       "batchUpsert",
       async () => {
         return this.context.runInTx(async (repos, _services) => {
-          const uv = await repos.videoRepository.batchUpsert(params);
+          const uv = await repos.streamRepository.batchUpsert(params);
           if (uv.err) {
             return uv;
           }
@@ -114,19 +117,19 @@ export class VideoInteractor implements IVideoInteractor {
   }
 
   async list(params: ListParam): Promise<Result<ListResponse, AppError>> {
-    return await withTracerResult("VideoInteractor", "list", async () => {
+    return await withTracerResult("StreamInteractor", "list", async () => {
       return this.context.runInTx(async (repos, _services) => {
-        const sv = await repos.videoRepository.list(params);
+        const sv = await repos.streamRepository.list(params);
         if (sv.err) {
           return sv;
         }
 
-        const c = await repos.videoRepository.count(params);
+        const c = await repos.streamRepository.count(params);
         if (c.err) {
           return c;
         }
         return Ok({
-          videos: sv.val,
+          streams: sv.val,
           pagination: createPage({
             currentPage: params.page,
             limit: params.limit,
@@ -137,13 +140,13 @@ export class VideoInteractor implements IVideoInteractor {
     });
   }
 
-  async searchDeletedCheck(): Promise<Result<Videos, AppError>> {
+  async searchDeletedCheck(): Promise<Result<Streams, AppError>> {
     return await withTracerResult(
-      "VideoInteractor",
+      "StreamInteractor",
       "searchDeletedCheck",
       async () => {
         return this.context.runInTx(async (repos, services) => {
-          const sv = await services.videoService.searchDeletedVideos();
+          const sv = await services.streamService.searchDeletedStreams();
           if (sv.err) {
             return sv;
           }
@@ -154,15 +157,15 @@ export class VideoInteractor implements IVideoInteractor {
     );
   }
 
-  async batchDeleteByVideoIds(
-    params: BatchDeleteByVideoIdsParam,
+  async batchDeleteByStreamIds(
+    params: BatchDeleteByStreamIdsParam,
   ): Promise<Result<void, AppError>> {
     return await withTracerResult(
-      "VideoInteractor",
-      "batchDeleteByVideoIds",
+      "StreamInteractor",
+      "batchDeleteByStreamIds",
       async () => {
         return this.context.runInTx(async (repos, _services) => {
-          const uv = await repos.videoRepository.batchDelete(params.videoIds);
+          const uv = await repos.streamRepository.batchDelete(params.streamIds);
           if (uv.err) {
             return uv;
           }
@@ -172,15 +175,15 @@ export class VideoInteractor implements IVideoInteractor {
     );
   }
 
-  async translateVideo(
-    params: TranslateVideoParam,
-  ): Promise<Result<Videos, AppError>> {
+  async translateStream(
+    params: TranslateStreamParam,
+  ): Promise<Result<Streams, AppError>> {
     return await withTracerResult(
-      "VideoInteractor",
-      "translateVideo",
+      "StreamInteractor",
+      "translateStream",
       async () => {
         return this.context.runInTx(async (_repos, services) => {
-          const sv = await services.videoService.translateVideos(params);
+          const sv = await services.streamService.translateStreams(params);
           if (sv.err) {
             return sv;
           }
@@ -190,13 +193,13 @@ export class VideoInteractor implements IVideoInteractor {
     );
   }
 
-  async getMemberVideos(): Promise<Result<Videos, AppError>> {
+  async getMemberStreams(): Promise<Result<Streams, AppError>> {
     return await withTracerResult(
-      "VideoInteractor",
-      "getMemberVideos",
+      "StreamInteractor",
+      "getMemberStreams",
       async () => {
         return this.context.runInTx(async (_repos, services) => {
-          const sv = await services.videoService.getMemberVideos();
+          const sv = await services.streamService.getMemberStreams();
           if (sv.err) {
             return sv;
           }
@@ -208,16 +211,16 @@ export class VideoInteractor implements IVideoInteractor {
 
   async deletedListIds(): Promise<Result<string[], AppError>> {
     return await withTracerResult(
-      "VideoInteractor",
+      "StreamInteractor",
       "deletedListIds",
       async () => {
         return this.context.runInTx(async (repos, _services) => {
-          const sv = await repos.videoRepository.deletedListIds();
+          const sv = await repos.streamRepository.deletedListIds();
           if (sv.err) {
             return sv;
           }
           AppLogger.info("deletedListIds", {
-            videoIds: sv.val,
+            streamIds: sv.val,
           });
           return Ok(sv.val);
         });
@@ -225,27 +228,27 @@ export class VideoInteractor implements IVideoInteractor {
     );
   }
 
-  async searchByVideosIdsAndCreate(
-    params: SearchByVideoIdsAndCreateParam,
-  ): Promise<Result<Videos, AppError>> {
+  async searchByStreamsIdsAndCreate(
+    params: SearchByStreamIdsAndCreateParam,
+  ): Promise<Result<Streams, AppError>> {
     return await withTracerResult(
-      "VideoInteractor",
-      "searchByVideosIdAndCreate",
+      "StreamInteractor",
+      "searchByStreamsIdAndCreate",
       async () => {
         return this.context.runInTx(async (repos, services) => {
-          const vs = await services.videoService.getVideosByVideoIds(params);
+          const vs = await services.streamService.getStreamsByStreamIds(params);
           if (vs.err) {
             return vs;
           }
 
-          const upsertedVideos = await repos.videoRepository.batchUpsert(
+          const upsertedStreams = await repos.streamRepository.batchUpsert(
             vs.val,
           );
-          if (upsertedVideos.err) {
-            return upsertedVideos;
+          if (upsertedStreams.err) {
+            return upsertedStreams;
           }
 
-          return Ok(upsertedVideos.val);
+          return Ok(upsertedStreams.val);
         });
       },
     );

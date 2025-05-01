@@ -114,7 +114,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
             rawId: message.rawId,
             channelId: message.channelId,
             content: savedMessage.message,
-            embedVideos: message.embedVideos || [],
+            embedStreams: message.embedStreams || [],
             createdAt: convertToUTC(savedMessage.createdAt),
             updatedAt: convertToUTC(savedMessage.updatedAt),
           }),
@@ -172,7 +172,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
             rawId: adminMessage ? adminMessage.adminMessageId : "",
             channelId: adminMessage ? adminMessage.channelId : "",
             content: message.message,
-            embedVideos: [], // Embed videos would need to be parsed from the message or stored separately
+            embedStreams: [], // Embed videos would need to be parsed from the message or stored separately
             createdAt: convertToUTC(message.createdAt),
             updatedAt: convertToUTC(message.updatedAt),
           }),
@@ -224,7 +224,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
                 rawId: adminMessage ? adminMessage.adminMessageId : "",
                 channelId: adminMessage ? adminMessage.channelId : "",
                 content: message.message,
-                embedVideos: [],
+                embedStreams: [],
                 createdAt: convertToUTC(message.createdAt),
                 updatedAt: convertToUTC(message.updatedAt),
               };

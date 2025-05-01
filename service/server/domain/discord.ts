@@ -4,7 +4,7 @@ import { z } from "zod";
 import { getCurrentUTCString } from "../pkg/dayjs";
 import { MemberTypeSchema } from "./creator";
 import { t } from "./service/i18n";
-import { StatusSchema, type Video } from "./video";
+import { StatusSchema, type Stream } from "./stream";
 
 export const discordChannel = z
   .object({
@@ -59,7 +59,7 @@ export const discordMessage = z
     rawId: z.string(),
     channelId: z.string(),
     content: z.string(),
-    embedVideos: z.array(
+    embedStreams: z.array(
       z.object({
         identifier: z.string(),
         title: z.string(),
@@ -126,32 +126,32 @@ export const createDiscordMessages = (
   return discordMessages;
 };
 
-export function createVideoEmbed(video: Video): DiscordEmbed {
+export function createStreamEmbed(stream: Stream): DiscordEmbed {
   const embeds = new EmbedsBuilder()
     .newEmbed()
-    .setTitle(video.title, video.link)
-    .setColor(video.statusColor)
+    .setTitle(stream.title, stream.link)
+    .setColor(stream.statusColor)
     .addField(
       t("embedMessage.streamingDate", {
-        languageCode: video.languageCode,
+        languageCode: stream.languageCode,
       }),
-      video.formattedStartedAt,
+      stream.formattedStartedAt || "",
       true,
     )
-    .setImage(video.thumbnailURL)
-    .setAuthor(video.creatorName || "Unknown", {
-      icon_url: video.creatorThumbnailURL || "",
+    .setImage(stream.thumbnailURL)
+    .setAuthor(stream.creatorName || "Unknown", {
+      icon_url: stream.creatorThumbnailURL || "",
     })
     .setFooter(
       t("embedMessage.poweredBySpodule", {
         translationOptions: {
           platform:
-            video.platform.charAt(0).toUpperCase() + video.platform.slice(1),
+            stream.platform.charAt(0).toUpperCase() + stream.platform.slice(1),
         },
-        languageCode: video.languageCode,
+        languageCode: stream.languageCode,
       }),
       {
-        icon_url: video.platformIconURL,
+        icon_url: stream.platformIconURL,
       },
     );
 

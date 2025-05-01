@@ -4,26 +4,26 @@ import { convertToUTCDate } from "../../../pkg/dayjs";
 import { openApiErrorResponses } from "../../../pkg/errors";
 import type { App } from "../hono";
 import {
-  ListVideoRequestSchema,
-  ListVideoResponseSchema,
-  VideoResponseSchema,
+  ListStreamRequestSchema,
+  ListStreamResponseSchema,
+  StreamResponseSchema,
 } from "./schema";
 
-const listVideosRoute = createRoute({
-  tags: ["Video"],
-  operationId: "listVideos",
+const listStreamsRoute = createRoute({
+  tags: ["Stream"],
+  operationId: "listStreams",
   method: "get" as const,
-  path: "/api/videos",
+  path: "/api/streams",
   security: [{ apiKeyAuth: [] }],
   request: {
-    query: ListVideoRequestSchema,
+    query: ListStreamRequestSchema,
   },
   responses: {
     200: {
       description: "The configuration for an api",
       content: {
         "application/json": {
-          schema: ListVideoResponseSchema,
+          schema: ListStreamResponseSchema,
         },
       },
     },
@@ -31,18 +31,18 @@ const listVideosRoute = createRoute({
   },
 });
 
-const postVideoRoute = createRoute({
-  tags: ["Video"],
-  operationId: "postVideo",
+const postStreamRoute = createRoute({
+  tags: ["Stream"],
+  operationId: "postStream",
   method: "post" as const,
-  path: "/api/videos/search",
+  path: "/api/streams/search",
   security: [{ apiKeyAuth: [] }],
   request: {
     body: {
       content: {
         "application/json": {
           schema: z.object({
-            videoIds: z.array(z.string()),
+            streamIds: z.array(z.string()),
           }),
         },
       },
@@ -54,7 +54,7 @@ const postVideoRoute = createRoute({
       content: {
         "application/json": {
           schema: z.object({
-            videos: z.array(VideoResponseSchema),
+            videos: z.array(StreamResponseSchema),
           }),
         },
       },
@@ -63,15 +63,14 @@ const postVideoRoute = createRoute({
   },
 });
 
-export const registerVideoListApi = (app: App) =>
-  app.openapi(listVideosRoute, async (c) => {
-    const p = ListVideoRequestSchema.parse(c.req.query());
-    const r = await c.env.APP_WORKER.newVideoUsecase().list({
+export const registerStreamListApi = (app: App) =>
+  app.openapi(listStreamsRoute, async (c) => {
+    const p = ListStreamRequestSchema.parse(c.req.query());
+    const r = await c.env.APP_WORKER.newStreamUsecase().list({
       limit: Number.parseInt(p.limit),
       page: Number.parseInt(p.page),
       platform: p.platform,
       status: p.status,
-      videoType: p.videoType,
       startedAt: p.startedAt ? convertToUTCDate(p.startedAt) : undefined,
       endedAt: p.endedAt ? convertToUTCDate(p.endedAt) : undefined,
       languageCode: p.languageCode,
@@ -82,16 +81,16 @@ export const registerVideoListApi = (app: App) =>
       throw r.err;
     }
 
-    return c.json(ListVideoResponseSchema.parse(r.val), 200);
+    return c.json(ListStreamResponseSchema.parse(r.val), 200);
   });
 
-export const registerVideoPostApi = (app: App) =>
-  app.openapi(postVideoRoute, async (c) => {
+export const registerStreamPostApi = (app: App) =>
+  app.openapi(postStreamRoute, async (c) => {
     const p = await c.req.json();
     console.log(p);
     const r =
-      await c.env.APP_WORKER.newVideoUsecase().searchByVideosIdsAndCreate({
-        videoIds: p.videoIds,
+      await c.env.APP_WORKER.newStreamUsecase().searchByStreamsIdsAndCreate({
+        streamIds: p.streamIds,
       });
 
     if (r.err) {
@@ -99,7 +98,7 @@ export const registerVideoPostApi = (app: App) =>
     }
     return c.json(
       {
-        videos: z.array(VideoResponseSchema).parse(r.val),
+        videos: z.array(StreamResponseSchema).parse(r.val),
       },
       200,
     );

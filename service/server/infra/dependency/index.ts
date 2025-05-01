@@ -2,8 +2,8 @@ import type { PgTransactionConfig } from "drizzle-orm/pg-core";
 import {
   CreatorService,
   type ICreatorService,
-  type IVideoService,
-  VideoService,
+  type IStreamService,
+  StreamService,
 } from "../../domain";
 import type { AppError, Result } from "../../pkg/errors";
 import {
@@ -14,16 +14,17 @@ import {
   type ICreatorRepository,
   type IDiscordMessageRepository,
   type IDiscordServerRepository,
+  type IStreamRepository,
   type ITxManager,
-  type IVideoRepository,
+  StreamRepository,
   TxManager,
-  VideoRepository,
 } from "../repository";
 import { type ITwitcastingService, TwitcastingService } from "../twitcasting";
 import { type ITwitchService, TwitchService } from "../twitch";
 import { type IYoutubeService, YoutubeService } from "../youtube";
 
 import type { AppWorkerEnv } from "../../config/env/internal";
+import { ClipService, type IClipService } from "../../domain/service/clip";
 import {
   DiscordService,
   type IDiscordService,
@@ -31,9 +32,10 @@ import {
 import {
   CreatorInteractor,
   type ICreatorInteractor,
-  type IVideoInteractor,
-  VideoInteractor,
+  type IStreamInteractor,
+  StreamInteractor,
 } from "../../usecase";
+import { ClipInteractor, type IClipInteractor } from "../../usecase/clip";
 import {
   DiscordInteractor,
   type IDiscordInteractor,
@@ -41,27 +43,31 @@ import {
 import { AIService, type IAIService } from "../ai";
 import { CloudflareKVCacheClient, type ICacheClient } from "../cache";
 import { DiscordClient, type IDiscordClient } from "../discord";
+import { ClipRepository, type IClipRepository } from "../repository/clip";
 
 export interface IRepositories {
   creatorRepository: ICreatorRepository;
-  videoRepository: IVideoRepository;
+  streamRepository: IStreamRepository;
   discordServerRepository: IDiscordServerRepository;
   discordMessageRepository: IDiscordMessageRepository;
+  clipRepository: IClipRepository;
 }
 
 export function createRepositories(tx: DB): IRepositories {
   return {
     creatorRepository: new CreatorRepository(tx),
-    videoRepository: new VideoRepository(tx),
+    streamRepository: new StreamRepository(tx),
     discordServerRepository: new DiscordServerRepository(tx),
     discordMessageRepository: new DiscordMessageRepository(tx),
+    clipRepository: new ClipRepository(tx),
   };
 }
 
 export interface IServices {
   creatorService: ICreatorService;
-  videoService: IVideoService;
+  streamService: IStreamService;
   discordService: IDiscordService;
+  clipService: IClipService;
 }
 
 export function createServices(
@@ -80,21 +86,26 @@ export function createServices(
       aiService,
       cacheClient,
     }),
-    videoService: new VideoService({
+    streamService: new StreamService({
       youtubeClient,
       twitchClient,
       twitCastingClient: twitcastingClient,
       creatorRepository: repos.creatorRepository,
-      videoRepository: repos.videoRepository,
+      streamRepository: repos.streamRepository,
       aiService,
       cacheClient,
     }),
     discordService: new DiscordService({
       discordServerRepository: repos.discordServerRepository,
       discordClient: discordClient,
-      videoRepository: repos.videoRepository,
+      streamRepository: repos.streamRepository,
       discordMessageRepository: repos.discordMessageRepository,
       cacheClient,
+    }),
+    clipService: new ClipService({
+      youtubeClient,
+      twitchClient,
+      creatorRepository: repos.creatorRepository,
     }),
   };
 }
@@ -153,7 +164,8 @@ export class Container {
   private readonly txManager: TxManager;
   private readonly cacheClient: ICacheClient;
   creatorInteractor: ICreatorInteractor;
-  videoInteractor: IVideoInteractor;
+  streamInteractor: IStreamInteractor;
+  clipInteractor: IClipInteractor;
   discordInteractor: IDiscordInteractor;
 
   constructor(private readonly env: AppWorkerEnv) {
@@ -192,7 +204,8 @@ export class Container {
       this.cacheClient,
     );
     this.creatorInteractor = new CreatorInteractor(context);
-    this.videoInteractor = new VideoInteractor(context);
+    this.streamInteractor = new StreamInteractor(context);
     this.discordInteractor = new DiscordInteractor(context);
+    this.clipInteractor = new ClipInteractor(context);
   }
 }

@@ -4,9 +4,9 @@ import {
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
 import { AppLogger } from "../../../../pkg/logging";
-import { withTracer } from "../../../http/trace/cloudflare";
+import { withTracer } from "../../trace/cloudflare";
 
-export const searchVideosWorkflow = () => {
+export const searchStreamsWorkflow = () => {
   return {
     handler:
       () =>
@@ -30,10 +30,10 @@ export const searchVideosWorkflow = () => {
             },
             async () => {
               return withTracer(
-                "video-workflow",
-                "search-live-videos",
+                "stream-workflow",
+                "search-live-streams",
                 async (span) => {
-                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const vu = await env.APP_WORKER.newStreamUsecase();
                   const result = await vu.searchLive();
                   if (result.err) {
                     throw result.err;
@@ -56,10 +56,10 @@ export const searchVideosWorkflow = () => {
             },
             async () => {
               return withTracer(
-                "video-workflow",
-                "search-existing-videos",
+                "stream-workflow",
+                "search-existing-streams",
                 async (span) => {
-                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const vu = await env.APP_WORKER.newStreamUsecase();
                   const result = await vu.searchExist();
                   if (result.err) {
                     throw result.err;
@@ -82,10 +82,10 @@ export const searchVideosWorkflow = () => {
             },
             async () => {
               return withTracer(
-                "video-workflow",
-                "search-deleted-videos",
+                "stream-workflow",
+                "search-deleted-streams",
                 async (span) => {
-                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const vu = await env.APP_WORKER.newStreamUsecase();
                   const result = await vu.searchDeletedCheck();
                   if (result.err) {
                     throw result.err;

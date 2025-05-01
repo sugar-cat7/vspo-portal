@@ -5,9 +5,9 @@ import {
 } from "../../../../config/env/worker";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { AppLogger } from "../../../../pkg/logging";
-import { withTracer } from "../../../http/trace/cloudflare";
+import { withTracer } from "../../trace/cloudflare";
 
-export const translateVideosWorkflow = () => {
+export const translateStreamsWorkflow = () => {
   return {
     handler:
       () =>
@@ -30,46 +30,46 @@ export const translateVideosWorkflow = () => {
           },
           async () => {
             return withTracer(
-              "video-workflow",
-              "fetch-default-language-videos",
+              "stream-workflow",
+              "fetch-default-language-streams",
               async (span) => {
-                const vu = await env.APP_WORKER.newVideoUsecase();
-                const liveVideos = await vu.list({
+                const vu = await env.APP_WORKER.newStreamUsecase();
+                const liveStreams = await vu.list({
                   limit: 100,
                   page: 0,
                   languageCode: "default",
-                  videoType: "vspo_stream",
+
                   status: "live",
                   orderBy: "desc",
                 });
 
-                if (liveVideos.err) {
-                  throw liveVideos.err;
+                if (liveStreams.err) {
+                  throw liveStreams.err;
                 }
 
-                const upcomingVideos = await vu.list({
+                const upcomingStreams = await vu.list({
                   limit: 100,
                   page: 0,
                   languageCode: "default",
-                  videoType: "vspo_stream",
+
                   status: "upcoming",
                   orderBy: "desc",
                 });
 
-                if (upcomingVideos.err) {
-                  throw upcomingVideos.err;
+                if (upcomingStreams.err) {
+                  throw upcomingStreams.err;
                 }
 
-                const videos = liveVideos.val.videos.concat(
-                  upcomingVideos.val.videos,
+                const videos = liveStreams.val.streams.concat(
+                  upcomingStreams.val.streams,
                 );
                 span.setAttribute(
                   "live_videos_count",
-                  liveVideos.val.videos.length,
+                  liveStreams.val.streams.length,
                 );
                 span.setAttribute(
                   "upcoming_videos_count",
-                  upcomingVideos.val.videos.length,
+                  upcomingStreams.val.streams.length,
                 );
                 span.setAttribute("total_videos_count", videos.length);
                 return { val: videos };
@@ -83,38 +83,38 @@ export const translateVideosWorkflow = () => {
           return;
         }
         const target = TargetLangSchema.options.map(async (lang) => {
-          const vu = await env.APP_WORKER.newVideoUsecase();
-          const liveVideos = await vu.list({
+          const vu = await env.APP_WORKER.newStreamUsecase();
+          const liveStreams = await vu.list({
             limit: 100,
             page: 0,
             languageCode: lang,
-            videoType: "vspo_stream",
+
             status: "live",
             orderBy: "desc",
           });
 
-          if (liveVideos.err) {
-            throw liveVideos.err;
+          if (liveStreams.err) {
+            throw liveStreams.err;
           }
 
-          const upcomingVideos = await vu.list({
+          const upcomingStreams = await vu.list({
             limit: 100,
             page: 0,
             languageCode: lang,
-            videoType: "vspo_stream",
+
             status: "upcoming",
             orderBy: "desc",
           });
 
-          if (upcomingVideos.err) {
-            throw upcomingVideos.err;
+          if (upcomingStreams.err) {
+            throw upcomingStreams.err;
           }
 
-          const videos = liveVideos.val.videos.concat(
-            upcomingVideos.val.videos,
+          const videos = liveStreams.val.streams.concat(
+            upcomingStreams.val.streams,
           );
 
-          const notTranslatedVideos = lv.val.filter(
+          const notTranslatedStreams = lv.val.filter(
             (v) => !videos.some((v2) => v2.rawId === v.rawId),
           );
 
@@ -126,15 +126,18 @@ export const translateVideosWorkflow = () => {
             },
             async () => {
               return withTracer(
-                "video-workflow",
-                `translate-videos-to-${lang}`,
+                "stream-workflow",
+                `translate-streams-to-${lang}`,
                 async (span) => {
-                  const vu = await env.APP_WORKER.newVideoUsecase();
+                  const vu = await env.APP_WORKER.newStreamUsecase();
                   span.setAttribute("language", lang);
-                  span.setAttribute("videos_count", notTranslatedVideos.length);
-                  await vu.translateVideoEnqueue({
+                  span.setAttribute(
+                    "videos_count",
+                    notTranslatedStreams.length,
+                  );
+                  await vu.translateStreamEnqueue({
                     languageCode: lang,
-                    videos: notTranslatedVideos,
+                    streams: notTranslatedStreams,
                   });
                 },
               );

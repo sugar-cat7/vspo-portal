@@ -1,4 +1,4 @@
-import { type Videos, createVideo, createVideos } from "../../domain/video";
+import { type Streams, createStream, createStreams } from "../../domain/stream";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
 import { withTracerResult } from "../http/trace/cloudflare";
 
@@ -35,11 +35,11 @@ type TwitcastingMoviesResponse = {
   total_count: number;
 };
 
-type GetVideosParams = {
+type GetStreamsParams = {
   userIds: string[];
 };
 
-export type TwitCastingVideo = {
+export type TwitCastingStream = {
   id: string;
   userId: string;
   title: string;
@@ -50,7 +50,7 @@ export type TwitCastingVideo = {
 };
 
 export interface ITwitcastingService {
-  getVideos(params: GetVideosParams): Promise<Result<Videos, AppError>>;
+  getStreams(params: GetStreamsParams): Promise<Result<Streams, AppError>>;
 }
 
 function isObject(value: unknown): value is Record<PropertyKey, unknown> {
@@ -101,31 +101,37 @@ export class TwitcastingService implements ITwitcastingService {
     this.accessToken = accessToken;
   }
 
-  async getVideos(params: GetVideosParams): Promise<Result<Videos, AppError>> {
-    return withTracerResult("TwitcastingService", "getVideos", async (span) => {
-      let allVideos: Videos = createVideos([]);
-
-      for (const userId of params.userIds) {
-        const result = await this.fetchUserVideos(userId);
-        if (result.err) {
-          return Err(result.err);
-        }
-        allVideos = createVideos([
-          ...allVideos,
-          ...result.val.map((video) => this.createVideoModel(video)),
-        ]);
-      }
-
-      return Ok(allVideos);
-    });
-  }
-
-  private async fetchUserVideos(
-    userId: string,
-  ): Promise<Result<TwitCastingVideo[], AppError>> {
+  async getStreams(
+    params: GetStreamsParams,
+  ): Promise<Result<Streams, AppError>> {
     return withTracerResult(
       "TwitcastingService",
-      "fetchUserVideos",
+      "getStreams",
+      async (span) => {
+        let allStreams: Streams = createStreams([]);
+
+        for (const userId of params.userIds) {
+          const result = await this.fetchUserStreams(userId);
+          if (result.err) {
+            return Err(result.err);
+          }
+          allStreams = createStreams([
+            ...allStreams,
+            ...result.val.map((video) => this.createStreamModel(video)),
+          ]);
+        }
+
+        return Ok(allStreams);
+      },
+    );
+  }
+
+  private async fetchUserStreams(
+    userId: string,
+  ): Promise<Result<TwitCastingStream[], AppError>> {
+    return withTracerResult(
+      "TwitcastingService",
+      "fetchUserStreams",
       async (span) => {
         const fetchPromise = fetch(
           `https://apiv2.twitcasting.tv/users/${userId}/movies?limit=3`,
@@ -183,14 +189,14 @@ export class TwitcastingService implements ITwitcastingService {
         }
 
         const videos = data.movies.map((movie) =>
-          this.mapToTwitCastingVideo(movie),
+          this.mapToTwitCastingStream(movie),
         );
         return Ok(videos);
       },
     );
   }
 
-  private mapToTwitCastingVideo(movie: TwitcastingMovie): TwitCastingVideo {
+  private mapToTwitCastingStream(movie: TwitcastingMovie): TwitCastingStream {
     return {
       id: movie.id,
       userId: movie.user_id,
@@ -202,11 +208,11 @@ export class TwitcastingService implements ITwitcastingService {
     };
   }
 
-  private createVideoModel(video: TwitCastingVideo) {
+  private createStreamModel(video: TwitCastingStream) {
     // Convert UNIX timestamp to ISO string
     const startedAt = new Date(video.startedAt * 1000).toISOString();
 
-    return createVideo({
+    return createStream({
       id: "",
       rawId: video.id,
       rawChannelID: video.userId,
@@ -221,7 +227,6 @@ export class TwitcastingService implements ITwitcastingService {
       tags: [],
       viewCount: video.viewCount,
       thumbnailURL: video.thumbnailURL,
-      videoType: "vspo_stream",
     });
   }
 }

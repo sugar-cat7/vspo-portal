@@ -2,23 +2,14 @@ import {
   type SQL,
   and,
   asc,
-  count,
   countDistinct,
   desc,
   eq,
-  gte,
   inArray,
-  lte,
-  or,
 } from "drizzle-orm";
+import { ClipTypeSchema, type Clips, createClips } from "../../domain/clip";
 import { TargetLangSchema } from "../../domain/translate";
-import {
-  PlatformSchema,
-  StatusSchema,
-  VideoTypeSchema,
-  type Videos,
-  createVideos,
-} from "../../domain/video";
+import { PlatformSchema } from "../../domain/video";
 import {
   convertToUTC,
   convertToUTCDate,
@@ -30,15 +21,15 @@ import { createUUID } from "../../pkg/uuid";
 import { withTracerResult } from "../http/trace/cloudflare";
 import { buildConflictUpdateColumns } from "./helper";
 import {
-  type InsertStreamStatus,
+  type InsertClipStats,
   type InsertVideo,
   type InsertVideoTranslation,
   channelTable,
-  createInsertStreamStatus,
+  clipStatsTable,
+  createInsertClipStats,
   createInsertVideo,
   creatorTable,
   creatorTranslationTable,
-  streamStatusTable,
   videoTable,
   videoTranslationTable,
 } from "./schema";
@@ -48,42 +39,38 @@ type ListQuery = {
   limit: number;
   page: number;
   platform?: string;
-  status?: string;
-  videoType?: string;
   memberType?: string;
-  startedAt?: Date;
-  endedAt?: Date;
   languageCode: string; // ISO 639-1 language code or [default] explicitly specified to narrow down to 1creator
   orderBy?: "asc" | "desc";
   channelIds?: string[];
   includeDeleted?: boolean;
+  clipType?: "clip" | "short";
 };
 
-export interface IVideoRepository {
-  list(query: ListQuery): Promise<Result<Videos, AppError>>;
-  batchUpsert(videos: Videos): Promise<Result<Videos, AppError>>;
+export interface IClipRepository {
+  list(query: ListQuery): Promise<Result<Clips, AppError>>;
+  batchUpsert(clips: Clips): Promise<Result<Clips, AppError>>;
   count(query: ListQuery): Promise<Result<number, AppError>>;
-  batchDelete(videoIds: string[]): Promise<Result<void, AppError>>;
-  deletedListIds(): Promise<Result<string[], AppError>>;
+  batchDelete(clipIds: string[]): Promise<Result<void, AppError>>;
 }
 
-export class VideoRepository implements IVideoRepository {
+export class ClipRepository implements IClipRepository {
   constructor(private readonly db: DB) {}
 
-  async list(query: ListQuery): Promise<Result<Videos, AppError>> {
-    return withTracerResult("VideoRepository", "list", async (span) => {
-      AppLogger.info("VideoRepository list", {
+  async list(query: ListQuery): Promise<Result<Clips, AppError>> {
+    return withTracerResult("ClipRepository", "list", async (span) => {
+      AppLogger.info("ClipRepository list", {
         query,
       });
       const filters = this.buildFilters(query);
 
-      const videoResult = await wrap(
+      const clipResult = await wrap(
         this.db
           .select()
           .from(videoTable)
           .innerJoin(
-            streamStatusTable,
-            eq(videoTable.rawId, streamStatusTable.videoId),
+            clipStatsTable,
+            eq(videoTable.rawId, clipStatsTable.videoId),
           )
           .innerJoin(
             videoTranslationTable,
@@ -101,70 +88,67 @@ export class VideoRepository implements IVideoRepository {
           .where(and(...filters))
           .orderBy(
             query.orderBy === "asc" || !query.orderBy
-              ? asc(streamStatusTable.startedAt)
-              : desc(streamStatusTable.startedAt),
+              ? asc(videoTable.publishedAt)
+              : desc(videoTable.publishedAt),
           )
           .limit(query.limit)
           .offset(query.page * query.limit)
           .execute(),
         (err) =>
           new AppError({
-            message: `Database error during video list query: ${err.message}`,
+            message: `Database error during clip list query: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
             cause: err,
           }),
       );
 
-      if (videoResult.err) {
-        return Err(videoResult.err);
+      if (clipResult.err) {
+        return Err(clipResult.err);
       }
 
       return Ok(
-        createVideos(
-          videoResult.val.map((r) => ({
-            id: r.video.id,
-            rawId: r.video.rawId,
-            rawChannelID: r.video.channelId,
-            title: r.video_translation.title,
-            languageCode: TargetLangSchema.parse(
-              r.video_translation.languageCode,
-            ),
-            description: r.video_translation.description,
-            publishedAt: r.video.publishedAt
-              ? convertToUTC(r.video.publishedAt)
-              : "",
-            startedAt: r.stream_status.startedAt
-              ? convertToUTC(r.stream_status.startedAt)
-              : null,
-            endedAt: r.stream_status.endedAt
-              ? convertToUTC(r.stream_status.endedAt)
-              : null,
-            platform: PlatformSchema.parse(r.video.platformType),
-            status: StatusSchema.parse(r.stream_status.status),
-            tags: r.video.tags.split(","),
-            viewCount: r.stream_status.viewCount,
-            thumbnailURL: r.video.thumbnailUrl,
-            videoType: VideoTypeSchema.parse(r.video.videoType),
-            creatorName: r.creator_translation.name,
-            creatorThumbnailURL: r.creator.representativeThumbnailUrl,
-            link: r.video.link ?? "",
-          })),
+        createClips(
+          clipResult.val.map((r) => {
+            // Ensure all required fields are included and properly typed
+            return {
+              id: r.video.id,
+              rawId: r.video.rawId,
+              rawChannelID: r.video.channelId,
+              title: r.video_translation.title,
+              languageCode: TargetLangSchema.parse(
+                r.video_translation.languageCode,
+              ),
+              description: r.video_translation.description,
+              publishedAt: r.video.publishedAt
+                ? convertToUTC(r.video.publishedAt)
+                : "",
+              platform: PlatformSchema.parse(r.video.platformType),
+              tags: r.video.tags.split(","),
+              viewCount: r.clip_stats.viewCount,
+              thumbnailURL: r.video.thumbnailUrl,
+              creatorName: r.creator_translation.name,
+              creatorThumbnailURL: r.creator.representativeThumbnailUrl,
+              link: r.video.link ?? "",
+              type: ClipTypeSchema.parse(r.video.videoType),
+              deleted: r.video.deleted,
+            };
+          }),
         ),
       );
     });
   }
 
   async count(query: ListQuery): Promise<Result<number, AppError>> {
-    return withTracerResult("VideoRepository", "count", async (span) => {
+    return withTracerResult("ClipRepository", "count", async (span) => {
       const filters = this.buildFilters(query);
 
-      const videoResult = await wrap(
+      const clipResult = await wrap(
         this.db
           .select({ value: countDistinct(videoTable.id) })
           .from(videoTable)
           .innerJoin(
-            streamStatusTable,
-            eq(videoTable.rawId, streamStatusTable.videoId),
+            clipStatsTable,
+            eq(videoTable.rawId, clipStatsTable.videoId),
           )
           .innerJoin(
             videoTranslationTable,
@@ -183,27 +167,27 @@ export class VideoRepository implements IVideoRepository {
           .execute(),
         (err) =>
           new AppError({
-            message: `Database error during video count query: ${err.message}`,
+            message: `Database error during clip count query: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
             cause: err,
           }),
       );
 
-      if (videoResult.err) {
-        return Err(videoResult.err);
+      if (clipResult.err) {
+        return Err(clipResult.err);
       }
 
-      return Ok(videoResult.val.at(0)?.value ?? 0);
+      return Ok(clipResult.val.at(0)?.value ?? 0);
     });
   }
 
-  async batchUpsert(videos: Videos): Promise<Result<Videos, AppError>> {
-    return withTracerResult("VideoRepository", "batchUpsert", async (span) => {
+  async batchUpsert(clips: Clips): Promise<Result<Clips, AppError>> {
+    return withTracerResult("ClipRepository", "batchUpsert", async (span) => {
       const dbVideos: InsertVideo[] = [];
-      const dbStreamStatus: InsertStreamStatus[] = [];
+      const dbClipStats: InsertClipStats[] = [];
       const dbVideoTranslation: InsertVideoTranslation[] = [];
 
-      for (const v of videos) {
+      for (const v of clips) {
         const videoId = v.id || createUUID();
         const existingVideo = dbVideos.find((video) => video.rawId === v.rawId);
         if (!existingVideo && !v.translated) {
@@ -213,7 +197,7 @@ export class VideoRepository implements IVideoRepository {
               rawId: v.rawId,
               channelId: v.rawChannelID,
               platformType: v.platform,
-              videoType: v.videoType,
+              videoType: v.type,
               publishedAt: convertToUTCDate(v.publishedAt),
               tags: v.tags.join(","),
               thumbnailUrl: v.thumbnailURL,
@@ -223,17 +207,14 @@ export class VideoRepository implements IVideoRepository {
           );
         }
 
-        const existingStreamStatus = dbStreamStatus.find(
-          (status) => status.videoId === v.rawId,
+        const existingClipStats = dbClipStats.find(
+          (stats) => stats.videoId === v.rawId,
         );
-        if (!existingStreamStatus && !v.translated) {
-          dbStreamStatus.push(
-            createInsertStreamStatus({
+        if (!existingClipStats && !v.translated) {
+          dbClipStats.push(
+            createInsertClipStats({
               id: createUUID(),
               videoId: v.rawId,
-              status: v.status,
-              startedAt: v.startedAt ? convertToUTCDate(v.startedAt) : null,
-              endedAt: v.endedAt ? convertToUTCDate(v.endedAt) : null,
               viewCount: v.viewCount,
               updatedAt: getCurrentUTCDate(),
             }),
@@ -288,21 +269,18 @@ export class VideoRepository implements IVideoRepository {
         }
       }
 
-      let streamStatusResult: Result<
-        (typeof streamStatusTable.$inferSelect)[],
+      let clipStatsResult: Result<
+        (typeof clipStatsTable.$inferSelect)[],
         AppError
       > = Ok([]);
-      if (dbStreamStatus.length > 0) {
-        streamStatusResult = await wrap(
+      if (dbClipStats.length > 0) {
+        clipStatsResult = await wrap(
           this.db
-            .insert(streamStatusTable)
-            .values(dbStreamStatus)
+            .insert(clipStatsTable)
+            .values(dbClipStats)
             .onConflictDoUpdate({
-              target: streamStatusTable.videoId,
-              set: buildConflictUpdateColumns(streamStatusTable, [
-                "status",
-                "startedAt",
-                "endedAt",
+              target: clipStatsTable.videoId,
+              set: buildConflictUpdateColumns(clipStatsTable, [
                 "viewCount",
                 "updatedAt",
               ]),
@@ -311,14 +289,14 @@ export class VideoRepository implements IVideoRepository {
             .execute(),
           (err) =>
             new AppError({
-              message: `Database error during stream status batch upsert: ${err.message}`,
+              message: `Database error during clip stats batch upsert: ${err.message}`,
               code: "INTERNAL_SERVER_ERROR",
               cause: err,
             }),
         );
 
-        if (streamStatusResult.err) {
-          return Err(streamStatusResult.err);
+        if (clipStatsResult.err) {
+          return Err(clipStatsResult.err);
         }
       }
 
@@ -358,9 +336,9 @@ export class VideoRepository implements IVideoRepository {
       }
 
       return Ok(
-        createVideos(
+        createClips(
           videoResult.val.map((r) => {
-            const streamStatus = streamStatusResult.val.find(
+            const clipStats = clipStatsResult.val.find(
               (s) => s.videoId === r.rawId,
             );
             const videoTranslation = videoTranslationResult.val.find(
@@ -377,19 +355,13 @@ export class VideoRepository implements IVideoRepository {
                 videoTranslation?.languageCode ?? "default",
               ),
               publishedAt: convertToUTC(r.publishedAt),
-              startedAt: streamStatus?.startedAt
-                ? convertToUTC(streamStatus.startedAt)
-                : null,
-              endedAt: streamStatus?.endedAt
-                ? convertToUTC(streamStatus.endedAt)
-                : null,
               platform: PlatformSchema.parse(r.platformType),
-              status: StatusSchema.parse(streamStatus?.status ?? "unknown"),
               tags: r.tags.split(","),
-              viewCount: streamStatus?.viewCount ?? 0,
+              viewCount: clipStats?.viewCount ?? 0,
               thumbnailURL: r.thumbnailUrl,
-              videoType: VideoTypeSchema.parse(r.videoType),
               link: r.link ?? "",
+              type: ClipTypeSchema.parse(r.videoType),
+              deleted: r.deleted,
             };
           }),
         ),
@@ -397,16 +369,16 @@ export class VideoRepository implements IVideoRepository {
     });
   }
 
-  async batchDelete(videoIds: string[]): Promise<Result<void, AppError>> {
-    return withTracerResult("VideoRepository", "batchDelete", async (span) => {
+  async batchDelete(clipIds: string[]): Promise<Result<void, AppError>> {
+    return withTracerResult("ClipRepository", "batchDelete", async (span) => {
       const result = await wrap(
         this.db
           .delete(videoTable)
-          .where(inArray(videoTable.id, videoIds))
+          .where(inArray(videoTable.id, clipIds))
           .execute(),
         (err) =>
           new AppError({
-            message: `Database error during video batch delete: ${err.message}`,
+            message: `Database error during clip batch delete: ${err.message}`,
             code: "INTERNAL_SERVER_ERROR",
             cause: err,
           }),
@@ -420,33 +392,6 @@ export class VideoRepository implements IVideoRepository {
     });
   }
 
-  async deletedListIds(): Promise<Result<string[], AppError>> {
-    return withTracerResult(
-      "VideoRepository",
-      "deletedListIds",
-      async (span) => {
-        const result = await wrap(
-          this.db
-            .select({ rawId: videoTable.rawId })
-            .from(videoTable)
-            .where(eq(videoTable.deleted, true)),
-          (err) =>
-            new AppError({
-              message: `Database error during video deleted list: ${err.message}`,
-              code: "INTERNAL_SERVER_ERROR",
-              cause: err,
-            }),
-        );
-
-        if (result.err) {
-          return Err(result.err);
-        }
-
-        return Ok(result.val.map((v) => v.rawId));
-      },
-    );
-  }
-
   private buildFilters(query: ListQuery): SQL[] {
     const filters: SQL[] = [];
     const languageCode = query.languageCode || "default";
@@ -454,22 +399,8 @@ export class VideoRepository implements IVideoRepository {
     if (query.platform) {
       filters.push(eq(videoTable.platformType, query.platform));
     }
-    if (query.videoType) {
-      filters.push(eq(videoTable.videoType, query.videoType));
-    }
-    if (query.status) {
-      filters.push(eq(streamStatusTable.status, query.status));
-    }
-    if (query.startedAt) {
-      filters.push(
-        gte(streamStatusTable.startedAt, convertToUTCDate(query.startedAt)),
-      );
-    }
-    if (query.endedAt) {
-      filters.push(
-        lte(streamStatusTable.endedAt, convertToUTCDate(query.endedAt)),
-      );
-    }
+    // Always filter for clip type
+    filters.push(eq(videoTable.videoType, query.clipType ?? "clip"));
 
     if (!query.includeDeleted) {
       filters.push(eq(videoTable.deleted, false));
