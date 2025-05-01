@@ -59,7 +59,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@cloudflare/workers-types": "^4.20250405.0",
-    "@testcontainers/postgresql": "^10.24.0",
+    "@testcontainers/postgresql": "^10.25.0",
     "@types/pg": "^8.11.11",
     "@types/uuid": "^10.0.0",
     "discord-api-types": "^0.37.119",
