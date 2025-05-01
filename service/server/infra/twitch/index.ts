@@ -1,5 +1,10 @@
+import { type Clips, createClip, createClips } from "../../domain/clip";
 import { type Streams, createStream, createStreams } from "../../domain/stream";
-import { convertToUTC } from "../../pkg/dayjs";
+import {
+  convertToUTC,
+  getCurrentUTCDate,
+  getCurrentUTCString,
+} from "../../pkg/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
 import { withTracerResult } from "../http/trace/cloudflare";
 import type { paths } from "./twitch-api.generated";
@@ -12,12 +17,15 @@ type TwitchServiceConfig = {
 type GetStreamsParams = { userIds: string[] };
 type GetStreamsByIDsParams = { streamIds: string[] };
 type GetArchiveParams = { userIds: string[] };
+type GetClipsParams = { userId: string };
+
 export interface ITwitchService {
   getStreams(params: GetStreamsParams): Promise<Result<Streams, AppError>>;
   getStreamsByIDs(
     params: GetStreamsByIDsParams,
   ): Promise<Result<Streams, AppError>>;
   getArchive(params: GetArchiveParams): Promise<Result<Streams, AppError>>;
+  getClipsByUserID(params: GetClipsParams): Promise<Result<Clips, AppError>>;
 }
 
 export class TwitchService implements ITwitchService {
@@ -271,6 +279,52 @@ export class TwitchService implements ITwitchService {
         );
 
       return Ok(createStreams(successfulStreams));
+    });
+  }
+
+  async getClipsByUserID(
+    params: GetClipsParams,
+  ): Promise<Result<Clips, AppError>> {
+    return withTracerResult("TwitchService", "getClips", async (span) => {
+      // Calculate dates for the 7-day window
+      const current = getCurrentUTCString();
+      const sevenDaysAgo = convertToUTC(
+        getCurrentUTCDate().getTime() - 7 * 24 * 60 * 60 * 1000,
+      );
+
+      type ClipsResponse =
+        paths["/clips"]["get"]["responses"]["200"]["content"]["application/json"];
+
+      const result = await this.fetchFromTwitch<ClipsResponse>("/clips", {
+        broadcaster_id: params.userId,
+        first: "100",
+        started_at: sevenDaysAgo,
+        ended_at: current,
+      });
+
+      if (result.err) return Err(result.err);
+
+      return Ok(
+        createClips(
+          result.val.data.map((clip) =>
+            createClip({
+              id: "",
+              rawId: clip.id,
+              rawChannelID: clip.broadcaster_id,
+              languageCode: "default",
+              title: clip.title,
+              description: clip.title,
+              publishedAt: convertToUTC(clip.created_at),
+              platform: "twitch",
+              type: "clip",
+              tags: [],
+              viewCount: clip.view_count,
+              thumbnailURL: clip.thumbnail_url,
+              link: clip.url,
+            }),
+          ),
+        ),
+      );
     });
   }
 }

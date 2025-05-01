@@ -177,6 +177,7 @@ export const setupTxManager = async () => {
     getStreams: async () => Ok([]),
     getStreamsByIDs: async () => Ok([]),
     getArchive: async () => Ok([]),
+    getClipsByUserID: async () => Ok([]),
   };
 
   const twitcastingService = {

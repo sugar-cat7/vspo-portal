@@ -93,6 +93,12 @@ export class MockTwitchService implements ITwitchService {
   > {
     return Ok([]);
   }
+
+  async getClipsByUserID(params: { userId: string }): Promise<
+    Result<Clip[], AppError>
+  > {
+    return Ok([]);
+  }
 }
 
 export class MockTwitcastingService implements ITwitcastingService {

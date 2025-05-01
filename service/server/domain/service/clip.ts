@@ -1,4 +1,9 @@
-import { type Creators, createCreator } from "..";
+import {
+  type Creator,
+  type Creators,
+  MemberTypeSchema,
+  createCreator,
+} from "..";
 import { type ITwitchService, type IYoutubeService, query } from "../../infra";
 import { withTracerResult } from "../../infra/http/trace/cloudflare";
 import type { ICreatorRepository } from "../../infra/repository/creator";
@@ -235,6 +240,61 @@ export class ClipService implements IClipService {
       service: this.SERVICE_NAME,
     });
 
-    return Ok([]);
+    const cs = await this.masterCreators();
+    if (cs.err) {
+      return cs;
+    }
+    const twitchIds = cs.val.jp
+      .map((c) => c.channel?.twitch?.rawId ?? "")
+      .concat(cs.val.en.map((c) => c.channel?.twitch?.rawId ?? ""))
+      .filter((id) => id !== "");
+
+    const batchSize = 5;
+    const allClips: Clips = [];
+
+    for (let i = 0; i < twitchIds.length; i += batchSize) {
+      const batch = twitchIds.slice(i, i + batchSize);
+      const batchPromises = batch.map((id) =>
+        this.deps.twitchClient.getClipsByUserID({
+          userId: id,
+        }),
+      );
+
+      const batchResults = await Promise.all(batchPromises);
+      for (const result of batchResults) {
+        if (result.err) {
+          continue;
+        }
+        allClips.push(...result.val);
+      }
+    }
+
+    return Ok(allClips);
+  }
+
+  private async masterCreators(): Promise<
+    Result<{ jp: Creator[]; en: Creator[] }, AppError>
+  > {
+    const jpCreators = await this.deps.creatorRepository.list({
+      limit: 300,
+      page: 0,
+      memberType: MemberTypeSchema.Enum.vspo_jp,
+      languageCode: "default",
+    });
+    if (jpCreators.err) {
+      return jpCreators;
+    }
+
+    const enCreators = await this.deps.creatorRepository.list({
+      limit: 300,
+      page: 0,
+      memberType: MemberTypeSchema.Enum.vspo_en,
+      languageCode: "default",
+    });
+    if (enCreators.err) {
+      return enCreators;
+    }
+
+    return Ok({ jp: jpCreators.val, en: enCreators.val });
   }
 }
