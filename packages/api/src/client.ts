@@ -1,7 +1,7 @@
 import { AppError, Err, Ok, type Result } from "@vspo-lab/error";
 import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
-import type * as apiGen from "../gen/openapi";
+import type * as apiGen from "./gen/openapi";
 
 interface ApiErrorResponse {
   error: {

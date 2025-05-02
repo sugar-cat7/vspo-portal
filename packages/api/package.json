@@ -9,7 +9,7 @@
   "keywords": [],
   "scripts": {
     "build": "tsup",
-    "generate-openapi": "orval --input ../../service/server/docs/openapi.json --output ./gen/openapi.ts"
+    "generate-openapi": "orval --input ../../service/server/docs/openapi.json --output ./src/gen/openapi.ts"
   },
   "author": "sugar-cat7",
   "license": "MIT",

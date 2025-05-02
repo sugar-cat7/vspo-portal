@@ -1,6 +1,4 @@
 import { members } from "@/data/members";
-import { applyFilters } from "@/lib/utils";
-import { Clip } from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
 import SearchIcon from "@mui/icons-material/Search";
 import {
@@ -20,11 +18,10 @@ import {
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import React from "react";
 
 type Props = {
-  clips: Clip[];
-  setFilteredClips: React.Dispatch<React.SetStateAction<Clip[]>>;
   setIsProcessing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
@@ -50,21 +47,42 @@ const StyledAlert = styled(Alert)(({ theme }) => ({
 }));
 
 export const SearchDialog: React.FC<Props> = ({
-  clips,
-  setFilteredClips,
   setIsProcessing,
 }) => {
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [searchMemberIds, setSearchMemberIds] = React.useState<number[]>([]);
   const [searchClipTimeframe, setSearchClipTimeframe] =
-    React.useState<Timeframe | null>(null);
+    React.useState<Timeframe | null>("1week");
   const [searchKeyword, setSearchKeyword] = React.useState<string>("");
   const { t } = useTranslation("clips");
 
-  const selectableMembers =
-    clips.at(0)?.platform === "twitch"
-      ? members.filter((member) => member.twitchChannelId)
-      : members;
+  // Initialize form values from URL query params when dialog opens
+  React.useEffect(() => {
+    if (isDialogOpen) {
+      // Get current search params from URL
+      const currentTimeframe = router.query.timeframe as Timeframe | undefined;
+      const currentMemberIds = router.query.members ? 
+        (Array.isArray(router.query.members) 
+          ? router.query.members 
+          : [router.query.members]).map(id => parseInt(id, 10)) 
+        : [];
+      const currentKeyword = router.query.keyword as string | undefined;
+
+      // Set form values
+      if (currentTimeframe) {
+        setSearchClipTimeframe(currentTimeframe);
+      }
+      if (currentMemberIds.length > 0) {
+        setSearchMemberIds(currentMemberIds);
+      }
+      if (currentKeyword) {
+        setSearchKeyword(currentKeyword);
+      }
+    }
+  }, [isDialogOpen, router.query]);
+
+  const selectableMembers = members;
 
   const handleClickOpen = () => {
     setIsDialogOpen(true);
@@ -76,13 +94,38 @@ export const SearchDialog: React.FC<Props> = ({
 
   const handleSearch = () => {
     setIsProcessing(true);
-    const filteredClips = applyFilters(
-      clips,
-      searchClipTimeframe,
-      searchMemberIds,
-      searchKeyword,
-    );
-    setFilteredClips(filteredClips);
+    
+    // Build query parameters for server-side search
+    const query: Record<string, string | string[]> = {
+      ...router.query,
+      page: "1", // Reset to first page for new search
+    };
+    
+    // Add search parameters if they have values
+    if (searchClipTimeframe) {
+      query.timeframe = searchClipTimeframe;
+    } else {
+      delete query.timeframe;
+    }
+    
+    if (searchMemberIds.length > 0) {
+      query.members = searchMemberIds.map(id => id.toString());
+    } else {
+      delete query.members;
+    }
+    
+    if (searchKeyword) {
+      query.keyword = searchKeyword;
+    } else {
+      delete query.keyword;
+    }
+    
+    // Navigate to the same page with search parameters
+    router.push({
+      pathname: router.pathname,
+      query,
+    });
+    
     dialogClose();
   };
 
