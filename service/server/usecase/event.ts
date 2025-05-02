@@ -1,7 +1,7 @@
+import { type AppError, Ok, type Result } from "@vspo-lab/error";
 import type { EventVisibility, VspoEvent, VspoEvents } from "../domain/event";
 import { type Page, createPage } from "../domain/pagination";
 import type { IAppContext } from "../infra/dependency";
-import { type AppError, Ok, type Result } from "../pkg/errors";
 
 export type UpsertEventParam = VspoEvent;
 export type BatchUpsertEventParam = VspoEvent[];

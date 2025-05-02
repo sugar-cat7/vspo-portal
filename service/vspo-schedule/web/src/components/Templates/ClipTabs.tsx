@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Tabs, Tab } from "@mui/material";
-import { Clip } from "@/types/streaming";
-import { ClipList } from "./ClipList";
 import { isTrending, shuffleClips, sortClipsByPopularity } from "@/lib/utils";
+import { Clip } from "@/types/streaming";
+import { Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";
+import React, { useEffect, useState } from "react";
+import { ClipList } from "./ClipList";
 
 type Props = {
   clips: Clip[];

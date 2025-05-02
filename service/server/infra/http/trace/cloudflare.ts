@@ -1,13 +1,13 @@
 import { type ResolveConfigFn, instrument } from "@microlabs/otel-cf-workers";
 import type { Span } from "@opentelemetry/api";
 import * as Sentry from "@sentry/cloudflare";
+import { AppError } from "@vspo-lab/error";
+import { Err, type Result } from "@vspo-lab/error";
+import { AppLogger } from "@vspo-lab/logging";
 import type { ApiEnv } from "../../../config/env/api";
 import type { CommonEnv } from "../../../config/env/common";
 import type { AppWorkerEnv } from "../../../config/env/internal";
 import type { BindingWorkflowEnv } from "../../../config/env/workflow";
-import { AppError } from "../../../pkg/errors";
-import { Err, type Result } from "../../../pkg/errors/result";
-import { AppLogger } from "../../../pkg/logging";
 
 export const withTracerResult = async <T, E extends AppError = AppError>(
   tracerName: string,

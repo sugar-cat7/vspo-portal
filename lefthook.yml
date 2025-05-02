@@ -2,8 +2,13 @@
 # https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
 pre-commit:
   commands:
-    autoformat-fe:
-      root: "service/vspo-schedule/web/"
-      glob: "service/vspo-schedule/web/src/**/*"
-      run: pnpm biome format --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
+    autoformat:
+      root: "."
+      glob: "**/*.{ts,tsx,js,jsx}"
+      run: pnpm biome:format
+      stage_fixed: true
+    typecheck:
+      root: "."
+      glob: "**/*.{ts,tsx,js,jsx}"
+      run: pnpm tsc
       stage_fixed: true

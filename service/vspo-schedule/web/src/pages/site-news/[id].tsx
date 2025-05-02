@@ -1,20 +1,20 @@
-import { GetStaticProps, GetStaticPaths } from "next";
-import { SiteNewsItem } from "@/types/site-news";
-import { ContentLayout } from "@/components/Layout";
-import { NextPageWithLayout } from "../_app";
-import { Typography, Chip, Box, Toolbar } from "@mui/material";
 import { Breadcrumb, TweetEmbed } from "@/components/Elements";
+import { ContentLayout } from "@/components/Layout";
 import { siteNewsItems } from "@/data/content/site-news";
+import { DEFAULT_LOCALE } from "@/lib/Const";
 import {
   formatDate,
   generateStaticPathsForLocales,
   getInitializedI18nInstance,
   getSiteNewsTagColor,
 } from "@/lib/utils";
-import { DEFAULT_LOCALE } from "@/lib/Const";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { SiteNewsItem } from "@/types/site-news";
+import { Box, Chip, Toolbar, Typography } from "@mui/material";
+import { GetStaticPaths, GetStaticProps } from "next";
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useRouter } from "next/router";
+import { NextPageWithLayout } from "../_app";
 
 type Params = {
   id: string;

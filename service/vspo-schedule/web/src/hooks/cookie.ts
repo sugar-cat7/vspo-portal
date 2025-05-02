@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
 import { getCookieValue } from "@/lib/utils";
+import { useEffect, useState } from "react";
 
 export const useCookie = (key: string, initialValue?: string) => {
   const [value, setValue] = useState(initialValue);

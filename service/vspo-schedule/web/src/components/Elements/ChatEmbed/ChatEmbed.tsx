@@ -1,7 +1,7 @@
-import React from "react";
-import { styled, useColorScheme } from "@mui/material/styles";
-import { Livestream, PlatformWithChat } from "@/types/streaming";
 import { getChatEmbedUrl } from "@/lib/utils";
+import { Livestream, PlatformWithChat } from "@/types/streaming";
+import { styled, useColorScheme } from "@mui/material/styles";
+import React from "react";
 import { Loading } from "..";
 
 const ResponsiveChatIframeWrapper = styled("div")({

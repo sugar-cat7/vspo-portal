@@ -1,6 +1,3 @@
-import OpenAI from "openai";
-import { z } from "zod";
-import { TargetLangSchema } from "../../domain/translate";
 import {
   AppError,
   Err,
@@ -8,7 +5,10 @@ import {
   Ok,
   type Result,
   wrap,
-} from "../../pkg/errors";
+} from "@vspo-lab/error";
+import OpenAI from "openai";
+import { z } from "zod";
+import { TargetLangSchema } from "../../domain/translate";
 import { withTracerResult } from "../http/trace/cloudflare";
 import { vspoKeywordMap } from "./keyword";
 

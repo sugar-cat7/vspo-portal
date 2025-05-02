@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import timeZone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { LOCALE_TIMEZONE_MAP, type TargetLang } from "../../domain/translate";
+import { LOCALE_TIMEZONE_MAP, type TargetLang } from "./schema";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(timeZone);

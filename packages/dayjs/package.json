@@ -1,0 +1,23 @@
+{
+  "name": "@vspo-lab/dayjs",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "files": ["./dist/**"],
+  "description": "",
+  "keywords": [],
+  "scripts": {
+    "build": "tsup"
+  },
+  "author": "sugar-cat7",
+  "license": "MIT",
+  "devDependencies": {
+    "tsup": "^8.4.0",
+    "typescript": "catalog:"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13",
+    "zod": "^3.24.3"
+  }
+}

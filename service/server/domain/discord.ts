@@ -1,7 +1,7 @@
 import type { DiscordEmbed } from "@discordeno/types";
 import { EmbedsBuilder } from "@discordeno/utils";
+import { getCurrentUTCString } from "@vspo-lab/dayjs";
 import { z } from "zod";
-import { getCurrentUTCString } from "../pkg/dayjs";
 import { MemberTypeSchema } from "./creator";
 import { t } from "./service/i18n";
 import { StatusSchema, type Stream } from "./stream";

@@ -1,6 +1,6 @@
+import { AppLogger } from "@vspo-lab/logging";
 import type { MessageParam } from ".";
 import { type Stream, StreamsSchema } from "../../../domain";
-import { AppLogger } from "../../../pkg/logging";
 import type { IStreamInteractor } from "../../../usecase";
 import { BaseHandler } from "./base";
 

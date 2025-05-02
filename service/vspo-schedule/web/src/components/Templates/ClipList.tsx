@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Box, Grid2 as Grid, Pagination } from "@mui/material";
 import { Clip } from "@/types/streaming";
+import { Box, Grid2 as Grid, Pagination } from "@mui/material";
+import React, { useState } from "react";
 import { ClipCard } from "../Elements";
 
 type Props = {

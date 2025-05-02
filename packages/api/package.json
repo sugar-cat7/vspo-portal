@@ -1,0 +1,26 @@
+{
+  "name": "@vspo-lab/api",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "files": ["./dist/**"],
+  "description": "",
+  "keywords": [],
+  "scripts": {
+    "build": "tsup",
+    "generate-openapi": "orval --input ../../service/server/docs/openapi.json --output ./gen/openapi.ts"
+  },
+  "author": "sugar-cat7",
+  "license": "MIT",
+  "devDependencies": {
+    "orval": "^7.9.0",
+    "tsup": "^8.4.0",
+    "typescript": "catalog:"
+  },
+  "dependencies": {
+    "@vspo-lab/error": "workspace:^",
+    "axios": "^1.9.0",
+    "axios-retry": "^4.5.0"
+  }
+}

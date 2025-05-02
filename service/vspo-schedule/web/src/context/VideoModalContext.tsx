@@ -1,6 +1,6 @@
-import { createContext, useCallback, useState } from "react";
-import dynamic from "next/dynamic";
 import { Video } from "@/types/streaming";
+import dynamic from "next/dynamic";
+import { createContext, useCallback, useState } from "react";
 
 const VideoModal = dynamic(
   () => import("../components/Elements").then((mod) => mod.VideoModal),

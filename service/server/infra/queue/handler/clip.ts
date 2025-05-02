@@ -1,5 +1,5 @@
+import { AppLogger } from "@vspo-lab/logging";
 import { type Clip, ClipsSchema } from "../../../domain/clip";
-import { AppLogger } from "../../../pkg/logging";
 import type { IClipInteractor } from "../../../usecase/clip";
 import { BaseHandler } from "./base";
 

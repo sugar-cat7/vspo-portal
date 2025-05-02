@@ -1,26 +1,26 @@
 import { members } from "@/data/members";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Alert,
-  FormControl,
-  Autocomplete,
-  TextField,
-  Avatar,
-  DialogActions,
-  Button,
-  Fab,
-  MenuItem,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { Box } from "@mui/system";
-import React from "react";
-import SearchIcon from "@mui/icons-material/Search";
 import { applyFilters } from "@/lib/utils";
 import { Clip } from "@/types/streaming";
 import { Timeframe } from "@/types/timeframe";
+import SearchIcon from "@mui/icons-material/Search";
+import {
+  Alert,
+  Autocomplete,
+  Avatar,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Fab,
+  FormControl,
+  MenuItem,
+  TextField,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { Box } from "@mui/system";
 import { useTranslation } from "next-i18next";
+import React from "react";
 
 type Props = {
   clips: Clip[];
@@ -91,9 +91,12 @@ export const SearchDialog: React.FC<Props> = ({
   };
 
   const timeframes: Timeframe[] = ["1day", "1week", "1month"];
-  const sampleKeywords: string[] = t("searchDialog.keywords", {
+  const translatedKeywords = t("searchDialog.keywords", {
     returnObjects: true,
   });
+  const sampleKeywords: string[] = Array.isArray(translatedKeywords)
+    ? translatedKeywords.map((keyword) => String(keyword))
+    : [];
   return (
     <>
       <Dialog open={isDialogOpen} onClose={dialogClose} maxWidth="md" fullWidth>

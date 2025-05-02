@@ -1,10 +1,12 @@
-import axios from "axios";
-import { VspoEvent } from "@/types/events";
-import { Clip, Livestream } from "@/types/streaming";
+import { members } from "@/data/members";
 import { mockClips, mockTwitchClips } from "@/data/mocks/clips";
 import { mockEvents } from "@/data/mocks/events";
 import { mockFreechats } from "@/data/mocks/freechats";
 import { mockLivestreams } from "@/data/mocks/livestreams";
+import { VspoEvent } from "@/types/events";
+import { Clip, Livestream } from "@/types/streaming";
+import axios from "axios";
+import { API_ROOT, ENVIRONMENT } from "./Const";
 import {
   convertThumbnailQualityInObjects,
   formatDate,
@@ -12,8 +14,6 @@ import {
   getOneWeekRange,
   shuffleClips,
 } from "./utils";
-import { API_ROOT, ENVIRONMENT } from "./Const";
-import { members } from "@/data/members";
 
 export const fetchEvents = async ({
   lang = "ja",

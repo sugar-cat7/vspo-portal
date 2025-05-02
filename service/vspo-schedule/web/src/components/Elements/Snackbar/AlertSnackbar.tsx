@@ -1,6 +1,6 @@
+import CloseIcon from "@mui/icons-material/Close";
 import { Alert, IconButton, Snackbar } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import CloseIcon from "@mui/icons-material/Close";
 import { useTranslation } from "next-i18next";
 
 const StyledAlert = styled(Alert)({

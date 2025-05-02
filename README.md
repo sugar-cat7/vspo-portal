@@ -2,26 +2,29 @@
 
 Join the Spodule Discord for developers by clicking [here](https://discord.gg/Q7Hm8h3HAG)!
 
-⚠️ Currently, this repository is under the process of refactoring from the old Vspo Schedule, hence the development of new features has been halted.Refactoring is expected to be completed around February, followed by the resumption of feature development. https://github.com/sugar-cat7/vspo-portal/issues/116
-
-Vspo Portal is a repository for providing fan-made services related to Vspo. ([X](https://twitter.com/vspodule))
 
 ## Current Services
 
 | Service Name                                          | Description                                                                                                | Repository                                |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [Spodule](https://www.vspo-schedule.com/schedule/all) | A site where you can check the streams (YouTube/Twitch/Twitcasting/Niconico) and clips of Vspo members. | [vspo-schedule](./service/vspo-schedule/) |
-| Common API                                            |                                                                                                            | [vspo-schedule-api](./service/common-job/)      |
+| [Spodule](https://www.vspo-schedule.com/schedule/all) | A site where you can check the streams (YouTube/Twitch/Twitcasting/Niconico) and clips of Vspo members. | [vspo-schedule](./service/vspo-schedule/web/README.md) |
+| Server | Backend services for Vspo Portal | [server](./service/server/README.md) |
 
+## Packages
+
+| Package Name | Description | Version |
+| ------------ | ----------- | ------- |
+| [@vspo-lab/api](./packages/api/README.md) | API client package for interacting with Vspo Portal backend services | 0.1.0 |
+| [@vspo-lab/dayjs](./packages/dayjs/README.md) | Date manipulation and formatting utilities | 0.1.0 |
+| [@vspo-lab/error](./packages/errors/README.md) | Error handling utilities | 0.1.0 |
+| [@vspo-lab/logging](./packages/logging/README.md) | Logging utilities | 0.1.0 |
+
+## Development Environment
+
+- Node.js: >=22.15.0
+- Package Manager: pnpm >=10.10.0
 
 ## Development Roadmap
 
 ### How to Contribute
-Please refer to “[CONTRIBUTING.md](./CONTRIBUTING.md).”
-
-### Local Setup
-
-#### Prerequisites
-- Container: [Docker](https://www.docker.com/)
-- DB Migration: [goose](https://github.com/pressly/goose)
-
+Please refer to "[CONTRIBUTING.md](./CONTRIBUTING.md)."

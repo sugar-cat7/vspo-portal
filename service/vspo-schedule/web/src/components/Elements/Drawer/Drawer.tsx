@@ -1,4 +1,11 @@
 import {
+  NavigationRouteId,
+  getNavigationRouteInfo,
+} from "@/constants/navigation";
+import { useTimeZoneContext } from "@/hooks";
+import { faTwitch } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
   Badge,
   Box,
   Chip,
@@ -13,18 +20,11 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import React from "react";
-import { faTwitch } from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  getNavigationRouteInfo,
-  NavigationRouteId,
-} from "@/constants/navigation";
-import { DrawerIcon } from "../Icon";
-import { ThemeToggleButton } from "../Button";
 import { useTranslation } from "next-i18next";
+import React from "react";
+import { ThemeToggleButton } from "../Button";
 import { LanguageSelector, TimeZoneSelector } from "../Control";
-import { useTimeZoneContext } from "@/hooks";
+import { DrawerIcon } from "../Icon";
 import { Link } from "../Link";
 
 const drawerNavigationSections: NavSectionProps[] = [

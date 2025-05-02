@@ -1,0 +1,54 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "ignore": [
+      "**/node_modules/**",
+      "**/.nx/**",
+      "**/.wrangler/**",
+      "**/public/**",
+      "**/dist/**",
+      "**/tools/**",
+      "**/*.config.js",
+      "**/.next/**",
+      "**/.turbo/**",
+      "**/*.js",
+      "**/.git/**",
+      "**/.vscode/**",
+      "**/gen/**"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": true,
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double"
+    }
+  },
+  "overrides": [
+    {
+      "include": ["**/service/vspo-schedule/**/**"],
+      "linter": {
+        "enabled": false
+      }
+    }
+  ]
+}

@@ -1,17 +1,17 @@
-import React, { useEffect } from "react";
-import { GetStaticProps } from "next";
-import { Clip } from "@/types/streaming";
-import { filterByTimeframe, getInitializedI18nInstance } from "@/lib/utils";
-import { Box } from "@mui/system";
-import { NextPageWithLayout } from "./_app";
 import { Loading, SearchDialog } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout";
 import { ClipTabs } from "@/components/Templates";
-import { fetchClips } from "@/lib/api";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { DEFAULT_LOCALE } from "@/lib/Const";
-import { useTranslation } from "next-i18next";
+import { fetchClips } from "@/lib/api";
 import { getCurrentUTCDate } from "@/lib/dayjs";
+import { filterByTimeframe, getInitializedI18nInstance } from "@/lib/utils";
+import { Clip } from "@/types/streaming";
+import { Box } from "@mui/system";
+import { GetStaticProps } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import React, { useEffect } from "react";
+import { NextPageWithLayout } from "./_app";
 
 type ClipsProps = {
   clips: Clip[];

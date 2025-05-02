@@ -1,14 +1,14 @@
-import type { ExtractTablesWithRelations } from "drizzle-orm";
-import { type NodePgQueryResultHKT, drizzle } from "drizzle-orm/node-postgres";
-import type { PgTransaction, PgTransactionConfig } from "drizzle-orm/pg-core";
 import {
   AppError,
   type BaseError,
   ErrorCodeSchema,
   type Result,
   wrap,
-} from "../../pkg/errors";
-import { AppLogger } from "../../pkg/logging";
+} from "@vspo-lab/error";
+import { AppLogger } from "@vspo-lab/logging";
+import type { ExtractTablesWithRelations } from "drizzle-orm";
+import { type NodePgQueryResultHKT, drizzle } from "drizzle-orm/node-postgres";
+import type { PgTransaction, PgTransactionConfig } from "drizzle-orm/pg-core";
 
 export interface IDbConfig {
   connectionString: string;

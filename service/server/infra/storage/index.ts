@@ -1,6 +1,6 @@
-import { AppError } from "../../pkg/errors/error";
-import { Err, Ok, type Result, wrap } from "../../pkg/errors/result";
-import { AppLogger } from "../../pkg/logging";
+import { AppError } from "@vspo-lab/error";
+import { Err, Ok, type Result, wrap } from "@vspo-lab/error";
+import { AppLogger } from "@vspo-lab/logging";
 
 /**
  * Interface for storage operations

@@ -1,19 +1,19 @@
-import { faDiscord, faTwitch } from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Image from "next/image";
-import { styled } from "@mui/material/styles";
-import ContentCutIcon from "@mui/icons-material/ContentCut";
-import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
-import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import LiveTvIcon from "@mui/icons-material/LiveTv";
-import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import AllInboxIcon from "@mui/icons-material/AllInbox";
-import EventIcon from "@mui/icons-material/Event";
-import InfoIcon from "@mui/icons-material/Info";
 import { NavigationRouteId } from "@/constants/navigation";
 import { Platform } from "@/types/streaming";
+import { faDiscord, faTwitch } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import AllInboxIcon from "@mui/icons-material/AllInbox";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
+import ContentCutIcon from "@mui/icons-material/ContentCut";
+import EventIcon from "@mui/icons-material/Event";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import InfoIcon from "@mui/icons-material/Info";
+import LiveTvIcon from "@mui/icons-material/LiveTv";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import { styled } from "@mui/material/styles";
+import Image from "next/image";
 
 const StyledFontAwesomeIcon = styled(FontAwesomeIcon)(({ theme }) => ({
   color: "black",

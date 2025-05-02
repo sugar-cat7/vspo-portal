@@ -1,7 +1,4 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import { type ISettingsParam, Logger as TSLogger } from "tslog";
-import type { CommonEnv } from "../../config/env/common";
-import { createUUID } from "../uuid";
 
 interface Fields {
   [key: string]: unknown;
@@ -30,28 +27,18 @@ interface LogContext {
 
 const loggerStorage = new AsyncLocalStorage<LogContext>();
 
-const createLoggerConfig = (env?: CommonEnv) =>
-  ({
-    name: "vspo-portal-server",
-    type: env?.LOG_TYPE || "pretty",
-    minLevel: env?.LOG_MINLEVEL || 0,
-    hideLogPositionForProduction: env?.LOG_HIDE_POSITION || true,
-  }) satisfies ISettingsParam<LogObject>;
-
 class AppLogger implements CustomLogger {
   private static instance: AppLogger;
-  private loggerInstance: TSLogger<LogObject>;
 
-  private constructor(env?: CommonEnv) {
-    const loggerConfig = createLoggerConfig(env);
-    this.loggerInstance = new TSLogger(loggerConfig);
-    // TODO: Transport logs to a log management system
-    this.loggerInstance.attachTransport((_logObj) => {});
-  }
+  private constructor() {}
 
-  static getInstance(env?: CommonEnv): AppLogger {
+  static getInstance(env?: {
+    LOG_TYPE: string;
+    LOG_MINLEVEL: number;
+    LOG_HIDE_POSITION: boolean;
+  }): AppLogger {
     if (!AppLogger.instance) {
-      AppLogger.instance = new AppLogger(env);
+      AppLogger.instance = new AppLogger();
     }
     return AppLogger.instance;
   }
@@ -59,7 +46,7 @@ class AppLogger implements CustomLogger {
   private getContext(): LogContext {
     const context = loggerStorage.getStore();
     if (!context) {
-      return { requestId: createUUID() };
+      return { requestId: crypto.randomUUID() };
     }
     return context;
   }
@@ -70,9 +57,13 @@ class AppLogger implements CustomLogger {
   ): Promise<T> {
     const fullContext: LogContext = {
       requestId:
-        AppLogger.getCurrentRequestId() || context.requestId || createUUID(),
-      additionalFields: context.additionalFields,
-      service: context.service,
+        AppLogger.getCurrentRequestId() ||
+        context.requestId ||
+        crypto.randomUUID(),
+      ...(context.additionalFields
+        ? { additionalFields: context.additionalFields }
+        : {}),
+      ...(context.service ? { service: context.service } : {}),
     };
     return loggerStorage.run(fullContext, fn);
   }

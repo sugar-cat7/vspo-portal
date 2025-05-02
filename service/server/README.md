@@ -1,6 +1,14 @@
+# Vspo Portal Server
+
+Backend services for Vspo Portal
+
 ### Architecture Overview
 ![alt text](./docs/images/architecture.png)
 
+### Requirements
+
+- Node.js: >=22.15.0
+- Package Manager: pnpm >=10.10.0
 
 ### Setup
 
@@ -46,6 +54,12 @@ curl "http://localhost:3002/__scheduled?cron=*+*+*+*+*"
 pnpm biome:check:write
 ```
 
+### Used Packages
+
+- @vspo-lab/api: 0.1.0
+- @vspo-lab/dayjs: 0.1.0
+- @vspo-lab/error: 0.1.0
+- @vspo-lab/logging: 0.1.0
 
 #### Discord Interaction
 

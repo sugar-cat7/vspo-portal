@@ -1,9 +1,9 @@
-import { useTranslation } from "next-i18next";
+import { getVideoIconUrl, isTrending } from "@/lib/utils";
+import { Clip } from "@/types/streaming";
 import PlayArrow from "@mui/icons-material/PlayArrow";
 import { Avatar, Box, CardContent, Chip, Typography } from "@mui/material";
 import { styled, useTheme } from "@mui/material/styles";
-import { getVideoIconUrl, isTrending } from "@/lib/utils";
-import { Clip } from "@/types/streaming";
+import { useTranslation } from "next-i18next";
 import { VideoCard } from "./VideoCard";
 
 type Props = {

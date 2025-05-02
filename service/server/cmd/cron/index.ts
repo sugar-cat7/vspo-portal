@@ -3,6 +3,7 @@ import {
   type WorkflowEvent,
   type WorkflowStep,
 } from "cloudflare:workers";
+import { AppLogger } from "@vspo-lab/logging";
 import type { BindingAppWorkerEnv } from "../../config/env/worker";
 import type { BindingWorkflowEnv } from "../../config/env/workflow";
 import { setFeatureFlagProvider } from "../../config/featureFlag";
@@ -25,7 +26,6 @@ import { deleteStreamsWorkflow } from "../../infra/http/workflow/stream/delete";
 import { searchStreamsWorkflow } from "../../infra/http/workflow/stream/search";
 import { searchMemberStreamsByChannelWorkflow } from "../../infra/http/workflow/stream/searchMemberStreamByChannel";
 import { translateStreamsWorkflow } from "../../infra/http/workflow/stream/trasnlate";
-import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
 
 export class SearchChannelsWorkflow extends WorkflowEntrypoint<

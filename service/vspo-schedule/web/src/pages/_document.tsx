@@ -1,17 +1,17 @@
 import {
-  Html,
-  Head,
-  Main,
-  NextScript,
-  type DocumentProps,
-  type DocumentContext,
-} from "next/document";
-import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
-import {
-  documentGetInitialProps,
   DocumentHeadTags,
   type DocumentHeadTagsProps,
+  documentGetInitialProps,
 } from "@mui/material-nextjs/v14-pagesRouter";
+import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
+import {
+  type DocumentContext,
+  type DocumentProps,
+  Head,
+  Html,
+  Main,
+  NextScript,
+} from "next/document";
 import i18nextConfig from "../../next-i18next.config";
 
 export default function MyDocument(

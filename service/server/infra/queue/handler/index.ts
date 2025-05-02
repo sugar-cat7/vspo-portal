@@ -1,6 +1,6 @@
+import { AppLogger } from "@vspo-lab/logging";
 import { type AppWorkerEnv, zAppWorkerEnv } from "../../../config/env/internal";
 import { setFeatureFlagProvider } from "../../../config/featureFlag";
-import { AppLogger } from "../../../pkg/logging";
 import { Container } from "../../dependency";
 import { createHandler, withTracer } from "../../http/trace";
 import { ClipHandler } from "./clip";
