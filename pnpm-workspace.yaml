@@ -3,3 +3,6 @@ packages:
   - "service/**/*"
 
 sharedWorkspaceLockfile: false
+
+catalog:
+  typescript: ^5.8.3

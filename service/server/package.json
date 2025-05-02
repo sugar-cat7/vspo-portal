@@ -64,7 +64,7 @@
     "drizzle-kit": "^0.31.0",
     "nx": "20.8.1",
     "tsup": "^8.4.0",
-    "typescript": "^5.8.3",
+    "typescript": "catalog:",
     "vite": "^6.3.4",
     "vitest": "^3.1.2",
     "wrangler": "^4.14.1"
