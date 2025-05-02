@@ -1,24 +1,24 @@
-import * as React from "react";
-import {
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Typography,
-  Button,
-  Box,
-  Stack,
-} from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { ContentLayout } from "@/components/Layout";
-import { NextPageWithLayout } from "./_app";
 import { aboutSections } from "@/data/content/about-sections";
-import Link from "next/link";
-import Image from "next/image";
-import { ReactNode } from "react";
-import { GetStaticProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getInitializedI18nInstance } from "@/lib/utils";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { GetStaticProps } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Image from "next/image";
+import Link from "next/link";
+import * as React from "react";
+import { ReactNode } from "react";
+import { NextPageWithLayout } from "./_app";
 
 type Props = {
   meta: {

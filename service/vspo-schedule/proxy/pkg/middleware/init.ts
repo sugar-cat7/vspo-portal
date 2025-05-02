@@ -1,10 +1,10 @@
-import { v4 as uuidv4 } from "uuid";
-import { MiddlewareHandler } from "hono";
-import { AppContext, HonoEnv } from "@/pkg/hono";
-import { env } from "hono/adapter";
 import { type Env, zEnv } from "@/pkg/env";
+import { AppContext, HonoEnv } from "@/pkg/hono";
 import { AppLogger } from "@/pkg/logging";
 import { trace } from "@opentelemetry/api";
+import { MiddlewareHandler } from "hono";
+import { env } from "hono/adapter";
+import { v4 as uuidv4 } from "uuid";
 
 export function init(): MiddlewareHandler<HonoEnv> {
   return async (c, next) => {

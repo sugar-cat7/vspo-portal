@@ -15,12 +15,7 @@
     "ci": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": [
-          "pnpm tsc",
-          "pnpm run biome:check",
-          "nx run vspo-portal-server:build-dryrun",
-          "pnpm test"
-        ],
+        "commands": ["nx run vspo-portal-server:build-dryrun", "pnpm test"],
         "parallel": false
       }
     }

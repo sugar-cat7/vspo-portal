@@ -1,4 +1,11 @@
-import React from "react";
+import {
+  formatDate,
+  getRelevantMembers,
+  groupLivestreamsByTimeRange,
+} from "@/lib/utils";
+import { VspoEvent } from "@/types/events";
+import { Livestream } from "@/types/streaming";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   Accordion,
   AccordionDetails,
@@ -9,16 +16,9 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Livestream } from "@/types/streaming";
-import {
-  formatDate,
-  getRelevantMembers,
-  groupLivestreamsByTimeRange,
-} from "@/lib/utils";
-import { Link, LivestreamCard } from "../Elements";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { VspoEvent } from "@/types/events";
 import { useTranslation } from "next-i18next";
+import React from "react";
+import { Link, LivestreamCard } from "../Elements";
 
 type Props = {
   livestreamsByDate: Record<string, Livestream[]>;

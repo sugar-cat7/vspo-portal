@@ -1,30 +1,30 @@
-import { siteNewsItems } from "@/data/content/site-news";
-import { NextPageWithLayout } from "../_app";
+import { Breadcrumb } from "@/components/Elements";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
-import {
-  TableContainer,
-  Paper,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Chip,
-  Box,
-  Toolbar,
-} from "@mui/material";
-import Link from "next/link";
+import { siteNewsItems } from "@/data/content/site-news";
+import { DEFAULT_LOCALE } from "@/lib/Const";
 import {
   formatDate,
   getInitializedI18nInstance,
   getSiteNewsTagColor,
 } from "@/lib/utils";
-import { Breadcrumb } from "@/components/Elements";
+import {
+  Box,
+  Chip,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Toolbar,
+} from "@mui/material";
 import { GetStaticProps } from "next";
-import { DEFAULT_LOCALE } from "@/lib/Const";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import Link from "next/link";
 import { useRouter } from "next/router";
+import { NextPageWithLayout } from "../_app";
 
 type Props = {
   meta: {

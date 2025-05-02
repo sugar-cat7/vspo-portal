@@ -1,6 +1,6 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { validateGetRequest } from "@/lib/validator";
 import { fetchRelatedVideos } from "@/lib/api";
+import { validateGetRequest } from "@/lib/validator";
+import { NextApiRequest, NextApiResponse } from "next";
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
   validateGetRequest(req, res, async () => {

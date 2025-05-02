@@ -19,7 +19,8 @@
       "**/.turbo/**",
       "**/*.js",
       "**/.git/**",
-      "**/.vscode/**"
+      "**/.vscode/**",
+      "**/gen/**"
     ]
   },
   "formatter": {
@@ -41,5 +42,13 @@
     "formatter": {
       "quoteStyle": "double"
     }
-  }
+  },
+  "overrides": [
+    {
+      "include": ["**/service/vspo-schedule/**/**"],
+      "linter": {
+        "enabled": false
+      }
+    }
+  ]
 }

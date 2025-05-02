@@ -1,7 +1,7 @@
+import { AppError, Err, Ok, type Result } from "@vspo-lab/error";
 import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
-import { AppError, Err, Ok, type Result } from "@vspo-lab/error";
-import * as apiGen from "../gen/openapi";
+import type * as apiGen from "../gen/openapi";
 
 interface ApiErrorResponse {
   error: {
@@ -119,7 +119,6 @@ export class VSPOApi {
   private async request<TData>(
     config: AxiosRequestConfig,
   ): Promise<Result<TData, AppError>> {
-    let res: any = null;
     let err: Error | null = null;
 
     const requestConfig = {
@@ -140,7 +139,7 @@ export class VSPOApi {
         // Use a default code that is definitely in the AppError['code'] union
         let determinedCode: AppError["code"] = "INTERNAL_SERVER_ERROR";
         // AppError['status'] expects number, not number | undefined. Use 0 for non-HTTP errors.
-        let errorStatus: number = 0;
+        let errorStatus = 0;
         // Ensure cause is Error | undefined
         const errorCause: Error | undefined =
           error instanceof Error ? error : undefined;

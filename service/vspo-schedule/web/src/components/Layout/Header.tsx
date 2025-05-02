@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import MenuIcon from "@mui/icons-material/Menu";
 import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from "@mui/system";
-import Image from "next/image";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGithub, faXTwitter } from "@fortawesome/free-brands-svg-icons";
-import { CustomDrawer, Link } from "../Elements";
 import { useTranslation } from "next-i18next";
+import Image from "next/image";
+import React, { useState } from "react";
+import { CustomDrawer, Link } from "../Elements";
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.vars.palette.customColors.vspoPurple,

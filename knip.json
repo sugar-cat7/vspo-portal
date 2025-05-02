@@ -1,19 +1,15 @@
 {
-    "workspaces": {
-      "packages/*": {
-        "entry": "{index,cli}.ts",
-        "project": "**/*.ts"
-      },
-      "service/*": {
-        "entry": "{index,cli}.ts",
-        "project": "**/*.ts"
-      }
+  "workspaces": {
+    "packages/*": {
+      "entry": "{index,cli}.ts",
+      "project": "**/*.ts"
     },
-    "ignore": [],
-    "ignoreBinaries": [
-        "lint"
-    ],
-    "ignoreWorkspaces": [
-        "service/vspo-schedule/proxy/**"
-    ]
-  }
+    "service/*": {
+      "entry": "{index,cli}.ts",
+      "project": "**/*.ts"
+    }
+  },
+  "ignore": [],
+  "ignoreBinaries": ["lint"],
+  "ignoreWorkspaces": ["service/vspo-schedule/proxy/**"]
+}

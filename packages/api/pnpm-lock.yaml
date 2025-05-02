@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@vspo-lab/error':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../errors
       axios:
         specifier: ^1.9.0

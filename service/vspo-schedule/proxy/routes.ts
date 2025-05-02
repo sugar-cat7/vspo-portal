@@ -1,6 +1,6 @@
-import { getCache, createCache } from "./pkg/cache";
+import { createCache, getCache } from "./pkg/cache";
 import { App, AppContext } from "./pkg/hono";
-import { videoProcessor, eventProcessor } from "./pkg/processor";
+import { eventProcessor, videoProcessor } from "./pkg/processor";
 import { translateText } from "./pkg/translator";
 
 export const registerOldAPIProxyRoutes = (app: App) => {

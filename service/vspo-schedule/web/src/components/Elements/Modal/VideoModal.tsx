@@ -1,20 +1,5 @@
-import React, { useEffect } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Typography,
-  Box,
-  Avatar,
-  Button,
-  IconButton,
-  Link as MuiLink,
-  Tab,
-  Tabs,
-  BottomNavigation,
-} from "@mui/material";
-import { styled, useTheme } from "@mui/material/styles";
-import { Video } from "@/types/streaming";
+import { RelatedVideos } from "@/components/Templates";
+import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import {
   formatDate,
   getLiveStatus,
@@ -24,16 +9,31 @@ import {
   isLivestream,
   isOnPlatformWithChat,
 } from "@/lib/utils";
-import { Link, PlatformIcon } from "..";
+import { Video } from "@/types/streaming";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
-import { RelatedVideos } from "@/components/Templates";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {
+  Avatar,
+  BottomNavigation,
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Link as MuiLink,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
+import { styled, useTheme } from "@mui/material/styles";
+import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import React, { useEffect } from "react";
+import { Link, PlatformIcon } from "..";
 import { ChatEmbed } from "../ChatEmbed";
-import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
-import { useTranslation } from "next-i18next";
 import { HighlightedVideoChip } from "../Chip";
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
