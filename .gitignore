@@ -68,3 +68,5 @@ next-env.d.ts
 .cursor/*
 dist
 .env.*
+
+.turbo

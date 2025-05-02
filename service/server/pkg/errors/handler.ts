@@ -4,29 +4,12 @@ import { env } from "hono/adapter";
 import { HTTPException } from "hono/http-exception";
 import type { ZodError } from "zod";
 
+import { AppError, type ErrorCode, ErrorCodeSchema } from "@vspo-lab/error";
+import { AppLogger } from "@vspo-lab/logging";
 import type { ContentfulStatusCode, StatusCode } from "hono/utils/http-status";
 import type { CommonEnv } from "../../config/env/common";
 import type { AppContext } from "../../infra/http/hono";
 import type { HonoEnv } from "../../infra/http/hono/env";
-import { AppLogger } from "../logging";
-import { AppError } from "./error";
-
-export const ErrorCodeSchema = z.enum([
-  "BAD_REQUEST",
-  "FORBIDDEN",
-  "INTERNAL_SERVER_ERROR",
-  "USAGE_EXCEEDED",
-  "DISABLED",
-  "NOT_FOUND",
-  "NOT_UNIQUE",
-  "RATE_LIMITED",
-  "UNAUTHORIZED",
-  "PRECONDITION_FAILED",
-  "INSUFFICIENT_PERMISSIONS",
-  "METHOD_NOT_ALLOWED",
-]);
-
-export type ErrorCode = z.infer<typeof ErrorCodeSchema>;
 
 const parseZodErrorMessage = (err: z.ZodError): string => {
   try {
@@ -67,7 +50,7 @@ export const errorSchemaFactory = (code: z.ZodEnum<any>) => {
 
 export const ErrorSchema = z.object({
   error: z.object({
-    code: ErrorCodeSchema.openapi({
+    code: z.enum(ErrorCodeSchema.options).openapi({
       description: "A machine readable error code.",
       example: "INTERNAL_SERVER_ERROR",
     }),

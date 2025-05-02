@@ -1,0 +1,20 @@
+{
+  "name": "@vspo-lab/logging",
+  "version": "0.1.0",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.mjs",
+  "files": ["./dist/**"],
+  "description": "",
+  "keywords": [],
+  "scripts": {
+    "build": "tsup"
+  },
+  "author": "sugar-cat7",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.15.3",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3"
+  }
+}

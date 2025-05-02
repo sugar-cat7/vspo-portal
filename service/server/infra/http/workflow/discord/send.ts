@@ -1,11 +1,11 @@
 import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
 import { OpenFeature } from "@openfeature/server-sdk";
+import { AppLogger } from "@vspo-lab/logging";
 import {
   type BindingAppWorkerEnv,
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
 import type { DiscordServers } from "../../../../domain";
-import { AppLogger } from "../../../../pkg/logging";
 import { withTracer } from "../../../http/trace/cloudflare";
 
 type DiscordChannelIdsMap = {

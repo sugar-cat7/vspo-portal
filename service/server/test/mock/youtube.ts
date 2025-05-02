@@ -1,8 +1,8 @@
+import { type AppError, Ok, type Result } from "@vspo-lab/error";
 import { vi } from "vitest";
 import type { Channel, Stream } from "../../domain";
 import type { Clip } from "../../domain/clip";
 import type { IYoutubeService, SearchClipsParams } from "../../infra/youtube";
-import { type AppError, Ok, type Result } from "../../pkg/errors";
 
 export type MockResponse =
   | {

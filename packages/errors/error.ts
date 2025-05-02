@@ -1,5 +1,5 @@
 import { BaseError, type ErrorContext } from "./base";
-import { type ErrorCode, codeToStatus } from "./handler";
+import { type ErrorCode, codeToStatus } from "./code";
 
 export class AppError extends BaseError {
   public readonly name = "AppError";
@@ -16,8 +16,8 @@ export class AppError extends BaseError {
   }) {
     super({
       message: opts.message,
-      cause: opts.cause instanceof Error ? opts.cause : undefined,
-      context: opts.context,
+      ...(opts.cause instanceof Error ? { cause: opts.cause } : {}),
+      ...(opts.context ? { context: opts.context } : {}),
     });
     this.retry = opts.retry ?? false;
     this.code = opts.code;

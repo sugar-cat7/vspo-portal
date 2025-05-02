@@ -1,2 +1,2 @@
-export * from './event';
-export * from './video';
+export * from "./event";
+export * from "./video";

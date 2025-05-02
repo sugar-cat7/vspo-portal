@@ -91,9 +91,12 @@ export const SearchDialog: React.FC<Props> = ({
   };
 
   const timeframes: Timeframe[] = ["1day", "1week", "1month"];
-  const sampleKeywords: string[] = t("searchDialog.keywords", {
+  const translatedKeywords = t("searchDialog.keywords", {
     returnObjects: true,
   });
+  const sampleKeywords: string[] = Array.isArray(translatedKeywords)
+    ? translatedKeywords
+    : [];
   return (
     <>
       <Dialog open={isDialogOpen} onClose={dialogClose} maxWidth="md" fullWidth>

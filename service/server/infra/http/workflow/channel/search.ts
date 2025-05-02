@@ -1,9 +1,9 @@
 import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
+import { AppLogger } from "@vspo-lab/logging";
 import {
   type BindingAppWorkerEnv,
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
-import { AppLogger } from "../../../../pkg/logging";
 import { withTracer } from "../../../http/trace/cloudflare";
 
 export const searchChannelsWorkflow = () => {

@@ -5,8 +5,8 @@ import {
   Ok,
   type Result,
   wrap,
-} from "../../pkg/errors";
-import { AppLogger } from "../../pkg/logging";
+} from "@vspo-lab/error";
+import { AppLogger } from "@vspo-lab/logging";
 import { withTracerResult } from "../http/trace/cloudflare";
 
 export const cacheKey = {

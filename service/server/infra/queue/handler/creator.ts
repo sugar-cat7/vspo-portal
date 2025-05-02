@@ -1,6 +1,6 @@
+import { AppLogger } from "@vspo-lab/logging";
 import type { MessageParam } from ".";
 import { type Creator, CreatorsSchema } from "../../../domain";
-import { AppLogger } from "../../../pkg/logging";
 import type { ICreatorInteractor } from "../../../usecase";
 import { BaseHandler } from "./base";
 

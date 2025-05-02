@@ -1,5 +1,6 @@
 import { createRoute } from "@hono/zod-openapi";
 import { createVspoEvent } from "../../../domain/event";
+
 import { openApiErrorResponses } from "../../../pkg/errors";
 import type { App } from "../hono";
 import {

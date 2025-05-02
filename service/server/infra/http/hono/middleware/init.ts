@@ -1,9 +1,9 @@
 import { OpenFeature } from "@openfeature/server-sdk";
+import { AppError, ErrorCodeSchema } from "@vspo-lab/error";
+import { AppLogger } from "@vspo-lab/logging";
 import { env } from "hono/adapter";
 import { createMiddleware } from "hono/factory";
 import { type ApiEnv, zApiEnv } from "../../../../config/env/api";
-import { AppError, ErrorCodeSchema } from "../../../../pkg/errors";
-import { AppLogger } from "../../../../pkg/logging";
 import type { AppContext } from "../app";
 import type { HonoEnv } from "../env";
 

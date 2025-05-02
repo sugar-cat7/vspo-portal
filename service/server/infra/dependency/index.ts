@@ -1,3 +1,4 @@
+import type { AppError, Result } from "@vspo-lab/error";
 import type { PgTransactionConfig } from "drizzle-orm/pg-core";
 import {
   CreatorService,
@@ -5,7 +6,6 @@ import {
   type IStreamService,
   StreamService,
 } from "../../domain";
-import type { AppError, Result } from "../../pkg/errors";
 import {
   CreatorRepository,
   type DB,
