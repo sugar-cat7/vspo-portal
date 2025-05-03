@@ -16,7 +16,7 @@
   "devDependencies": {
     "orval": "^7.9.0",
     "tsup": "^8.4.0",
-    "typescript": "catalog:"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@vspo-lab/error": "workspace:^",

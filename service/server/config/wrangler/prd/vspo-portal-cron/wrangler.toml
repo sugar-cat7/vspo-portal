@@ -14,7 +14,7 @@ service = "prd-vspo-portal-app"
 entrypoint = "ApplicationService"
 
 [triggers]
-crons = [ "0 0,7,18 * * *", "5 0,7,18 * * *", "*/2 * * * *", "*/30 * * * *", "*/1 * * * *", "15 * * * *" ]
+crons = [ "0 0,7,18 * * *", "5 0,7,18 * * *", "*/2 * * * *", "*/30 * * * *", "*/1 * * * *", "15 * * * *", "30 21 * * *" ]
 
 [[workflows]]
 name = "prd-search-streams-workflow"
@@ -75,6 +75,11 @@ class_name = "ExistClipsWorkflow"
 name = "prd-search-clips-workflow"
 binding = "SEARCH_CLIPS_WORKFLOW"
 class_name = "SearchClipsWorkflow"
+
+[[workflows]]
+name = "prd-search-clips-by-vspo-member-name-workflow"
+binding = "SEARCH_CLIPS_BY_VSPO_MEMBER_NAME_WORKFLOW"
+class_name = "SearchClipsByVspoMemberNameWorkflow"
 
 [vars]
 SERVICE_NAME = "prd-vspo-portal-cron"

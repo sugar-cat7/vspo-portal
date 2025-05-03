@@ -19,8 +19,7 @@
   "bottomNav": {
     "pages": {
       "list": "配信一覧",
-      "clip": "切り抜き",
-      "twitch-clip": "クリップ",
+      "clip": "切り抜き/ショート",
       "event": "イベント"
     }
   },
@@ -30,8 +29,7 @@
       "upcoming": "配信予定",
       "archive": "アーカイブ",
       "freechat": "フリーチャット",
-      "clip": "切り抜き一覧",
-      "twitch-clip": "クリップ一覧",
+      "clip": "切り抜き/ショート一覧",
       "about": "すぽじゅーるについて",
       "site-news": "お知らせ",
       "qa": "お問い合わせ",

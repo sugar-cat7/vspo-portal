@@ -3,8 +3,6 @@ import {
   getNavigationRouteInfo,
 } from "@/constants/navigation";
 import { useTimeZoneContext } from "@/hooks";
-import { faTwitch } from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Badge,
   Box,
@@ -39,14 +37,7 @@ const drawerNavigationSections: NavSectionProps[] = [
   },
   {
     heading: "Clips Section",
-    links: [
-      { id: "clip", isBeta: true },
-      {
-        id: "twitch-clip",
-        isBeta: true,
-        supplementaryIcon: <FontAwesomeIcon icon={faTwitch} />,
-      },
-    ],
+    links: [{ id: "clip" }],
   },
   {
     heading: "Help Section",

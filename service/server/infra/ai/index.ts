@@ -10,7 +10,7 @@ import OpenAI from "openai";
 import { z } from "zod";
 import { TargetLangSchema } from "../../domain/translate";
 import { withTracerResult } from "../http/trace/cloudflare";
-import { vspoKeywordMap } from "./keyword";
+import { vspoKeywordMap } from "../../config/data/keyword";
 
 const languageCodeMapping: Record<string, string> = {
   en: "English",

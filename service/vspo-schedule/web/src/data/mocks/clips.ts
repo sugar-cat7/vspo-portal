@@ -1,5 +1,5 @@
 import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
-import { Clip } from "@/types/streaming";
+import { Clip } from "@/features/clips/domain/clip";
 
 const today = getCurrentUTCDate();
 const tomorrow = convertToUTCDate(today);
@@ -262,7 +262,7 @@ export const mockClips: Clip[] = [
       "11:09 vs猟犬騎士ダリウィル\n" +
       "14:52 強武器ゲット！\n" +
       "18:14 ネフェリ姉さん再び\n" +
-      "19:58 イライライライライライライライラ\n" +
+      "19:58 イライライライライライライラ\n" +
       "20:23 vs獅子の混種\n" +
       "21:23 娘がバックれた！\n" +
       "22:22 王まであと1歩だな。\n" +

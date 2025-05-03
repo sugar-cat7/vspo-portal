@@ -9,7 +9,8 @@
     "biome:check": "biome check ./**/**",
     "biome:format": "biome format --write ./**/**",
     "knip": "knip",
-    "tsc": "pnpm -r exec tsc --noEmit"
+    "tsc": "pnpm -r exec tsc --noEmit",
+    "generate-openapi": "pnpm --filter @vspo-lab/api generate-openapi"
   },
   "author": "sugar-cat7",
   "license": "MIT",

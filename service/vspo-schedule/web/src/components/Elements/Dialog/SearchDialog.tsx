@@ -46,9 +46,7 @@ const StyledAlert = styled(Alert)(({ theme }) => ({
   },
 }));
 
-export const SearchDialog: React.FC<Props> = ({
-  setIsProcessing,
-}) => {
+export const SearchDialog: React.FC<Props> = ({ setIsProcessing }) => {
   const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [searchMemberIds, setSearchMemberIds] = React.useState<number[]>([]);
@@ -62,10 +60,11 @@ export const SearchDialog: React.FC<Props> = ({
     if (isDialogOpen) {
       // Get current search params from URL
       const currentTimeframe = router.query.timeframe as Timeframe | undefined;
-      const currentMemberIds = router.query.members ? 
-        (Array.isArray(router.query.members) 
-          ? router.query.members 
-          : [router.query.members]).map(id => parseInt(id, 10)) 
+      const currentMemberIds = router.query.members
+        ? (Array.isArray(router.query.members)
+            ? router.query.members
+            : [router.query.members]
+          ).map((id) => parseInt(id, 10))
         : [];
       const currentKeyword = router.query.keyword as string | undefined;
 
@@ -94,38 +93,38 @@ export const SearchDialog: React.FC<Props> = ({
 
   const handleSearch = () => {
     setIsProcessing(true);
-    
+
     // Build query parameters for server-side search
     const query: Record<string, string | string[]> = {
       ...router.query,
       page: "1", // Reset to first page for new search
     };
-    
+
     // Add search parameters if they have values
     if (searchClipTimeframe) {
       query.timeframe = searchClipTimeframe;
     } else {
       delete query.timeframe;
     }
-    
+
     if (searchMemberIds.length > 0) {
-      query.members = searchMemberIds.map(id => id.toString());
+      query.members = searchMemberIds.map((id) => id.toString());
     } else {
       delete query.members;
     }
-    
+
     if (searchKeyword) {
       query.keyword = searchKeyword;
     } else {
       delete query.keyword;
     }
-    
+
     // Navigate to the same page with search parameters
     router.push({
       pathname: router.pathname,
       query,
     });
-    
+
     dialogClose();
   };
 

@@ -12,7 +12,9 @@ import {
   countDistinct,
   desc,
   eq,
+  gte,
   inArray,
+  lte,
 } from "drizzle-orm";
 import { ClipTypeSchema, type Clips, createClips } from "../../domain/clip";
 import { TargetLangSchema } from "../../domain/translate";
@@ -45,6 +47,9 @@ type ListQuery = {
   channelIds?: string[];
   includeDeleted?: boolean;
   clipType?: "clip" | "short";
+  orderKey?: "publishedAt" | "viewCount";
+  beforePublishedAtDate?: Date;
+  afterPublishedAtDate?: Date;
 };
 
 export interface IClipRepository {
@@ -87,9 +92,13 @@ export class ClipRepository implements IClipRepository {
           )
           .where(and(...filters))
           .orderBy(
-            query.orderBy === "asc" || !query.orderBy
-              ? asc(videoTable.publishedAt)
-              : desc(videoTable.publishedAt),
+            query.orderKey === "publishedAt"
+              ? query.orderBy === "asc" || !query.orderBy
+                ? asc(videoTable.publishedAt)
+                : desc(videoTable.publishedAt)
+              : query.orderBy === "asc" || !query.orderBy
+                ? asc(clipStatsTable.viewCount)
+                : desc(clipStatsTable.viewCount),
           )
           .limit(query.limit)
           .offset(query.page * query.limit)
@@ -417,6 +426,24 @@ export class ClipRepository implements IClipRepository {
     }
     if (query.channelIds && query.channelIds.length > 0) {
       filters.push(inArray(videoTable.channelId, query.channelIds));
+    }
+
+    if (query.afterPublishedAtDate) {
+      filters.push(
+        gte(
+          videoTable.publishedAt,
+          convertToUTCDate(query.afterPublishedAtDate),
+        ),
+      );
+    }
+
+    if (query.beforePublishedAtDate) {
+      filters.push(
+        lte(
+          videoTable.publishedAt,
+          convertToUTCDate(query.beforePublishedAtDate),
+        ),
+      );
     }
 
     return filters;

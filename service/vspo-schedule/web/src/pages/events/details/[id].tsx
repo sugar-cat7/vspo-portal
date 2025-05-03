@@ -1,22 +1,22 @@
+import { Typography, Button, Box, Link, Avatar, Toolbar } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { GetStaticPaths, GetStaticProps } from "next";
+import { useRouter } from "next/router";
+import { NextPageWithLayout } from "../../_app";
+import { VspoEvent } from "@/types/events";
 import { TweetEmbed } from "@/components/Elements";
-import { ContentLayout } from "@/components/Layout";
-import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
-import { fetchEvents } from "@/lib/api";
-import { convertToUTCDate } from "@/lib/dayjs";
 import {
   formatDate,
   generateStaticPathsForLocales,
   getRelevantMembers,
 } from "@/lib/utils";
-import { VspoEvent } from "@/types/events";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Avatar, Box, Button, Link, Toolbar, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { GetStaticPaths, GetStaticProps } from "next";
-import { useTranslation } from "next-i18next";
+import { ContentLayout } from "@/components/Layout";
+import { fetchEvents } from "@/lib/api";
+import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useRouter } from "next/router";
-import { NextPageWithLayout } from "../../_app";
+import { useTranslation } from "next-i18next";
+import { convertToUTCDate } from "@/lib/dayjs";
 
 type Params = {
   id: string;

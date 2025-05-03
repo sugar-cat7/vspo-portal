@@ -88,7 +88,7 @@ export class VSPOApi {
     this.apiKey = opts.apiKey;
     this.cfAccessClientId = opts.cfAccessClientId;
     this.cfAccessClientSecret = opts.cfAccessClientSecret;
-    this.baseUrl = opts.baseUrl ?? "https://api.vspo-portal.com";
+    this.baseUrl = opts.baseUrl ?? "http://localhost:3000";
 
     this.retry = {
       attempts: opts.retry?.attempts ?? 3,
