@@ -4,10 +4,11 @@ import { Box, Card, CardActionArea } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Image from "next/image";
 import { HighlightedVideoChip } from "../Chip";
+import { Clip } from "@/features/clips";
 
 type Props = {
-  video: Video;
-  children: React.ReactNode; // CardContent
+  video: Video | Clip;
+  children: React.ReactNode;
   highlight?: {
     label: string;
     color: string;

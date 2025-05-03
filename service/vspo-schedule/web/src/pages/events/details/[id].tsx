@@ -83,7 +83,7 @@ export const getStaticProps: GetStaticProps<Props, Params> = async ({
       id: params.id,
       meta: {
         title: event.title,
-        description: event?.contentSummary || event.title,
+        description: event.contentSummary || event.title,
       },
     },
   };
@@ -187,8 +187,8 @@ const EventPage: NextPageWithLayout<Props> = ({ event }) => {
 
 EventPage.getLayout = (page, pageProps) => (
   <ContentLayout
-    title={pageProps.meta?.title}
-    description={pageProps.meta?.description}
+    title={pageProps.meta.title}
+    description={pageProps.meta.description}
     path={`/events/details/${pageProps.id}`}
     maxPageWidth="md"
   >

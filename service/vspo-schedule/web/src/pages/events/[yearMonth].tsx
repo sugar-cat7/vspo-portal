@@ -395,8 +395,8 @@ const IndexPage: NextPageWithLayout<Props> = ({
 
 IndexPage.getLayout = (page, pageProps) => (
   <ContentLayout
-    title={pageProps.meta?.title}
-    description={pageProps.meta?.description}
+    title={pageProps.meta.title}
+    description={pageProps.meta.description}
     lastUpdateTimestamp={pageProps.lastUpdateTimestamp}
     path={`/events/${pageProps.currentYearMonth}`}
     maxPageWidth="md"

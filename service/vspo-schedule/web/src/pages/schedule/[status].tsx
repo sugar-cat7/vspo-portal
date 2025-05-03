@@ -365,12 +365,12 @@ export const getServerSideProps: GetServerSideProps<
 
 HomePage.getLayout = (page, pageProps) => (
   <ContentLayout
-    title={pageProps.meta?.title}
-    description={pageProps.meta?.description}
+    title={pageProps.meta.title}
+    description={pageProps.meta.description}
     lastUpdateTimestamp={pageProps.lastUpdateTimestamp}
     footerMessage={pageProps.footerMessage}
-    headTitle={pageProps.meta?.headTitle}
-    path={`/${pageProps?.locale}/schedule/${pageProps.liveStatus}`}
+    headTitle={pageProps.meta.headTitle}
+    path={`/${pageProps.locale}/schedule/${pageProps.liveStatus}`}
     // canonicalPath={`/schedule/all`}
   >
     {page}
