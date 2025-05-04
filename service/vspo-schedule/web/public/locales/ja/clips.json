@@ -13,12 +13,12 @@
   },
   "home": {
     "meta": {
-      "title": "ぶいすぽっ!クリップ集",
-      "description": "ぶいすぽっ!メンバーのストリーム動画クリップ集。"
+      "title": "ぶいすぽっ!クリップコレクション",
+      "description": "ぶいすぽっ!メンバーのYouTubeの切り抜き、Shorts、Twitchクリップを一箇所でチェック！"
     },
     "hero": {
       "title": "ぶいすぽっ!クリップコレクション",
-      "subtitle": "YouTubeの切り抜き、Shorts、Twitchクリップを一箇所でチェック！",
+      "subtitle": "ぶいすぽっ!メンバーのYouTubeの切り抜き、Shorts、Twitchクリップを一箇所でチェック！",
       "exploreClips": "クリップを見る"
     },
     "members": {
