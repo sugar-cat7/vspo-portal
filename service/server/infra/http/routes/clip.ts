@@ -1,5 +1,5 @@
 import { createRoute } from "@hono/zod-openapi";
-
+import { convertToUTCDate } from "@vspo-lab/dayjs";
 import { openApiErrorResponses } from "../../../pkg/errors";
 import type { App } from "../hono";
 import { ListClipRequestSchema, ListClipResponseSchema } from "./schema";
@@ -36,6 +36,13 @@ export const registerClipListApi = (app: App) =>
       languageCode: p.languageCode,
       orderBy: p.orderBy,
       clipType: p.clipType,
+      orderKey: p.orderKey,
+      afterPublishedAtDate: p.afterPublishedAtDate
+        ? convertToUTCDate(p.afterPublishedAtDate)
+        : undefined,
+      beforePublishedAtDate: p.beforePublishedAtDate
+        ? convertToUTCDate(p.beforePublishedAtDate)
+        : undefined,
     });
 
     if (r.err) {

@@ -4,12 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-catalogs:
-  default:
-    typescript:
-      specifier: ^5.8.3
-      version: 5.8.3
-
 importers:
 
   .:
@@ -25,7 +19,7 @@ importers:
         specifier: ^8.4.0
         version: 8.4.0(typescript@5.8.3)
       typescript:
-        specifier: 'catalog:'
+        specifier: ^5.8.3
         version: 5.8.3
 
 packages:

@@ -13,7 +13,6 @@ import { DrawerIcon, Link } from "../Elements";
 const bottomNavigationRoutes = [
   "list",
   "clip",
-  "twitch-clip",
   "event",
 ] satisfies NavigationRouteId[];
 

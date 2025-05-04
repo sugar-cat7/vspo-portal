@@ -3,7 +3,6 @@ import { Platform } from "@/types/streaming";
 import { faDiscord, faTwitch } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AllInboxIcon from "@mui/icons-material/AllInbox";
-import AttachFileIcon from "@mui/icons-material/AttachFile";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import ChatBubbleOutlineIcon from "@mui/icons-material/ChatBubbleOutline";
 import ContentCutIcon from "@mui/icons-material/ContentCut";
@@ -77,8 +76,6 @@ export const DrawerIcon: React.FC<DrawerIconProps> = ({ id }) => {
       return <HelpOutlineIcon />;
     case "freechat":
       return <ChatBubbleOutlineIcon />;
-    case "twitch-clip":
-      return <AttachFileIcon />;
     case "site-news":
       return <NotificationsIcon />;
     case "event":

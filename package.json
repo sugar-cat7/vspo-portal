@@ -9,7 +9,9 @@
     "biome:check": "biome check ./**/**",
     "biome:format": "biome format --write ./**/**",
     "knip": "knip",
-    "tsc": "pnpm -r exec tsc --noEmit"
+    "tsc": "pnpm -r exec tsc --noEmit",
+    "generate-openapi": "pnpm --filter @vspo-lab/api generate-openapi",
+    "start": "pnpm --filter ./service/vspo-schedule/web start"
   },
   "author": "sugar-cat7",
   "license": "MIT",
@@ -19,14 +21,15 @@
     "knip": "^5.52.0",
     "lefthook": "^1.11.12",
     "turbo": "^2.5.2",
-    "typescript": "catalog:"
+    "typescript": "^5.8.3",
+    "next": "^14.2.26"
   },
   "pnpm": {
     "overrides": {}
   },
   "packageManager": "pnpm@10.10.0",
   "engines": {
-    "pnpm": ">=10.10.0",
-    "node": ">=22.15.0"
+    "pnpm": ">=9.15.9",
+    "node": ">=20.18.0"
   }
 }

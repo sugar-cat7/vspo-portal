@@ -65,6 +65,21 @@ const ListClipRequestSchema = PaginationQuerySchema.merge(
           in: "query",
         },
       }),
+    orderKey: z
+      .enum(["publishedAt", "viewCount"])
+      .default("publishedAt")
+      .openapi({
+        description: "Order Key",
+        example: "publishedAt",
+      }),
+    afterPublishedAtDate: z.string().optional().openapi({
+      description: "After Published At Date",
+      example: "2023-05-20T12:00:00.000Z",
+    }),
+    beforePublishedAtDate: z.string().optional().openapi({
+      description: "Before Published At Date",
+      example: "2023-05-20T12:00:00.000Z",
+    }),
   }),
 );
 

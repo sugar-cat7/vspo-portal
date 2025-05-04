@@ -74,6 +74,7 @@ export const registerStreamListApi = (app: App) =>
       endedAt: p.endedAt ? convertToUTCDate(p.endedAt) : undefined,
       languageCode: p.languageCode,
       orderBy: p.orderBy,
+      memberType: p.memberType,
     });
 
     if (r.err) {

@@ -14,6 +14,7 @@ export const zBindingWorkflowEnv = z
     DISCORD_SEND_MESSAGE_CHANNELS_WORKFLOW: z.custom<Workflow>(),
     EXIST_CLIPS_WORKFLOW: z.custom<Workflow>(),
     SEARCH_CLIPS_WORKFLOW: z.custom<Workflow>(),
+    SEARCH_CLIPS_BY_VSPO_MEMBER_NAME_WORKFLOW: z.custom<Workflow>(),
   })
   .merge(zFeatureFlagEnv);
 export type BindingWorkflowEnv = z.infer<typeof zBindingWorkflowEnv>;

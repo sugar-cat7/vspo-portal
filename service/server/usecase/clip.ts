@@ -16,6 +16,9 @@ export type ListClipsQuery = {
   channelIds?: string[];
   includeDeleted?: boolean;
   clipType?: "clip" | "short";
+  orderKey?: "publishedAt" | "viewCount";
+  afterPublishedAtDate?: Date;
+  beforePublishedAtDate?: Date;
 };
 
 export type ListClipsResponse = {
@@ -33,6 +36,9 @@ export interface IClipInteractor {
     clipIds,
   }: { clipIds: string[] }): Promise<
     Result<{ clips: Clips; notExistsClipIds: string[] }, AppError>
+  >;
+  searchNewClipsByVspoMemberName(): Promise<
+    Result<{ newCreators: Creators; clips: Clips }, AppError>
   >;
   deleteClips({
     clipIds,
@@ -92,6 +98,14 @@ export class ClipInteractor implements IClipInteractor {
   > {
     return this.context.runInTx(async (repos, services) => {
       return services.clipService.searchExistVspoClips({ clipIds });
+    });
+  }
+
+  async searchNewClipsByVspoMemberName(): Promise<
+    Result<{ newCreators: Creators; clips: Clips }, AppError>
+  > {
+    return this.context.runInTx(async (repos, services) => {
+      return services.clipService.searchNewClipsByVspoMemberName();
     });
   }
 

@@ -15,6 +15,6 @@
   "devDependencies": {
     "@types/node": "^22.15.3",
     "tsup": "^8.4.0",
-    "typescript": "catalog:"
+    "typescript": "^5.8.3"
   }
 }

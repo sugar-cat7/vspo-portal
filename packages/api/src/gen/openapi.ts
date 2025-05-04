@@ -5,18 +5,21 @@
  * API
  * OpenAPI spec version: 1.0.0
  */
-import axios from "axios";
-import type { AxiosRequestConfig, AxiosResponse } from "axios";
+import axios from 'axios';
+import type {
+  AxiosRequestConfig,
+  AxiosResponse
+} from 'axios';
 
 /**
  * A machine readable error code.
  */
-export type ErrBadRequestErrorCode =
-  (typeof ErrBadRequestErrorCode)[keyof typeof ErrBadRequestErrorCode];
+export type ErrBadRequestErrorCode = typeof ErrBadRequestErrorCode[keyof typeof ErrBadRequestErrorCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ErrBadRequestErrorCode = {
-  BAD_REQUEST: "BAD_REQUEST",
+  BAD_REQUEST: 'BAD_REQUEST',
 } as const;
 
 export type ErrBadRequestError = {
@@ -37,12 +40,12 @@ export interface ErrBadRequest {
 /**
  * A machine readable error code.
  */
-export type ErrUnauthorizedErrorCode =
-  (typeof ErrUnauthorizedErrorCode)[keyof typeof ErrUnauthorizedErrorCode];
+export type ErrUnauthorizedErrorCode = typeof ErrUnauthorizedErrorCode[keyof typeof ErrUnauthorizedErrorCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ErrUnauthorizedErrorCode = {
-  UNAUTHORIZED: "UNAUTHORIZED",
+  UNAUTHORIZED: 'UNAUTHORIZED',
 } as const;
 
 export type ErrUnauthorizedError = {
@@ -63,12 +66,12 @@ export interface ErrUnauthorized {
 /**
  * A machine readable error code.
  */
-export type ErrForbiddenErrorCode =
-  (typeof ErrForbiddenErrorCode)[keyof typeof ErrForbiddenErrorCode];
+export type ErrForbiddenErrorCode = typeof ErrForbiddenErrorCode[keyof typeof ErrForbiddenErrorCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ErrForbiddenErrorCode = {
-  FORBIDDEN: "FORBIDDEN",
+  FORBIDDEN: 'FORBIDDEN',
 } as const;
 
 export type ErrForbiddenError = {
@@ -89,12 +92,12 @@ export interface ErrForbidden {
 /**
  * A machine readable error code.
  */
-export type ErrNotFoundErrorCode =
-  (typeof ErrNotFoundErrorCode)[keyof typeof ErrNotFoundErrorCode];
+export type ErrNotFoundErrorCode = typeof ErrNotFoundErrorCode[keyof typeof ErrNotFoundErrorCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ErrNotFoundErrorCode = {
-  NOT_FOUND: "NOT_FOUND",
+  NOT_FOUND: 'NOT_FOUND',
 } as const;
 
 export type ErrNotFoundError = {
@@ -115,12 +118,12 @@ export interface ErrNotFound {
 /**
  * A machine readable error code.
  */
-export type ErrConflictErrorCode =
-  (typeof ErrConflictErrorCode)[keyof typeof ErrConflictErrorCode];
+export type ErrConflictErrorCode = typeof ErrConflictErrorCode[keyof typeof ErrConflictErrorCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ErrConflictErrorCode = {
-  CONFLICT: "CONFLICT",
+  CONFLICT: 'CONFLICT',
 } as const;
 
 export type ErrConflictError = {
@@ -141,12 +144,12 @@ export interface ErrConflict {
 /**
  * A machine readable error code.
  */
-export type ErrTooManyRequestsErrorCode =
-  (typeof ErrTooManyRequestsErrorCode)[keyof typeof ErrTooManyRequestsErrorCode];
+export type ErrTooManyRequestsErrorCode = typeof ErrTooManyRequestsErrorCode[keyof typeof ErrTooManyRequestsErrorCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ErrTooManyRequestsErrorCode = {
-  TOO_MANY_REQUESTS: "TOO_MANY_REQUESTS",
+  TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
 } as const;
 
 export type ErrTooManyRequestsError = {
@@ -167,12 +170,12 @@ export interface ErrTooManyRequests {
 /**
  * A machine readable error code.
  */
-export type ErrInternalServerErrorErrorCode =
-  (typeof ErrInternalServerErrorErrorCode)[keyof typeof ErrInternalServerErrorErrorCode];
+export type ErrInternalServerErrorErrorCode = typeof ErrInternalServerErrorErrorCode[keyof typeof ErrInternalServerErrorErrorCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ErrInternalServerErrorErrorCode = {
-  INTERNAL_SERVER_ERROR: "INTERNAL_SERVER_ERROR",
+  INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
 } as const;
 
 export type ErrInternalServerErrorError = {
@@ -191,85 +194,98 @@ export interface ErrInternalServerError {
 }
 
 export type ListStreamsParams = {
-  limit: string;
-  page: string;
-  platform?: ListStreamsPlatform;
-  status?: ListStreamsStatus;
-  startedAt?: string;
-  endedAt?: string;
-  languageCode?: string;
-  orderBy?: ListStreamsOrderBy;
+limit: string;
+page: string;
+platform?: ListStreamsPlatform;
+status?: ListStreamsStatus;
+memberType?: ListStreamsMemberType;
+startedAt?: string;
+endedAt?: string;
+languageCode?: string;
+orderBy?: ListStreamsOrderBy;
 };
 
-export type ListStreamsPlatform =
-  (typeof ListStreamsPlatform)[keyof typeof ListStreamsPlatform];
+export type ListStreamsPlatform = typeof ListStreamsPlatform[keyof typeof ListStreamsPlatform];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListStreamsPlatform = {
-  youtube: "youtube",
-  twitch: "twitch",
-  twitcasting: "twitcasting",
-  niconico: "niconico",
-  unknown: "unknown",
+  youtube: 'youtube',
+  twitch: 'twitch',
+  twitcasting: 'twitcasting',
+  niconico: 'niconico',
+  unknown: 'unknown',
 } as const;
 
-export type ListStreamsStatus =
-  (typeof ListStreamsStatus)[keyof typeof ListStreamsStatus];
+export type ListStreamsStatus = typeof ListStreamsStatus[keyof typeof ListStreamsStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListStreamsStatus = {
-  live: "live",
-  upcoming: "upcoming",
-  ended: "ended",
-  unknown: "unknown",
+  live: 'live',
+  upcoming: 'upcoming',
+  ended: 'ended',
+  unknown: 'unknown',
 } as const;
 
-export type ListStreamsOrderBy =
-  (typeof ListStreamsOrderBy)[keyof typeof ListStreamsOrderBy];
+export type ListStreamsMemberType = typeof ListStreamsMemberType[keyof typeof ListStreamsMemberType];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListStreamsMemberType = {
+  vspo_jp: 'vspo_jp',
+  vspo_en: 'vspo_en',
+  vspo_ch: 'vspo_ch',
+  vspo_all: 'vspo_all',
+  general: 'general',
+} as const;
+
+export type ListStreamsOrderBy = typeof ListStreamsOrderBy[keyof typeof ListStreamsOrderBy];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListStreamsOrderBy = {
-  asc: "asc",
-  desc: "desc",
+  asc: 'asc',
+  desc: 'desc',
 } as const;
 
-export type ListStreams200StreamsItemLanguageCode =
-  (typeof ListStreams200StreamsItemLanguageCode)[keyof typeof ListStreams200StreamsItemLanguageCode];
+export type ListStreams200StreamsItemLanguageCode = typeof ListStreams200StreamsItemLanguageCode[keyof typeof ListStreams200StreamsItemLanguageCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListStreams200StreamsItemLanguageCode = {
-  en: "en",
-  ja: "ja",
-  fr: "fr",
-  de: "de",
-  es: "es",
-  cn: "cn",
-  tw: "tw",
-  ko: "ko",
-  default: "default",
+  en: 'en',
+  ja: 'ja',
+  fr: 'fr',
+  de: 'de',
+  es: 'es',
+  cn: 'cn',
+  tw: 'tw',
+  ko: 'ko',
+  default: 'default',
 } as const;
 
-export type ListStreams200StreamsItemPlatform =
-  (typeof ListStreams200StreamsItemPlatform)[keyof typeof ListStreams200StreamsItemPlatform];
+export type ListStreams200StreamsItemPlatform = typeof ListStreams200StreamsItemPlatform[keyof typeof ListStreams200StreamsItemPlatform];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListStreams200StreamsItemPlatform = {
-  youtube: "youtube",
-  twitch: "twitch",
-  twitcasting: "twitcasting",
-  niconico: "niconico",
-  unknown: "unknown",
+  youtube: 'youtube',
+  twitch: 'twitch',
+  twitcasting: 'twitcasting',
+  niconico: 'niconico',
+  unknown: 'unknown',
 } as const;
 
-export type ListStreams200StreamsItemStatus =
-  (typeof ListStreams200StreamsItemStatus)[keyof typeof ListStreams200StreamsItemStatus];
+export type ListStreams200StreamsItemStatus = typeof ListStreams200StreamsItemStatus[keyof typeof ListStreams200StreamsItemStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListStreams200StreamsItemStatus = {
-  live: "live",
-  upcoming: "upcoming",
-  ended: "ended",
-  unknown: "unknown",
+  live: 'live',
+  upcoming: 'upcoming',
+  ended: 'ended',
+  unknown: 'unknown',
 } as const;
 
 /**
@@ -321,31 +337,31 @@ export type ListStreams200 = {
 };
 
 export type ListCreatorsParams = {
-  limit: string;
-  page: string;
-  memberType?: ListCreatorsMemberType;
+limit: string;
+page: string;
+memberType?: ListCreatorsMemberType;
 };
 
-export type ListCreatorsMemberType =
-  (typeof ListCreatorsMemberType)[keyof typeof ListCreatorsMemberType];
+export type ListCreatorsMemberType = typeof ListCreatorsMemberType[keyof typeof ListCreatorsMemberType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListCreatorsMemberType = {
-  vspo_jp: "vspo_jp",
-  vspo_en: "vspo_en",
-  vspo_ch: "vspo_ch",
-  general: "general",
+  vspo_jp: 'vspo_jp',
+  vspo_en: 'vspo_en',
+  vspo_ch: 'vspo_ch',
+  general: 'general',
 } as const;
 
-export type ListCreators200CreatorsItemMemberType =
-  (typeof ListCreators200CreatorsItemMemberType)[keyof typeof ListCreators200CreatorsItemMemberType];
+export type ListCreators200CreatorsItemMemberType = typeof ListCreators200CreatorsItemMemberType[keyof typeof ListCreators200CreatorsItemMemberType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListCreators200CreatorsItemMemberType = {
-  vspo_jp: "vspo_jp",
-  vspo_en: "vspo_en",
-  vspo_ch: "vspo_ch",
-  general: "general",
+  vspo_jp: 'vspo_jp',
+  vspo_en: 'vspo_en',
+  vspo_ch: 'vspo_ch',
+  general: 'general',
 } as const;
 
 /**
@@ -457,43 +473,43 @@ export type PostStreamBody = {
   streamIds: string[];
 };
 
-export type PostStream200VideosItemLanguageCode =
-  (typeof PostStream200VideosItemLanguageCode)[keyof typeof PostStream200VideosItemLanguageCode];
+export type PostStream200VideosItemLanguageCode = typeof PostStream200VideosItemLanguageCode[keyof typeof PostStream200VideosItemLanguageCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PostStream200VideosItemLanguageCode = {
-  en: "en",
-  ja: "ja",
-  fr: "fr",
-  de: "de",
-  es: "es",
-  cn: "cn",
-  tw: "tw",
-  ko: "ko",
-  default: "default",
+  en: 'en',
+  ja: 'ja',
+  fr: 'fr',
+  de: 'de',
+  es: 'es',
+  cn: 'cn',
+  tw: 'tw',
+  ko: 'ko',
+  default: 'default',
 } as const;
 
-export type PostStream200VideosItemPlatform =
-  (typeof PostStream200VideosItemPlatform)[keyof typeof PostStream200VideosItemPlatform];
+export type PostStream200VideosItemPlatform = typeof PostStream200VideosItemPlatform[keyof typeof PostStream200VideosItemPlatform];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PostStream200VideosItemPlatform = {
-  youtube: "youtube",
-  twitch: "twitch",
-  twitcasting: "twitcasting",
-  niconico: "niconico",
-  unknown: "unknown",
+  youtube: 'youtube',
+  twitch: 'twitch',
+  twitcasting: 'twitcasting',
+  niconico: 'niconico',
+  unknown: 'unknown',
 } as const;
 
-export type PostStream200VideosItemStatus =
-  (typeof PostStream200VideosItemStatus)[keyof typeof PostStream200VideosItemStatus];
+export type PostStream200VideosItemStatus = typeof PostStream200VideosItemStatus[keyof typeof PostStream200VideosItemStatus];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PostStream200VideosItemStatus = {
-  live: "live",
-  upcoming: "upcoming",
-  ended: "ended",
-  unknown: "unknown",
+  live: 'live',
+  upcoming: 'upcoming',
+  ended: 'ended',
+  unknown: 'unknown',
 } as const;
 
 /**
@@ -529,79 +545,91 @@ export type PostStream200 = {
 };
 
 export type ListClipsParams = {
-  limit: string;
-  page: string;
-  platform?: ListClipsPlatform;
-  clipType?: ListClipsClipType;
-  languageCode?: string;
-  orderBy?: ListClipsOrderBy;
+limit: string;
+page: string;
+platform?: ListClipsPlatform;
+clipType?: ListClipsClipType;
+languageCode?: string;
+orderBy?: ListClipsOrderBy;
+orderKey?: ListClipsOrderKey;
+afterPublishedAtDate?: string;
+beforePublishedAtDate?: string;
 };
 
-export type ListClipsPlatform =
-  (typeof ListClipsPlatform)[keyof typeof ListClipsPlatform];
+export type ListClipsPlatform = typeof ListClipsPlatform[keyof typeof ListClipsPlatform];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListClipsPlatform = {
-  youtube: "youtube",
-  twitch: "twitch",
-  twitcasting: "twitcasting",
-  niconico: "niconico",
-  unknown: "unknown",
+  youtube: 'youtube',
+  twitch: 'twitch',
+  twitcasting: 'twitcasting',
+  niconico: 'niconico',
+  unknown: 'unknown',
 } as const;
 
-export type ListClipsClipType =
-  (typeof ListClipsClipType)[keyof typeof ListClipsClipType];
+export type ListClipsClipType = typeof ListClipsClipType[keyof typeof ListClipsClipType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListClipsClipType = {
-  clip: "clip",
-  short: "short",
+  clip: 'clip',
+  short: 'short',
 } as const;
 
-export type ListClipsOrderBy =
-  (typeof ListClipsOrderBy)[keyof typeof ListClipsOrderBy];
+export type ListClipsOrderBy = typeof ListClipsOrderBy[keyof typeof ListClipsOrderBy];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListClipsOrderBy = {
-  asc: "asc",
-  desc: "desc",
+  asc: 'asc',
+  desc: 'desc',
 } as const;
 
-export type ListClips200ClipsItemLanguageCode =
-  (typeof ListClips200ClipsItemLanguageCode)[keyof typeof ListClips200ClipsItemLanguageCode];
+export type ListClipsOrderKey = typeof ListClipsOrderKey[keyof typeof ListClipsOrderKey];
+
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ListClipsOrderKey = {
+  publishedAt: 'publishedAt',
+  viewCount: 'viewCount',
+} as const;
+
+export type ListClips200ClipsItemLanguageCode = typeof ListClips200ClipsItemLanguageCode[keyof typeof ListClips200ClipsItemLanguageCode];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListClips200ClipsItemLanguageCode = {
-  en: "en",
-  ja: "ja",
-  fr: "fr",
-  de: "de",
-  es: "es",
-  cn: "cn",
-  tw: "tw",
-  ko: "ko",
-  default: "default",
+  en: 'en',
+  ja: 'ja',
+  fr: 'fr',
+  de: 'de',
+  es: 'es',
+  cn: 'cn',
+  tw: 'tw',
+  ko: 'ko',
+  default: 'default',
 } as const;
 
-export type ListClips200ClipsItemPlatform =
-  (typeof ListClips200ClipsItemPlatform)[keyof typeof ListClips200ClipsItemPlatform];
+export type ListClips200ClipsItemPlatform = typeof ListClips200ClipsItemPlatform[keyof typeof ListClips200ClipsItemPlatform];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListClips200ClipsItemPlatform = {
-  youtube: "youtube",
-  twitch: "twitch",
-  twitcasting: "twitcasting",
-  niconico: "niconico",
-  unknown: "unknown",
+  youtube: 'youtube',
+  twitch: 'twitch',
+  twitcasting: 'twitcasting',
+  niconico: 'niconico',
+  unknown: 'unknown',
 } as const;
 
-export type ListClips200ClipsItemType =
-  (typeof ListClips200ClipsItemType)[keyof typeof ListClips200ClipsItemType];
+export type ListClips200ClipsItemType = typeof ListClips200ClipsItemType[keyof typeof ListClips200ClipsItemType];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListClips200ClipsItemType = {
-  short: "short",
-  clip: "clip",
+  short: 'short',
+  clip: 'clip',
 } as const;
 
 /**
@@ -649,44 +677,44 @@ export type ListClips200 = {
 };
 
 export type ListEventsParams = {
-  limit: string;
-  page: string;
-  visibility?: ListEventsVisibility;
-  orderBy?: ListEventsOrderBy;
-  startAt?: string;
-  endAt?: string;
+limit: string;
+page: string;
+visibility?: ListEventsVisibility;
+orderBy?: ListEventsOrderBy;
+startAt?: string;
+endAt?: string;
 };
 
-export type ListEventsVisibility =
-  (typeof ListEventsVisibility)[keyof typeof ListEventsVisibility];
+export type ListEventsVisibility = typeof ListEventsVisibility[keyof typeof ListEventsVisibility];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEventsVisibility = {
-  public: "public",
-  private: "private",
-  internal: "internal",
+  public: 'public',
+  private: 'private',
+  internal: 'internal',
 } as const;
 
-export type ListEventsOrderBy =
-  (typeof ListEventsOrderBy)[keyof typeof ListEventsOrderBy];
+export type ListEventsOrderBy = typeof ListEventsOrderBy[keyof typeof ListEventsOrderBy];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEventsOrderBy = {
-  asc: "asc",
-  desc: "desc",
+  asc: 'asc',
+  desc: 'desc',
 } as const;
 
 /**
  * Event visibility status
  */
-export type ListEvents200EventsItemVisibility =
-  (typeof ListEvents200EventsItemVisibility)[keyof typeof ListEvents200EventsItemVisibility];
+export type ListEvents200EventsItemVisibility = typeof ListEvents200EventsItemVisibility[keyof typeof ListEvents200EventsItemVisibility];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ListEvents200EventsItemVisibility = {
-  public: "public",
-  private: "private",
-  internal: "internal",
+  public: 'public',
+  private: 'private',
+  internal: 'internal',
 } as const;
 
 export type ListEvents200EventsItem = {
@@ -731,14 +759,14 @@ export type ListEvents200 = {
 /**
  * Event visibility status
  */
-export type CreateEventBodyVisibility =
-  (typeof CreateEventBodyVisibility)[keyof typeof CreateEventBodyVisibility];
+export type CreateEventBodyVisibility = typeof CreateEventBodyVisibility[keyof typeof CreateEventBodyVisibility];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateEventBodyVisibility = {
-  public: "public",
-  private: "private",
-  internal: "internal",
+  public: 'public',
+  private: 'private',
+  internal: 'internal',
 } as const;
 
 export type CreateEventBody = {
@@ -757,14 +785,14 @@ export type CreateEventBody = {
 /**
  * Event visibility status
  */
-export type CreateEvent201Visibility =
-  (typeof CreateEvent201Visibility)[keyof typeof CreateEvent201Visibility];
+export type CreateEvent201Visibility = typeof CreateEvent201Visibility[keyof typeof CreateEvent201Visibility];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateEvent201Visibility = {
-  public: "public",
-  private: "private",
-  internal: "internal",
+  public: 'public',
+  private: 'private',
+  internal: 'internal',
 } as const;
 
 export type CreateEvent201 = {
@@ -789,14 +817,14 @@ export type CreateEvent201 = {
 /**
  * Event visibility status
  */
-export type GetEvent200Visibility =
-  (typeof GetEvent200Visibility)[keyof typeof GetEvent200Visibility];
+export type GetEvent200Visibility = typeof GetEvent200Visibility[keyof typeof GetEvent200Visibility];
+
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetEvent200Visibility = {
-  public: "public",
-  private: "private",
-  internal: "internal",
+  public: 'public',
+  private: 'private',
+  internal: 'internal',
 } as const;
 
 export type GetEvent200 = {
@@ -819,70 +847,75 @@ export type GetEvent200 = {
 };
 
 export const listStreams = <TData = AxiosResponse<ListStreams200>>(
-  params: ListStreamsParams,
-  options?: AxiosRequestConfig,
-): Promise<TData> => {
-  return axios.get(`/api/streams`, {
+    params: ListStreamsParams, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.get(
+      `/api/streams`,{
     ...options,
-    params: { ...params, ...options?.params },
-  });
-};
+        params: {...params, ...options?.params},}
+    );
+  }
 
 export const listCreators = <TData = AxiosResponse<ListCreators200>>(
-  params: ListCreatorsParams,
-  options?: AxiosRequestConfig,
-): Promise<TData> => {
-  return axios.get(`/api/creators`, {
+    params: ListCreatorsParams, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.get(
+      `/api/creators`,{
     ...options,
-    params: { ...params, ...options?.params },
-  });
-};
+        params: {...params, ...options?.params},}
+    );
+  }
 
 export const postStream = <TData = AxiosResponse<PostStream200>>(
-  postStreamBody: PostStreamBody,
-  options?: AxiosRequestConfig,
-): Promise<TData> => {
-  return axios.post(`/api/streams/search`, postStreamBody, options);
-};
+    postStreamBody: PostStreamBody, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.post(
+      `/api/streams/search`,
+      postStreamBody,options
+    );
+  }
 
 export const listClips = <TData = AxiosResponse<ListClips200>>(
-  params: ListClipsParams,
-  options?: AxiosRequestConfig,
-): Promise<TData> => {
-  return axios.get(`/api/clips`, {
+    params: ListClipsParams, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.get(
+      `/api/clips`,{
     ...options,
-    params: { ...params, ...options?.params },
-  });
-};
+        params: {...params, ...options?.params},}
+    );
+  }
 
 export const listEvents = <TData = AxiosResponse<ListEvents200>>(
-  params: ListEventsParams,
-  options?: AxiosRequestConfig,
-): Promise<TData> => {
-  return axios.get(`/api/events`, {
+    params: ListEventsParams, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.get(
+      `/api/events`,{
     ...options,
-    params: { ...params, ...options?.params },
-  });
-};
+        params: {...params, ...options?.params},}
+    );
+  }
 
 export const createEvent = <TData = AxiosResponse<CreateEvent201>>(
-  createEventBody: CreateEventBody,
-  options?: AxiosRequestConfig,
-): Promise<TData> => {
-  return axios.post(`/api/events`, createEventBody, options);
-};
+    createEventBody: CreateEventBody, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.post(
+      `/api/events`,
+      createEventBody,options
+    );
+  }
 
 export const getEvent = <TData = AxiosResponse<GetEvent200>>(
-  id: string,
-  options?: AxiosRequestConfig,
-): Promise<TData> => {
-  return axios.get(`/api/events/${id}`, options);
-};
+    id: string, options?: AxiosRequestConfig
+ ): Promise<TData> => {
+    return axios.get(
+      `/api/events/${id}`,options
+    );
+  }
 
-export type ListStreamsResult = AxiosResponse<ListStreams200>;
-export type ListCreatorsResult = AxiosResponse<ListCreators200>;
-export type PostStreamResult = AxiosResponse<PostStream200>;
-export type ListClipsResult = AxiosResponse<ListClips200>;
-export type ListEventsResult = AxiosResponse<ListEvents200>;
-export type CreateEventResult = AxiosResponse<CreateEvent201>;
-export type GetEventResult = AxiosResponse<GetEvent200>;
+export type ListStreamsResult = AxiosResponse<ListStreams200>
+export type ListCreatorsResult = AxiosResponse<ListCreators200>
+export type PostStreamResult = AxiosResponse<PostStream200>
+export type ListClipsResult = AxiosResponse<ListClips200>
+export type ListEventsResult = AxiosResponse<ListEvents200>
+export type CreateEventResult = AxiosResponse<CreateEvent201>
+export type GetEventResult = AxiosResponse<GetEvent200>
