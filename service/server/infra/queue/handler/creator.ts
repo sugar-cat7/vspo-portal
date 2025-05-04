@@ -1,6 +1,7 @@
+import { AppLogger } from "@vspo-lab/logging";
 import type { MessageParam } from ".";
+import { batchEnqueueWithChunks } from "../../../cmd/server/internal/application";
 import { type Creator, CreatorsSchema } from "../../../domain";
-import { AppLogger } from "../../../pkg/logging";
 import type { ICreatorInteractor } from "../../../usecase";
 import { BaseHandler } from "./base";
 
@@ -97,10 +98,13 @@ export class CreatorHandler extends BaseHandler<CreatorMessage> {
         continue;
       }
 
-      await this.#queue.sendBatch(
-        tc.val.map((creator) => ({
-          body: { ...creator, kind: "upsert-creator" },
-        })),
+      await batchEnqueueWithChunks<Creator, MessageParam>(
+        tc.val,
+        50,
+        (creator: Creator) => ({
+          body: { ...creator, kind: "upsert-creator" } as MessageParam,
+        }),
+        this.#queue,
       );
     }
   }

@@ -1,6 +1,6 @@
-import React from "react";
-import { Link as MuiLink, LinkProps as MuiLinkProps } from "@mui/material";
 import { useLocale } from "@/hooks";
+import { Link as MuiLink, LinkProps as MuiLinkProps } from "@mui/material";
+import React from "react";
 
 export const Link = React.forwardRef<HTMLAnchorElement, MuiLinkProps>(
   function Link({ children, href, sx, ...props }, ref) {

@@ -1,10 +1,10 @@
+import { type AppError, Ok, type Result } from "@vspo-lab/error";
+import { AppLogger } from "@vspo-lab/logging";
 import { type Creator, type Creators, createCreator } from "..";
 import type { ICreatorRepository, IYoutubeService } from "../../infra";
 import type { IAIService } from "../../infra/ai";
 import type { ICacheClient } from "../../infra/cache";
 import { withTracerResult } from "../../infra/http/trace/cloudflare";
-import { type AppError, Ok, type Result } from "../../pkg/errors";
-import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
 
 export interface ICreatorService {

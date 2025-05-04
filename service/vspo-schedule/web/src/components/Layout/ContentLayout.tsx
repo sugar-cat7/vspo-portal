@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { CustomHead } from "../Head/Head";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
-import { CustomBottomNavigation } from "./Navigation";
-import { AlertSnackbar, GoogleAd } from "../Elements";
 import { Breakpoint, Container, ContainerTypeMap } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { OverridableComponent } from "@mui/material/OverridableComponent";
+import { styled } from "@mui/material/styles";
+import React, { useEffect, useState } from "react";
+import { AlertSnackbar, GoogleAd } from "../Elements";
+import { CustomHead } from "../Head/Head";
+import { Footer } from "./Footer";
+import { Header } from "./Header";
+import { CustomBottomNavigation } from "./Navigation";
 
 type ContentLayoutProps = {
   children: React.ReactNode;

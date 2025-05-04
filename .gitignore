@@ -65,6 +65,7 @@ next-env.d.ts
 .nx
 
 *ignore
-.cursor/*
 dist
 .env.*
+
+.turbo

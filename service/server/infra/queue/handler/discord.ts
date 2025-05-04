@@ -1,6 +1,6 @@
+import { AppLogger } from "@vspo-lab/logging";
 import type { DiscordServer, Stream } from "../../../domain";
 import { t } from "../../../domain/service/i18n";
-import { AppLogger } from "../../../pkg/logging";
 import type { IDiscordInteractor } from "../../../usecase";
 import { BaseHandler } from "./base";
 

@@ -1,6 +1,6 @@
-import React, { createContext } from "react";
 import { useCookie } from "@/hooks";
 import { DEFAULT_TIME_ZONE, TIME_ZONE_COOKIE } from "@/lib/Const";
+import React, { createContext } from "react";
 
 type ContextProps = {
   timeZone: string;

@@ -1,19 +1,16 @@
-import axios from "axios";
-import { VspoEvent } from "@/types/events";
-import { Clip, Livestream } from "@/types/streaming";
-import { mockClips, mockTwitchClips } from "@/data/mocks/clips";
 import { mockEvents } from "@/data/mocks/events";
 import { mockFreechats } from "@/data/mocks/freechats";
 import { mockLivestreams } from "@/data/mocks/livestreams";
+import { VspoEvent } from "@/types/events";
+import { Livestream } from "@/types/streaming";
+import axios from "axios";
+import { API_ROOT, ENVIRONMENT } from "./Const";
 import {
   convertThumbnailQualityInObjects,
   formatDate,
   getLiveStatus,
   getOneWeekRange,
-  shuffleClips,
 } from "./utils";
-import { API_ROOT, ENVIRONMENT } from "./Const";
-import { members } from "@/data/members";
 
 export const fetchEvents = async ({
   lang = "ja",
@@ -151,95 +148,8 @@ export const fetchFreechats = async ({
   }
 };
 
-export const fetchClips = async ({
-  lang = "ja",
-}: {
-  lang?: string;
-}): Promise<Clip[]> => {
-  try {
-    if (ENVIRONMENT === "production") {
-      const response = await axios.get<Clip[]>(
-        `${API_ROOT}/api/clips/youtube`,
-        {
-          headers: {
-            "x-api-key": process.env.API_KEY,
-          },
-          params: {
-            lang: lang,
-          },
-        },
-      );
-      return convertThumbnailQualityInObjects(response.data);
-    } else {
-      return mockClips;
-    }
-  } catch (error) {
-    console.warn("Failed to fetch YouTube clips:", error);
-    throw error;
-  }
-};
-
-export const fetchTwitchClips = async ({
-  lang = "ja",
-}: {
-  lang?: string;
-}): Promise<Clip[]> => {
-  try {
-    if (ENVIRONMENT === "production") {
-      const memberClipsPromises = members.map((member) => {
-        return member.twitchChannelId
-          ? fetchMemberTwitchClips({
-              channelId: member.twitchChannelId,
-              lang: lang,
-            })
-          : Promise.resolve([]);
-      });
-      const settledResults = await Promise.allSettled(memberClipsPromises);
-      return settledResults
-        .filter(
-          (result): result is PromiseFulfilledResult<Clip[]> =>
-            result.status === "fulfilled" && Array.isArray(result.value),
-        )
-        .flatMap((fulfilledResult) => fulfilledResult.value);
-    } else {
-      return mockTwitchClips;
-    }
-  } catch (error) {
-    console.warn("Failed to fetch Twitch clips:", error);
-    throw error;
-  }
-};
-
-const fetchMemberTwitchClips = async ({
-  channelId,
-  lang = "ja",
-}: {
-  channelId: string;
-  lang?: string;
-}): Promise<Clip[]> => {
-  try {
-    const response = await axios.get<Clip[]>(`${API_ROOT}/api/clips/twitch`, {
-      params: {
-        channelId: channelId,
-        lang: lang,
-      },
-      headers: {
-        "x-api-key": process.env.API_KEY,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.warn(
-      `Failed to fetch Twitch clips for channel ID ${channelId}:`,
-      error,
-    );
-    throw error;
-  }
-};
-
 export type RelatedProps = {
   liveStreams: Livestream[];
-  clips: Clip[];
 };
 
 export const fetchRelatedVideos = async (
@@ -259,11 +169,8 @@ export const fetchRelatedVideos = async (
     (livestream) => getLiveStatus(livestream) === "live",
   );
 
-  const pastClips = await fetchClips({ lang });
-  const shuffledClips = shuffleClips(pastClips);
   return {
     liveStreams: liveStreams.slice((page - 1) * limit, page * limit),
-    clips: shuffledClips.slice((page - 1) * limit, page * limit),
   };
 };
 

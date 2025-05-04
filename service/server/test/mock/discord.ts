@@ -1,7 +1,7 @@
 import type { DiscordEmbed } from "@discordeno/types";
+import { getCurrentUTCString } from "@vspo-lab/dayjs";
 import { vi } from "vitest";
 import type { DiscordChannel, DiscordMessage } from "../../domain";
-import { getCurrentUTCString } from "../../pkg/dayjs";
 import { createUUID } from "../../pkg/uuid";
 
 export type MockResponse =

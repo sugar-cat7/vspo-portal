@@ -3,7 +3,7 @@ import { join } from "path";
 import { z } from "zod";
 import { type TargetLang, TargetLangSchema } from "../../domain/translate";
 import type { AIService } from "../../infra/ai/index";
-import { vspoKeywordMap } from "../../infra/ai/keyword";
+import { vspoKeywordMap } from "../../config/data/keyword";
 
 // Define schemas for different message types
 export const DiscordMessageSchema = z.object({

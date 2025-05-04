@@ -1,3 +1,9 @@
+import {
+  AppError,
+  type BaseError,
+  ErrorCodeSchema,
+  type Result,
+} from "@vspo-lab/error";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTransactionConfig } from "drizzle-orm/pg-core";
 import { Client } from "pg";
@@ -7,12 +13,6 @@ import {
   type ITxManager,
   defaultConfig,
 } from "../../infra";
-import {
-  AppError,
-  type BaseError,
-  ErrorCodeSchema,
-  type Result,
-} from "../../pkg/errors";
 
 export class TestTxManager implements ITxManager {
   constructor(private readonly dbConfig: IDbConfig) {}

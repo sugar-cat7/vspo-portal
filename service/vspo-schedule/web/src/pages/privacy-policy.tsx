@@ -1,11 +1,11 @@
-import React from "react";
-import { NextPageWithLayout } from "./_app";
 import { ContentLayout } from "@/components/Layout/ContentLayout";
 import { AgreementDocument } from "@/components/Templates";
 import { DEFAULT_LOCALE, QA_LINK } from "@/lib/Const";
+import { getInitializedI18nInstance } from "@/lib/utils";
 import { GetStaticProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { getInitializedI18nInstance } from "@/lib/utils";
+import React from "react";
+import { NextPageWithLayout } from "./_app";
 
 type Props = {
   meta: {

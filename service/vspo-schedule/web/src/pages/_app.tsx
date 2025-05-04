@@ -1,17 +1,17 @@
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "@/styles/globals.css";
 import "@/styles/normalize.css";
-import type { AppProps } from "next/app";
-import { Analytics } from "@vercel/analytics/react";
-import { ReactElement, ReactNode } from "react";
-import { NextPage } from "next";
-import { ThemeModeProvider } from "@/context/Theme";
 import { GoogleAnalytics } from "@/components/Elements";
-import { config } from "@fortawesome/fontawesome-svg-core";
+import { ThemeModeProvider } from "@/context/Theme";
 import { TimeZoneContextProvider } from "@/context/TimeZoneContext";
 import { VideoModalContextProvider } from "@/context/VideoModalContext";
-import { appWithTranslation } from "next-i18next";
+import { config } from "@fortawesome/fontawesome-svg-core";
 import { AppCacheProvider } from "@mui/material-nextjs/v14-pagesRouter";
+import { Analytics } from "@vercel/analytics/react";
+import { NextPage } from "next";
+import { appWithTranslation } from "next-i18next";
+import type { AppProps } from "next/app";
+import { ReactElement, ReactNode } from "react";
 
 config.autoAddCss = false;
 

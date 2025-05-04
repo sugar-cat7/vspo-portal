@@ -1,36 +1,36 @@
-import React, { useMemo } from "react";
-import { Box, Tab, Tabs } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { GetServerSideProps } from "next";
-import { Livestream } from "@/types/streaming";
-import {
-  groupBy,
-  isValidDate,
-  formatDate,
-  getInitializedI18nInstance,
-  getOneWeekRange,
-  getSetCookieTimeZone,
-} from "@/lib/utils";
-import { TabContext } from "@mui/lab";
-import { ContentLayout } from "@/components/Layout/ContentLayout";
-import { NextPageWithLayout } from "../_app";
-import { LivestreamCards } from "@/components/Templates";
-import {
-  fetchEvents,
-  fetchLivestreamForTab,
-  fetchLivestreams,
-} from "@/lib/api";
-import { VspoEvent } from "@/types/events";
-import { useRouter } from "next/router";
 import { Link, Loading } from "@/components/Elements";
-import { useTranslation } from "next-i18next";
+import { ContentLayout } from "@/components/Layout/ContentLayout";
+import { LivestreamCards } from "@/components/Templates";
 import {
   DEFAULT_LOCALE,
   DEFAULT_TIME_ZONE,
   TIME_ZONE_COOKIE,
 } from "@/lib/Const";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import {
+  fetchEvents,
+  fetchLivestreamForTab,
+  fetchLivestreams,
+} from "@/lib/api";
 import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
+import {
+  formatDate,
+  getInitializedI18nInstance,
+  getOneWeekRange,
+  getSetCookieTimeZone,
+  groupBy,
+  isValidDate,
+} from "@/lib/utils";
+import { VspoEvent } from "@/types/events";
+import { Livestream } from "@/types/streaming";
+import { TabContext } from "@mui/lab";
+import { Box, Tab, Tabs } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { GetServerSideProps } from "next";
+import { useTranslation } from "next-i18next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { useRouter } from "next/router";
+import React, { useMemo } from "react";
+import { NextPageWithLayout } from "../_app";
 
 type Params = {
   status: string;
@@ -365,12 +365,12 @@ export const getServerSideProps: GetServerSideProps<
 
 HomePage.getLayout = (page, pageProps) => (
   <ContentLayout
-    title={pageProps.meta?.title}
-    description={pageProps.meta?.description}
+    title={pageProps.meta.title}
+    description={pageProps.meta.description}
     lastUpdateTimestamp={pageProps.lastUpdateTimestamp}
     footerMessage={pageProps.footerMessage}
-    headTitle={pageProps.meta?.headTitle}
-    path={`/${pageProps?.locale}/schedule/${pageProps.liveStatus}`}
+    headTitle={pageProps.meta.headTitle}
+    path={`/${pageProps.locale}/schedule/${pageProps.liveStatus}`}
     // canonicalPath={`/schedule/all`}
   >
     {page}

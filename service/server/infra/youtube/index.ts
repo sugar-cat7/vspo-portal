@@ -1,3 +1,6 @@
+import { getCurrentUTCString } from "@vspo-lab/dayjs";
+import { AppError, Err, Ok, type Result, wrap } from "@vspo-lab/error";
+import { AppLogger } from "@vspo-lab/logging";
 import { google, type youtube_v3 } from "googleapis";
 import {
   type Channels,
@@ -6,9 +9,6 @@ import {
 } from "../../domain/channel";
 import { type Clips, createClip, createClips } from "../../domain/clip";
 import { type Streams, createStream, createStreams } from "../../domain/stream";
-import { getCurrentUTCString } from "../../pkg/dayjs";
-import { AppError, Err, Ok, type Result, wrap } from "../../pkg/errors";
-import { AppLogger } from "../../pkg/logging";
 import { withTracerResult } from "../http/trace/cloudflare";
 
 type GetStreamsParams = {
@@ -47,7 +47,7 @@ export type GetStreamsByChannelParams = {
 };
 
 export type SearchClipsParams = {
-  query: QueryKeys;
+  query: QueryKeys | string;
   maxResults?: number;
   order: "relevance" | "date" | "rating" | "title" | "videoCount" | "viewCount";
 };
@@ -405,9 +405,6 @@ export class YoutubeService implements IYoutubeService {
         items.push(...(response.data.items || []));
       }
 
-      // Create a map of videoId to isShort status
-      const shortStatusMap = new Map<string, boolean>();
-
       return Ok(
         createClips(
           items.map((item) => {
@@ -423,7 +420,13 @@ export class YoutubeService implements IYoutubeService {
               platform: "youtube",
               tags: item.snippet?.tags || [],
               viewCount: Number.parseInt(item.statistics?.viewCount || "0", 10),
-              thumbnailURL: item.snippet?.thumbnails?.default?.url || "",
+              thumbnailURL:
+                item.snippet?.thumbnails?.medium?.url ||
+                item.snippet?.thumbnails?.standard?.url ||
+                item.snippet?.thumbnails?.default?.url ||
+                item.snippet?.thumbnails?.maxres?.url ||
+                item.snippet?.thumbnails?.high?.url ||
+                "",
               type: this.isYoutubeShort(item) ? "short" : "clip",
             });
           }) ?? [],
@@ -513,6 +516,7 @@ export class YoutubeService implements IYoutubeService {
       }
     }
 
-    return "unknown";
+    // Probably a regular video
+    return "ended"; // Regular videos are treated as ended streams
   }
 }

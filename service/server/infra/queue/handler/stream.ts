@@ -1,6 +1,7 @@
+import { AppLogger } from "@vspo-lab/logging";
 import type { MessageParam } from ".";
+import { batchEnqueueWithChunks } from "../../../cmd/server/internal/application";
 import { type Stream, StreamsSchema } from "../../../domain";
-import { AppLogger } from "../../../pkg/logging";
 import type { IStreamInteractor } from "../../../usecase";
 import { BaseHandler } from "./base";
 
@@ -92,10 +93,13 @@ export class StreamHandler extends BaseHandler<StreamMessage> {
         continue;
       }
 
-      await this.#queue.sendBatch(
-        tv.val.map((stream) => ({
-          body: { ...stream, kind: "upsert-stream" },
-        })),
+      await batchEnqueueWithChunks<Stream, MessageParam>(
+        tv.val,
+        50,
+        (stream: Stream) => ({
+          body: { ...stream, kind: "upsert-stream" } as MessageParam,
+        }),
+        this.#queue,
       );
     }
   }

@@ -1,5 +1,5 @@
+import { formatToLocalizedDate, getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { z } from "zod";
-import { formatToLocalizedDate, getCurrentUTCDate } from "../pkg/dayjs";
 import { ThumbnailURLSchema } from "./thumbnail";
 import { TargetLangSchema } from "./translate";
 

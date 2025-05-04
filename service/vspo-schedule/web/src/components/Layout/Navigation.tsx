@@ -1,19 +1,18 @@
-import React, { useEffect, useState } from "react";
+import {
+  NavigationRouteId,
+  getNavigationRouteInfo,
+} from "@/constants/navigation";
+import { useTimeZoneContext } from "@/hooks";
 import { BottomNavigation, BottomNavigationAction } from "@mui/material";
 import { Box } from "@mui/system";
-import { DrawerIcon, Link } from "../Elements";
-import { useRouter } from "next/router";
-import {
-  getNavigationRouteInfo,
-  NavigationRouteId,
-} from "@/constants/navigation";
 import { useTranslation } from "next-i18next";
-import { useTimeZoneContext } from "@/hooks";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { DrawerIcon, Link } from "../Elements";
 
 const bottomNavigationRoutes = [
   "list",
   "clip",
-  "twitch-clip",
   "event",
 ] satisfies NavigationRouteId[];
 

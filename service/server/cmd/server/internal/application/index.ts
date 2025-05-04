@@ -39,20 +39,77 @@ import type {
   ListClipsQuery,
 } from "../../../../usecase/clip";
 
-async function batchEnqueueWithChunks<T, U>(
+// Utility function to safely send batches respecting size limits
+export async function safeSendBatch<T, U>(
+  items: { body: U }[],
+  queue: Queue<T>,
+): Promise<void> {
+  const MAX_BATCH_SIZE = 250000; // 256KB limit with some buffer
+
+  // Check batch size before sending
+  const batchSize = JSON.stringify(items).length;
+
+  if (batchSize <= MAX_BATCH_SIZE) {
+    // If batch size is within limit, send it
+    return queue.sendBatch(items as unknown as { body: T }[]);
+  }
+
+  // Split the batch in half and process each half separately
+  const midpoint = Math.ceil(items.length / 2);
+  const firstHalf = items.slice(0, midpoint);
+  const secondHalf = items.slice(midpoint);
+
+  // Recursively process both halves
+  await Promise.all([
+    firstHalf.length > 0 ? safeSendBatch(firstHalf, queue) : Promise.resolve(),
+    secondHalf.length > 0
+      ? safeSendBatch(secondHalf, queue)
+      : Promise.resolve(),
+  ]);
+}
+
+export async function batchEnqueueWithChunks<T, U>(
   items: T[],
   chunkSize: number,
   transform: (item: T) => { body: U },
   queue: Queue<U>,
 ): Promise<void> {
-  const chunks = [];
+  const MAX_BATCH_SIZE = 240000; // 256KB limit with more buffer
+
+  // Process an array of items of any size
+  const processItems = async (chunk: T[]): Promise<void> => {
+    // For very small chunks, just process directly
+    if (chunk.length <= 1) {
+      await queue.sendBatch(chunk.map(transform));
+      return;
+    }
+
+    // For larger chunks, check the serialized size first
+    const transformedMessages = chunk.map(transform);
+    const batchSize = JSON.stringify(transformedMessages).length;
+
+    if (batchSize <= MAX_BATCH_SIZE) {
+      // If size is ok, send the batch
+      await queue.sendBatch(transformedMessages);
+      return;
+    }
+
+    // If too large, split the chunk in half and process recursively
+    const midpoint = Math.ceil(chunk.length / 2);
+    const firstHalf = chunk.slice(0, midpoint);
+    const secondHalf = chunk.slice(midpoint);
+
+    await Promise.all([processItems(firstHalf), processItems(secondHalf)]);
+  };
+
+  // First split items into initial chunks by count
+  const initialChunks: T[][] = [];
   for (let i = 0; i < items.length; i += chunkSize) {
-    chunks.push(items.slice(i, i + chunkSize));
+    initialChunks.push(items.slice(i, i + chunkSize));
   }
 
-  await Promise.all(
-    chunks.map((chunk) => queue.sendBatch(chunk.map(transform))),
-  );
+  // Process each initial chunk, which may get further subdivided if needed
+  await Promise.all(initialChunks.map(processItems));
 }
 
 export class StreamService extends RpcTarget {
@@ -67,7 +124,7 @@ export class StreamService extends RpcTarget {
   async batchUpsertEnqueue(params: BatchUpsertStreamsParam) {
     return batchEnqueueWithChunks(
       params,
-      100,
+      50,
       (stream) => ({ body: { ...stream, kind: "upsert-stream" as const } }),
       this.#queue,
     );
@@ -100,7 +157,7 @@ export class StreamService extends RpcTarget {
   async translateStreamEnqueue(params: TranslateStreamParam) {
     return batchEnqueueWithChunks(
       params.streams,
-      100,
+      50,
       (stream) => ({
         body: {
           ...stream,
@@ -137,7 +194,7 @@ export class ClipService extends RpcTarget {
   async batchUpsertEnqueue(params: BatchUpsertClipsParam) {
     return batchEnqueueWithChunks(
       params,
-      100,
+      50,
       (clip) => ({ body: { ...clip, kind: "upsert-clip" as const } }),
       this.#queue,
     );
@@ -159,6 +216,10 @@ export class ClipService extends RpcTarget {
     return this.#usecase.searchExistVspoClips({ clipIds });
   }
 
+  async searchNewClipsByVspoMemberName() {
+    return this.#usecase.searchNewClipsByVspoMemberName();
+  }
+
   async deleteClips({ clipIds }: { clipIds: string[] }) {
     return this.#usecase.deleteClips({ clipIds });
   }
@@ -176,7 +237,7 @@ export class CreatorService extends RpcTarget {
   async batchUpsertEnqueue(params: BatchUpsertCreatorsParam) {
     return batchEnqueueWithChunks(
       params,
-      100,
+      50,
       (creator) => ({ body: { ...creator, kind: "upsert-creator" as const } }),
       this.#queue,
     );
@@ -185,7 +246,7 @@ export class CreatorService extends RpcTarget {
   async translateCreatorEnqueue(params: TranslateCreatorParam) {
     return batchEnqueueWithChunks(
       params.creators,
-      100,
+      50,
       (creator) => ({
         body: {
           ...creator,
@@ -234,7 +295,7 @@ export class DiscordService extends RpcTarget {
   async batchUpsertEnqueue(params: BatchUpsertDiscordServersParam) {
     return batchEnqueueWithChunks(
       params,
-      100,
+      50,
       (server) => ({
         body: { ...server, kind: "upsert-discord-server" as const },
       }),
@@ -269,7 +330,7 @@ export class DiscordService extends RpcTarget {
   async deleteMessageInChannelEnqueue(channelId: string) {
     return batchEnqueueWithChunks(
       [channelId],
-      100,
+      50,
       (channelId) => ({
         body: { channelId, kind: "delete-message-in-channel" as const },
       }),

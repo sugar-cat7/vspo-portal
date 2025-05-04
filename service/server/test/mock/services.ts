@@ -1,3 +1,4 @@
+import { type AppError, Ok, type Result } from "@vspo-lab/error";
 import type { Channel } from "../../domain/channel";
 import type { Clip } from "../../domain/clip";
 import type { Stream } from "../../domain/stream";
@@ -11,7 +12,6 @@ import type {
   TwitCastingStream,
   TwitcastingMovie,
 } from "../../infra/twitcasting";
-import { type AppError, Ok, type Result } from "../../pkg/errors";
 
 export class MockYoutubeService implements IYoutubeService {
   youtube = null;

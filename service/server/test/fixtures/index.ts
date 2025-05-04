@@ -1,3 +1,4 @@
+import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 import type {
   InsertCreatorTranslation,
   InsertDiscordChannel,
@@ -6,7 +7,6 @@ import type {
   InsertVideo,
   InsertVideoTranslation,
 } from "../../infra/repository/schema";
-import { getCurrentUTCDate } from "../../pkg/dayjs";
 import { createUUID } from "../../pkg/uuid";
 // Helper function to generate dates
 export const createDate = (daysOffset: number): Date => {

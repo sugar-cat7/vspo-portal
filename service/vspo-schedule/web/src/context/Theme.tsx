@@ -1,9 +1,9 @@
+import CssBaseline from "@mui/material/CssBaseline";
 import {
   ColorSystemOptions,
-  createTheme,
   ThemeProvider,
+  createTheme,
 } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
 // Module augmentation to enable type-safe use of Theme variables with ThemeProvider
 // https://mui.com/material-ui/customization/css-theme-variables/usage/#typescript
 import type {} from "@mui/material/themeCssVarsAugmentation";

@@ -3,6 +3,7 @@ import {
   type WorkflowEvent,
   type WorkflowStep,
 } from "cloudflare:workers";
+import { AppLogger } from "@vspo-lab/logging";
 import type { BindingAppWorkerEnv } from "../../config/env/worker";
 import type { BindingWorkflowEnv } from "../../config/env/workflow";
 import { setFeatureFlagProvider } from "../../config/featureFlag";
@@ -10,7 +11,10 @@ import { createHandler, withTracer } from "../../infra/http/trace";
 import { searchChannelsWorkflow } from "../../infra/http/workflow/channel/search";
 import { translateCreatorsWorkflow } from "../../infra/http/workflow/channel/trasnlate";
 import { existClipsWorkflow } from "../../infra/http/workflow/clip/exist";
-import { searchClipsWorkflow } from "../../infra/http/workflow/clip/search";
+import {
+  searchClipsByVspoMemberNameWorkflow,
+  searchClipsWorkflow,
+} from "../../infra/http/workflow/clip/search";
 import { discordDeleteAllWorkflow } from "../../infra/http/workflow/discord/deleteAll";
 import { discordSendMessagesWorkflow } from "../../infra/http/workflow/discord/send";
 import {
@@ -25,7 +29,6 @@ import { deleteStreamsWorkflow } from "../../infra/http/workflow/stream/delete";
 import { searchStreamsWorkflow } from "../../infra/http/workflow/stream/search";
 import { searchMemberStreamsByChannelWorkflow } from "../../infra/http/workflow/stream/searchMemberStreamByChannel";
 import { translateStreamsWorkflow } from "../../infra/http/workflow/stream/trasnlate";
-import { AppLogger } from "../../pkg/logging";
 import { createUUID } from "../../pkg/uuid";
 
 export class SearchChannelsWorkflow extends WorkflowEntrypoint<
@@ -162,6 +165,20 @@ export class SearchClipsWorkflow extends WorkflowEntrypoint<
   }
 }
 
+export class SearchClipsByVspoMemberNameWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  Params
+> {
+  async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await setFeatureFlagProvider(this.env);
+    await searchClipsByVspoMemberNameWorkflow().handler()(
+      this.env,
+      _event,
+      step,
+    );
+  }
+}
+
 export default createHandler({
   scheduled: async (
     controller: ScheduledController,
@@ -206,6 +223,13 @@ export default createHandler({
           span.setAttribute("workflow", "clips-hourly");
           await env.EXIST_CLIPS_WORKFLOW.create({ id: createUUID() });
           await env.SEARCH_CLIPS_WORKFLOW.create({ id: createUUID() });
+          break;
+        case "30 21 * * *":
+          AppLogger.info("search-clips-by-vspo-member-name");
+          span.setAttribute("workflow", "search-clips-by-vspo-member-name");
+          await env.SEARCH_CLIPS_BY_VSPO_MEMBER_NAME_WORKFLOW.create({
+            id: createUUID(),
+          });
           break;
         default:
           console.error("Unknown cron", controller.cron);

@@ -7,28 +7,29 @@
     "deploy": "wrangler deploy"
   },
   "dependencies": {
-    "@hono/swagger-ui": "^0.2.2",
-    "@hono/zod-openapi": "^0.14.1",
-    "@microlabs/otel-cf-workers": "^1.0.0-rc.40",
-    "@opentelemetry/api": "1.6.0",
-    "@tsndr/cloudflare-worker-jwt": "2.5.3",
-    "dayjs": "^1.11.11",
-    "hono": "^4.6.5",
-    "miniflare": "3.20240524.1",
-    "openai": "^4.55.4",
-    "pg": "^8.11.5",
-    "tslog": "^4.9.2",
-    "uuid": "^9.0.1",
-    "valibot": "^0.30.0"
+    "@hono/swagger-ui": "^0.5.1",
+    "@hono/zod-openapi": "^0.19.6",
+    "@microlabs/otel-cf-workers": "1.0.0-rc.49",
+    "@opentelemetry/api": "1.9.0",
+    "@tsndr/cloudflare-worker-jwt": "3.1.4",
+    "dayjs": "^1.11.13",
+    "hono": "^4.7.8",
+    "miniflare": "4.20250428.1",
+    "openai": "^4.96.2",
+    "pg": "^8.15.6",
+    "tslog": "^4.9.3",
+    "uuid": "^11.1.0",
+    "valibot": "^1.0.0",
+    "zod": "^3.24.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20240529.0",
-    "@types/pg": "^8.11.6",
-    "@types/uuid": "^9.0.8",
-    "better-sqlite3": "^11.0.0",
-    "bun-types": "^1.1.12",
-    "drizzle-kit": "^0.22.1",
-    "typescript": "^5.4.5",
-    "wrangler": "^3.58.0"
+    "@cloudflare/workers-types": "^4.20250502.0",
+    "@types/pg": "^8.11.14",
+    "@types/uuid": "^10.0.0",
+    "better-sqlite3": "^11.9.1",
+    "bun-types": "^1.2.11",
+    "drizzle-kit": "^0.31.0",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.14.1"
   }
 }

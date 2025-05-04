@@ -1,5 +1,5 @@
 import { z } from "@hono/zod-openapi";
-import { PlatformSchema } from "../../../../domain";
+import { MemberTypeSchema, PlatformSchema } from "../../../../domain";
 import { StatusSchema, StreamSchema } from "../../../../domain/stream";
 import { PaginationQuerySchema, PaginationResponseSchema } from "./common";
 
@@ -45,6 +45,14 @@ const ListStreamRequestSchema = PaginationQuerySchema.merge(
       example: "live",
       param: {
         name: "status",
+        in: "query",
+      },
+    }),
+    memberType: MemberTypeSchema.optional().openapi({
+      description: "Member Type",
+      example: "vspo_all",
+      param: {
+        name: "memberType",
         in: "query",
       },
     }),

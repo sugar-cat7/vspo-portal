@@ -1,13 +1,14 @@
-import Image from "next/image";
-import { Box, Card, CardActionArea } from "@mui/material";
-import { styled } from "@mui/material/styles";
+import { Clip } from "@/features/clips";
 import { useVideoModalContext } from "@/hooks";
 import { Video } from "@/types/streaming";
+import { Box, Card, CardActionArea } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import Image from "next/image";
 import { HighlightedVideoChip } from "../Chip";
 
 type Props = {
-  video: Video;
-  children: React.ReactNode; // CardContent
+  video: Video | Clip;
+  children: React.ReactNode;
   highlight?: {
     label: string;
     color: string;

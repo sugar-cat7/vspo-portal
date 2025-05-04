@@ -1,5 +1,5 @@
-import { FC } from "react";
 import Script from "next/script";
+import { FC } from "react";
 
 /** Google Analytics によるアクセス解析を行うためのコンポーネント */
 export const GoogleAnalytics: FC = () => {

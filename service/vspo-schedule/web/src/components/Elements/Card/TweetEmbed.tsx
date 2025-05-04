@@ -1,5 +1,5 @@
-import { Tweet, TweetNotFound } from "react-tweet";
 import { useColorScheme } from "@mui/material/styles";
+import { Tweet, TweetNotFound } from "react-tweet";
 
 type TweetEmbedProps = {
   tweetLink: string;

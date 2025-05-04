@@ -1,0 +1,35 @@
+{
+  "name": "vspo-portal",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "turbo build",
+    "biome:check": "biome check ./**/**",
+    "biome:format": "biome format --write ./**/**",
+    "knip": "knip",
+    "tsc": "pnpm -r exec tsc --noEmit",
+    "generate-openapi": "pnpm --filter @vspo-lab/api generate-openapi",
+    "start": "pnpm --filter ./service/vspo-schedule/web start"
+  },
+  "author": "sugar-cat7",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.15.3",
+    "knip": "^5.52.0",
+    "lefthook": "^1.11.12",
+    "turbo": "^2.5.2",
+    "typescript": "^5.8.3",
+    "next": "^14.2.26"
+  },
+  "pnpm": {
+    "overrides": {}
+  },
+  "packageManager": "pnpm@10.10.0",
+  "engines": {
+    "pnpm": ">=9.15.9",
+    "node": ">=20.18.0"
+  }
+}

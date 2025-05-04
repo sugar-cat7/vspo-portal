@@ -1,20 +1,6 @@
-import React, { useEffect } from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Typography,
-  Box,
-  Avatar,
-  Button,
-  IconButton,
-  Link as MuiLink,
-  Tab,
-  Tabs,
-  BottomNavigation,
-} from "@mui/material";
-import { styled, useTheme } from "@mui/material/styles";
-import { Video } from "@/types/streaming";
+import { RelatedVideos } from "@/components/Templates";
+import { Clip } from "@/features/clips";
+import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import {
   formatDate,
   getLiveStatus,
@@ -24,16 +10,31 @@ import {
   isLivestream,
   isOnPlatformWithChat,
 } from "@/lib/utils";
-import { Link, PlatformIcon } from "..";
+import { Video } from "@/types/streaming";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
-import { RelatedVideos } from "@/components/Templates";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {
+  Avatar,
+  BottomNavigation,
+  Box,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Link as MuiLink,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
+import { styled, useTheme } from "@mui/material/styles";
+import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import React, { useEffect } from "react";
+import { Link, PlatformIcon } from "..";
 import { ChatEmbed } from "../ChatEmbed";
-import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
-import { useTranslation } from "next-i18next";
 import { HighlightedVideoChip } from "../Chip";
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
@@ -82,7 +83,7 @@ const ResponsiveIframe = styled("iframe")({
   border: "0",
 });
 
-const VideoPlayerComponent: React.FC<{ video: Video }> = ({ video }) => {
+const VideoPlayerComponent: React.FC<{ video: Video | Clip }> = ({ video }) => {
   const embedUrl = getVideoEmbedUrl(video);
   return (
     <ResponsiveIframeWrapper>
@@ -251,7 +252,7 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{
-                    textDecoration: "none", // 下線を削除する
+                    textDecoration: "none",
                   }}
                 >
                   {t("videoModal.watch")}
@@ -265,9 +266,9 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
                   if (navigator.share) {
                     try {
                       await navigator.share({
-                        title: video.title, // ここにビデオのタイトルを設定します
-                        text: video.title, // ここに共有するテキストを設定します
-                        url: url, // ここにビデオのURLを設定します
+                        title: video.title,
+                        text: video.title,
+                        url: url,
                       });
                     } catch (error) {
                       console.error("Share failed:", error);

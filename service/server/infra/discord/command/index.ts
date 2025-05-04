@@ -1,4 +1,5 @@
 import { OpenFeature } from "@openfeature/server-sdk";
+import { AppLogger } from "@vspo-lab/logging";
 import {
   Button,
   type CommandHandler,
@@ -14,7 +15,6 @@ import {
   t,
 } from "../../../domain/service/i18n";
 import { LangCodeLabelMapping } from "../../../domain/translate";
-import { AppLogger } from "../../../pkg/logging";
 import { CloudflareKVCacheClient, cacheKey } from "../../cache";
 
 const MemberTypeLabelMapping = {

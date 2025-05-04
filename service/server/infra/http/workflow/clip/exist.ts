@@ -1,9 +1,9 @@
 import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
+import { AppLogger } from "@vspo-lab/logging";
 import {
   type BindingAppWorkerEnv,
   zBindingAppWorkerEnv,
 } from "../../../../config/env/worker";
-import { AppLogger } from "../../../../pkg/logging";
 import { withTracer } from "../../trace/cloudflare";
 
 export const existClipsWorkflow = () => {
@@ -48,6 +48,7 @@ export const existClipsWorkflow = () => {
                     orderBy: "desc",
                     includeDeleted: true,
                     clipType: "clip",
+                    platform: "youtube",
                   });
 
                   if (r1.err) {
@@ -215,7 +216,7 @@ export const existClipsWorkflow = () => {
                   const cu = await env.APP_WORKER.newClipUsecase();
                   const deletedClips = combinedClips
                     .filter((clip) =>
-                      r1.result.notExistsClipIds.includes(clip.id),
+                      r1.result.notExistsClipIds.includes(clip.rawId),
                     )
                     .map((clip) => {
                       return {

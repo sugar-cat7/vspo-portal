@@ -1,5 +1,5 @@
+import { formatToLocalizedDate } from "@vspo-lab/dayjs";
 import { z } from "zod";
-import { formatToLocalizedDate } from "../pkg/dayjs";
 import { BaseVideoSchema, type Platform, PlatformSchema } from "./video";
 
 const StatusSchema = z.enum(["live", "upcoming", "ended", "unknown"]); // Specific to Streams

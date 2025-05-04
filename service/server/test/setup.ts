@@ -3,6 +3,7 @@ import {
   PostgreSqlContainer,
   type StartedPostgreSqlContainer,
 } from "@testcontainers/postgresql";
+import { Ok } from "@vspo-lab/error";
 import { inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { migrate } from "drizzle-orm/node-postgres/migrator";
@@ -25,7 +26,6 @@ import {
   videoTable,
   videoTranslationTable,
 } from "../infra/repository/schema";
-import { Ok } from "../pkg/errors";
 import {
   VSPO_MEMBER_CHANNEL_IDS,
   VSPO_MEMBER_NAMES,

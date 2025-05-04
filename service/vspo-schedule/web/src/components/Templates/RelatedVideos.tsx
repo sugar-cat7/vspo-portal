@@ -1,24 +1,24 @@
-import { members } from "@/data/members";
+import { Clip } from "@/features/clips";
+import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
 import { RelatedProps, fetcher } from "@/lib/api";
-import { formatDate, isRelevantMember } from "@/lib/utils";
-import { Clip, Livestream, Video } from "@/types/streaming";
+import { formatDate } from "@/lib/utils";
+import { Livestream, Video } from "@/types/streaming";
 import {
-  Card,
-  CardActionArea,
-  CardMedia,
-  CardContent,
-  Typography,
   Box,
   Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import useSWRInfinite from "swr/infinite";
 import { Loading } from "../Elements";
-import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
 
 const StyledCard = styled(Card)({
   marginTop: "8px",
@@ -81,7 +81,6 @@ const getRelatedVideos = (
   if (!relatedVideos) return { liveStreams: [], clips: [] };
 
   const livestreamIdSet = new Set();
-  const clipIdSet = new Set();
 
   const relatedLivestreams: Livestream[] = relatedVideos.liveStreams.filter(
     (l) => {
@@ -93,28 +92,9 @@ const getRelatedVideos = (
     },
   );
 
-  const relatedClips: Clip[] = relatedVideos.clips.filter((c) => {
-    if (c.channelId === channelId && c.id !== videoId && !clipIdSet.has(c.id)) {
-      clipIdSet.add(c.id);
-      return true;
-    }
-    return false;
-  });
-
-  const relatedMemberClip = relatedVideos.clips.filter((c) => {
-    if (
-      members.some((member) => isRelevantMember(member, c.title)) &&
-      !clipIdSet.has(c.id)
-    ) {
-      clipIdSet.add(c.id);
-      return true;
-    }
-    return false;
-  });
-
   const relatedVideosArray: Videos = {
     liveStreams: relatedLivestreams,
-    clips: [...relatedClips, ...relatedMemberClip],
+    clips: [],
   };
 
   return relatedVideosArray;
@@ -191,12 +171,10 @@ export const RelatedVideos: React.FC<{
     // Extract data from each page and combine into one RelatedProps object
     const combinedData: RelatedProps = {
       liveStreams: [],
-      clips: [],
     };
 
     data?.forEach((pageData) => {
       combinedData.liveStreams.push(...pageData.liveStreams);
-      combinedData.clips.push(...pageData.clips);
     });
 
     return getRelatedVideos(combinedData, channelId, videoId);
