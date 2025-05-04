@@ -1,11 +1,11 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
+import { getInitializedI18nInstance } from "@/lib/utils";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { TwitchClipsProps } from "./container";
-import { paginateClips } from "../../utils/clipUtils";
 import { fetchClips } from "../../api";
-import { getInitializedI18nInstance } from "@/lib/utils";
+import { paginateClips } from "../../utils/clipUtils";
+import { TwitchClipsProps } from "./container";
 
 // Get date for N days ago in ISO format
 const getDaysAgoISO = (days: number): string => {

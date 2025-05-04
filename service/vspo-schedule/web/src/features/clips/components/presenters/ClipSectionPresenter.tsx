@@ -1,4 +1,7 @@
-import React from "react";
+import { Clip } from "@/features/clips/domain";
+import { useVideoModalContext } from "@/hooks/video-modal";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   Box,
   Button,
@@ -10,11 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Clip } from "@/features/clips/domain";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import { useVideoModalContext } from "@/hooks/video-modal";
 import { useTranslation } from "next-i18next";
+import React from "react";
 
 // Styled components
 const SectionTitle = styled(Typography)(({ theme }) => ({

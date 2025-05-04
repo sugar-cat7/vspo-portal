@@ -1,11 +1,11 @@
-import { VSPOApi, ListClips200ClipsItem } from "@vspo-lab/api";
-import { Result, Ok, Err, BaseError } from "@vspo-lab/error";
+import { ListClips200ClipsItem, VSPOApi } from "@vspo-lab/api";
+import { BaseError, Err, Ok, Result } from "@vspo-lab/error";
 import {
   Clip,
-  clipSchema,
-  Platform,
-  paginationSchema,
   Pagination,
+  Platform,
+  clipSchema,
+  paginationSchema,
 } from "../domain";
 
 export type FetchClipsParams = {

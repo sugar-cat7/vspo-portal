@@ -1,10 +1,10 @@
-import { GetServerSidePropsContext } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { ClipsHomeProps } from "./container";
-import { fetchHomePageData } from "../../api";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
 import { getInitializedI18nInstance } from "@/lib/utils";
+import { GetServerSidePropsContext } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { fetchHomePageData } from "../../api";
+import { ClipsHomeProps } from "./container";
 
 // Get date for N days ago in ISO format
 const getDaysAgoISO = (days: number): string => {

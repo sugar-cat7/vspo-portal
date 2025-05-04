@@ -1,7 +1,7 @@
-import { Clip } from "../../domain/clip";
-import React from "react";
-import { Card, CardContent, Typography, Box } from "@mui/material";
 import { VideoCard } from "@/components/Elements/Card/VideoCard";
+import { Box, Card, CardContent, Typography } from "@mui/material";
+import React from "react";
+import { Clip } from "../../domain/clip";
 export type ClipCardPresenterProps = {
   clip: Clip;
 };

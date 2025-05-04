@@ -1,5 +1,5 @@
-import { VSPOApi, ListCreators200CreatorsItem } from "@vspo-lab/api";
-import { Result, Ok, Err, BaseError } from "@vspo-lab/error";
+import { ListCreators200CreatorsItem, VSPOApi } from "@vspo-lab/api";
+import { BaseError, Err, Ok, Result } from "@vspo-lab/error";
 import { Channel } from "../domain/channel";
 
 export type FetchVspoMembersResult = Result<

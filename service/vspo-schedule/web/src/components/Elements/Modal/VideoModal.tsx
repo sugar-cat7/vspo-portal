@@ -1,4 +1,5 @@
 import { RelatedVideos } from "@/components/Templates";
+import { Clip } from "@/features/clips";
 import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import {
   formatDate,
@@ -35,7 +36,6 @@ import React, { useEffect } from "react";
 import { Link, PlatformIcon } from "..";
 import { ChatEmbed } from "../ChatEmbed";
 import { HighlightedVideoChip } from "../Chip";
-import { Clip } from "@/features/clips";
 
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   backgroundColor: theme.vars.palette.customColors.vspoPurple,

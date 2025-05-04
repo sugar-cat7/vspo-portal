@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { Clip } from "@/features/clips/domain";
+import { useVideoModalContext } from "@/hooks";
+import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import {
   Box,
   IconButton,
@@ -6,11 +9,8 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { styled, alpha } from "@mui/material/styles";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import { Clip } from "@/features/clips/domain";
-import { useVideoModalContext } from "@/hooks";
+import { alpha, styled } from "@mui/material/styles";
+import React, { useEffect, useState } from "react";
 
 const CarouselContainer = styled(Box)(({ theme }) => ({
   position: "relative",

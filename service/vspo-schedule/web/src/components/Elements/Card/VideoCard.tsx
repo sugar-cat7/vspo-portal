@@ -1,10 +1,10 @@
+import { Clip } from "@/features/clips";
 import { useVideoModalContext } from "@/hooks";
 import { Video } from "@/types/streaming";
 import { Box, Card, CardActionArea } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Image from "next/image";
 import { HighlightedVideoChip } from "../Chip";
-import { Clip } from "@/features/clips";
 
 type Props = {
   video: Video | Clip;

@@ -1,3 +1,4 @@
+import { Clip } from "@/features/clips";
 import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { DEFAULT_LOCALE, TEMP_TIMESTAMP } from "@/lib/Const";
 import { RelatedProps, fetcher } from "@/lib/api";
@@ -18,7 +19,6 @@ import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import useSWRInfinite from "swr/infinite";
 import { Loading } from "../Elements";
-import { Clip } from "@/features/clips";
 
 const StyledCard = styled(Card)({
   marginTop: "8px",

@@ -1,9 +1,11 @@
 import { Loading } from "@/components/Elements";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import FilterListIcon from "@mui/icons-material/FilterList";
 import {
   Box,
+  ButtonBase,
   Container,
   Grid,
-  ButtonBase,
   Paper,
   Typography,
   styled,
@@ -11,12 +13,10 @@ import {
   useTheme,
 } from "@mui/material";
 import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { ClipTabsAndList } from "../../components";
 import { Clip, Pagination } from "../../domain/clip";
-import { useRouter } from "next/router";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import FilterListIcon from "@mui/icons-material/FilterList";
 
 // Styled container for filter section
 const FilterContainer = styled(Paper)(({ theme }) => ({

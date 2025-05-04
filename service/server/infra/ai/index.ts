@@ -8,9 +8,9 @@ import {
 } from "@vspo-lab/error";
 import OpenAI from "openai";
 import { z } from "zod";
+import { vspoKeywordMap } from "../../config/data/keyword";
 import { TargetLangSchema } from "../../domain/translate";
 import { withTracerResult } from "../http/trace/cloudflare";
-import { vspoKeywordMap } from "../../config/data/keyword";
 
 const languageCodeMapping: Record<string, string> = {
   en: "English",

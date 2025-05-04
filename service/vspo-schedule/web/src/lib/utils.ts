@@ -3,6 +3,7 @@ import { ParsedUrlQuery } from "querystring";
 import { platforms } from "@/constants/platforms";
 import { freechatVideoIds } from "@/data/freechat-video-ids";
 import { members } from "@/data/members";
+import { Clip } from "@/features/clips";
 import { VspoEvent } from "@/types/events";
 import { Member } from "@/types/member";
 import { SiteNewsTag } from "@/types/site-news";
@@ -20,7 +21,6 @@ import { createInstance as createI18nInstance } from "i18next";
 import { SSRConfig } from "next-i18next";
 import { DEFAULT_LOCALE, TIME_ZONE_COOKIE } from "./Const";
 import { convertToUTCDate, getCurrentUTCDate } from "./dayjs";
-import { Clip } from "@/features/clips";
 
 /**
  * Group an array of items by a specified key.

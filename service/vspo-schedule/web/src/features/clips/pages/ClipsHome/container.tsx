@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { NextPageWithLayout } from "@/pages/_app";
 import { ContentLayout } from "@/components/Layout";
+import { NextPageWithLayout } from "@/pages/_app";
+import React, { useEffect, useState } from "react";
 import { Channel, Clip } from "../../domain";
 import { Presenter } from "./presenter";
 

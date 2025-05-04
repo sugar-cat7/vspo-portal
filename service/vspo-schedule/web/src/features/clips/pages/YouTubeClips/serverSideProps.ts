@@ -3,8 +3,8 @@ import { getCurrentUTCDate } from "@/lib/dayjs";
 import { getInitializedI18nInstance } from "@/lib/utils";
 import { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { YouTubeClipsProps } from "./container";
 import { fetchClips } from "../../api";
+import { YouTubeClipsProps } from "./container";
 
 // Get date for N days ago in ISO format
 const getDaysAgoISO = (days: number): string => {

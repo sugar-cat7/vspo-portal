@@ -6,12 +6,12 @@ import {
   MemberTypeSchema,
   createCreator,
 } from "..";
+import { vspoKeywordMap } from "../../config/data/keyword";
 import { type ITwitchService, type IYoutubeService, query } from "../../infra";
 import { withTracerResult } from "../../infra/http/trace/cloudflare";
 import type { ICreatorRepository } from "../../infra/repository/creator";
 import { createUUID } from "../../pkg/uuid";
 import { type Clips, isVspoClip } from "../clip";
-import { vspoKeywordMap } from "../../config/data/keyword";
 
 export interface IClipService {
   searchNewVspoClipsAndNewCreators(): Promise<

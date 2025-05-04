@@ -1,10 +1,10 @@
-import React, { useRef } from "react";
+import { Channel } from "@/features/clips/domain";
+import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
-import { Channel } from "@/features/clips/domain";
 import { useRouter } from "next/router";
+import React, { useRef } from "react";
 
 // Styled components
 const StoryContainer = styled(Box)(({ theme }) => ({

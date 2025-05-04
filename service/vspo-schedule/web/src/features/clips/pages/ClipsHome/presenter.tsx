@@ -1,22 +1,22 @@
 import { Loading } from "@/components/Elements";
 import { Clip } from "@/features/clips/domain";
-import {
-  Container,
-  Box,
-  Typography,
-  styled,
-  Paper,
-  useTheme,
-  Grid,
-  ButtonBase,
-  useMediaQuery,
-} from "@mui/material";
-import React, { useState, useEffect } from "react";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
-import { ClipCarousel, ClipSection } from "../../components/containers";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import {
+  Box,
+  ButtonBase,
+  Container,
+  Grid,
+  Paper,
+  Typography,
+  styled,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
+import React, { useState, useEffect } from "react";
+import { ClipCarousel, ClipSection } from "../../components/containers";
 
 // Add responsive styled title component
 const ResponsiveSectionTitle = styled(Typography)(({ theme }) => ({
