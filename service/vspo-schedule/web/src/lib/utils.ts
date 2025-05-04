@@ -3,24 +3,23 @@ import { ParsedUrlQuery } from "querystring";
 import { platforms } from "@/constants/platforms";
 import { freechatVideoIds } from "@/data/freechat-video-ids";
 import { members } from "@/data/members";
+import { Clip } from "@/features/clips";
 import { VspoEvent } from "@/types/events";
 import { Member } from "@/types/member";
 import { SiteNewsTag } from "@/types/site-news";
 import {
-  Clip,
   LiveStatus,
   Livestream,
   Platform,
   PlatformWithChat,
   Video,
 } from "@/types/streaming";
-import { Timeframe } from "@/types/timeframe";
 import { Locale, getHours, isMatch } from "date-fns";
 import { formatInTimeZone, utcToZonedTime } from "date-fns-tz";
 import { enUS, ja, ko, zhCN, zhTW } from "date-fns/locale";
 import { createInstance as createI18nInstance } from "i18next";
 import { SSRConfig } from "next-i18next";
-import { DEFAULT_LOCALE, TEMP_TIMESTAMP, TIME_ZONE_COOKIE } from "./Const";
+import { DEFAULT_LOCALE, TIME_ZONE_COOKIE } from "./Const";
 import { convertToUTCDate, getCurrentUTCDate } from "./dayjs";
 
 /**
@@ -56,6 +55,11 @@ export const groupBy = <T>(
  */
 export const isLivestream = (video: Video): video is Livestream => {
   return "actualEndTime" in video;
+};
+
+// FIXME: Temp
+export const isClip = (video: Video): video is Clip => {
+  return "viewCount" in video;
 };
 
 /**
@@ -137,7 +141,7 @@ const getClipUrl = ({ id, platform, link }: Clip) => {
  * @param video - The video to generate the embed URL for.
  * @returns The embed URL for the video.
  */
-export const getVideoEmbedUrl = (video: Video) =>
+export const getVideoEmbedUrl = (video: Video | Clip) =>
   isLivestream(video) ? getLivestreamEmbedUrl(video) : getClipEmbedUrl(video);
 
 const getLivestreamEmbedUrl = (livestream: Livestream) => {
@@ -196,75 +200,10 @@ export const getChatEmbedUrl = (
  * @returns The icon URL for the video.
  */
 export const getVideoIconUrl = (video: Video) => {
-  if (!isLivestream(video) && video.platform === "twitch") {
-    const member = members.find((m) => m.twitchChannelId === video.channelId);
-    return member?.iconUrl;
+  if (isClip(video)) {
+    return video.channelThumbnailUrl;
   }
   return video.iconUrl;
-};
-
-/**
- * Filters clips based on the given searchMemberIds.
- *
- * @param clips - An array of Clip objects.
- * @param searchMemberIds - An array of member IDs to filter clips by.
- * @returns An array of filtered Clip objects.
- */
-const filterClips = (clips: Clip[], searchMemberIds: number[]): Clip[] => {
-  if (!clips) {
-    return [];
-  }
-  const titleWeight = 2;
-  const descriptionWeight = 1;
-  const bracketWeight = 3;
-  const hashtagWeight = 3;
-  const keywordMatchThreshold = 5;
-
-  const filteredClips = clips.filter((clip) => {
-    const isMemberMatch = searchMemberIds.some((memberId) => {
-      const memberKeywords = members.find(
-        (member) => member.id === memberId,
-      )?.keywords;
-
-      if (!memberKeywords) {
-        return false;
-      }
-
-      let keywordMatchCount = 0;
-
-      memberKeywords.forEach((keyword) => {
-        // Check for keyword match in title
-        if (clip.title.includes(keyword)) {
-          keywordMatchCount += titleWeight;
-
-          // Check for keyword match inside brackets
-          const bracketPattern = new RegExp(`【${keyword}】`);
-          if (bracketPattern.test(clip.title)) {
-            keywordMatchCount += bracketWeight;
-          }
-        }
-      });
-
-      // Check for keyword match in description
-      memberKeywords.forEach((keyword) => {
-        if (clip.description.includes(keyword)) {
-          keywordMatchCount += descriptionWeight;
-
-          // Check for keyword match in hashtag format
-          const hashtagPattern = new RegExp(`#${keyword}`);
-          if (hashtagPattern.test(clip.description)) {
-            keywordMatchCount += hashtagWeight;
-          }
-        }
-      });
-
-      return keywordMatchCount >= keywordMatchThreshold;
-    });
-
-    return isMemberMatch;
-  });
-
-  return filteredClips;
 };
 
 /**
@@ -397,147 +336,6 @@ export const groupLivestreamsByTimeRange = (
         return hours >= timeRange.start && hours < timeRange.end;
       }),
     };
-  });
-};
-
-/**
- * Sorts an array of clips by their weighted score (a combination of view count, like count, and comment count) and returns the sorted clips.
- * @param {Clip[]} clips - The array of clips to sort.
- * @returns {Clip[]} - An array of sorted clips.
- */
-export const sortClipsByPopularity = (clips: Clip[]): Clip[] => {
-  return clips.sort((a, b) => {
-    const aViewCount = parseInt(a.viewCount ?? "0") || 0;
-    const aLikeCount = parseInt(a.likeCount ?? "0") || 0;
-    const aCommentCount = parseInt(a.commentCount ?? "0") || 0;
-
-    const bViewCount = parseInt(b.viewCount ?? "0") || 0;
-    const bLikeCount = parseInt(b.likeCount ?? "0") || 0;
-    const bCommentCount = parseInt(b.commentCount ?? "0") || 0;
-
-    const aWeightedScore = aViewCount * 0.01 + aLikeCount * 0.1 + aCommentCount;
-    const bWeightedScore = bViewCount * 0.01 + bLikeCount * 0.1 + bCommentCount;
-
-    return bWeightedScore - aWeightedScore;
-  });
-};
-
-/**
- * Shuffles an array of clips and returns the shuffled clips.
- * @param {Clip[]} clips - The array of clips to shuffle.
- * @returns {Clip[]} - An array of shuffled clips.
- */
-export const shuffleClips = (clips: Clip[]): Clip[] => {
-  const newArray = [...clips];
-  for (let i = newArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
-  }
-  return newArray;
-};
-
-export const filterByTimeframe = (
-  clips: Clip[],
-  timeframe: Timeframe | null,
-): Clip[] => {
-  if (!timeframe) return clips;
-
-  const now = getCurrentUTCDate();
-  return clips.filter((clip) => {
-    const clipCreatedAt = convertToUTCDate(clip.createdAt || TEMP_TIMESTAMP);
-    const daysDifference = Math.floor(
-      (now.getTime() - clipCreatedAt.getTime()) / (1000 * 60 * 60 * 24),
-    );
-
-    switch (timeframe) {
-      case "1day":
-        return daysDifference < 1;
-      case "1week":
-        return daysDifference < 7;
-      case "1month":
-        return daysDifference < 30;
-      default:
-        return true;
-    }
-  });
-};
-
-/**
- * Filters an array of clips by specified member IDs.
- * @param {Clip[]} clips - The array of clips to filter.
- * @param {number[]} memberIds - The array of member IDs to filter by.
- * @returns {Clip[]} - An array of filtered clips.
- */
-const filterByMemberIds = (clips: Clip[], memberIds: number[]): Clip[] => {
-  if (memberIds.length === 0) return clips;
-
-  if (clips.at(0)?.platform !== "twitch") {
-    return filterClips(clips, memberIds);
-  } else {
-    return clips.filter((clip) =>
-      memberIds.includes(
-        members.filter((m) => m.twitchChannelId === clip.channelId).at(0)?.id ??
-          0,
-      ),
-    );
-  }
-};
-
-const filterByKeyword = (clips: Clip[], keyword: string): Clip[] => {
-  if (!keyword.trim()) return clips;
-
-  const lowercasedKeyword = keyword.toLowerCase();
-  return clips.filter(
-    (clip) =>
-      clip.title.toLowerCase().includes(lowercasedKeyword) ||
-      clip.description.toLowerCase().includes(lowercasedKeyword),
-  );
-};
-
-export const applyFilters = (
-  clips: Clip[],
-  searchClipTimeframe: Timeframe | null,
-  searchMemberIds: number[],
-  searchKeyword: string,
-): Clip[] => {
-  let filteredClips = [...clips];
-
-  filteredClips = filterByTimeframe(filteredClips, searchClipTimeframe);
-  filteredClips = filterByMemberIds(filteredClips, searchMemberIds);
-  filteredClips = filterByKeyword(filteredClips, searchKeyword);
-
-  return filteredClips;
-};
-
-const TRENDING_THRESHOLDS = [
-  { days: 1, viewCount: 500 },
-  { days: 2, viewCount: 750 },
-  { days: 3, viewCount: 1250 },
-  { days: 4, viewCount: 1750 },
-  { days: 5, viewCount: 2250 },
-  { days: 6, viewCount: 3250 },
-  { days: 7, viewCount: 5000 },
-];
-const TWITCH_TRENDING_THRESHOLDS = 500;
-const YOUTUBE_TRENDING_THRESHOLDS = 30_000;
-export const isTrending = (clip: Clip) => {
-  if (!clip.createdAt) return false;
-
-  const createdAt = convertToUTCDate(clip.createdAt);
-  const viewCount = Number(clip.viewCount);
-
-  const isOlderThan = (days: number) => {
-    const date = getCurrentUTCDate();
-    date.setDate(date.getDate() - days);
-    return createdAt > date;
-  };
-
-  return TRENDING_THRESHOLDS.some(({ days }) => {
-    const trendThreshold =
-      clip.platform === "youtube"
-        ? YOUTUBE_TRENDING_THRESHOLDS * days
-        : TWITCH_TRENDING_THRESHOLDS * days * 1.25;
-    return isOlderThan(days) && viewCount >= trendThreshold;
   });
 };
 

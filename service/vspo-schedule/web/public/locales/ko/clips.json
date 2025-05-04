@@ -1,28 +1,64 @@
 {
   "noClips": "일치하는 클립이 없습니다.",
   "clipLabels": {
-    "new": "새로운",
-    "popular": "인기 있는",
+    "new": "신규",
+    "popular": "인기",
     "recommended": "추천",
     "trending": "트렌딩"
   },
+  "platformTabs": {
+    "twitch": "Twitch",
+    "youtube": "YouTube",
+    "shorts": "Shorts"
+  },
+  "home": {
+    "meta": {
+      "title": "$t(common:vspo) 클립 모음",
+      "description": "$t(common:vspo) 멤버들의 클립과 하이라이트를 확인하세요."
+    },
+    "hero": {
+      "title": "$t(common:vspo) 클립 컬렉션",
+      "subtitle": "YouTube 클립, Shorts, Twitch 클립을 한 곳에서 확인하세요!",
+      "exploreClips": "클립 둘러보기"
+    },
+    "members": {
+      "title": "VSPO 멤버"
+    },
+    "sections": {
+      "popularYoutubeClips": "인기 클립",
+      "popularShortsClips": "인기 쇼츠",
+      "popularTwitchClips": "인기 Twitch 클립"
+    },
+    "youtubeClips": {
+      "title": "YouTube 클립"
+    },
+    "shorts": {
+      "title": "YouTube Shorts"
+    },
+    "twitchClips": {
+      "title": "Twitch 클립"
+    },
+    "viewMore": "더 보기"
+  },
   "youtubeClips": {
     "title": "$t(common:vspo) 클립",
-    "description": "$t(common:vspo) 멤버들의 YouTube 클립(기리누키)을 확인하세요."
+    "description": "$t(common:vspo) 멤버들의 YouTube 클립을 확인하세요."
   },
   "twitchClips": {
     "title": "$t(common:vspo) Twitch 클립",
     "description": "$t(common:vspo) 멤버들의 Twitch 클립을 확인하세요."
   },
-  "viewCountLabel": "{{views, number}}+ 조회수",
+  "viewCountLabel": "조회수 {{views, number}}+",
   "searchDialog": {
     "title": "클립 검색",
-    "alertMessage": "1개월 이내의 클립만 검색 가능합니다.",
-    "timeframe": "기간",
+    "alertMessage": "한 달 이내의 클립만 검색이 가능합니다.",
+    "timeframe": "기간별 필터",
     "timeframes": {
-      "1day": "오늘",
-      "1week": "이번 주",
-      "1month": "이번 달"
+      "all": "전체",
+      "1day": "24시간",
+      "1week": "1주일",
+      "1month": "1개월",
+      "year": "1년"
     },
     "members": "멤버",
     "keyword": "키워드",

@@ -1,4 +1,5 @@
 import { RelatedVideos } from "@/components/Templates";
+import { Clip } from "@/features/clips";
 import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import {
   formatDate,
@@ -82,7 +83,7 @@ const ResponsiveIframe = styled("iframe")({
   border: "0",
 });
 
-const VideoPlayerComponent: React.FC<{ video: Video }> = ({ video }) => {
+const VideoPlayerComponent: React.FC<{ video: Video | Clip }> = ({ video }) => {
   const embedUrl = getVideoEmbedUrl(video);
   return (
     <ResponsiveIframeWrapper>
@@ -251,7 +252,7 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{
-                    textDecoration: "none", // 下線を削除する
+                    textDecoration: "none",
                   }}
                 >
                   {t("videoModal.watch")}
@@ -265,9 +266,9 @@ const InfoTabs: React.FC<{ video: Video }> = ({ video }) => {
                   if (navigator.share) {
                     try {
                       await navigator.share({
-                        title: video.title, // ここにビデオのタイトルを設定します
-                        text: video.title, // ここに共有するテキストを設定します
-                        url: url, // ここにビデオのURLを設定します
+                        title: video.title,
+                        text: video.title,
+                        url: url,
                       });
                     } catch (error) {
                       console.error("Share failed:", error);

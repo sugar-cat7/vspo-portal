@@ -9,7 +9,6 @@ const internalRoutes = {
   upcoming: "/schedule/upcoming",
   freechat: "/freechat",
   clip: "/clips",
-  "twitch-clip": "/twitch-clips",
   event: (timeZone: string) =>
     `/events/${formatDate(getCurrentUTCDate(), "yyyy-MM", { timeZone })}`,
   about: "/about",

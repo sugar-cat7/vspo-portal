@@ -48,6 +48,7 @@ export const existClipsWorkflow = () => {
                     orderBy: "desc",
                     includeDeleted: true,
                     clipType: "clip",
+                    platform: "youtube",
                   });
 
                   if (r1.err) {
@@ -215,7 +216,7 @@ export const existClipsWorkflow = () => {
                   const cu = await env.APP_WORKER.newClipUsecase();
                   const deletedClips = combinedClips
                     .filter((clip) =>
-                      r1.result.notExistsClipIds.includes(clip.id),
+                      r1.result.notExistsClipIds.includes(clip.rawId),
                     )
                     .map((clip) => {
                       return {

@@ -305,6 +305,17 @@
           {
             "schema": {
               "type": "string",
+              "enum": ["vspo_jp", "vspo_en", "vspo_ch", "vspo_all", "general"],
+              "description": "Member Type",
+              "example": "vspo_all"
+            },
+            "required": false,
+            "name": "memberType",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
               "description": "Started At",
               "example": "2022-01-01T00:00:00.000Z"
             },
@@ -1304,6 +1315,38 @@
             },
             "required": false,
             "name": "orderBy",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["publishedAt", "viewCount"],
+              "default": "publishedAt",
+              "description": "Order Key",
+              "example": "publishedAt"
+            },
+            "required": false,
+            "name": "orderKey",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "After Published At Date",
+              "example": "2023-05-20T12:00:00.000Z"
+            },
+            "required": false,
+            "name": "afterPublishedAtDate",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Before Published At Date",
+              "example": "2023-05-20T12:00:00.000Z"
+            },
+            "required": false,
+            "name": "beforePublishedAtDate",
             "in": "query"
           }
         ],

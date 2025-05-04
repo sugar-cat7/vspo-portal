@@ -1,7 +1,7 @@
 import { AppError, Err, Ok, type Result } from "@vspo-lab/error";
 import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
-import type * as apiGen from "../gen/openapi";
+import type * as apiGen from "./gen/openapi";
 
 interface ApiErrorResponse {
   error: {
@@ -88,7 +88,7 @@ export class VSPOApi {
     this.apiKey = opts.apiKey;
     this.cfAccessClientId = opts.cfAccessClientId;
     this.cfAccessClientSecret = opts.cfAccessClientSecret;
-    this.baseUrl = opts.baseUrl ?? "https://api.vspo-portal.com";
+    this.baseUrl = opts.baseUrl ?? "http://localhost:3000";
 
     this.retry = {
       attempts: opts.retry?.attempts ?? 3,
