@@ -3,9 +3,11 @@
   "noLiveStreams": "配信情報はありません。\nアーカイブ・切り抜きを御覧ください。",
   "events": "イベント一覧",
   "streamsOnDate": "{{date}}の配信一覧",
+  "loading": "読み込み中...",
   "status": {
-    "live": "Live",
-    "upcoming": "配信予定"
+    "live": "配信中",
+    "upcoming": "配信予定",
+    "all": "すべて"
   },
   "titles": {
     "streamSchedule": "$t(common:vspo)配信スケジュール",

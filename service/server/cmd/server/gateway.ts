@@ -29,6 +29,7 @@ import {
   registerStreamPostApi,
 } from "../../infra/http/routes/stream";
 import { createHandler, withTracer } from "../../infra/http/trace";
+import { registerFreechatListApi } from "../../infra/http/routes/freechat";
 
 const app = newApp();
 app.notFound((c) => {
@@ -74,6 +75,7 @@ registerClipListApi(app);
 registerEventListApi(app);
 registerEventGetApi(app);
 registerEventCreateApi(app);
+registerFreechatListApi(app);
 
 export default createHandler({
   fetch: async (req: Request, env: ApiEnv, executionCtx: ExecutionContext) => {

@@ -3,9 +3,11 @@
   "noLiveStreams": "No livestreams available.\nTry browsing past streams or clips from the sidebar.",
   "events": "Events",
   "streamsOnDate": "Livestreams on {{date}}",
+  "loading": "Loading...",
   "status": {
     "live": "Live",
-    "upcoming": "Upcoming"
+    "upcoming": "Upcoming",
+    "all": "All"
   },
   "titles": {
     "streamSchedule": "$t(common:vspo) Stream Schedule",

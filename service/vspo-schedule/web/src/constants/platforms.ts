@@ -1,8 +1,8 @@
-import { Platform } from "@/types/streaming";
+import { Platform } from "@/features/shared/domain";
 
 export const platforms: { id: Platform; name: string }[] = [
   { id: "youtube", name: "YouTube" },
   { id: "twitch", name: "Twitch" },
   { id: "twitcasting", name: "ツイキャス" },
-  { id: "nicovideo", name: "ニコニコ動画" },
+  { id: "niconico", name: "ニコニコ動画" },
 ];

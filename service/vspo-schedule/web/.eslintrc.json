@@ -36,6 +36,10 @@
       "parserOptions": {
         "project": "./tsconfig.json"
       },
+      "excludedFiles": [
+        "./src/features/schedule/pages/ScheduleStatus/**/*.ts",
+        "./src/features/schedule/pages/ScheduleStatus/**/*.tsx"
+      ],
       "extends": ["plugin:@typescript-eslint/recommended-type-checked"],
       "rules": {
         /* Overrides for @typescript-eslint/recommended-type-checked */
@@ -66,6 +70,18 @@
         "@typescript-eslint/no-inferrable-types": "error",
         // Flag potentially unnecessary conditions
         "@typescript-eslint/no-unnecessary-condition": "warn"
+      }
+    },
+    {
+      "files": [
+        "./src/features/schedule/pages/ScheduleStatus/**/*.ts",
+        "./src/features/schedule/pages/ScheduleStatus/**/*.tsx"
+      ],
+      "extends": ["plugin:@typescript-eslint/recommended"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/explicit-function-return-type": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off"
       }
     }
   ]

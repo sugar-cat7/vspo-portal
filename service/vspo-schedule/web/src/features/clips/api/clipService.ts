@@ -31,18 +31,20 @@ export type ClipFetchResult = Result<
 const mapToClip = (apiClip: ListClips200ClipsItem): Clip => {
   return clipSchema.parse({
     id: apiClip.rawId,
+    type: "clip",
     title: apiClip.title,
     description: apiClip.description,
     thumbnailUrl: apiClip.thumbnailURL,
     platform: apiClip.platform as Platform,
-    url: apiClip.link || "",
+    link: apiClip.link || "",
     viewCount: apiClip.viewCount,
-    likeCount: 0,
     channelId: apiClip.rawChannelID,
     channelTitle: apiClip.creatorName || "",
     channelThumbnailUrl: apiClip.creatorThumbnailURL || "",
-    createdAt: apiClip.publishedAt,
-  });
+    videoPlayerLink: apiClip.videoPlayerLink || "",
+    publishedAt: apiClip.publishedAt,
+    tags: apiClip.tags || [],
+  } satisfies Clip);
 };
 
 /**
@@ -71,7 +73,7 @@ export const fetchClips = async (
     afterPublishedAtDate: params.afterPublishedAtDate,
   });
 
-  if (result.err) {
+  if (!result.val) {
     return Err(result.err);
   }
 

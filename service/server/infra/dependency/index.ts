@@ -11,9 +11,11 @@ import {
   type DB,
   DiscordMessageRepository,
   DiscordServerRepository,
+  FreechatRepository,
   type ICreatorRepository,
   type IDiscordMessageRepository,
   type IDiscordServerRepository,
+  type IFreechatRepository,
   type IStreamRepository,
   type ITxManager,
   StreamRepository,
@@ -47,6 +49,10 @@ import { CloudflareKVCacheClient, type ICacheClient } from "../cache";
 import { DiscordClient, type IDiscordClient } from "../discord";
 import { ClipRepository, type IClipRepository } from "../repository/clip";
 import { EventRepository, type IEventRepository } from "../repository/event";
+import {
+  FreechatInteractor,
+  type IFreechatInteractor,
+} from "../../usecase/freechat";
 
 export interface IRepositories {
   creatorRepository: ICreatorRepository;
@@ -55,6 +61,7 @@ export interface IRepositories {
   discordMessageRepository: IDiscordMessageRepository;
   clipRepository: IClipRepository;
   eventRepository: IEventRepository;
+  freechatRepository: IFreechatRepository;
 }
 
 export function createRepositories(tx: DB): IRepositories {
@@ -65,6 +72,7 @@ export function createRepositories(tx: DB): IRepositories {
     discordMessageRepository: new DiscordMessageRepository(tx),
     clipRepository: new ClipRepository(tx),
     eventRepository: new EventRepository(tx),
+    freechatRepository: new FreechatRepository(tx),
   };
 }
 
@@ -173,7 +181,7 @@ export class Container {
   clipInteractor: IClipInteractor;
   discordInteractor: IDiscordInteractor;
   eventInteractor: IEventInteractor;
-
+  freechatInteractor: IFreechatInteractor;
   constructor(private readonly env: AppWorkerEnv) {
     this.cacheClient = new CloudflareKVCacheClient(this.env.APP_KV);
 
@@ -214,5 +222,6 @@ export class Container {
     this.discordInteractor = new DiscordInteractor(context);
     this.clipInteractor = new ClipInteractor(context);
     this.eventInteractor = new EventInteractor(context);
+    this.freechatInteractor = new FreechatInteractor(context);
   }
 }

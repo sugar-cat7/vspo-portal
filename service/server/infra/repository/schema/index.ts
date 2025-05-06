@@ -209,8 +209,7 @@ export const eventTable = pgTable("event", {
   id: text("id").primaryKey(), // Unique identifier for the event
   title: text("title").notNull(), // Event title
   storageFileId: text("storage_file_id"), // ID of the storage file containing event details
-  startAt: timestamp("start_at", { withTimezone: true, mode: "date" }), // Event start date and time
-  endAt: timestamp("end_at", { withTimezone: true, mode: "date" }), // Event end date and time
+  startedDate: text("started_date").notNull(), // Event start date (eg. 2023-12-01)
   visibility: text("visibility").notNull().default("private"), // Visibility: public, private, or internal
   tags: text("tags"),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })

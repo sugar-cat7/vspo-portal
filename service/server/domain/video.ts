@@ -44,6 +44,8 @@ const BaseVideoSchema = z.object({
   link: z.string().optional(), // Original link if provided from DB
   deleted: z.boolean().default(false),
   translated: z.boolean().optional(),
+  videoPlayerLink: z.string().optional().nullable(),
+  chatPlayerLink: z.string().optional().nullable(),
 });
 
 // Type inference

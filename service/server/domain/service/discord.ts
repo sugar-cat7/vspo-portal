@@ -142,7 +142,7 @@ export class DiscordService implements IDiscordService {
           limit: 1000,
           page: 0,
           languageCode: options.channelLangaugeCode,
-          startedAt: convertToUTCDate(
+          startDateFrom: convertToUTCDate(
             getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
           ),
           memberType: options.channelMemberType,
@@ -171,7 +171,7 @@ export class DiscordService implements IDiscordService {
           limit: 1000,
           page: 0,
           languageCode: options.channelLangaugeCode,
-          startedAt: convertToUTCDate(
+          startDateFrom: convertToUTCDate(
             getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
           ),
           memberType: options.channelMemberType,

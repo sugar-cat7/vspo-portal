@@ -1,5 +1,5 @@
-import { Breadcrumb } from "@/components/Elements";
-import { ContentLayout } from "@/components/Layout/ContentLayout";
+import { Breadcrumb } from "@/features/shared/components/Elements";
+import { ContentLayout } from "@/features/shared/components/Layout/ContentLayout";
 import { siteNewsItems } from "@/data/content/site-news";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import {
