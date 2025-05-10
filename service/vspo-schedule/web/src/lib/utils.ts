@@ -1,11 +1,10 @@
 import { ServerResponse } from "http";
 import { ParsedUrlQuery } from "querystring";
 import { members } from "@/data/members";
-import { Livestream } from "@/features/schedule/domain";
 import { Member } from "@/types/member";
 import { SiteNewsTag } from "@/types/site-news";
-import { Locale, getHours, isMatch } from "date-fns";
-import { formatInTimeZone, utcToZonedTime } from "date-fns-tz";
+import { Locale, isMatch } from "date-fns";
+import { formatInTimeZone } from "date-fns-tz";
 import { enUS, ja, ko, zhCN, zhTW } from "date-fns/locale";
 import { createInstance as createI18nInstance } from "i18next";
 import { SSRConfig } from "next-i18next";
@@ -95,38 +94,6 @@ export const formatDate = (
  */
 export const matchesDateFormat = (dateString: string, dateFormat: string) => {
   return isMatch(dateString, dateFormat);
-};
-
-const timeRanges = [
-  { start: 0, end: 6, label: "00:00 - 06:00" },
-  { start: 6, end: 12, label: "06:00 - 12:00" },
-  { start: 12, end: 18, label: "12:00 - 18:00" },
-  { start: 18, end: 24, label: "18:00 - 24:00" },
-];
-
-/**
- * Groups livestreams into time ranges of 6 hours, starting at 0:00.
- * @param {Livestream[]} livestreams - The array of livestreams to group.
- * @param {string} timeZone - The time zone to use for time comparison.
- * @returns {Array<{label: string, livestreams: Livestream[]}>} - An array of objects containing a label and an array of livestreams.
- */
-export const groupLivestreamsByTimeRange = (
-  livestreams: Livestream[],
-  timeZone: string,
-) => {
-  return timeRanges.map((timeRange) => {
-    return {
-      label: timeRange.label,
-      livestreams: livestreams.filter((livestream) => {
-        const zonedStartTime = utcToZonedTime(
-          livestream.scheduledStartTime,
-          timeZone,
-        );
-        const hours = getHours(zonedStartTime);
-        return hours >= timeRange.start && hours < timeRange.end;
-      }),
-    };
-  });
 };
 
 export const getSiteNewsTagColor = (tag: SiteNewsTag) => {

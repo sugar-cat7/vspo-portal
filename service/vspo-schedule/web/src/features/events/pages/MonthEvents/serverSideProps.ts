@@ -21,45 +21,63 @@ export const getServerSideProps: GetServerSideProps<
   const isValidYearMonth =
     yearMonth !== undefined && matchesDateFormat(yearMonth, "yyyy-MM");
   if (!isValidYearMonth) {
+    console.error("Invalid yearMonth format:", yearMonth);
     return {
       notFound: true,
     };
   }
 
-  const eventsResult = await fetchEvents({
-    startedDateFrom: `${yearMonth}-01`,
-    startedDateTo: `${yearMonth}-31`,
-  });
-  if (eventsResult.err) {
-    console.error("Error fetching events:", eventsResult.err);
+  try {
+    const eventsResult = await fetchEvents({
+      startedDateFrom: `${yearMonth}-01`,
+      startedDateTo: `${yearMonth}-31`,
+    });
+
+    if (eventsResult.err) {
+      console.error("Error fetching events:", eventsResult.err, {
+        yearMonth,
+        startedDateFrom: `${yearMonth}-01`,
+        startedDateTo: `${yearMonth}-31`,
+      });
+      return {
+        notFound: true,
+      };
+    }
+
+    const fetchedEvents = eventsResult.val.events;
+    if (fetchedEvents.length === 0) {
+      console.error("No events found for period:", {
+        yearMonth,
+        startedDateFrom: `${yearMonth}-01`,
+        startedDateTo: `${yearMonth}-31`,
+      });
+      return {
+        notFound: true,
+      };
+    }
+
+    const translations = await serverSideTranslations(locale, [
+      "common",
+      "events",
+    ]);
+    const { t } = getInitializedI18nInstance(translations);
+
     return {
-      notFound: true,
-    };
-  }
-
-  const fetchedEvents = eventsResult.val.events;
-  if (fetchedEvents.length === 0) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const translations = await serverSideTranslations(locale, [
-    "common",
-    "events",
-  ]);
-  const { t } = getInitializedI18nInstance(translations);
-
-  return {
-    props: {
-      ...translations,
-      events: fetchedEvents,
-      yearMonth,
-      lastUpdateTimestamp: getCurrentUTCDate().getTime(),
-      meta: {
-        title: t("title", { ns: "events" }),
-        description: t("description", { ns: "events" }),
+      props: {
+        ...translations,
+        events: fetchedEvents,
+        yearMonth,
+        lastUpdateTimestamp: getCurrentUTCDate().getTime(),
+        meta: {
+          title: t("title", { ns: "events" }),
+          description: t("description", { ns: "events" }),
+        },
       },
-    },
-  };
+    };
+  } catch (error) {
+    console.error("Unexpected error in getServerSideProps:", error);
+    return {
+      notFound: true,
+    };
+  }
 };

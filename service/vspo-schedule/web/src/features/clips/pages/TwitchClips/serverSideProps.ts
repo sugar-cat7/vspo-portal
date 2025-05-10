@@ -80,6 +80,7 @@ export const getTwitchClipsServerSideProps: GetServerSideProps<
 
   // Handle API error
   if (!clipsResult.val) {
+    console.error("Failed to fetch Twitch clips:", clipsResult.err);
     return {
       props: {
         ...translations,

@@ -29,7 +29,4 @@ alwaysApply: true
 - [typescript.mdc](mdc:.cursor/rules/typescript.mdc)
 
 5. Server Side
-- [server-side.mdc](mdc:.cursor/rules/server-side.mdc)
-
-6. Web Frontend
-- [frontend-architecture.mdc](mdc:.cursor/rules/frontend-architecture.mdc)
+- [](mdc:.cursor/rules/frontend-architecture.mdc)[](mdc:.cursor/rules/server-side.mdc)[](mdc:.cursor/rules/server-side.mdc)
