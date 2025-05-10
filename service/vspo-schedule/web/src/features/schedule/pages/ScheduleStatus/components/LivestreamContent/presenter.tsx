@@ -18,14 +18,14 @@ const DateHeader = styled(Box)(({ theme }) => ({
   alignItems: "center",
   justifyContent: "space-between",
   marginBottom: theme.spacing(2),
-  padding: theme.spacing(1.5, 2),
+  padding: theme.spacing(1),
   borderBottom: `1px solid ${theme.vars.palette.divider}`,
 }));
 
 const LivestreamGrid = styled(Grid)(({ theme }) => ({
   padding: theme.spacing(2),
   [theme.breakpoints.down("sm")]: {
-    padding: theme.spacing(1),
+    padding: theme.spacing(0),
   },
 }));
 
@@ -57,7 +57,7 @@ export const LivestreamContentPresenter: React.FC<LivestreamContentProps> = ({
   );
 
   return (
-    <Box sx={{ py: 2 }}>
+    <Box>
       {Object.entries(livestreamsByTimeBlock).map(([date, timeBlocks]) => (
         <ContentSection key={date}>
           <DateHeader>
@@ -74,7 +74,7 @@ export const LivestreamContentPresenter: React.FC<LivestreamContentProps> = ({
 
           {Object.entries(timeBlocks).map(([timeBlock, livestreams]) => (
             <Box key={`${date}-${timeBlock}`}>
-              <TimeBlockHeader sx={{ mx: 2, mt: 2 }}>
+              <TimeBlockHeader sx={{ mt: 2 }}>
                 <Typography
                   variant="h6"
                   sx={{

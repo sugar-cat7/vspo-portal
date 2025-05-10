@@ -81,7 +81,7 @@ export const ScheduleStatusPresenter: React.FC<PresenterProps> = ({
   const { t } = useTranslation("streams");
 
   return (
-    <Container maxWidth="lg" sx={{ position: "relative", pb: 4 }}>
+    <Container maxWidth="lg" sx={{ position: "relative", pb: 4, pl: 0, pr: 0 }}>
       {!isArchivePage && (
         <FixedTabsContainer elevation={2}>
           <Tabs
