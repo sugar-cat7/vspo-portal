@@ -53,7 +53,7 @@ const StyledAvatarGroup = styled(AvatarGroup)(({ theme }) => ({
     width: 36,
     height: 36,
     marginLeft: -10,
-    border: `2px solid ${theme.palette.background.paper}`,
+    border: `2px solid ${theme.vars.palette.background.paper}`,
     [theme.breakpoints.down("sm")]: {
       width: 28,
       height: 28,
@@ -83,7 +83,7 @@ const TitleTypography = styled(Typography)(({ theme }) => ({
 const CreatorTypography = styled(Typography)(({ theme }) => ({
   fontSize: "0.8rem",
   lineHeight: 1.2,
-  color: theme.palette.text.secondary,
+  color: theme.vars.palette.text.secondary,
   padding: `0 ${theme.spacing(0.5)}`,
   marginBottom: theme.spacing(0.8),
   overflow: "hidden",

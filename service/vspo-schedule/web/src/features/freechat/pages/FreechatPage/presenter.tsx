@@ -1,4 +1,4 @@
-import Grid from "@mui/material/Grid2";
+import { Grid } from "@mui/material";
 import React from "react";
 import { FreechatCard } from "../../components";
 import { Freechat } from "../../domain";

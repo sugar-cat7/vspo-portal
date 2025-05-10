@@ -30,7 +30,7 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
     left: 0,
     width: "100%",
     height: 3,
-    background: theme.palette.primary.main,
+    background: theme.vars.palette.primary.main,
     borderRadius: theme.shape.borderRadius,
   },
 }));
@@ -207,7 +207,7 @@ export const ClipSectionPresenter: React.FC<ClipSectionPresenterProps> = ({
       return (
         <Grid container spacing={2}>
           {clips.map((clip) => (
-            <Grid item xs={6} sm={4} md={3} lg={2} key={clip.id}>
+            <Grid size={{ xs: 6, sm: 4, md: 3, lg: 2 }} key={clip.id}>
               <ShortsCard>
                 <CardActionArea onClick={() => pushVideo(clip)}>
                   <CardMedia
@@ -240,7 +240,7 @@ export const ClipSectionPresenter: React.FC<ClipSectionPresenterProps> = ({
     return (
       <Grid container spacing={3}>
         {clips.map((clip) => (
-          <Grid item xs={12} sm={6} md={4} key={clip.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={clip.id}>
             <ModernCard>
               <CardActionArea onClick={() => pushVideo(clip)}>
                 <CardMediaWrapper>

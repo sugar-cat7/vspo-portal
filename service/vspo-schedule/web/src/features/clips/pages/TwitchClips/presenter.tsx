@@ -26,7 +26,7 @@ const FilterContainer = styled(Paper)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   boxShadow: theme.shadows[1],
-  background: theme.palette.background.paper,
+  background: theme.vars.palette.background.paper,
   [theme.breakpoints.down("sm")]: {
     padding: theme.spacing(2),
   },
@@ -37,7 +37,7 @@ const FilterTitle = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   marginBottom: theme.spacing(2),
-  color: theme.palette.text.primary,
+  color: theme.vars.palette.text.primary,
 }));
 
 // Period filter button
@@ -58,17 +58,17 @@ const PeriodButton = styled(ButtonBase, {
   width: "100%", // Use full width for better mobile layout
   backgroundColor: active
     ? "#3474db" // Specific blue color for active state
-    : theme.palette.mode === "dark"
+    : theme.vars.palette.mode === "dark"
       ? "#333333" // Dark grey for inactive buttons in dark mode
       : "#e0e0e0", // Light grey for inactive buttons in light mode
   color:
-    active || theme.palette.mode === "dark"
+    active || theme.vars.palette.mode === "dark"
       ? theme.palette.common.white // White text for active buttons and dark mode
-      : theme.palette.grey[800], // Dark text for inactive buttons in light mode
+      : theme.vars.palette.grey[800], // Dark text for inactive buttons in light mode
   "&:hover": {
     backgroundColor: active
       ? "#2a5cb8" // Slightly darker blue for hover on active
-      : theme.palette.mode === "dark"
+      : theme.vars.palette.mode === "dark"
         ? "#444444" // Slightly lighter gray for hover in dark mode
         : "#cccccc", // Darker gray for hover in light mode
   },
@@ -186,8 +186,9 @@ export const Presenter: React.FC<TwitchClipsPresenterProps> = ({
         <Grid container spacing={isMobile ? 1 : 2}>
           {dateFilterOptions.map((option) => (
             <Grid
-              item
-              xs={isMobile ? (option.value === "all" ? 4 : 4) : "auto"}
+              size={{
+                xs: isMobile ? (option.value === "all" ? 4 : 4) : "auto",
+              }}
               key={option.value}
             >
               <PeriodButton
