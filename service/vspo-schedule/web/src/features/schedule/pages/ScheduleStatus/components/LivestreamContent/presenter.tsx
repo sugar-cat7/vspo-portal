@@ -10,7 +10,7 @@ const ContentSection = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(6),
   borderRadius: theme.shape.borderRadius,
   overflow: "hidden",
-  backgroundColor: theme.palette.background.paper,
+  backgroundColor: theme.vars.palette.background.paper,
 }));
 
 const DateHeader = styled(Box)(({ theme }) => ({
@@ -19,7 +19,7 @@ const DateHeader = styled(Box)(({ theme }) => ({
   justifyContent: "space-between",
   marginBottom: theme.spacing(2),
   padding: theme.spacing(1.5, 2),
-  borderBottom: `1px solid ${theme.palette.divider}`,
+  borderBottom: `1px solid ${theme.vars.palette.divider}`,
 }));
 
 const LivestreamGrid = styled(Grid)(({ theme }) => ({
@@ -32,12 +32,12 @@ const LivestreamGrid = styled(Grid)(({ theme }) => ({
 const TimeBlockHeader = styled(Box)(({ theme }) => ({
   padding: theme.spacing(1.5, 2),
   marginBottom: theme.spacing(2),
-  backgroundColor:
-    theme.palette.mode === "dark"
-      ? theme.palette.grey[800]
-      : theme.palette.common.white,
+  backgroundColor: theme.vars.palette.background.paper,
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: theme.vars.palette.grey[800],
+  },
   borderRadius: theme.shape.borderRadius,
-  borderLeft: `4px solid ${theme.palette.primary.main}`,
+  borderLeft: `4px solid ${theme.vars.palette.primary.main}`,
   display: "flex",
   alignItems: "center",
 }));
@@ -65,7 +65,7 @@ export const LivestreamContentPresenter: React.FC<LivestreamContentProps> = ({
               variant="h5"
               sx={(theme) => ({
                 fontWeight: 600,
-                color: theme.palette.mode === "dark" ? "white" : "black",
+                color: theme.vars.palette.text.primary,
               })}
             >
               {formatDate(date, "MM/dd (EEE)")}
@@ -88,7 +88,7 @@ export const LivestreamContentPresenter: React.FC<LivestreamContentProps> = ({
 
               <LivestreamGrid container spacing={{ xs: 1, sm: 2, md: 3 }}>
                 {livestreams.map((livestream) => (
-                  <Grid item xs={6} sm={6} md={4} key={livestream.id}>
+                  <Grid size={{ xs: 6, sm: 6, md: 4 }} key={livestream.id}>
                     <LivestreamCard
                       livestream={livestream}
                       isFreechat={false}

@@ -84,7 +84,7 @@ export const ClipTabsAndListPresenter: React.FC<
       {/* Clip List Section */}
       <Grid container spacing={isMobile ? 2 : 3} sx={{ width: "100%" }}>
         {clips.map((clip) => (
-          <Grid item xs={12} sm={6} md={4} key={clip.id}>
+          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={clip.id}>
             <ClipCardPresenter clip={clip} />
           </Grid>
         ))}
