@@ -1,9 +1,9 @@
-import React, { useMemo, useState, useEffect } from "react";
-import { ScheduleStatusPresenter } from "./presenter";
-import { Livestream } from "../../domain";
 import { Event } from "@/features/events/domain";
 import { formatDate } from "@/lib/utils";
 import { useRouter } from "next/router";
+import React, { useMemo, useState, useEffect } from "react";
+import { Livestream } from "../../domain";
+import { ScheduleStatusPresenter } from "./presenter";
 
 // Props received from getServerSideProps
 type ScheduleStatusContainerProps = {

@@ -1,10 +1,10 @@
-import { GetStaticProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { Freechat } from "../../domain";
-import { fetchFreechats } from "../../api";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { getInitializedI18nInstance } from "@/lib/utils";
+import { getInitializedI18nInstance, getSessionId } from "@/lib/utils";
+import { GetServerSideProps } from "next";
+import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import { fetchFreechats } from "../../api";
+import { Freechat } from "../../domain";
 
 export type FreechatPageProps = {
   freechats: Freechat[];
@@ -15,11 +15,11 @@ export type FreechatPageProps = {
   };
 };
 
-export const getFreechatStaticProps: GetStaticProps<
+export const getFreechatServerSideProps: GetServerSideProps<
   FreechatPageProps
-> = async ({ locale = DEFAULT_LOCALE }) => {
+> = async ({ locale = DEFAULT_LOCALE, req }) => {
   const [freechatResult, translationsResult] = await Promise.allSettled([
-    fetchFreechats({ lang: locale }),
+    fetchFreechats({ lang: locale, sessionId: getSessionId(req) }),
     serverSideTranslations(locale, ["common", "freechat"]),
   ]);
 

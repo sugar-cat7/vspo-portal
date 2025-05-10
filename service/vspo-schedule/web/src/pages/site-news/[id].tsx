@@ -1,6 +1,6 @@
+import { siteNewsItems } from "@/data/content/site-news";
 import { Breadcrumb, TweetEmbed } from "@/features/shared/components/Elements";
 import { ContentLayout } from "@/features/shared/components/Layout";
-import { siteNewsItems } from "@/data/content/site-news";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import {
   formatDate,

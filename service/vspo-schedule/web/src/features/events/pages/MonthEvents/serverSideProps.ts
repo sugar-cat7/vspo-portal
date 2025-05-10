@@ -1,6 +1,10 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { getInitializedI18nInstance, matchesDateFormat } from "@/lib/utils";
+import {
+  getInitializedI18nInstance,
+  getSessionId,
+  matchesDateFormat,
+} from "@/lib/utils";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { fetchEvents } from "../../api";
@@ -16,7 +20,7 @@ type Params = {
 export const getServerSideProps: GetServerSideProps<
   MonthEventsProps,
   Params
-> = async ({ params, locale = DEFAULT_LOCALE }) => {
+> = async ({ params, locale = DEFAULT_LOCALE, req }) => {
   const yearMonth = params?.yearMonth;
   const isValidYearMonth =
     yearMonth !== undefined && matchesDateFormat(yearMonth, "yyyy-MM");
@@ -31,6 +35,7 @@ export const getServerSideProps: GetServerSideProps<
     const eventsResult = await fetchEvents({
       startedDateFrom: `${yearMonth}-01`,
       startedDateTo: `${yearMonth}-31`,
+      sessionId: getSessionId(req),
     });
 
     if (eventsResult.err) {

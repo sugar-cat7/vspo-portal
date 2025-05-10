@@ -15,6 +15,7 @@ export type FetchHomePageDataResult = Result<HomePageData, BaseError>;
 export type FetchHomePageDataOptions = {
   beforePublishedAtDate?: string;
   afterPublishedAtDate?: string;
+  sessionId?: string;
 };
 
 /**
@@ -40,6 +41,7 @@ export const fetchHomePageData = async (
       orderKey: "viewCount",
       beforePublishedAtDate: options?.beforePublishedAtDate,
       afterPublishedAtDate: options?.afterPublishedAtDate,
+      sessionId: options?.sessionId,
     }),
     fetchClips({
       platform: "youtube",
@@ -50,6 +52,7 @@ export const fetchHomePageData = async (
       orderKey: "viewCount",
       beforePublishedAtDate: options?.beforePublishedAtDate,
       afterPublishedAtDate: options?.afterPublishedAtDate,
+      sessionId: options?.sessionId,
     }),
     fetchClips({
       platform: "twitch",
@@ -60,8 +63,11 @@ export const fetchHomePageData = async (
       orderKey: "viewCount",
       beforePublishedAtDate: options?.beforePublishedAtDate,
       afterPublishedAtDate: options?.afterPublishedAtDate,
+      sessionId: options?.sessionId,
     }),
-    fetchVspoMembers(),
+    fetchVspoMembers({
+      sessionId: options?.sessionId,
+    }),
   ]);
 
   // Error checking

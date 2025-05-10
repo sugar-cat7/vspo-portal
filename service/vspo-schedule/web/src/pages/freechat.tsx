@@ -1,10 +1,10 @@
-import { ContentLayout } from "@/features/shared/components/Layout";
-import { NextPageWithLayout } from "./_app";
 import { FreechatPage } from "@/features/freechat";
 import {
-  getFreechatStaticProps,
   FreechatPageProps,
+  getFreechatServerSideProps,
 } from "@/features/freechat/pages/FreechatPage/serverSideProps";
+import { ContentLayout } from "@/features/shared/components/Layout";
+import { NextPageWithLayout } from "./_app";
 
 const FreechatPageWrapper: NextPageWithLayout<FreechatPageProps> = (
   pageProps,
@@ -25,6 +25,6 @@ FreechatPageWrapper.getLayout = (page, pageProps) => (
   </ContentLayout>
 );
 
-export const getStaticProps = getFreechatStaticProps;
+export const getServerSideProps = getFreechatServerSideProps;
 
 export default FreechatPageWrapper;

@@ -1,6 +1,5 @@
-import { formatDate } from "@/lib/utils";
 import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
-import { EventsByDate } from "../../domain";
+import { formatDate } from "@/lib/utils";
 import Timeline from "@mui/lab/Timeline";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
@@ -10,6 +9,7 @@ import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import { Typography, useMediaQuery } from "@mui/material";
 import React, { useRef } from "react";
+import { EventsByDate } from "../../domain";
 import { EventCard } from "./EventCard";
 
 export type EventTimelineProps = {

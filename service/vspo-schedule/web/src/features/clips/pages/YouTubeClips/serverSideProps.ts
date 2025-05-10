@@ -1,6 +1,6 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { getInitializedI18nInstance } from "@/lib/utils";
+import { getInitializedI18nInstance, getSessionId } from "@/lib/utils";
 import { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { fetchClips } from "../../api";
@@ -92,6 +92,7 @@ export const getYouTubeClipsServerSideProps = (options: YouTubeClipOptions) => {
       order: order as "asc" | "desc",
       orderKey: orderKey as "publishedAt" | "viewCount",
       afterPublishedAtDate: afterDate,
+      sessionId: getSessionId(context.req),
     });
 
     // Check for errors in the API response

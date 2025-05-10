@@ -46,6 +46,11 @@ export interface VSPOApiOptions {
   cfAccessClientSecret?: string;
 
   /**
+   * Custom session ID to include in requests
+   */
+  sessionId?: string;
+
+  /**
    * Base URL for API requests
    * @default "https://api.vspo-portal.com"
    */
@@ -77,6 +82,7 @@ export class VSPOApi {
   private readonly apiKey: string | undefined;
   private readonly cfAccessClientId: string | undefined;
   private readonly cfAccessClientSecret: string | undefined;
+  private readonly sessionId: string | undefined;
   public readonly baseUrl: string;
 
   public readonly retry: {
@@ -88,6 +94,7 @@ export class VSPOApi {
     this.apiKey = opts.apiKey;
     this.cfAccessClientId = opts.cfAccessClientId;
     this.cfAccessClientSecret = opts.cfAccessClientSecret;
+    this.sessionId = opts.sessionId;
     this.baseUrl = opts.baseUrl ?? "http://localhost:3000";
 
     this.retry = {
@@ -111,6 +118,10 @@ export class VSPOApi {
 
     if (this.cfAccessClientSecret) {
       headers["CF-Access-Client-Secret"] = this.cfAccessClientSecret;
+    }
+
+    if (this.sessionId) {
+      headers["x-session-id"] = this.sessionId;
     }
 
     return headers;
