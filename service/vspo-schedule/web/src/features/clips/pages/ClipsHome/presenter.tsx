@@ -71,17 +71,17 @@ const PeriodButton = styled(ButtonBase, {
   // Dynamic color based on theme mode and active state
   backgroundColor: active
     ? "#3474db" // Specific blue color for active state
-    : theme.vars.palette.mode === "dark"
+    : theme.palette.mode === "dark"
       ? "#333333" // Dark grey for inactive buttons in dark mode
       : "#e0e0e0", // Light grey for inactive buttons in light mode
   color:
-    active || theme.vars.palette.mode === "dark"
+    active || theme.palette.mode === "dark"
       ? theme.palette.common.white // White text for active buttons and dark mode
       : theme.vars.palette.grey[800], // Dark text for inactive buttons in light mode
   "&:hover": {
     backgroundColor: active
       ? "#2a5cb8" // Slightly darker blue for hover on active
-      : theme.vars.palette.mode === "dark"
+      : theme.palette.mode === "dark"
         ? "#444444" // Slightly lighter gray for hover in dark mode
         : "#cccccc", // Darker gray for hover in light mode
   },
