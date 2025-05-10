@@ -44,15 +44,15 @@ import {
   DiscordInteractor,
   type IDiscordInteractor,
 } from "../../usecase/discord";
+import {
+  FreechatInteractor,
+  type IFreechatInteractor,
+} from "../../usecase/freechat";
 import { AIService, type IAIService } from "../ai";
 import { CloudflareKVCacheClient, type ICacheClient } from "../cache";
 import { DiscordClient, type IDiscordClient } from "../discord";
 import { ClipRepository, type IClipRepository } from "../repository/clip";
 import { EventRepository, type IEventRepository } from "../repository/event";
-import {
-  FreechatInteractor,
-  type IFreechatInteractor,
-} from "../../usecase/freechat";
 
 export interface IRepositories {
   creatorRepository: ICreatorRepository;

@@ -24,12 +24,12 @@ import {
   registerEventGetApi,
   registerEventListApi,
 } from "../../infra/http/routes/event";
+import { registerFreechatListApi } from "../../infra/http/routes/freechat";
 import {
   registerStreamListApi,
   registerStreamPostApi,
 } from "../../infra/http/routes/stream";
 import { createHandler, withTracer } from "../../infra/http/trace";
-import { registerFreechatListApi } from "../../infra/http/routes/freechat";
 
 const app = newApp();
 app.notFound((c) => {

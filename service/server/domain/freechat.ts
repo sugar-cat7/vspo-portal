@@ -1,7 +1,6 @@
 import { z } from "zod";
-import { ThumbnailURLSchema } from "./thumbnail";
-import { BaseVideoSchema, type Platform, PlatformSchema } from "./video";
 import { getChatEmbedUrl, getLivestreamEmbedUrl } from "./stream";
+import { BaseVideoSchema, type Platform } from "./video";
 
 // Function to get clip link
 const getFreechatLink = (
