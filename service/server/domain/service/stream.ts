@@ -397,7 +397,7 @@ export class StreamService implements IStreamService {
       limit: 1000,
       page: 0,
       status: StatusSchema.Enum.live,
-      startedAt: convertToUTCDate(
+      startDateFrom: convertToUTCDate(
         getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
       ),
       languageCode: "default",
@@ -407,7 +407,7 @@ export class StreamService implements IStreamService {
       limit: 1000,
       page: 0,
       status: StatusSchema.Enum.upcoming,
-      startedAt: convertToUTCDate(
+      startDateFrom: convertToUTCDate(
         getCurrentUTCDate().setDate(getCurrentUTCDate().getDate() - 1),
       ),
       languageCode: "default",

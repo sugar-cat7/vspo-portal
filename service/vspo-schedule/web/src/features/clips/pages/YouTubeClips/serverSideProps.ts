@@ -81,7 +81,7 @@ export const getYouTubeClipsServerSideProps = (options: YouTubeClipOptions) => {
     const { t } = getInitializedI18nInstance(translations, "clips");
 
     // Get clip type from options (default to "clip")
-    const clipType = options?.type || "clip";
+    const clipType = options.type || "clip";
 
     // Fetch clips
     const response = await fetchClips({

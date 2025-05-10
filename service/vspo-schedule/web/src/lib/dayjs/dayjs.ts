@@ -20,6 +20,18 @@ const convertToUTCDate = (input: Date | string | number) => {
   return dayjs.tz(input).utc().toDate();
 };
 
-export { convertToUTC, convertToUTCDate, getCurrentUTCDate };
+const convertToUTCTimestamp = (
+  dateStr: Date | string | number,
+  tz: string,
+): string => {
+  return dayjs.tz(dateStr, tz).utc().format();
+};
+
+export {
+  convertToUTC,
+  convertToUTCDate,
+  getCurrentUTCDate,
+  convertToUTCTimestamp,
+};
 
 export type { ConfigType } from "dayjs";

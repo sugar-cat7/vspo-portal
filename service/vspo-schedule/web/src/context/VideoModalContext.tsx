@@ -1,10 +1,13 @@
 import { Clip } from "@/features/clips";
-import { Video } from "@/types/streaming";
+import { Video } from "@/features/shared/domain";
 import dynamic from "next/dynamic";
 import { createContext, useCallback, useState } from "react";
 
 const VideoModal = dynamic(
-  () => import("../components/Elements").then((mod) => mod.VideoModal),
+  () =>
+    import("../features/shared/components/Elements").then(
+      (mod) => mod.VideoModal,
+    ),
   { ssr: false },
 );
 

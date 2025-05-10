@@ -79,6 +79,72 @@ const formatTwitchThumbnail = (url: string): string =>
     .replace("-{width}x{height}", "-400x220")
     .replace("http://", "https://");
 
+// Helper function to extract TwitCasting user ID from URL
+const extractTwitcastingUserId = (url: string): string | null => {
+  // Match patterns like "http://twitcasting.tv/twitcasting_jp/movie/189037369"
+  const match = url.match(/twitcasting\.tv\/([^\/]+)\/movie/);
+  return match ? match[1] : null;
+};
+
+export const getChatEmbedUrl = (livestream: {
+  platform: Platform;
+  rawId: string;
+  link: string;
+}): string | null => {
+  if (livestream.platform === "twitch") {
+    const userLogin = livestream.link.split("/").pop();
+    const chatEmbedUrl = `https://www.twitch.tv/embed/${userLogin}/chat`;
+    return chatEmbedUrl;
+  }
+  if (livestream.platform === "youtube") {
+    const chatEmbedUrl = `https://www.youtube.com/live_chat?v=${livestream.rawId}`;
+    return chatEmbedUrl;
+  }
+  return null;
+};
+
+export const getLivestreamEmbedUrl = (livestream: {
+  platform: Platform;
+  rawId: string;
+  link: string;
+  status: Status;
+  rawChannelID?: string;
+}): string | null => {
+  switch (livestream.platform) {
+    case "youtube":
+      return `https://www.youtube.com/embed/${livestream.rawId}`;
+    case "twitch": {
+      if (livestream.status === "live") {
+        const userLogin = livestream.link.split("/").pop();
+        return `https://player.twitch.tv/?channel=${userLogin}`;
+      }
+
+      if (livestream.status === "ended") {
+        return `https://player.twitch.tv/?video=${livestream.rawId}`;
+      }
+
+      return null;
+    }
+    case "twitcasting": {
+      const channelId =
+        extractTwitcastingUserId(livestream.link) ||
+        livestream.link.split("/").pop();
+      if (livestream.status === "live") {
+        return `https://twitcasting.tv/${channelId}/embeddedplayer/live`;
+      }
+      if (livestream.status === "ended") {
+        return `https://twitcasting.tv/${channelId}/embeddedplayer/${livestream.rawId}`;
+      }
+      return null;
+    }
+    case "niconico": {
+      return `https://live.nicovideo.jp/embed/${livestream.rawId}`;
+    }
+    default:
+      return null;
+  }
+};
+
 // Stream Schema (extends Base, adds stream-specific fields)
 const StreamSchema = BaseVideoSchema.extend({
   // Stream specific fields from streamStatusTable
@@ -121,14 +187,32 @@ const StreamSchema = BaseVideoSchema.extend({
       ? formatTwitchThumbnail(stream.thumbnailURL)
       : stream.thumbnailURL;
 
+  // Ensure link is always defined before passing to getChatEmbedUrl
+  const link = stream.link || generatedLink;
+  const chatPlayerLink = getChatEmbedUrl({
+    platform: stream.platform,
+    rawId: stream.rawId,
+    link,
+  });
+
+  const videoPlayerLink = getLivestreamEmbedUrl({
+    platform: stream.platform,
+    rawId: stream.rawId,
+    link,
+    status: stream.status,
+    rawChannelID: stream.rawChannelID,
+  });
+
   return {
     ...stream,
     platformIconURL,
-    link: stream.link || generatedLink, // Use DB link first, then generate
+    link, // Use DB link first, then generate
     statusColor,
     formattedStartedAt,
     formattedEndedAt,
     thumbnailURL,
+    chatPlayerLink,
+    videoPlayerLink,
   };
 });
 
@@ -138,17 +222,29 @@ const StreamsSchema = z.array(StreamSchema);
 // Type inference
 type Status = z.infer<typeof StatusSchema>; // Stream status
 
-// Stream types
-type StreamInput = z.input<typeof StreamSchema>; // Includes Base + Stream specifics
-type Stream = z.output<typeof StreamSchema>; // Includes Base + Stream specifics + transformed fields
+// Base type for stream without transformed properties
+type BaseStream = z.input<typeof StreamSchema>;
+
+// Stream types with transformed properties
+type Stream = z.output<typeof StreamSchema>;
 type Streams = z.output<typeof StreamsSchema>;
 
 // Creator functions
-const createStream = (stream: StreamInput): Stream => {
+const createStream = (stream: BaseStream): Stream => {
   return StreamSchema.parse(stream);
 };
-const createStreams = (streams: StreamInput[]): Streams => {
-  return StreamsSchema.parse(streams);
+
+const createStreams = (streams: BaseStream[]): Streams => {
+  // Filter out streams with invalid thumbnail URLs
+  const validStreams = streams.filter(
+    (stream) =>
+      !(
+        stream.thumbnailURL &&
+        (stream.thumbnailURL.includes("_404") ||
+          stream.thumbnailURL.includes("404_processing"))
+      ),
+  );
+  return StreamsSchema.parse(validStreams);
 };
 
 export {
@@ -158,7 +254,7 @@ export {
   StatusSchema, // Stream status enum
   // Types
   type Status,
-  type StreamInput,
+  type BaseStream,
   type Stream,
   type Streams,
   // Creator functions

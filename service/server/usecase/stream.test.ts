@@ -528,7 +528,7 @@ describe.concurrent("StreamInteractor", () => {
         params: {
           limit: 10,
           page: 0,
-          startedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+          startDateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
           endedAt: new Date(),
           languageCode: TargetLangSchema.Enum.en,
         },
@@ -650,10 +650,10 @@ describe.concurrent("StreamInteractor", () => {
         if (
           tc.expectations.dateRange &&
           streams.length > 0 &&
-          tc.params.startedAt &&
+          tc.params.startDateFrom &&
           tc.params.endedAt
         ) {
-          assertDateRange(streams, tc.params.startedAt, tc.params.endedAt);
+          assertDateRange(streams, tc.params.startDateFrom, tc.params.endedAt);
         }
 
         if (tc.expectations.ordering && streams.length > 1) {
@@ -764,8 +764,7 @@ describe.concurrent("StreamInteractor", () => {
           page: 0,
           platform: PlatformSchema.Enum.youtube,
           status: StatusSchema.Enum.live,
-
-          startedAt: new Date("2099-01-01"),
+          startDateFrom: new Date("2099-01-01"),
           languageCode: TargetLangSchema.Enum.en,
         };
 

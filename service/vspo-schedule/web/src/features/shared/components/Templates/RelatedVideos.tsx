@@ -1,0 +1,213 @@
+import { Clip } from "@/features/clips";
+import { useVideoModalContext } from "@/hooks";
+import { Livestream } from "@/features/schedule/domain";
+import {
+  Box,
+  Button,
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  Typography,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { useTranslation } from "next-i18next";
+import React, { useMemo } from "react";
+import useSWRInfinite from "swr/infinite";
+import { Loading } from "../Elements";
+import { fetcher } from "@/lib/api";
+import { Video } from "@/features/shared/domain";
+
+const StyledCard = styled(Card)({
+  marginTop: "8px",
+  marginBottom: "8px",
+  "& .MuiTypography-root": {
+    fontSize: "0.75rem",
+  },
+  "& .MuiTypography-h5": {
+    fontSize: "0.9rem",
+  },
+
+  display: "flex",
+  height: "90px",
+  width: "100%",
+});
+
+const StyledCardMedia = styled(CardMedia)({
+  width: "120px", // fixed width
+  height: "90px", // fixed height
+  objectFit: "cover",
+  backgroundSize: "cover",
+});
+
+const StyledCardContent = styled(CardContent)({
+  display: "flex",
+  flexDirection: "column",
+  alignContent: "center",
+  margin: "0",
+  padding: "0",
+  marginLeft: "8px",
+  paddingTop: "8px",
+  justifyContent: "center",
+  // flex: 1, // flex grow to fill remaining space
+});
+
+const StyledTitle = styled(Typography)({
+  display: "-webkit-box",
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+});
+
+const StyledChannelTitle = styled(Typography)({
+  display: "-webkit-box",
+  WebkitLineClamp: 1,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+});
+
+type Videos = {
+  liveStreams: Livestream[];
+  clips: Clip[];
+};
+
+const getRelatedVideos = (
+  relatedVideos?: Videos,
+  channelId?: string,
+  videoId?: string,
+): Videos => {
+  if (!relatedVideos) return { liveStreams: [], clips: [] };
+
+  const livestreamIdSet = new Set();
+
+  const relatedLivestreams: Livestream[] = relatedVideos.liveStreams.filter(
+    (l) => {
+      if (l.id !== videoId && !livestreamIdSet.has(l.id)) {
+        livestreamIdSet.add(l.id);
+        return true;
+      }
+      return false;
+    },
+  );
+
+  const relatedVideosArray: Videos = {
+    liveStreams: relatedLivestreams,
+    clips: [],
+  };
+
+  return relatedVideosArray;
+};
+
+type RelatedVideoCardProps = {
+  video: Video;
+  onClick: () => void;
+};
+
+const RelatedVideoCard: React.FC<RelatedVideoCardProps> = ({
+  video,
+  onClick,
+}) => {
+  return (
+    <StyledCard>
+      <CardActionArea onClick={onClick}>
+        <Box sx={{ display: "flex" }}>
+          <Box sx={{ width: "120px" }}>
+            <StyledCardMedia
+              image={video.thumbnailUrl
+                .replace("%{width}", "320")
+                .replace("%{height}", "180")
+                .replace("-{width}x{height}", "-320x180")
+                .replace("http://", "https://")}
+              title={video.title}
+            />
+          </Box>
+          <StyledCardContent>
+            <StyledTitle variant="h5">{video.title}</StyledTitle>
+            <StyledChannelTitle
+              variant="body2"
+              sx={{ color: "text.secondary" }}
+            >
+              {video.channelTitle}
+            </StyledChannelTitle>
+            {/* <Typography variant="body2" sx={{ color: "text.secondary" }}>
+              {formatDate(
+                video.scheduledStartTime || TEMP_TIMESTAMP,
+                "MM/dd (E)",
+                { localeCode: locale, timeZone },
+              )}
+            </Typography> */}
+          </StyledCardContent>
+        </Box>
+      </CardActionArea>
+    </StyledCard>
+  );
+};
+
+export const RelatedVideos: React.FC<{
+  channelId: string;
+  videoId: string;
+}> = ({ channelId, videoId }) => {
+  const { pushVideo } = useVideoModalContext();
+  const { t } = useTranslation("common");
+  const { data, error, size, setSize, isValidating } = useSWRInfinite<
+    Videos,
+    Error
+  >(
+    (index: number) => `/relatedVideo?page=${index + 1}&limit=5`,
+    fetcher<Videos>,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      shouldRetryOnError: false,
+    },
+  );
+  const relatedVideos: Videos = useMemo(() => {
+    // Extract data from each page and combine into one RelatedProps object
+    const combinedData: Videos = {
+      liveStreams: [],
+      clips: [],
+    };
+
+    data?.forEach((pageData) => {
+      combinedData.liveStreams.push(...pageData.liveStreams);
+      combinedData.clips.push(...pageData.clips);
+    });
+
+    return getRelatedVideos(combinedData, channelId, videoId);
+  }, [channelId, data, videoId]);
+
+  const loadMoreData = () => {
+    setSize(size + 1); // fetch new data
+  };
+
+  if (error) {
+    return <div>Error loading data</div>;
+  }
+
+  return (
+    <Box>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {[...relatedVideos.liveStreams, ...relatedVideos.clips].map((video) => (
+          <RelatedVideoCard
+            key={video.id}
+            video={video}
+            onClick={() => pushVideo(video)}
+          />
+        ))}
+      </Box>
+      {isValidating && <Loading />}
+      <Button
+        onClick={loadMoreData}
+        disabled={isValidating}
+        sx={{ width: "100%", display: "flex", justifyContent: "center" }}
+      >
+        {t("relatedVideos.loadMore")}
+      </Button>
+    </Box>
+  );
+};

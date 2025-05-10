@@ -320,7 +320,17 @@
               "example": "2022-01-01T00:00:00.000Z"
             },
             "required": false,
-            "name": "startedAt",
+            "name": "startDateFrom",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "description": "Start Date To",
+              "example": "2022-01-01T00:00:00.000Z"
+            },
+            "required": false,
+            "name": "startDateTo",
             "in": "query"
           },
           {
@@ -442,6 +452,14 @@
                           "translated": {
                             "type": "boolean"
                           },
+                          "videoPlayerLink": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "chatPlayerLink": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "status": {
                             "type": "string",
                             "enum": ["live", "upcoming", "ended", "unknown"]
@@ -497,7 +515,9 @@
                           "creatorName": "藍沢エマ",
                           "creatorThumbnailURL": "https://yt3.googleusercontent.com/oIps6UVvqtpJykcdjYYyRvhdcyVoR1wAdH8CnTp4msMaKYdn8XMLj4FHsLoqfWaJzbLJKSPjCg=s176-c-k-c0x00ffffff-no-rj",
                           "deleted": false,
-                          "translated": false
+                          "translated": false,
+                          "videoPlayerLink": "https://www.youtube.com/embed/O0XCK3NhzqE",
+                          "chatPlayerLink": "https://www.youtube.com/live_chat?v=O0XCK3NhzqE"
                         }
                       }
                     },
@@ -1095,6 +1115,14 @@
                           "translated": {
                             "type": "boolean"
                           },
+                          "videoPlayerLink": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "chatPlayerLink": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "status": {
                             "type": "string",
                             "enum": ["live", "upcoming", "ended", "unknown"]
@@ -1150,7 +1178,9 @@
                           "creatorName": "藍沢エマ",
                           "creatorThumbnailURL": "https://yt3.googleusercontent.com/oIps6UVvqtpJykcdjYYyRvhdcyVoR1wAdH8CnTp4msMaKYdn8XMLj4FHsLoqfWaJzbLJKSPjCg=s176-c-k-c0x00ffffff-no-rj",
                           "deleted": false,
-                          "translated": false
+                          "translated": false,
+                          "videoPlayerLink": "https://www.youtube.com/embed/O0XCK3NhzqE",
+                          "chatPlayerLink": "https://www.youtube.com/live_chat?v=O0XCK3NhzqE"
                         }
                       }
                     }
@@ -1435,6 +1465,14 @@
                           "translated": {
                             "type": "boolean"
                           },
+                          "videoPlayerLink": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "chatPlayerLink": {
+                            "type": "string",
+                            "nullable": true
+                          },
                           "type": {
                             "type": "string",
                             "enum": ["short", "clip"]
@@ -1660,21 +1698,21 @@
           {
             "schema": {
               "type": "string",
-              "description": "Start datetime (ISO format)",
-              "example": "2023-12-01T10:00:00.000Z"
+              "description": "Start date from",
+              "example": "2023-12-01"
             },
             "required": false,
-            "name": "startAt",
+            "name": "startedDateFrom",
             "in": "query"
           },
           {
             "schema": {
               "type": "string",
-              "description": "End datetime (ISO format)",
-              "example": "2023-12-01T18:00:00.000Z"
+              "description": "Start date to",
+              "example": "2023-12-01"
             },
             "required": false,
-            "name": "endAt",
+            "name": "startedDateTo",
             "in": "query"
           }
         ],
@@ -1693,54 +1731,39 @@
                         "properties": {
                           "id": {
                             "type": "string",
-                            "description": "Event ID",
-                            "example": "event-123456"
+                            "default": "add2ebe7-f711-4014-a674-e26e20cc5f81"
                           },
                           "title": {
-                            "type": "string",
-                            "description": "Event title",
-                            "example": "ぶいすぽっ！感謝祭2023"
+                            "type": "string"
                           },
                           "storageFileId": {
-                            "type": "string",
-                            "description": "Storage file ID containing event details",
-                            "example": "file-abcdef"
+                            "type": "string"
                           },
-                          "startAt": {
-                            "type": "string",
-                            "description": "Event start datetime (ISO format)",
-                            "example": "2023-12-01T10:00:00.000Z"
-                          },
-                          "endAt": {
-                            "type": "string",
-                            "description": "Event end datetime (ISO format)",
-                            "example": "2023-12-01T18:00:00.000Z"
+                          "startedDate": {
+                            "type": "string"
                           },
                           "visibility": {
                             "type": "string",
                             "enum": ["public", "private", "internal"],
-                            "description": "Event visibility status",
-                            "example": "public"
+                            "default": "private"
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "default": []
                           },
                           "createdAt": {
                             "type": "string",
-                            "description": "Creation datetime",
-                            "example": "2023-11-15T08:00:00.000Z"
+                            "default": "2025-05-10T08:34:28.451Z"
                           },
                           "updatedAt": {
                             "type": "string",
-                            "description": "Last update datetime",
-                            "example": "2023-11-15T08:00:00.000Z"
+                            "default": "2025-05-10T08:34:28.451Z"
                           }
                         },
-                        "required": [
-                          "id",
-                          "title",
-                          "storageFileId",
-                          "visibility",
-                          "createdAt",
-                          "updatedAt"
-                        ]
+                        "required": ["title", "storageFileId", "startedDate"]
                       }
                     },
                     "pagination": {
@@ -1886,15 +1909,10 @@
                     "description": "Storage file ID containing event details",
                     "example": "file-abcdef"
                   },
-                  "startAt": {
+                  "startedDate": {
                     "type": "string",
-                    "description": "Event start datetime (ISO format)",
-                    "example": "2023-12-01T10:00:00.000Z"
-                  },
-                  "endAt": {
-                    "type": "string",
-                    "description": "Event end datetime (ISO format)",
-                    "example": "2023-12-01T18:00:00.000Z"
+                    "description": "Event start date",
+                    "example": "2023-12-01"
                   },
                   "visibility": {
                     "type": "string",
@@ -1904,7 +1922,7 @@
                     "example": "private"
                   }
                 },
-                "required": ["title", "storageFileId"]
+                "required": ["title", "storageFileId", "startedDate"]
               }
             }
           }
@@ -1919,54 +1937,39 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Event ID",
-                      "example": "event-123456"
+                      "default": "14971039-9ff6-437b-854b-ec84f0f2db19"
                     },
                     "title": {
-                      "type": "string",
-                      "description": "Event title",
-                      "example": "ぶいすぽっ！感謝祭2023"
+                      "type": "string"
                     },
                     "storageFileId": {
-                      "type": "string",
-                      "description": "Storage file ID containing event details",
-                      "example": "file-abcdef"
+                      "type": "string"
                     },
-                    "startAt": {
-                      "type": "string",
-                      "description": "Event start datetime (ISO format)",
-                      "example": "2023-12-01T10:00:00.000Z"
-                    },
-                    "endAt": {
-                      "type": "string",
-                      "description": "Event end datetime (ISO format)",
-                      "example": "2023-12-01T18:00:00.000Z"
+                    "startedDate": {
+                      "type": "string"
                     },
                     "visibility": {
                       "type": "string",
                       "enum": ["public", "private", "internal"],
-                      "description": "Event visibility status",
-                      "example": "public"
+                      "default": "private"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": []
                     },
                     "createdAt": {
                       "type": "string",
-                      "description": "Creation datetime",
-                      "example": "2023-11-15T08:00:00.000Z"
+                      "default": "2025-05-10T08:34:28.456Z"
                     },
                     "updatedAt": {
                       "type": "string",
-                      "description": "Last update datetime",
-                      "example": "2023-11-15T08:00:00.000Z"
+                      "default": "2025-05-10T08:34:28.456Z"
                     }
                   },
-                  "required": [
-                    "id",
-                    "title",
-                    "storageFileId",
-                    "visibility",
-                    "createdAt",
-                    "updatedAt"
-                  ]
+                  "required": ["title", "storageFileId", "startedDate"]
                 }
               }
             }
@@ -2075,54 +2078,371 @@
                   "properties": {
                     "id": {
                       "type": "string",
-                      "description": "Event ID",
-                      "example": "event-123456"
+                      "default": "583a08c2-587a-4005-8d78-c540d38f6973"
                     },
                     "title": {
-                      "type": "string",
-                      "description": "Event title",
-                      "example": "ぶいすぽっ！感謝祭2023"
+                      "type": "string"
                     },
                     "storageFileId": {
-                      "type": "string",
-                      "description": "Storage file ID containing event details",
-                      "example": "file-abcdef"
+                      "type": "string"
                     },
-                    "startAt": {
-                      "type": "string",
-                      "description": "Event start datetime (ISO format)",
-                      "example": "2023-12-01T10:00:00.000Z"
-                    },
-                    "endAt": {
-                      "type": "string",
-                      "description": "Event end datetime (ISO format)",
-                      "example": "2023-12-01T18:00:00.000Z"
+                    "startedDate": {
+                      "type": "string"
                     },
                     "visibility": {
                       "type": "string",
                       "enum": ["public", "private", "internal"],
-                      "description": "Event visibility status",
-                      "example": "public"
+                      "default": "private"
+                    },
+                    "tags": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": []
                     },
                     "createdAt": {
                       "type": "string",
-                      "description": "Creation datetime",
-                      "example": "2023-11-15T08:00:00.000Z"
+                      "default": "2025-05-10T08:34:28.455Z"
                     },
                     "updatedAt": {
                       "type": "string",
-                      "description": "Last update datetime",
-                      "example": "2023-11-15T08:00:00.000Z"
+                      "default": "2025-05-10T08:34:28.455Z"
                     }
                   },
-                  "required": [
-                    "id",
-                    "title",
-                    "storageFileId",
-                    "visibility",
-                    "createdAt",
-                    "updatedAt"
-                  ]
+                  "required": ["title", "storageFileId", "startedDate"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrBadRequest"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Although the HTTP standard specifies \"unauthorized\", semantically this response means \"unauthenticated\". That is, the client must authenticate itself to get the requested response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrUnauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource. Unlike 401 Unauthorized, the client's identity is known to the server.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrForbidden"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource. In the browser, this means the URL is not recognized. In an API, this can also mean that the endpoint is valid but the resource itself does not exist. Servers may also send this response instead of 403 Forbidden to hide the existence of a resource from an unauthorized client. This response code is probably the most well known due to its frequent occurrence on the web.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrNotFound"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "This response is sent when a request conflicts with the current state of the server.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrConflict"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "The user has sent too many requests in a given amount of time (\"rate limiting\")",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrTooManyRequests"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "The server has encountered a situation it does not know how to handle.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrInternalServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/freechats": {
+      "get": {
+        "tags": ["Freechat"],
+        "operationId": "listFreechats",
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Maximum number of items to retrieve per page",
+              "example": "10"
+            },
+            "required": true,
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Page number to start retrieving items(starts from 1)",
+              "example": "1"
+            },
+            "required": true,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "default": "default",
+              "description": "Language Code",
+              "example": "en"
+            },
+            "required": false,
+            "name": "languageCode",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["vspo_all", "vspo_jp", "vspo_en"],
+              "default": "vspo_all",
+              "description": "Member Type",
+              "example": "vspo_all"
+            },
+            "required": false,
+            "name": "memberType",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc",
+              "description": "Order By",
+              "example": "desc"
+            },
+            "required": false,
+            "name": "orderBy",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["publishedAt", "creatorName"],
+              "default": "publishedAt",
+              "description": "Order Key",
+              "example": "publishedAt"
+            },
+            "required": false,
+            "name": "orderKey",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The configuration for an api",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "freechats": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "rawId": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "languageCode": {
+                            "type": "string",
+                            "enum": [
+                              "en",
+                              "ja",
+                              "fr",
+                              "de",
+                              "es",
+                              "cn",
+                              "tw",
+                              "ko",
+                              "default"
+                            ]
+                          },
+                          "rawChannelID": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "publishedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "platform": {
+                            "type": "string",
+                            "enum": [
+                              "youtube",
+                              "twitch",
+                              "twitcasting",
+                              "niconico",
+                              "unknown"
+                            ]
+                          },
+                          "tags": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "thumbnailURL": {
+                            "type": "string"
+                          },
+                          "creatorName": {
+                            "type": "string"
+                          },
+                          "creatorThumbnailURL": {
+                            "type": "string"
+                          },
+                          "viewCount": {
+                            "type": "integer",
+                            "minimum": 0
+                          },
+                          "link": {
+                            "type": "string"
+                          },
+                          "deleted": {
+                            "type": "boolean",
+                            "default": false
+                          },
+                          "translated": {
+                            "type": "boolean"
+                          },
+                          "videoPlayerLink": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "chatPlayerLink": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "rawId",
+                          "title",
+                          "languageCode",
+                          "rawChannelID",
+                          "description",
+                          "publishedAt",
+                          "platform",
+                          "tags",
+                          "thumbnailURL",
+                          "viewCount"
+                        ],
+                        "description": "Freechat",
+                        "example": {
+                          "id": "O0XCK3NhzqE",
+                          "rawId": "O0XCK3NhzqE",
+                          "title": "【APEX】ランドマークは溶岩になった！！#三清傑WIN w/まつりちゃん,えるちゃん【ぶいすぽっ！/ 藍沢エマ】",
+                          "languageCode": "ja",
+                          "rawChannelID": "UCPkKpOHxEDcwmUAnRpIu-Ng",
+                          "description": "ぶいすぽっ！所属の藍沢エマです！\nApexの配信をします！\nチャンネル登録、高評価よろしくお願いします！",
+                          "publishedAt": "2023-05-20T12:00:00.000Z",
+                          "platform": "youtube",
+                          "tags": [
+                            "APEX",
+                            "ぶいすぽっ！",
+                            "藍沢エマ",
+                            "三清傑"
+                          ],
+                          "viewCount": 125000,
+                          "thumbnailURL": "https://i.ytimg.com/vi/O0XCK3NhzqE/hqdefault_live.jpg",
+                          "creatorName": "藍沢エマ",
+                          "creatorThumbnailURL": "https://yt3.googleusercontent.com/oIps6UVvqtpJykcdjYYyRvhdcyVoR1wAdH8CnTp4msMaKYdn8XMLj4FHsLoqfWaJzbLJKSPjCg=s176-c-k-c0x00ffffff-no-rj",
+                          "deleted": false,
+                          "translated": false
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "currentPage": {
+                          "type": "integer",
+                          "description": "Current Page",
+                          "example": 1
+                        },
+                        "prevPage": {
+                          "type": "integer",
+                          "description": "Previous Page",
+                          "example": 1
+                        },
+                        "nextPage": {
+                          "type": "integer",
+                          "description": "Next Page",
+                          "example": 1
+                        },
+                        "totalPage": {
+                          "type": "integer",
+                          "description": "Total Pages",
+                          "example": 1
+                        },
+                        "totalCount": {
+                          "type": "integer",
+                          "description": "Total Count",
+                          "example": 1
+                        },
+                        "hasNext": {
+                          "type": "boolean",
+                          "description": "Has Next",
+                          "example": true
+                        }
+                      },
+                      "required": [
+                        "currentPage",
+                        "totalPage",
+                        "totalCount",
+                        "hasNext"
+                      ]
+                    }
+                  },
+                  "required": ["freechats", "pagination"]
                 }
               }
             }
