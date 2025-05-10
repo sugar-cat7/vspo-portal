@@ -4,7 +4,7 @@ import {
   EventsContent,
   DateSearchDialogContainer,
 } from "./components";
-import { Box, Fab, Tabs, Tab, Paper } from "@mui/material";
+import { Box, Fab, Tabs, Tab, Paper, Container } from "@mui/material";
 import { useTranslation } from "next-i18next";
 import SearchIcon from "@mui/icons-material/Search";
 import { Livestream } from "../../domain";
@@ -20,7 +20,33 @@ const FixedTabsContainer = styled(Paper)(({ theme }) => ({
   top: HEADER_HEIGHT, // Stick to the position right below the header
   zIndex: 1100,
   width: "100%",
-  backgroundColor: theme.palette.background.paper,
+  backgroundColor: theme.palette.background.default,
+  transition: "none",
+
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: theme.vars.palette.customColors.gray,
+  },
+}));
+
+const ContentContainer = styled(Box)({
+  position: "relative",
+  minHeight: "100px",
+});
+
+const LoadingOverlay = styled(Box)(({ theme }) => ({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  zIndex: 5,
+  backgroundColor: theme.vars?.palette?.background?.default || "transparent",
+  [theme.getColorSchemeSelector("dark")]: {
+    backgroundColor: theme.vars?.palette?.background?.paper || "transparent",
+  },
 }));
 
 type PresenterProps = {
@@ -53,7 +79,7 @@ export const ScheduleStatusPresenter: React.FC<PresenterProps> = ({
   const { t } = useTranslation("streams");
 
   return (
-    <Box sx={{ position: "relative", pb: 4 }}>
+    <Container maxWidth="lg" sx={{ position: "relative", pb: 4 }}>
       {!isArchivePage && (
         <FixedTabsContainer elevation={2}>
           <Tabs
@@ -71,19 +97,29 @@ export const ScheduleStatusPresenter: React.FC<PresenterProps> = ({
         </FixedTabsContainer>
       )}
 
-      {isLoading ? (
-        <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
-          <Loading />
-        </Box>
-      ) : (
-        <>
+      <ContentContainer sx={{ mt: 4 }}>
+        {/* Always render content but with opacity based on loading state */}
+        <Box
+          sx={{
+            opacity: isLoading ? 0 : 1,
+            visibility: isLoading ? "hidden" : "visible",
+            transition: "opacity 0.2s",
+          }}
+        >
           <EventsContent events={events} />
           <LivestreamContent
             livestreamsByDate={livestreamsByDate}
             timeZone={timeZone}
           />
-        </>
-      )}
+        </Box>
+
+        {/* Loading overlay */}
+        {isLoading && (
+          <LoadingOverlay>
+            <Loading />
+          </LoadingOverlay>
+        )}
+      </ContentContainer>
 
       {/* Floating search button */}
       <Fab
@@ -105,6 +141,6 @@ export const ScheduleStatusPresenter: React.FC<PresenterProps> = ({
         open={isSearchDialogOpen}
         onClose={onSearchDialogClose}
       />
-    </Box>
+    </Container>
   );
 };

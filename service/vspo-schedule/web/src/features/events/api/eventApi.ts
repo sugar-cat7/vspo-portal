@@ -64,10 +64,6 @@ export const fetchEvents = async ({
     return eventSchema.parse(eventData);
   });
 
-  console.log({
-    events,
-  });
-
   return Ok({
     events,
   });
