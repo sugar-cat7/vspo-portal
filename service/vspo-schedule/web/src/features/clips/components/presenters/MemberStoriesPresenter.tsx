@@ -8,7 +8,7 @@ import React, { useRef } from "react";
 
 // Styled components
 const StoryContainer = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.background.paper,
+  backgroundColor: theme.vars.palette.background.paper,
   borderRadius: theme.shape.borderRadius,
   padding: theme.spacing(2),
   marginBottom: theme.spacing(4),
@@ -18,7 +18,7 @@ const StoryContainer = styled(Box)(({ theme }) => ({
 const StoryAvatar = styled(Avatar)(({ theme }) => ({
   width: 80,
   height: 80,
-  border: `3px solid ${theme.palette.primary.main}`,
+  border: `3px solid ${theme.vars.palette.primary.main}`,
   boxShadow: "0 0 0 2px white",
   cursor: "pointer",
   transition: "transform 0.2s",
@@ -30,7 +30,7 @@ const StoryAvatar = styled(Avatar)(({ theme }) => ({
 const StoryAvatarInactive = styled(Avatar)(({ theme }) => ({
   width: 80,
   height: 80,
-  border: `3px solid ${theme.palette.grey[300]}`,
+  border: `3px solid ${theme.vars.palette.grey[300]}`,
   filter: "grayscale(100%)",
   opacity: 0.7,
   boxShadow: "0 0 0 2px white",

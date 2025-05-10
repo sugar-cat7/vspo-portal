@@ -1,7 +1,5 @@
 import { ServerResponse } from "http";
 import { ParsedUrlQuery } from "querystring";
-import { members } from "@/data/members";
-import { Member } from "@/types/member";
 import { SiteNewsTag } from "@/types/site-news";
 import { Locale, isMatch } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
@@ -105,44 +103,6 @@ export const getSiteNewsTagColor = (tag: SiteNewsTag) => {
     default:
       return "default";
   }
-};
-
-/**
- * Searches for members who are relevant to the given string.
- * @param str - The string to search through.
- * @returns The list of relevant members.
- */
-export const getRelevantMembers = (str: string) => {
-  return members.filter((member) => isRelevantMember(member, str));
-};
-
-/**
- * Determines whether the given member is relevant to the given string.
- * @param member - The query member.
- * @param str - The string to search through.
- * @returns true if the member is relevant to the string, false otherwise.
- */
-export const isRelevantMember = (member: Member, str: string) => {
-  return member.keywords.some((keyword) => str.includes(keyword));
-};
-
-type HasThumbnailUrl = { thumbnailUrl: string };
-
-export const convertThumbnailQualityInObjects = <T extends HasThumbnailUrl>(
-  objects: T[],
-): T[] => {
-  if (!Array.isArray(objects)) {
-    return objects;
-  }
-  return objects.map((object) => ({
-    ...object,
-    thumbnailUrl: object.thumbnailUrl
-      .replace("http://", "https://")
-      .replace("%{width}", "320")
-      .replace("%{height}", "180")
-      .replace("-{width}x{height}", "-320x180"),
-    // .replace("hqdefault", "mqdefault")
-  }));
 };
 
 export const isValidYearMonth = (yearMonth: string) => {

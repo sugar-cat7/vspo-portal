@@ -26,7 +26,7 @@ const FilterContainer = styled(Paper)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
   boxShadow: theme.shadows[1],
-  background: theme.palette.background.paper,
+  background: theme.vars.palette.background.paper,
   [theme.breakpoints.down("sm")]: {
     padding: theme.spacing(2),
   },
@@ -37,7 +37,7 @@ const FilterTitle = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   marginBottom: theme.spacing(2),
-  color: theme.palette.text.primary,
+  color: theme.vars.palette.text.primary,
 }));
 
 // Period filter button
@@ -64,7 +64,7 @@ const PeriodButton = styled(ButtonBase, {
   color:
     active || theme.palette.mode === "dark"
       ? theme.palette.common.white // White text for active buttons and dark mode
-      : theme.palette.grey[800], // Dark text for inactive buttons in light mode
+      : theme.vars.palette.grey[800], // Dark text for inactive buttons in light mode
   "&:hover": {
     backgroundColor: active
       ? "#2a5cb8" // Slightly darker blue for hover on active
@@ -198,8 +198,9 @@ export const Presenter: React.FC<YouTubeClipsPresenterProps> = ({
         <Grid container spacing={isMobile ? 1 : 2}>
           {dateFilterOptions.map((option) => (
             <Grid
-              item
-              xs={isMobile ? (option.value === "all" ? 4 : 4) : "auto"}
+              size={{
+                xs: isMobile ? (option.value === "all" ? 4 : 4) : "auto",
+              }}
               key={option.value}
             >
               <PeriodButton

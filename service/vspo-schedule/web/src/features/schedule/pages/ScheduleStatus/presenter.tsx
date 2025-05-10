@@ -20,7 +20,7 @@ const FixedTabsContainer = styled(Paper)(({ theme }) => ({
   top: HEADER_HEIGHT, // Stick to the position right below the header
   zIndex: 1100,
   width: "100%",
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: theme.vars.palette.background.default,
   transition: "none",
 
   [theme.getColorSchemeSelector("dark")]: {
@@ -28,10 +28,12 @@ const FixedTabsContainer = styled(Paper)(({ theme }) => ({
   },
 }));
 
-const ContentContainer = styled(Box)({
+const ContentContainer = styled(Box)(({ theme }) => ({
   position: "relative",
   minHeight: "100px",
-});
+  backgroundColor: theme.vars.palette.background.default,
+  color: theme.vars.palette.text.primary,
+}));
 
 const LoadingOverlay = styled(Box)(({ theme }) => ({
   position: "absolute",
@@ -43,9 +45,9 @@ const LoadingOverlay = styled(Box)(({ theme }) => ({
   justifyContent: "center",
   alignItems: "center",
   zIndex: 5,
-  backgroundColor: theme.vars?.palette?.background?.default || "transparent",
+  backgroundColor: theme.vars.palette.background.default,
   [theme.getColorSchemeSelector("dark")]: {
-    backgroundColor: theme.vars?.palette?.background?.paper || "transparent",
+    backgroundColor: theme.vars.palette.background.paper,
   },
 }));
 
@@ -79,7 +81,7 @@ export const ScheduleStatusPresenter: React.FC<PresenterProps> = ({
   const { t } = useTranslation("streams");
 
   return (
-    <Container maxWidth="lg" sx={{ position: "relative", pb: 4 }}>
+    <Container maxWidth="lg" sx={{ position: "relative", pb: 4, pl: 0, pr: 0 }}>
       {!isArchivePage && (
         <FixedTabsContainer elevation={2}>
           <Tabs
