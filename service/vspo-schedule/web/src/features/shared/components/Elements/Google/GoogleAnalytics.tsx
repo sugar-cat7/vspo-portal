@@ -1,7 +1,6 @@
 import Script from "next/script";
 import { FC } from "react";
 
-/** Google Analytics によるアクセス解析を行うためのコンポーネント */
 export const GoogleAnalytics: FC = () => {
   if (process.env.NODE_ENV !== "production") {
     return <></>;
