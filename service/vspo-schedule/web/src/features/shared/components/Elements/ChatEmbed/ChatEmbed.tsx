@@ -1,9 +1,9 @@
+import { Freechat } from "@/features/freechat/domain";
+import { Livestream } from "@/features/schedule/domain";
 import { convertChatPlayerLink } from "@/features/shared/utils";
 import { styled, useColorScheme } from "@mui/material/styles";
 import React from "react";
 import { Loading } from "..";
-import { Livestream } from "@/features/schedule/domain";
-import { Freechat } from "@/features/freechat/domain";
 
 // Styled components
 const ResponsiveChatIframeWrapper = styled("div")({
@@ -67,8 +67,6 @@ export const ChatEmbed: React.FC<{
     livestream.platform,
     isDarkMode,
   );
-
-  console.log("chatEmbedUrl", chatEmbedUrl);
 
   const handleLoad = () => {
     setIsLoading(false);

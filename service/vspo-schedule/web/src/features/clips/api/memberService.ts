@@ -12,13 +12,18 @@ export type FetchVspoMembersResult = Result<
 /**
  * Fetch VSPO member information
  */
-export const fetchVspoMembers = async (): Promise<FetchVspoMembersResult> => {
+export const fetchVspoMembers = async ({
+  sessionId,
+}: {
+  sessionId?: string;
+}): Promise<FetchVspoMembersResult> => {
   // Initialize API client
   const client = new VSPOApi({
     apiKey: process.env.API_KEY_V2,
     baseUrl: process.env.API_URL_V2,
     cfAccessClientId: process.env.CF_ACCESS_CLIENT_ID,
     cfAccessClientSecret: process.env.CF_ACCESS_CLIENT_SECRET,
+    sessionId: sessionId,
   });
 
   // Fetch Japanese and English members in parallel

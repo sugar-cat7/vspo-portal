@@ -1,11 +1,11 @@
-import { useVideoModalContext } from "@/hooks";
+import { PlatformIcon } from "@/features/schedule/pages/ScheduleStatus/components/LivestreamContent/PlatformIcon";
 import { Video } from "@/features/shared/domain";
+import { useVideoModalContext } from "@/hooks";
 import { Box, Card, CardActionArea } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useTranslation } from "next-i18next";
 import Image from "next/image";
 import { HighlightedVideoChip } from "../Chip";
-import { PlatformIcon } from "@/features/schedule/pages/ScheduleStatus/components/LivestreamContent/PlatformIcon";
-import { useTranslation } from "next-i18next";
 
 type Props = {
   video: Video;

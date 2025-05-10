@@ -1,5 +1,5 @@
-import { ContentLayout } from "@/features/shared/components/Layout";
 import { aboutSections } from "@/data/content/about-sections";
+import { ContentLayout } from "@/features/shared/components/Layout";
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getInitializedI18nInstance } from "@/lib/utils";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";

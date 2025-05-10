@@ -18,6 +18,7 @@ export type FetchClipsParams = {
   orderKey: "viewCount" | "publishedAt";
   beforePublishedAtDate?: string;
   afterPublishedAtDate?: string;
+  sessionId?: string;
 };
 
 export type ClipFetchResult = Result<
@@ -60,6 +61,7 @@ export const fetchClips = async (
     baseUrl: process.env.API_URL_V2,
     cfAccessClientId: process.env.CF_ACCESS_CLIENT_ID,
     cfAccessClientSecret: process.env.CF_ACCESS_CLIENT_SECRET,
+    sessionId: params.sessionId,
   });
   const result = await client.clips.list({
     limit: limit.toString(),

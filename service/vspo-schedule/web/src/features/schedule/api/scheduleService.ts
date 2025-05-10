@@ -1,13 +1,13 @@
+import { Event, eventSchema } from "@/features/events/domain";
+import { addDaysAndConvertToUTC, convertToUTCTimestamp } from "@/lib/dayjs";
 import {
-  ListStreamsParams,
-  VSPOApi,
   ListStreamsMemberType,
+  ListStreamsParams,
   ListStreamsPlatform,
+  VSPOApi,
 } from "@vspo-lab/api";
 import { BaseError, Err, Ok, Result } from "@vspo-lab/error";
-import { Livestream, livestreamSchema, Status } from "../domain";
-import { convertToUTCTimestamp, addDaysAndConvertToUTC } from "@/lib/dayjs";
-import { eventSchema, Event } from "@/features/events/domain";
+import { Livestream, Status, livestreamSchema } from "../domain";
 
 export type FetchLivestreamsParams = {
   limit: number;
@@ -18,6 +18,7 @@ export type FetchLivestreamsParams = {
   startedDate?: string;
   memberType?: string;
   platform?: string;
+  sessionId?: string;
 };
 
 export type FetchEventsParams = {
@@ -50,6 +51,7 @@ export const fetchLivestreams = async (
     baseUrl: process.env.API_URL_V2,
     cfAccessClientId: process.env.CF_ACCESS_CLIENT_ID,
     cfAccessClientSecret: process.env.CF_ACCESS_CLIENT_SECRET,
+    sessionId: params.sessionId,
   });
 
   const statusMap: Record<string, Status | undefined> = {
@@ -97,7 +99,7 @@ export const fetchLivestreams = async (
       params.timezone,
     );
   }
-  console.log("param", param);
+
   // Cast to any to allow the new parameter names until the API client is updated
   const result = await client.streams.list(param);
 
@@ -138,8 +140,10 @@ export const fetchLivestreams = async (
  */
 export const fetchEvents = async ({
   startedDate,
+  sessionId,
 }: {
   startedDate?: string;
+  sessionId?: string;
 }): Promise<EventFetchResult> => {
   // Initialize API client
   const client = new VSPOApi({
@@ -147,6 +151,7 @@ export const fetchEvents = async ({
     baseUrl: process.env.API_URL_V2,
     cfAccessClientId: process.env.CF_ACCESS_CLIENT_ID,
     cfAccessClientSecret: process.env.CF_ACCESS_CLIENT_SECRET,
+    sessionId: sessionId,
   });
 
   const result = await client.events.list({

@@ -1,20 +1,21 @@
-import { GetServerSideProps } from "next";
+import { Event } from "@/features/events/domain";
 import {
   fetchEvents,
   fetchLivestreams,
 } from "@/features/schedule/api/scheduleService";
+import { Livestream } from "@/features/schedule/domain";
+import { DEFAULT_TIME_ZONE } from "@/lib/Const";
+import { TIME_ZONE_COOKIE } from "@/lib/Const";
+import { getCurrentUTCDate } from "@/lib/dayjs";
 import {
   formatDate,
-  groupBy,
   getInitializedI18nInstance,
+  getSessionId,
   getSetCookieTimeZone,
+  groupBy,
 } from "@/lib/utils";
-import { Livestream } from "@/features/schedule/domain";
-import { Event } from "@/features/events/domain";
+import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { DEFAULT_TIME_ZONE } from "@/lib/Const";
-import { getCurrentUTCDate } from "@/lib/dayjs";
-import { TIME_ZONE_COOKIE } from "@/lib/Const";
 
 export type ScheduleStatusPageProps = {
   livestreamsByDate: Record<string, Livestream[]>;
@@ -73,6 +74,7 @@ export const getLivestreamsServerSideProps: GetServerSideProps<
     await Promise.allSettled([
       fetchEvents({
         startedDate,
+        sessionId: getSessionId(req),
       }),
       fetchLivestreams({
         limit,
@@ -83,6 +85,7 @@ export const getLivestreamsServerSideProps: GetServerSideProps<
         startedDate,
         memberType,
         platform,
+        sessionId: getSessionId(req),
       }),
       serverSideTranslations(locale || "ja", ["common", "streams", "schedule"]),
     ]);

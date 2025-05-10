@@ -3,6 +3,7 @@ import {
   DEFAULT_LOCALE,
   DEFAULT_TIME_ZONE,
   LOCALE_COOKIE,
+  SESSION_ID_COOKIE,
   TIME_ZONE_COOKIE,
   TIME_ZONE_HEADER,
 } from "./lib/Const";
@@ -27,6 +28,7 @@ export const middleware = (req: NextRequest) => {
       return redirect;
     }
     setTimeZone(req, res);
+    setSessionId(req, res);
     return res;
   } catch (e) {
     console.error(e);
@@ -64,6 +66,18 @@ const setTimeZone = (req: NextRequest, res: NextResponse) => {
   setCookie(res, TIME_ZONE_COOKIE, timeZone);
 };
 
+/**
+ * Ensure a session ID exists in cookies
+ * If none exists, generate a new UUID using crypto
+ */
+const setSessionId = (req: NextRequest, res: NextResponse) => {
+  const existingSessionId = getCookieSessionId(req);
+  if (!existingSessionId) {
+    const sessionId = crypto.randomUUID();
+    setCookie(res, SESSION_ID_COOKIE, sessionId);
+  }
+};
+
 const getCookieLocale = (req: NextRequest) => {
   return req.cookies.get(LOCALE_COOKIE)?.value;
 };
@@ -88,6 +102,13 @@ const getCookieTimeZone = (req: NextRequest) => {
 
 const getHeaderTimeZone = (req: NextRequest) => {
   return req.headers.get(TIME_ZONE_HEADER) ?? undefined;
+};
+
+/**
+ * Get session ID from cookies
+ */
+export const getCookieSessionId = (req: NextRequest) => {
+  return req.cookies.get(SESSION_ID_COOKIE)?.value;
 };
 
 const setCookie = (res: NextResponse, name: string, value: string) => {

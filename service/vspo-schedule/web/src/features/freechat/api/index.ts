@@ -4,6 +4,7 @@ import { Freechat, freechatSchema } from "../domain";
 
 export type FetchFreechatsParams = {
   lang?: string;
+  sessionId?: string;
 };
 
 export type FreechatFetchResult = Result<
@@ -48,6 +49,7 @@ export const fetchFreechats = async (
     baseUrl: process.env.API_URL_V2,
     cfAccessClientId: process.env.CF_ACCESS_CLIENT_ID,
     cfAccessClientSecret: process.env.CF_ACCESS_CLIENT_SECRET,
+    sessionId: params.sessionId,
   });
 
   const result = await api.freechats.list({

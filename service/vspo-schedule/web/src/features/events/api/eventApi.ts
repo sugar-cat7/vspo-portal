@@ -19,9 +19,11 @@ export type EventFetchResult = Result<
 export const fetchEvents = async ({
   startedDateFrom,
   startedDateTo,
+  sessionId,
 }: {
   startedDateFrom: string;
   startedDateTo: string;
+  sessionId?: string;
 }): Promise<EventFetchResult> => {
   // Initialize API client
   const client = new VSPOApi({
@@ -29,16 +31,10 @@ export const fetchEvents = async ({
     baseUrl: process.env.API_URL_V2,
     cfAccessClientId: process.env.CF_ACCESS_CLIENT_ID,
     cfAccessClientSecret: process.env.CF_ACCESS_CLIENT_SECRET,
+    sessionId: sessionId,
   });
 
   const result = await client.events.list({
-    limit: "100",
-    page: "0",
-    visibility: "public",
-    startedDateFrom,
-    startedDateTo,
-  });
-  console.log({
     limit: "100",
     page: "0",
     visibility: "public",

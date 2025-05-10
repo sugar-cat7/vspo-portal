@@ -1,6 +1,6 @@
 import React from "react";
-import { FreechatPagePresenter } from "./presenter";
 import { Freechat } from "../../domain";
+import { FreechatPagePresenter } from "./presenter";
 
 type FreechatPageContainerProps = {
   freechats: Freechat[];

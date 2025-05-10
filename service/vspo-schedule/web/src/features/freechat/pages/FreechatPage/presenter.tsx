@@ -1,7 +1,7 @@
-import React from "react";
 import Grid from "@mui/material/Grid2";
-import { Freechat } from "../../domain";
+import React from "react";
 import { FreechatCard } from "../../components";
+import { Freechat } from "../../domain";
 
 type FreechatPagePresenterProps = {
   freechats: Freechat[];

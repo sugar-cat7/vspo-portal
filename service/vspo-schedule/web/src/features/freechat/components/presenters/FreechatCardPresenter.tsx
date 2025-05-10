@@ -1,17 +1,17 @@
-import React from "react";
-import { Freechat } from "../../domain";
+import { VideoCard } from "@/features/shared/components/Elements/Card/VideoCard";
 import {
   Avatar,
+  AvatarGroup,
   Card,
   CardContent,
   Typography,
-  AvatarGroup,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
-import { VideoCard } from "@/features/shared/components/Elements/Card/VideoCard";
+import React from "react";
+import { Freechat } from "../../domain";
 
 // Styled components
 const StyledCard = styled(Card)(() => ({

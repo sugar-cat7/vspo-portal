@@ -8,7 +8,7 @@ import { formatInTimeZone } from "date-fns-tz";
 import { enUS, ja, ko, zhCN, zhTW } from "date-fns/locale";
 import { createInstance as createI18nInstance } from "i18next";
 import { SSRConfig } from "next-i18next";
-import { DEFAULT_LOCALE, TIME_ZONE_COOKIE } from "./Const";
+import { DEFAULT_LOCALE, SESSION_ID_COOKIE, TIME_ZONE_COOKIE } from "./Const";
 import { convertToUTCDate, getCurrentUTCDate } from "./dayjs";
 
 /**
@@ -206,6 +206,18 @@ export const getInitializedI18nInstance = (
   });
   i18n.init();
   return i18n;
+};
+
+/**
+ * Gets the session ID from the request's cookie.
+ * @param req - The request object containing the cookie.
+ * @returns The session ID from the cookie, or undefined if not found.
+ */
+export const getSessionId = (req: { headers: { cookie?: string } }) => {
+  if (!req.headers.cookie) {
+    return undefined;
+  }
+  return getCookieValue(SESSION_ID_COOKIE, req.headers.cookie);
 };
 
 /**

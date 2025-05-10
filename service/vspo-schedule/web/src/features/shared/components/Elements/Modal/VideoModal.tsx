@@ -1,10 +1,11 @@
 import { Platform } from "@/features/clips";
+import { Clip } from "@/features/clips/domain";
+import { Freechat } from "@/features/freechat/domain";
+import { Livestream } from "@/features/schedule/domain";
+import { Video } from "@/features/shared/domain";
+import { convertVideoPlayerLink } from "@/features/shared/utils";
 import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { formatDate } from "@/lib/utils";
-import { Video } from "@/features/shared/domain";
-import { Livestream } from "@/features/schedule/domain";
-import { Freechat } from "@/features/freechat/domain";
-import { Clip } from "@/features/clips/domain";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import CloseIcon from "@mui/icons-material/Close";
 import ShareIcon from "@mui/icons-material/Share";
@@ -30,7 +31,6 @@ import React, { useEffect } from "react";
 import { Link, PlatformIcon } from "..";
 import { ChatEmbed } from "../ChatEmbed";
 import { HighlightedVideoChip } from "../Chip";
-import { convertVideoPlayerLink } from "@/features/shared/utils";
 
 // Styled components
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({

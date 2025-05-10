@@ -1,10 +1,10 @@
-import React from "react";
-import { Box, Typography, Grid } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { formatDate } from "@/lib/utils";
 import { Livestream } from "@/features/schedule/domain";
-import { LivestreamCard } from "./LivestreamCard";
+import { formatDate } from "@/lib/utils";
+import { Box, Grid, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import React from "react";
 import { groupLivestreamsByTimeBlock } from "../../utils";
+import { LivestreamCard } from "./LivestreamCard";
 
 const ContentSection = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(6),

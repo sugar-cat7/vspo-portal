@@ -1,6 +1,6 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { getInitializedI18nInstance } from "@/lib/utils";
+import { getInitializedI18nInstance, getSessionId } from "@/lib/utils";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { fetchClips } from "../../api";
@@ -18,7 +18,7 @@ const getDaysAgoISO = (days: number): string => {
 // NOTE: Not included in barrel exports because it contains node:fs internally
 export const getTwitchClipsServerSideProps: GetServerSideProps<
   TwitchClipsProps
-> = async ({ locale = DEFAULT_LOCALE as string, query }) => {
+> = async ({ locale = DEFAULT_LOCALE as string, query, req }) => {
   // Get the current page from query params or default to 1
   const currentPage = query.page ? parseInt(query.page as string, 10) : 0;
 
@@ -71,6 +71,7 @@ export const getTwitchClipsServerSideProps: GetServerSideProps<
     order: order,
     orderKey: orderKey,
     afterPublishedAtDate: afterDate,
+    sessionId: getSessionId(req),
   });
 
   // Handler function for getCurrentUTCDate to avoid repeated type assertions

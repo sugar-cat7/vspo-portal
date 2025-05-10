@@ -1,8 +1,8 @@
-import React from "react";
-import { Box, Typography, List, ListItem, Paper } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { Event } from "@/features/events/domain";
+import { Box, List, ListItem, Paper, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";
+import React from "react";
 
 const ContentSection = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(6),

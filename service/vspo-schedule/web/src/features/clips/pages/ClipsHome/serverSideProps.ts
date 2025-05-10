@@ -1,6 +1,6 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { getInitializedI18nInstance } from "@/lib/utils";
+import { getInitializedI18nInstance, getSessionId } from "@/lib/utils";
 import { GetServerSidePropsContext } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { fetchHomePageData } from "../../api";
@@ -48,6 +48,7 @@ export const getServerSideProps = async (
     serverSideTranslations(locale, ["common", "clips"]),
     fetchHomePageData({
       afterPublishedAtDate: afterDate,
+      sessionId: getSessionId(context.req),
     }),
   ]);
 

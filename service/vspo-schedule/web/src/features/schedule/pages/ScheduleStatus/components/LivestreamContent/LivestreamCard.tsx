@@ -1,19 +1,19 @@
-import { formatDate } from "@/lib/utils";
 import { Livestream } from "@/features/schedule/domain";
+import { VideoCard } from "@/features/shared/components/Elements/Card/VideoCard";
+import { formatDate } from "@/lib/utils";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import {
   Avatar,
+  AvatarGroup,
   Card,
   CardContent,
   Typography,
-  AvatarGroup,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import React, { useMemo } from "react";
-import { VideoCard } from "@/features/shared/components/Elements/Card/VideoCard";
-import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
 // VideoCard Component
 const StyledCard = styled(Card)(() => ({

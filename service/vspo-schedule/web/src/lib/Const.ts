@@ -7,14 +7,10 @@ export const LOCALE_COOKIE = "NEXT_LOCALE";
 
 export const TIME_ZONE_COOKIE = "time-zone";
 export const TIME_ZONE_HEADER = "x-vercel-ip-timezone";
+export const SESSION_ID_COOKIE = "x-session-id";
 
 export const QA_LINK = process.env.NEXT_PUBLIC_FORM;
 
 export const DISCORD_LINK = process.env.NEXT_PUBLIC_DISCORD_LINK;
-
-export const API_ROOT =
-  process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : process.env.API_ROOT;
 
 export const ENVIRONMENT = process.env.ENVIRONMENT;

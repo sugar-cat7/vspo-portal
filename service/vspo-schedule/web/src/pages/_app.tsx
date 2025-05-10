@@ -1,10 +1,10 @@
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "@/styles/globals.css";
 import "@/styles/normalize.css";
-import { GoogleAnalytics } from "@/features/shared/components/Elements";
 import { ThemeModeProvider } from "@/context/Theme";
 import { TimeZoneContextProvider } from "@/context/TimeZoneContext";
 import { VideoModalContextProvider } from "@/context/VideoModalContext";
+import { GoogleAnalytics } from "@/features/shared/components/Elements";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { AppCacheProvider } from "@mui/material-nextjs/v14-pagesRouter";
 import { Analytics } from "@vercel/analytics/react";
