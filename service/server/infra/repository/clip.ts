@@ -111,10 +111,6 @@ export class ClipRepository implements IClipRepository {
           }),
       );
 
-      if (clipResult.val?.length === 0) {
-        return Ok([]);
-      }
-
       if (clipResult.err) {
         return Err(clipResult.err);
       }

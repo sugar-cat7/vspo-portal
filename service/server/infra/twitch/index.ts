@@ -238,7 +238,6 @@ export class TwitchService implements ITwitchService {
           user_id: uid,
           period: "week",
           type: "archive",
-          order: "desc",
         });
       });
 

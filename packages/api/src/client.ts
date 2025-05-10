@@ -222,14 +222,14 @@ export class VSPOApi {
         });
       },
 
-      search: (
+      create: (
         body: apiGen.PostStreamBody,
         options?: AxiosRequestConfig,
       ): Promise<Result<apiGen.PostStream200, AppError>> => {
         return this.request<apiGen.PostStream200>({
           ...options,
           method: "POST",
-          url: `${this.baseUrl}/streams/search`,
+          url: `${this.baseUrl}/streams`,
           data: body,
         });
       },
@@ -302,22 +302,6 @@ export class VSPOApi {
           ...options,
           method: "GET",
           url: `${this.baseUrl}/events/${id}`,
-        });
-      },
-    };
-  }
-
-  public get freechats() {
-    return {
-      list: (
-        params: apiGen.ListFreechatsParams,
-        options?: AxiosRequestConfig,
-      ): Promise<Result<apiGen.ListFreechats200, AppError>> => {
-        return this.request<apiGen.ListFreechats200>({
-          ...options,
-          method: "GET",
-          url: `${this.baseUrl}/freechats`,
-          params,
         });
       },
     };

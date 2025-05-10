@@ -18,6 +18,13 @@ export const getServerSideProps = async (
 ) => {
   const locale = context.locale || DEFAULT_LOCALE;
 
+  // Get translations
+  const translations = await serverSideTranslations(locale, [
+    "common",
+    "clips",
+  ]);
+  const { t } = getInitializedI18nInstance(translations, "clips");
+
   // Get date range from query parameters or default to 1 week
   const period = (context.query.period as string) || "week";
 
@@ -43,24 +50,42 @@ export const getServerSideProps = async (
       break;
   }
 
-  // Fetch translations and home page data in parallel
-  const [translationsResult, homePageDataResult] = await Promise.allSettled([
-    serverSideTranslations(locale, ["common", "clips"]),
-    fetchHomePageData({
-      afterPublishedAtDate: afterDate,
-    }),
-  ]);
+  // Fetch all data for homepage with date filters
+  const homePageDataResponse = await fetchHomePageData({
+    afterPublishedAtDate: afterDate,
+  });
 
-  // Extract results or use defaults
-  const translations =
-    translationsResult.status === "fulfilled" ? translationsResult.value : {};
-  const homePageData =
-    homePageDataResult.status === "fulfilled"
-      ? homePageDataResult.value
-      : { err: true };
+  // Error handling
+  if (homePageDataResponse.err) {
+    console.error("Failed to fetch home page data:", homePageDataResponse.err);
+    // Return empty data on error
+    return {
+      props: {
+        popularYoutubeClips: [],
+        popularShortsClips: [],
+        popularTwitchClips: [],
+        vspoMembers: [],
+        lastUpdateTimestamp: getCurrentUTCDate().getTime(),
+        meta: {
+          title: t("home.meta.title", "ぶいすぽっ!クリップ集"),
+          description: t(
+            "home.meta.description",
+            "ぶいすぽっ!メンバーのストリーム動画クリップ集。",
+          ),
+        },
+        currentPeriod: period || "week",
+        ...translations,
+      } as ClipsHomeProps,
+    };
+  }
 
-  // Get translations instance
-  const { t } = getInitializedI18nInstance(translations, "clips");
+  // Return data fetched from API on success
+  const {
+    popularYoutubeClips,
+    popularShortsClips,
+    popularTwitchClips,
+    vspoMembers,
+  } = homePageDataResponse.val;
 
   // Meta content
   const title = t("home.meta.title", "ぶいすぽっ!クリップ集");
@@ -71,35 +96,6 @@ export const getServerSideProps = async (
 
   // Get the last update timestamp
   const lastUpdateTimestamp = getCurrentUTCDate().getTime();
-
-  // Error handling
-  if (homePageData.err) {
-    console.error("Failed to fetch home page data:", homePageData.err);
-    // Return empty data on error
-    return {
-      props: {
-        popularYoutubeClips: [],
-        popularShortsClips: [],
-        popularTwitchClips: [],
-        vspoMembers: [],
-        lastUpdateTimestamp,
-        meta: {
-          title,
-          description,
-        },
-        currentPeriod: period || "week",
-        ...translations,
-      } as ClipsHomeProps,
-    };
-  }
-
-  // Return data fetched from API on success
-  const {
-    popularYoutubeClips = [],
-    popularShortsClips = [],
-    popularTwitchClips = [],
-    vspoMembers = [],
-  } = "val" in homePageData ? homePageData.val : {};
 
   return {
     props: {

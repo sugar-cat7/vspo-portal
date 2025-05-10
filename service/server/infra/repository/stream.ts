@@ -15,7 +15,6 @@ import {
   eq,
   gte,
   inArray,
-  isNull,
   lte,
   or,
 } from "drizzle-orm";
@@ -52,8 +51,7 @@ type ListQuery = {
   platform?: string;
   status?: string;
   memberType?: string;
-  startDateFrom?: Date; // Start date range: streams starting on or after this date
-  startDateTo?: Date; // Start date range: streams starting on or before this date
+  startedAt?: Date;
   endedAt?: Date;
   languageCode: string; // ISO 639-1 language code or [default] explicitly specified to narrow down to 1creator
   orderBy?: "asc" | "desc";
@@ -116,10 +114,6 @@ export class StreamRepository implements IStreamRepository {
             cause: err,
           }),
       );
-
-      if (streamResult.val?.length === 0) {
-        return Ok([]);
-      }
 
       if (streamResult.err) {
         return Err(streamResult.err);
@@ -463,15 +457,9 @@ export class StreamRepository implements IStreamRepository {
     if (query.status) {
       filters.push(eq(streamStatusTable.status, query.status));
     }
-    if (query.startDateFrom) {
+    if (query.startedAt) {
       filters.push(
-        gte(streamStatusTable.startedAt, convertToUTCDate(query.startDateFrom)),
-      );
-    }
-
-    if (query.startDateTo) {
-      filters.push(
-        lte(streamStatusTable.startedAt, convertToUTCDate(query.startDateTo)),
+        gte(streamStatusTable.startedAt, convertToUTCDate(query.startedAt)),
       );
     }
     if (query.endedAt) {

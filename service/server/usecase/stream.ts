@@ -16,8 +16,7 @@ export type ListParam = {
   platform?: string;
   status?: string;
   memberType?: string;
-  startDateFrom?: Date;
-  startDateTo?: Date;
+  startedAt?: Date;
   endedAt?: Date;
   languageCode: string;
   orderBy?: "asc" | "desc";

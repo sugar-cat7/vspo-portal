@@ -24,7 +24,6 @@ import {
   registerEventGetApi,
   registerEventListApi,
 } from "../../infra/http/routes/event";
-import { registerFreechatListApi } from "../../infra/http/routes/freechat";
 import {
   registerStreamListApi,
   registerStreamPostApi,
@@ -75,7 +74,6 @@ registerClipListApi(app);
 registerEventListApi(app);
 registerEventGetApi(app);
 registerEventCreateApi(app);
-registerFreechatListApi(app);
 
 export default createHandler({
   fetch: async (req: Request, env: ApiEnv, executionCtx: ExecutionContext) => {

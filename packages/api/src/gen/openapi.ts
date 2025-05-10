@@ -199,8 +199,7 @@ page: string;
 platform?: ListStreamsPlatform;
 status?: ListStreamsStatus;
 memberType?: ListStreamsMemberType;
-startDateFrom?: string;
-startDateTo?: string;
+startedAt?: string;
 endedAt?: string;
 languageCode?: string;
 orderBy?: ListStreamsOrderBy;
@@ -310,10 +309,6 @@ export type ListStreams200StreamsItem = {
   link?: string;
   deleted?: boolean;
   translated?: boolean;
-  /** @nullable */
-  videoPlayerLink?: string | null;
-  /** @nullable */
-  chatPlayerLink?: string | null;
   status: ListStreams200StreamsItemStatus;
   /** @nullable */
   startedAt: string | null;
@@ -538,10 +533,6 @@ export type PostStream200VideosItem = {
   link?: string;
   deleted?: boolean;
   translated?: boolean;
-  /** @nullable */
-  videoPlayerLink?: string | null;
-  /** @nullable */
-  chatPlayerLink?: string | null;
   status: PostStream200VideosItemStatus;
   /** @nullable */
   startedAt: string | null;
@@ -662,10 +653,6 @@ export type ListClips200ClipsItem = {
   link?: string;
   deleted?: boolean;
   translated?: boolean;
-  /** @nullable */
-  videoPlayerLink?: string | null;
-  /** @nullable */
-  chatPlayerLink?: string | null;
   type: ListClips200ClipsItemType;
 };
 
@@ -694,8 +681,8 @@ limit: string;
 page: string;
 visibility?: ListEventsVisibility;
 orderBy?: ListEventsOrderBy;
-startedDateFrom?: string;
-startedDateTo?: string;
+startAt?: string;
+endAt?: string;
 };
 
 export type ListEventsVisibility = typeof ListEventsVisibility[keyof typeof ListEventsVisibility];
@@ -717,6 +704,9 @@ export const ListEventsOrderBy = {
   desc: 'desc',
 } as const;
 
+/**
+ * Event visibility status
+ */
 export type ListEvents200EventsItemVisibility = typeof ListEvents200EventsItemVisibility[keyof typeof ListEvents200EventsItemVisibility];
 
 
@@ -728,14 +718,22 @@ export const ListEvents200EventsItemVisibility = {
 } as const;
 
 export type ListEvents200EventsItem = {
-  id?: string;
+  /** Event ID */
+  id: string;
+  /** Event title */
   title: string;
+  /** Storage file ID containing event details */
   storageFileId: string;
-  startedDate: string;
-  visibility?: ListEvents200EventsItemVisibility;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
+  /** Event start datetime (ISO format) */
+  startAt?: string;
+  /** Event end datetime (ISO format) */
+  endAt?: string;
+  /** Event visibility status */
+  visibility: ListEvents200EventsItemVisibility;
+  /** Creation datetime */
+  createdAt: string;
+  /** Last update datetime */
+  updatedAt: string;
 };
 
 export type ListEvents200Pagination = {
@@ -776,12 +774,17 @@ export type CreateEventBody = {
   title: string;
   /** Storage file ID containing event details */
   storageFileId: string;
-  /** Event start date */
-  startedDate: string;
+  /** Event start datetime (ISO format) */
+  startAt?: string;
+  /** Event end datetime (ISO format) */
+  endAt?: string;
   /** Event visibility status */
   visibility?: CreateEventBodyVisibility;
 };
 
+/**
+ * Event visibility status
+ */
 export type CreateEvent201Visibility = typeof CreateEvent201Visibility[keyof typeof CreateEvent201Visibility];
 
 
@@ -793,16 +796,27 @@ export const CreateEvent201Visibility = {
 } as const;
 
 export type CreateEvent201 = {
-  id?: string;
+  /** Event ID */
+  id: string;
+  /** Event title */
   title: string;
+  /** Storage file ID containing event details */
   storageFileId: string;
-  startedDate: string;
-  visibility?: CreateEvent201Visibility;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
+  /** Event start datetime (ISO format) */
+  startAt?: string;
+  /** Event end datetime (ISO format) */
+  endAt?: string;
+  /** Event visibility status */
+  visibility: CreateEvent201Visibility;
+  /** Creation datetime */
+  createdAt: string;
+  /** Last update datetime */
+  updatedAt: string;
 };
 
+/**
+ * Event visibility status
+ */
 export type GetEvent200Visibility = typeof GetEvent200Visibility[keyof typeof GetEvent200Visibility];
 
 
@@ -814,126 +828,22 @@ export const GetEvent200Visibility = {
 } as const;
 
 export type GetEvent200 = {
-  id?: string;
-  title: string;
-  storageFileId: string;
-  startedDate: string;
-  visibility?: GetEvent200Visibility;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-};
-
-export type ListFreechatsParams = {
-limit: string;
-page: string;
-languageCode?: string;
-memberType?: ListFreechatsMemberType;
-orderBy?: ListFreechatsOrderBy;
-orderKey?: ListFreechatsOrderKey;
-};
-
-export type ListFreechatsMemberType = typeof ListFreechatsMemberType[keyof typeof ListFreechatsMemberType];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ListFreechatsMemberType = {
-  vspo_all: 'vspo_all',
-  vspo_jp: 'vspo_jp',
-  vspo_en: 'vspo_en',
-} as const;
-
-export type ListFreechatsOrderBy = typeof ListFreechatsOrderBy[keyof typeof ListFreechatsOrderBy];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ListFreechatsOrderBy = {
-  asc: 'asc',
-  desc: 'desc',
-} as const;
-
-export type ListFreechatsOrderKey = typeof ListFreechatsOrderKey[keyof typeof ListFreechatsOrderKey];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ListFreechatsOrderKey = {
-  publishedAt: 'publishedAt',
-  creatorName: 'creatorName',
-} as const;
-
-export type ListFreechats200FreechatsItemLanguageCode = typeof ListFreechats200FreechatsItemLanguageCode[keyof typeof ListFreechats200FreechatsItemLanguageCode];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ListFreechats200FreechatsItemLanguageCode = {
-  en: 'en',
-  ja: 'ja',
-  fr: 'fr',
-  de: 'de',
-  es: 'es',
-  cn: 'cn',
-  tw: 'tw',
-  ko: 'ko',
-  default: 'default',
-} as const;
-
-export type ListFreechats200FreechatsItemPlatform = typeof ListFreechats200FreechatsItemPlatform[keyof typeof ListFreechats200FreechatsItemPlatform];
-
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ListFreechats200FreechatsItemPlatform = {
-  youtube: 'youtube',
-  twitch: 'twitch',
-  twitcasting: 'twitcasting',
-  niconico: 'niconico',
-  unknown: 'unknown',
-} as const;
-
-/**
- * Freechat
- */
-export type ListFreechats200FreechatsItem = {
+  /** Event ID */
   id: string;
-  rawId: string;
+  /** Event title */
   title: string;
-  languageCode: ListFreechats200FreechatsItemLanguageCode;
-  rawChannelID: string;
-  description: string;
-  publishedAt: string;
-  platform: ListFreechats200FreechatsItemPlatform;
-  tags: string[];
-  thumbnailURL: string;
-  creatorName?: string;
-  creatorThumbnailURL?: string;
-  /** @minimum 0 */
-  viewCount: number;
-  link?: string;
-  deleted?: boolean;
-  translated?: boolean;
-  /** @nullable */
-  videoPlayerLink?: string | null;
-  /** @nullable */
-  chatPlayerLink?: string | null;
-};
-
-export type ListFreechats200Pagination = {
-  /** Current Page */
-  currentPage: number;
-  /** Previous Page */
-  prevPage?: number;
-  /** Next Page */
-  nextPage?: number;
-  /** Total Pages */
-  totalPage: number;
-  /** Total Count */
-  totalCount: number;
-  /** Has Next */
-  hasNext: boolean;
-};
-
-export type ListFreechats200 = {
-  freechats: ListFreechats200FreechatsItem[];
-  pagination: ListFreechats200Pagination;
+  /** Storage file ID containing event details */
+  storageFileId: string;
+  /** Event start datetime (ISO format) */
+  startAt?: string;
+  /** Event end datetime (ISO format) */
+  endAt?: string;
+  /** Event visibility status */
+  visibility: GetEvent200Visibility;
+  /** Creation datetime */
+  createdAt: string;
+  /** Last update datetime */
+  updatedAt: string;
 };
 
 export const listStreams = <TData = AxiosResponse<ListStreams200>>(
@@ -1002,16 +912,6 @@ export const getEvent = <TData = AxiosResponse<GetEvent200>>(
     );
   }
 
-export const listFreechats = <TData = AxiosResponse<ListFreechats200>>(
-    params: ListFreechatsParams, options?: AxiosRequestConfig
- ): Promise<TData> => {
-    return axios.get(
-      `/api/freechats`,{
-    ...options,
-        params: {...params, ...options?.params},}
-    );
-  }
-
 export type ListStreamsResult = AxiosResponse<ListStreams200>
 export type ListCreatorsResult = AxiosResponse<ListCreators200>
 export type PostStreamResult = AxiosResponse<PostStream200>
@@ -1019,4 +919,3 @@ export type ListClipsResult = AxiosResponse<ListClips200>
 export type ListEventsResult = AxiosResponse<ListEvents200>
 export type CreateEventResult = AxiosResponse<CreateEvent201>
 export type GetEventResult = AxiosResponse<GetEvent200>
-export type ListFreechatsResult = AxiosResponse<ListFreechats200>

@@ -32,7 +32,6 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { hostname: "localhost", protocol: "http", port: "3000" },
-      { hostname: "imagegw03.twitcasting.tv", protocol: "http", port: "" },
       ...[
         "i.ytimg.com",
         "play-lh.googleusercontent.com",
@@ -51,10 +50,7 @@ const nextConfig = {
       })),
     ],
   },
-  i18n: {
-    ...i18n,
-    localeDetection: false,
-  },
+  i18n,
   skipMiddlewareUrlNormalize: true,
   experimental: {
     scrollRestoration: true,

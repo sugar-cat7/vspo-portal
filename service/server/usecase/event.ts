@@ -11,8 +11,8 @@ export type ListEventsQuery = {
   page: number;
   orderBy?: "asc" | "desc";
   visibility?: EventVisibility;
-  startedDateFrom?: string;
-  startedDateTo?: string;
+  startAt?: string;
+  endAt?: string;
 };
 
 export type ListEventsResponse = {

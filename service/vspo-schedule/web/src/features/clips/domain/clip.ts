@@ -1,4 +1,3 @@
-import { videoSchema } from "@/features/shared/domain";
 import { z } from "zod";
 
 export type Platform = "youtube" | "twitch";
@@ -6,9 +5,23 @@ export type Platform = "youtube" | "twitch";
 /**
  * Zod schema for clips
  */
-export const clipSchema = videoSchema.extend({
-  type: z.literal("clip"),
-  publishedAt: z.string(),
+export const clipSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  channelId: z.string(),
+  channelTitle: z.string(),
+  thumbnailUrl: z.string(),
+  platform: z
+    .string()
+    .refine((val): val is Platform => ["youtube", "twitch"].includes(val)),
+  viewCount: z.union([z.string(), z.number()]).optional(),
+  likeCount: z.union([z.string(), z.number()]).optional(),
+  commentCount: z.string().optional(),
+  createdAt: z.string().optional(),
+  link: z.string().optional(),
+  scheduledStartTime: z.string().optional(),
+  channelThumbnailUrl: z.string().optional(),
 });
 
 /**

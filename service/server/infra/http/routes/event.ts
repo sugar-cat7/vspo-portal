@@ -92,8 +92,8 @@ export const registerEventListApi = (app: App) =>
       page: Number.parseInt(p.page),
       orderBy: p.orderBy,
       visibility: p.visibility ?? "public",
-      startedDateFrom: p.startedDateFrom,
-      startedDateTo: p.startedDateTo,
+      startAt: p.startAt,
+      endAt: p.endAt,
     });
 
     if (r.err) {
@@ -127,7 +127,8 @@ export const registerEventCreateApi = (app: App) =>
     const event = createVspoEvent({
       title: p.title,
       storageFileId: p.storageFileId,
-      startedDate: p.startedDate,
+      startAt: p.startAt,
+      endAt: p.endAt,
       visibility: p.visibility,
     });
 
