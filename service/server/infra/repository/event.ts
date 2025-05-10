@@ -1,8 +1,4 @@
-import {
-  convertToUTC,
-  convertToUTCDate,
-  getCurrentUTCDate,
-} from "@vspo-lab/dayjs";
+import { convertToUTC, getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "@vspo-lab/error";
 import { AppLogger } from "@vspo-lab/logging";
 import {
@@ -34,8 +30,8 @@ type ListQuery = {
   page: number;
   orderBy?: "asc" | "desc";
   visibility?: EventVisibility;
-  startAt?: string;
-  endAt?: string;
+  startedDateFrom?: string;
+  startedDateTo?: string;
 };
 
 export interface IEventRepository {
@@ -65,8 +61,8 @@ export class EventRepository implements IEventRepository {
           .where(and(...filters))
           .orderBy(
             query.orderBy === "asc" || !query.orderBy
-              ? asc(eventTable.startAt)
-              : desc(eventTable.startAt),
+              ? asc(eventTable.startedDate)
+              : desc(eventTable.startedDate),
           )
           .limit(query.limit)
           .offset(query.page * query.limit)
@@ -79,6 +75,10 @@ export class EventRepository implements IEventRepository {
           }),
       );
 
+      if (eventResult.val?.length === 0) {
+        return Ok([]);
+      }
+
       if (eventResult.err) {
         return Err(eventResult.err);
       }
@@ -90,8 +90,7 @@ export class EventRepository implements IEventRepository {
               id: r.id,
               title: r.title,
               storageFileId: r.storageFileId ?? undefined,
-              startAt: r.startAt ? convertToUTC(r.startAt) : undefined,
-              endAt: r.endAt ? convertToUTC(r.endAt) : undefined,
+              startedDate: r.startedDate,
               visibility: r.visibility as EventVisibility,
               tags: r.tags ? r.tags.split(",") : [],
               createdAt: convertToUTC(r.createdAt),
@@ -135,8 +134,7 @@ export class EventRepository implements IEventRepository {
           id: r.id,
           title: r.title,
           storageFileId: r.storageFileId ?? undefined,
-          startAt: r.startAt ? convertToUTC(r.startAt) : undefined,
-          endAt: r.endAt ? convertToUTC(r.endAt) : undefined,
+          startedDate: r.startedDate,
           visibility: r.visibility as EventVisibility,
           createdAt: convertToUTC(r.createdAt),
           updatedAt: convertToUTC(r.updatedAt),
@@ -177,8 +175,7 @@ export class EventRepository implements IEventRepository {
         id: event.id,
         title: event.title,
         storageFileId: event.storageFileId,
-        startAt: event.startAt ? convertToUTCDate(event.startAt) : null,
-        endAt: event.endAt ? convertToUTCDate(event.endAt) : null,
+        startedDate: event.startedDate,
         visibility: event.visibility,
         tags: event.tags.join(","),
         updatedAt: getCurrentUTCDate(),
@@ -193,8 +190,7 @@ export class EventRepository implements IEventRepository {
             set: buildConflictUpdateColumns(eventTable, [
               "title",
               "storageFileId",
-              "startAt",
-              "endAt",
+              "startedDate",
               "visibility",
               "tags",
               "updatedAt",
@@ -220,8 +216,7 @@ export class EventRepository implements IEventRepository {
           id: r.id,
           title: r.title,
           storageFileId: r.storageFileId ?? undefined,
-          startAt: r.startAt ? convertToUTC(r.startAt) : undefined,
-          endAt: r.endAt ? convertToUTC(r.endAt) : undefined,
+          startedDate: r.startedDate,
           visibility: r.visibility as EventVisibility,
           tags: r.tags ? r.tags.split(",") : [],
           createdAt: convertToUTC(r.createdAt),
@@ -283,8 +278,7 @@ export class EventRepository implements IEventRepository {
           id: event.id,
           title: event.title,
           storageFileId: event.storageFileId,
-          startAt: event.startAt ? convertToUTCDate(event.startAt) : null,
-          endAt: event.endAt ? convertToUTCDate(event.endAt) : null,
+          startedDate: event.startedDate,
           visibility: event.visibility,
           tags: event.tags.join(","),
           updatedAt: getCurrentUTCDate(),
@@ -300,8 +294,7 @@ export class EventRepository implements IEventRepository {
             set: buildConflictUpdateColumns(eventTable, [
               "title",
               "storageFileId",
-              "startAt",
-              "endAt",
+              "startedDate",
               "visibility",
               "tags",
               "updatedAt",
@@ -326,8 +319,7 @@ export class EventRepository implements IEventRepository {
           id: r.id,
           title: r.title,
           storageFileId: r.storageFileId ?? undefined,
-          startAt: r.startAt ? convertToUTC(r.startAt) : undefined,
-          endAt: r.endAt ? convertToUTC(r.endAt) : undefined,
+          startedDate: r.startedDate,
           visibility: EventVisibilitySchema.parse(r.visibility),
           tags: r.tags ? r.tags.split(",") : [],
           createdAt: convertToUTC(r.createdAt),
@@ -346,13 +338,14 @@ export class EventRepository implements IEventRepository {
       filters.push(eq(eventTable.visibility, query.visibility));
     }
 
-    if (query.startAt) {
-      filters.push(gte(eventTable.startAt, convertToUTCDate(query.startAt)));
+    if (query.startedDateFrom) {
+      filters.push(gte(eventTable.startedDate, query.startedDateFrom));
     }
 
-    if (query.endAt) {
-      filters.push(lte(eventTable.endAt, convertToUTCDate(query.endAt)));
+    if (query.startedDateTo) {
+      filters.push(lte(eventTable.startedDate, query.startedDateTo));
     }
+
     return filters;
   }
 }

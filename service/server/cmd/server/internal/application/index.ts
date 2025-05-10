@@ -38,6 +38,10 @@ import type {
   IClipInteractor,
   ListClipsQuery,
 } from "../../../../usecase/clip";
+import type {
+  IFreechatInteractor,
+  ListFreechatsQuery,
+} from "../../../../usecase/freechat";
 
 // Utility function to safely send batches respecting size limits
 export async function safeSendBatch<T, U>(
@@ -371,6 +375,18 @@ export class EventService extends RpcTarget {
   }
 }
 
+export class FreechatService extends RpcTarget {
+  #usecase: IFreechatInteractor;
+  constructor(usecase: IFreechatInteractor) {
+    super();
+    this.#usecase = usecase;
+  }
+
+  async list(params: ListFreechatsQuery) {
+    return this.#usecase.list(params);
+  }
+}
+
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   newStreamUsecase() {
     const d = this.setup();
@@ -395,6 +411,10 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   newEventUsecase() {
     const d = this.setup();
     return new EventService(d.eventInteractor);
+  }
+  newFreechatUsecase() {
+    const d = this.setup();
+    return new FreechatService(d.freechatInteractor);
   }
 
   private setup() {

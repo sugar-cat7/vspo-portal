@@ -1,7 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import { PlatformSchema } from "../../../../domain";
 import { ClipSchema } from "../../../../domain/clip";
-import { StatusSchema } from "../../../../domain/stream";
 import { PaginationQuerySchema, PaginationResponseSchema } from "./common";
 
 const ClipResponseSchema = ClipSchema.openapi({

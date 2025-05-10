@@ -206,6 +206,11 @@ export class ClipService implements IClipService {
     const notExistsClipIds = clipIds.filter(
       (id) => !clips.some((c) => c.rawId === id),
     );
+    AppLogger.info("Found clips", {
+      service: this.SERVICE_NAME,
+      clipsCount: clips.length,
+      notExistsClipIdsCount: notExistsClipIds.length,
+    });
     return Ok({
       clips,
       notExistsClipIds,

@@ -47,6 +47,7 @@ export type TwitCastingStream = {
   viewCount: number;
   thumbnailURL: string;
   startedAt: number;
+  link: string;
 };
 
 export interface ITwitcastingService {
@@ -205,6 +206,7 @@ export class TwitcastingService implements ITwitcastingService {
       viewCount: movie.total_view_count,
       thumbnailURL: movie.large_thumbnail,
       startedAt: movie.created,
+      link: movie.link,
     };
   }
 
@@ -227,6 +229,8 @@ export class TwitcastingService implements ITwitcastingService {
       tags: [],
       viewCount: video.viewCount,
       thumbnailURL: video.thumbnailURL,
+      videoPlayerLink: video.link,
+      link: video.link,
     });
   }
 }

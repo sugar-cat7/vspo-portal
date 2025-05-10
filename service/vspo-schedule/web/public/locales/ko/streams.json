@@ -3,9 +3,11 @@
   "noLiveStreams": "이용 가능한 라이브 스트림이 없습니다.\n사이드바에서 지난 스트림이나 클립을 확인해 보세요.",
   "events": "이벤트",
   "streamsOnDate": "{{date}}의 라이브 스트림",
+  "loading": "로딩 중...",
   "status": {
     "live": "라이브",
-    "upcoming": "예정"
+    "upcoming": "예정",
+    "all": "전체"
   },
   "titles": {
     "streamSchedule": "$t(common:vspo) 스트리밍 일정",

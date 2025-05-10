@@ -1,4 +1,4 @@
-import { VideoCard } from "@/components/Elements/Card/VideoCard";
+import { VideoCard } from "@/features/shared/components/Elements/Card/VideoCard";
 import { Box, Card, CardContent, Typography } from "@mui/material";
 import React from "react";
 import { Clip } from "../../domain/clip";
@@ -38,7 +38,7 @@ export const ClipCardPresenter: React.FC<ClipCardPresenterProps> = ({
               {clip.channelTitle}
             </Typography>
             <Typography variant="body2" color="text.secondary" noWrap>
-              {clip.viewCount !== undefined ? clip.viewCount : 0} 回
+              {clip.viewCount} 回
             </Typography>
           </Box>
         </CardContent>

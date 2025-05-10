@@ -1,7 +1,7 @@
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import "@/styles/globals.css";
 import "@/styles/normalize.css";
-import { GoogleAnalytics } from "@/components/Elements";
+import { GoogleAnalytics } from "@/features/shared/components/Elements";
 import { ThemeModeProvider } from "@/context/Theme";
 import { TimeZoneContextProvider } from "@/context/TimeZoneContext";
 import { VideoModalContextProvider } from "@/context/VideoModalContext";
@@ -12,6 +12,7 @@ import { NextPage } from "next";
 import { appWithTranslation } from "next-i18next";
 import type { AppProps } from "next/app";
 import { ReactElement, ReactNode } from "react";
+import "@/lib/i18n";
 
 config.autoAddCss = false;
 

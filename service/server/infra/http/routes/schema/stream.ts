@@ -27,6 +27,8 @@ const StreamResponseSchema = StreamSchema.openapi({
       "https://yt3.googleusercontent.com/oIps6UVvqtpJykcdjYYyRvhdcyVoR1wAdH8CnTp4msMaKYdn8XMLj4FHsLoqfWaJzbLJKSPjCg=s176-c-k-c0x00ffffff-no-rj",
     deleted: false,
     translated: false,
+    videoPlayerLink: "https://www.youtube.com/embed/O0XCK3NhzqE",
+    chatPlayerLink: "https://www.youtube.com/live_chat?v=O0XCK3NhzqE",
   },
 });
 
@@ -56,14 +58,25 @@ const ListStreamRequestSchema = PaginationQuerySchema.merge(
         in: "query",
       },
     }),
-    startedAt: z
+    startDateFrom: z
       .string()
       .optional()
       .openapi({
         description: "Started At",
         example: "2022-01-01T00:00:00.000Z",
         param: {
-          name: "startedAt",
+          name: "startDateFrom",
+          in: "query",
+        },
+      }),
+    startDateTo: z
+      .string()
+      .optional()
+      .openapi({
+        description: "Start Date To",
+        example: "2022-01-01T00:00:00.000Z",
+        param: {
+          name: "startDateTo",
           in: "query",
         },
       }),

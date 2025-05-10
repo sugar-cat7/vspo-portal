@@ -70,7 +70,10 @@ export const registerStreamListApi = (app: App) =>
       page: Number.parseInt(p.page),
       platform: p.platform,
       status: p.status,
-      startedAt: p.startedAt ? convertToUTCDate(p.startedAt) : undefined,
+      startDateFrom: p.startDateFrom
+        ? convertToUTCDate(p.startDateFrom)
+        : undefined,
+      startDateTo: p.startDateTo ? convertToUTCDate(p.startDateTo) : undefined,
       endedAt: p.endedAt ? convertToUTCDate(p.endedAt) : undefined,
       languageCode: p.languageCode,
       orderBy: p.orderBy,
@@ -87,7 +90,6 @@ export const registerStreamListApi = (app: App) =>
 export const registerStreamPostApi = (app: App) =>
   app.openapi(postStreamRoute, async (c) => {
     const p = await c.req.json();
-    console.log(p);
     const r =
       await c.env.APP_WORKER.newStreamUsecase().searchByStreamsIdsAndCreate({
         streamIds: p.streamIds,

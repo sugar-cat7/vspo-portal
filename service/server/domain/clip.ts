@@ -24,6 +24,20 @@ const getClipLink = (
   }
 };
 
+const getClipEmbedUrl = ({
+  rawId,
+  platform,
+}: { rawId: string; platform: Platform }): string | null => {
+  switch (platform) {
+    case "youtube":
+      return `https://www.youtube.com/embed/${rawId}`;
+    case "twitch":
+      return `https://clips.twitch.tv/embed?clip=${rawId}`;
+    default:
+      return null;
+  }
+};
+
 // Helper function for Twitch thumbnail URL formatting
 const formatTwitchThumbnail = (url: string): string =>
   url
@@ -66,11 +80,17 @@ const ClipSchema = BaseVideoSchema.extend({
       ? formatTwitchThumbnail(clip.thumbnailURL) // Assume same format for clip thumbs
       : clip.thumbnailURL;
 
+  const videoPlayerLink = getClipEmbedUrl({
+    rawId: clip.rawId,
+    platform: clip.platform,
+  });
+
   return {
     ...clip,
     platformIconURL,
     link: clip.link || generatedLink, // Use DB link first, then generate
     thumbnailURL,
+    videoPlayerLink,
   };
 });
 

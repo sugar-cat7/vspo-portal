@@ -1,5 +1,5 @@
-import { ContentLayout } from "@/components/Layout/ContentLayout";
-import { AgreementDocument } from "@/components/Templates";
+import { ContentLayout } from "@/features/shared/components/Layout/ContentLayout";
+import { AgreementDocument } from "@/features/shared/components/Templates";
 import { DEFAULT_LOCALE, QA_LINK } from "@/lib/Const";
 import { getInitializedI18nInstance } from "@/lib/utils";
 import { GetStaticProps } from "next";

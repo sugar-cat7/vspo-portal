@@ -1,0 +1,20 @@
+{
+  "search": {
+    "title": "검색 옵션",
+    "selectDate": "날짜 선택",
+    "memberType": "멤버 유형",
+    "memberType.all": "모든 멤버",
+    "memberType.jp": "VSPO JP",
+    "memberType.en": "VSPO EN",
+    "memberType.ch": "VSPO CH",
+    "platform": "플랫폼",
+    "platform.all": "모든 플랫폼",
+    "platform.youtube": "YouTube",
+    "platform.twitch": "Twitch",
+    "platform.twitcasting": "TwitCasting",
+    "platform.niconico": "Niconico",
+    "clear": "초기화",
+    "cancel": "취소",
+    "search": "검색"
+  }
+} 
