@@ -94,12 +94,27 @@ export const getLivestreamsServerSideProps: GetServerSideProps<
     eventsResult.status === "fulfilled"
       ? eventsResult.value.val?.events || []
       : [];
+
+  if (eventsResult.status === "rejected") {
+    console.error("Error fetching events:", eventsResult.reason);
+  }
+
   const livestreams =
     livestreamsResult.status === "fulfilled"
       ? livestreamsResult.value
       : { val: { livestreams: [] } };
+
+  if (livestreamsResult.status === "rejected") {
+    console.error("Error fetching livestreams:", livestreamsResult.reason);
+  }
+
   const translations =
     translationsResult.status === "fulfilled" ? translationsResult.value : {};
+
+  if (translationsResult.status === "rejected") {
+    console.error("Error loading translations:", translationsResult.reason);
+  }
+
   // Group livestreams by date
   const livestreamsByDate = groupBy(
     livestreams.val?.livestreams ?? [],

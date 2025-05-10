@@ -27,11 +27,20 @@ const convertToUTCTimestamp = (
   return dayjs.tz(dateStr, tz).utc().format();
 };
 
+const addDaysAndConvertToUTC = (
+  dateStr: Date | string | number,
+  days: number,
+  tz: string,
+): string => {
+  return dayjs.tz(dateStr, tz).add(days, "day").utc().format();
+};
+
 export {
   convertToUTC,
   convertToUTCDate,
   getCurrentUTCDate,
   convertToUTCTimestamp,
+  addDaysAndConvertToUTC,
 };
 
 export type { ConfigType } from "dayjs";

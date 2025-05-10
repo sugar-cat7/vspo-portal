@@ -1,4 +1,3 @@
-import { RelatedVideos } from "@/features/shared/components/Templates";
 import { Platform } from "@/features/clips";
 import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { formatDate } from "@/lib/utils";
@@ -123,7 +122,6 @@ const VideoPlayerComponent: React.FC<{ video: Video }> = ({ video }) => {
     videoPlayerLink: video.videoPlayerLink ?? "",
     platform: video.platform,
   });
-  console.log("embedUrl", embedUrl);
   return (
     <ResponsiveIframeWrapper>
       <ResponsiveIframe
@@ -161,7 +159,9 @@ const LivestreamInfoTabsPresenter: React.FC<
     { timeZone },
   );
 
-  const showChatTab = video.platform === "youtube" && video.status !== "ended";
+  const showChatTab =
+    (video.platform === "youtube" && video.status !== "ended") ||
+    (video.platform === "twitch" && video.status !== "ended");
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -179,7 +179,7 @@ const LivestreamInfoTabsPresenter: React.FC<
             {...a11yProps(1)}
           /> */}
           {showChatTab && (
-            <Tab label={t("videoModal.tabLabels.chat")} {...a11yProps(2)} />
+            <Tab label={t("videoModal.tabLabels.chat")} {...a11yProps(1)} />
           )}
         </Tabs>
       </Box>
@@ -304,11 +304,8 @@ const LivestreamInfoTabsPresenter: React.FC<
           })}
         </TypographySmallOnMobileDescription>
       </TabPanel>
-      <TabPanel value={tabValue} index={1}>
-        <RelatedVideos channelId={video.channelId} videoId={video.id} />
-      </TabPanel>
       {showChatTab && (
-        <TabPanel value={tabValue} index={2}>
+        <TabPanel value={tabValue} index={1}>
           <ChatEmbed livestream={video} />
         </TabPanel>
       )}
@@ -473,11 +470,8 @@ const FreechatInfoTabsPresenter: React.FC<
           })}
         </TypographySmallOnMobileDescription>
       </TabPanel>
-      <TabPanel value={tabValue} index={1}>
-        <RelatedVideos channelId={video.channelId} videoId={video.id} />
-      </TabPanel>
       {showChatTab && (
-        <TabPanel value={tabValue} index={2}>
+        <TabPanel value={tabValue} index={1}>
           <ChatEmbed livestream={video} />
         </TabPanel>
       )}
@@ -607,9 +601,6 @@ const ClipInfoTabsPresenter: React.FC<
             );
           })}
         </TypographySmallOnMobileDescription>
-      </TabPanel>
-      <TabPanel value={tabValue} index={1}>
-        <RelatedVideos channelId={video.channelId} videoId={video.id} />
       </TabPanel>
     </Box>
   );

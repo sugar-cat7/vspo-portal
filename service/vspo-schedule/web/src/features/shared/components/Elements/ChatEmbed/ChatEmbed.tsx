@@ -68,6 +68,8 @@ export const ChatEmbed: React.FC<{
     isDarkMode,
   );
 
+  console.log("chatEmbedUrl", chatEmbedUrl);
+
   const handleLoad = () => {
     setIsLoading(false);
   };

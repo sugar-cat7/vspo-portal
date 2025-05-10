@@ -6,8 +6,9 @@ import {
 } from "@vspo-lab/api";
 import { BaseError, Err, Ok, Result } from "@vspo-lab/error";
 import { Livestream, livestreamSchema, Status } from "../domain";
-import { convertToUTCDate, convertToUTCTimestamp } from "@/lib/dayjs";
+import { convertToUTCTimestamp, addDaysAndConvertToUTC } from "@/lib/dayjs";
 import { eventSchema, Event } from "@/features/events/domain";
+
 export type FetchLivestreamsParams = {
   limit: number;
   lang: string;
@@ -65,14 +66,7 @@ export const fetchLivestreams = async (
     : undefined;
 
   const startDateTo = params.startedDate
-    ? convertToUTCTimestamp(
-        new Date(
-          convertToUTCDate(params.startedDate).getFullYear(),
-          convertToUTCDate(params.startedDate).getMonth(),
-          convertToUTCDate(params.startedDate).getDate() + 1,
-        ),
-        params.timezone,
-      )
+    ? addDaysAndConvertToUTC(params.startedDate, 1, params.timezone)
     : undefined;
 
   const param: ListStreamsParams = {
@@ -103,7 +97,7 @@ export const fetchLivestreams = async (
       params.timezone,
     );
   }
-
+  console.log("param", param);
   // Cast to any to allow the new parameter names until the API client is updated
   const result = await client.streams.list(param);
 

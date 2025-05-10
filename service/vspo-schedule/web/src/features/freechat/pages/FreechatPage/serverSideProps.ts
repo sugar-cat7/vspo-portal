@@ -18,33 +18,43 @@ export type FreechatPageProps = {
 export const getFreechatStaticProps: GetStaticProps<
   FreechatPageProps
 > = async ({ locale = DEFAULT_LOCALE }) => {
-  const freechatResult = await fetchFreechats({ lang: locale });
+  const [freechatResult, translationsResult] = await Promise.allSettled([
+    fetchFreechats({ lang: locale }),
+    serverSideTranslations(locale, ["common", "freechat"]),
+  ]);
 
-  if (freechatResult.err) {
-    return {
-      props: {
-        freechats: [],
-        lastUpdateTimestamp: getCurrentUTCDate().getTime(),
-        meta: {
-          title: "",
-          description: "",
-        },
-      },
-    };
+  // Check for errors in freechat API response
+  if (freechatResult.status === "rejected") {
+    console.error(
+      "Failed to fetch freechats (rejected):",
+      freechatResult.reason,
+    );
+  } else if (freechatResult.value.err) {
+    console.error("Failed to fetch freechats:", freechatResult.value.err);
   }
 
-  const { freechats } = freechatResult.val;
+  const freechats =
+    freechatResult.status === "fulfilled" && !freechatResult.value.err
+      ? freechatResult.value.val.freechats
+      : [];
 
-  const translations = await serverSideTranslations(locale, [
-    "common",
+  // Check for errors in translations API response
+  if (translationsResult.status === "rejected") {
+    console.error("Failed to fetch translations:", translationsResult.reason);
+  }
+
+  const translations =
+    translationsResult.status === "fulfilled" ? translationsResult.value : {};
+
+  const { t } = getInitializedI18nInstance(
+    translationsResult.status === "fulfilled" ? translations : {},
     "freechat",
-  ]);
-  const { t } = getInitializedI18nInstance(translations, "freechat");
+  );
 
   return {
     props: {
       ...translations,
-      freechats: freechats,
+      freechats,
       lastUpdateTimestamp: getCurrentUTCDate().getTime(),
       meta: {
         title: t("title"),

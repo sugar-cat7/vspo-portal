@@ -94,6 +94,11 @@ export const getYouTubeClipsServerSideProps = (options: YouTubeClipOptions) => {
       afterPublishedAtDate: afterDate,
     });
 
+    // Check for errors in the API response
+    if (!response.val) {
+      console.error(`Failed to fetch YouTube ${clipType}s:`, response.err);
+    }
+
     // Format the clips
     const clips = response.val ? response.val.clips : [];
 
