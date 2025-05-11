@@ -4,12 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { styled } from "@mui/material/styles";
 import Image from "next/image";
 
-const StyledFontAwesomeIcon = styled(FontAwesomeIcon)(({ theme }) => ({
+const StyledFontAwesomeIcon = styled(FontAwesomeIcon)(() => ({
   color: "black",
-
-  [theme.getColorSchemeSelector("dark")]: {
-    color: "white",
-  },
 }));
 
 type PlatformIconProps = { platform: Platform };

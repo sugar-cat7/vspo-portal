@@ -63,6 +63,8 @@ export const getLivestreamsServerSideProps: GetServerSideProps<
         ? 300
         : 50;
 
+  const order = status === "archive" ? "desc" : "asc";
+
   const memberType =
     typeof customMemberType === "string" ? customMemberType : undefined;
 
@@ -80,7 +82,7 @@ export const getLivestreamsServerSideProps: GetServerSideProps<
         limit,
         lang: locale ?? "default",
         status: (status as "live" | "upcoming" | "archive" | "all") || "all",
-        order: "asc",
+        order: order,
         timezone: timeZone,
         startedDate,
         memberType,
