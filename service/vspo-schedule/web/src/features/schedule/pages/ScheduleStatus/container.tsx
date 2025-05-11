@@ -63,13 +63,38 @@ export const ScheduleStatusContainer: React.FC<
   // Filter livestreams based on the current status
   const filteredLivestreamsByDate = useMemo(() => {
     if (currentStatusFilter === "all") {
+      // For archive pages, we need to sort dates in descending order but streams in ascending order
+      if (liveStatus === "archive") {
+        const sortedByDate: Record<string, Livestream[]> = {};
+        // Sort dates in descending order (newest dates first)
+        const sortedDates = Object.keys(livestreamsByDate).sort().reverse();
+
+        sortedDates.forEach((date) => {
+          // Sort the streams within each date in ascending order by scheduledStartTime
+          sortedByDate[date] = [...livestreamsByDate[date]].sort(
+            (a, b) =>
+              new Date(a.scheduledStartTime).getTime() -
+              new Date(b.scheduledStartTime).getTime(),
+          );
+        });
+
+        return sortedByDate;
+      }
       return livestreamsByDate;
     }
 
     const filtered: Record<string, Livestream[]> = {};
 
-    Object.entries(livestreamsByDate).forEach(([date, streams]) => {
-      const filteredStreams = streams.filter((stream) => {
+    // For filtered views, also apply the same sorting pattern for archive pages
+    const entries =
+      liveStatus === "archive"
+        ? Object.entries(livestreamsByDate).sort((a, b) =>
+            b[0].localeCompare(a[0]),
+          ) // Sort dates in descending order
+        : Object.entries(livestreamsByDate);
+
+    entries.forEach(([date, streams]) => {
+      let filteredStreams = streams.filter((stream) => {
         if (currentStatusFilter === "live") {
           return stream.status === "live";
         }
@@ -77,13 +102,22 @@ export const ScheduleStatusContainer: React.FC<
         return stream.status === "upcoming";
       });
 
+      if (liveStatus === "archive") {
+        // Sort streams by scheduled start time in ascending order for archive pages
+        filteredStreams = filteredStreams.sort(
+          (a, b) =>
+            new Date(a.scheduledStartTime).getTime() -
+            new Date(b.scheduledStartTime).getTime(),
+        );
+      }
+
       if (filteredStreams.length > 0) {
         filtered[date] = filteredStreams;
       }
     });
 
     return filtered;
-  }, [livestreamsByDate, currentStatusFilter]);
+  }, [livestreamsByDate, currentStatusFilter, liveStatus]);
 
   // Setup router events for loading state
   useEffect(() => {
@@ -127,7 +161,7 @@ export const ScheduleStatusContainer: React.FC<
 
   // Prepare tab labels
   const allTabLabel =
-    currentStatusFilter === "all" && formattedDate
+    liveStatus === "all" && formattedDate
       ? `すべて (${formattedDate})`
       : "すべて";
 
