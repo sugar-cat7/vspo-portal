@@ -1,10 +1,15 @@
 import { Livestream } from "@/features/schedule/domain";
 import { formatDate } from "@/lib/utils";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import React from "react";
 import { groupLivestreamsByTimeBlock } from "../../utils";
 import { LivestreamCard } from "./LivestreamCard";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { useRouter } from "next/router";
+import { utcToZonedTime } from "date-fns-tz";
+import { format } from "date-fns";
 
 const ContentSection = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(6),
@@ -20,6 +25,21 @@ const DateHeader = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   padding: theme.spacing(1),
   borderBottom: `1px solid ${theme.vars.palette.divider}`,
+}));
+
+const DateNavigation = styled(Box)(() => ({
+  display: "flex",
+  alignItems: "center",
+  gap: "16px",
+}));
+
+const NavButton = styled(Button)(({ theme }) => ({
+  fontSize: "0.875rem",
+  padding: theme.spacing(0.5, 1.5),
+  minWidth: "auto",
+  display: "flex",
+  alignItems: "center",
+  gap: "4px",
 }));
 
 const LivestreamGrid = styled(Grid)(({ theme }) => ({
@@ -51,10 +71,29 @@ export const LivestreamContentPresenter: React.FC<LivestreamContentProps> = ({
   livestreamsByDate,
   timeZone,
 }) => {
+  const router = useRouter();
   const livestreamsByTimeBlock = groupLivestreamsByTimeBlock(
     livestreamsByDate,
     timeZone,
   );
+
+  const navigateToDate = (date: string, daysToAdd: number) => {
+    const currentDate = new Date(date);
+    const zonedDate = utcToZonedTime(currentDate, timeZone);
+    const newDate = new Date(zonedDate);
+    newDate.setDate(newDate.getDate() + daysToAdd);
+
+    const formattedDate = format(newDate, "yyyy-MM-dd");
+
+    router.push(
+      {
+        pathname: router.pathname,
+        query: { ...router.query, date: formattedDate },
+      },
+      undefined,
+      { shallow: false },
+    );
+  };
 
   return (
     <Box>
@@ -68,8 +107,26 @@ export const LivestreamContentPresenter: React.FC<LivestreamContentProps> = ({
                 color: theme.vars.palette.text.primary,
               })}
             >
-              {formatDate(date, "MM/dd (EEE)")}
+              {formatDate(date, "MM/dd (EEE)", { timeZone })}
             </Typography>
+            <DateNavigation>
+              <NavButton
+                size="small"
+                variant="outlined"
+                onClick={() => navigateToDate(date, -1)}
+                startIcon={<ChevronLeftIcon />}
+              >
+                前日
+              </NavButton>
+              <NavButton
+                size="small"
+                variant="outlined"
+                onClick={() => navigateToDate(date, 1)}
+                endIcon={<ChevronRightIcon />}
+              >
+                翌日
+              </NavButton>
+            </DateNavigation>
           </DateHeader>
 
           {Object.entries(timeBlocks).map(([timeBlock, livestreams]) => (
