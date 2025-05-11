@@ -1,15 +1,16 @@
 import { Livestream } from "@/features/schedule/domain";
 import { formatDate } from "@/lib/utils";
-import { Box, Grid, Typography, Button } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { Box, Button, Grid, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { format } from "date-fns";
+import { utcToZonedTime } from "date-fns-tz";
+import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import React from "react";
 import { groupLivestreamsByTimeBlock } from "../../utils";
 import { LivestreamCard } from "./LivestreamCard";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { useRouter } from "next/router";
-import { utcToZonedTime } from "date-fns-tz";
-import { format } from "date-fns";
 
 const ContentSection = styled(Box)(({ theme }) => ({
   marginBottom: theme.spacing(6),
@@ -30,16 +31,20 @@ const DateHeader = styled(Box)(({ theme }) => ({
 const DateNavigation = styled(Box)(() => ({
   display: "flex",
   alignItems: "center",
-  gap: "16px",
+  gap: "8px",
 }));
 
 const NavButton = styled(Button)(({ theme }) => ({
-  fontSize: "0.875rem",
-  padding: theme.spacing(0.5, 1.5),
+  fontSize: "0.75rem",
+  padding: theme.spacing(0.3, 0.8),
   minWidth: "auto",
   display: "flex",
   alignItems: "center",
-  gap: "4px",
+  gap: "1px",
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "0.7rem",
+    padding: theme.spacing(0.2, 0.8),
+  },
 }));
 
 const LivestreamGrid = styled(Grid)(({ theme }) => ({
@@ -72,6 +77,7 @@ export const LivestreamContentPresenter: React.FC<LivestreamContentProps> = ({
   timeZone,
 }) => {
   const router = useRouter();
+  const { t } = useTranslation("schedule");
   const livestreamsByTimeBlock = groupLivestreamsByTimeBlock(
     livestreamsByDate,
     timeZone,
@@ -114,17 +120,17 @@ export const LivestreamContentPresenter: React.FC<LivestreamContentProps> = ({
                 size="small"
                 variant="outlined"
                 onClick={() => navigateToDate(date, -1)}
-                startIcon={<ChevronLeftIcon />}
+                startIcon={<ChevronLeftIcon fontSize="small" />}
               >
-                前日
+                {t("navigation.previousDay")}
               </NavButton>
               <NavButton
                 size="small"
                 variant="outlined"
                 onClick={() => navigateToDate(date, 1)}
-                endIcon={<ChevronRightIcon />}
+                endIcon={<ChevronRightIcon fontSize="small" />}
               >
-                翌日
+                {t("navigation.nextDay")}
               </NavButton>
             </DateNavigation>
           </DateHeader>

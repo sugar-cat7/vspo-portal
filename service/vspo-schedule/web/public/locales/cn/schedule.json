@@ -16,5 +16,9 @@
     "clear": "清除",
     "cancel": "取消",
     "search": "搜索"
+  },
+  "navigation": {
+    "previousDay": "前一天",
+    "nextDay": "后一天"
   }
 } 

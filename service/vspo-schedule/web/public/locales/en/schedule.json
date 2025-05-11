@@ -16,5 +16,9 @@
     "clear": "Clear",
     "cancel": "Cancel",
     "search": "Search"
+  },
+  "navigation": {
+    "previousDay": "Previous Day",
+    "nextDay": "Next Day"
   }
 } 
