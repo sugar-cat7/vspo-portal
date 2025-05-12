@@ -107,6 +107,27 @@ export const fetchLivestreams = async (
     return Err(result.err);
   }
 
+  if (result.val.streams.length === 0) {
+    // If no streams found, try fetching from the previous day
+    const previousDayFrom = params.startedDate
+      ? addDaysAndConvertToUTC(params.startedDate, -1, params.timezone)
+      : undefined;
+    const previousDayTo = params.startedDate
+      ? convertToUTCTimestamp(params.startedDate, params.timezone)
+      : undefined;
+
+    param.startDateFrom = previousDayFrom;
+    param.startDateTo = previousDayTo;
+
+    // Fetch with the new date parameters
+    const previousDayResult = await client.streams.list(param);
+
+    if (!previousDayResult.err) {
+      // Replace the result with the previous day's data
+      result.val.streams = previousDayResult.val.streams;
+    }
+  }
+
   // Transform API data to domain model
   const livestreams = result.val.streams.map((stream) => {
     const livestream = {
