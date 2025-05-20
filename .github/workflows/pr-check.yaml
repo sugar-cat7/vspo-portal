@@ -56,4 +56,4 @@ jobs:
       - name: Lint
         run: |
           pnpm lint
-        working-directory: service/vspo-schedule/web
+        working-directory: service/vspo-schedule/v2/web

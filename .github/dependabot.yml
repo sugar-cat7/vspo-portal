@@ -6,7 +6,7 @@
 version: 2
 updates:
   # - package-ecosystem: "npm"
-  #   directory: "/service/vspo-schedule/web/"
+  #   directory: "/service/vspo-schedule/v2/web/"
   #   schedule:
   #     interval: "monthly"
   #   ignore:
