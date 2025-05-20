@@ -1,4 +1,3 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
@@ -40,11 +39,9 @@ export const GoogleAd: React.FC = () => {
           maxHeight: "250px",
           margin: "16px",
         }}
-        data-adtest={
-          getCloudflareContext().env.ENV === "development" ? "on" : "off"
-        }
-        data-ad-client={getCloudflareContext().env.NEXT_PUBLIC_AD_CLIENT}
-        data-ad-slot={getCloudflareContext().env.NEXT_PUBLIC_AD_SLOT}
+        data-adtest={process.env.ENV === "development" ? "on" : "off"}
+        data-ad-client={process.env.NEXT_PUBLIC_AD_CLIENT}
+        data-ad-slot={process.env.NEXT_PUBLIC_AD_SLOT}
         data-ad-format="horizontal"
         data-full-width-responsive="true"
       />

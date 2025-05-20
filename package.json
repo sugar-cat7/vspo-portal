@@ -12,7 +12,8 @@
     "knip": "knip",
     "tsc": "pnpm -r exec tsc --noEmit",
     "generate-openapi": "pnpm --filter @vspo-lab/api generate-openapi",
-    "start": "pnpm --filter ./service/vspo-schedule/web start"
+    "start": "pnpm --filter ./service/vspo-schedule/web start",
+    "deploy:web": "pnpm build && pnpm --filter ./service/vspo-schedule/v2/web run deploy"
   },
   "author": "sugar-cat7",
   "license": "MIT",

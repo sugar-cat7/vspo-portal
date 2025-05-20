@@ -4,7 +4,6 @@ import {
   documentGetInitialProps,
 } from "@mui/material-nextjs/v14-pagesRouter";
 import InitColorSchemeScript from "@mui/material/InitColorSchemeScript";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 import {
   type DocumentContext,
   type DocumentProps,
@@ -25,10 +24,10 @@ export default function MyDocument(
     <Html lang={currentLocale}>
       <Head>
         <DocumentHeadTags {...props} />
-        {getCloudflareContext().env.ENV === "production" && (
+        {process.env.ENV === "production" && (
           <script
             async
-            src={getCloudflareContext().env.NEXT_PUBLIC_ADS_GOOGLE}
+            src={process.env.NEXT_PUBLIC_ADS_GOOGLE}
             crossOrigin="anonymous"
           />
         )}
