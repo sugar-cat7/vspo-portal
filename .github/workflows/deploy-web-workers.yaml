@@ -28,15 +28,17 @@ jobs:
         run: pnpm install
       - name: Turbo Build(Package)
         run: pnpm build
-      - name: Web Build & Deploy Worker
+      - name: Web Deploy Worker
         uses: cloudflare/wrangler-action@v3.14.1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: pnpm
           wranglerVersion: "4.6.0"
-          workingDirectory: service/vspo-schedule/v2/web
+          workingDirectory: service/vspo-schedule/v2/web/config/wrangler/${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}
           command: deploy
+          preCommands: |
+            cp -R ./ ../../..
           quiet: true
           secrets: |
             ENV
