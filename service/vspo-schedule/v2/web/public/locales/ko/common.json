@@ -1,0 +1,67 @@
+{
+  "spodule": "Spodule",
+  "vspo": "VSPO!",
+  "search": "검색",
+  "cancel": "취소",
+  "back": "뒤로",
+  "liveStatus": {
+    "live": "라이브",
+    "upcoming": "예정"
+  },
+  "footer": {
+    "lastUpdated": "페이지 마지막 업데이트: {{date}}",
+    "pages": {
+      "home": "홈",
+      "terms": "이용 약관",
+      "privacy": "개인정보 처리방침"
+    }
+  },
+  "bottomNav": {
+    "pages": {
+      "list": "스트림",
+      "clip": "클립",
+      "twitch-clip": "Twitch 클립",
+      "event": "이벤트"
+    }
+  },
+  "drawer": {
+    "pages": {
+      "live": "라이브 스트림",
+      "upcoming": "예정된 스트림",
+      "archive": "보관된 스트림",
+      "freechat": "프리챗",
+      "clip": "클립",
+      "twitch-clip": "Twitch 클립",
+      "about": "Spodule 소개",
+      "site-news": "사이트 뉴스",
+      "qa": "문의하기",
+      "discord": "Discord 봇"
+    },
+    "language": "언어",
+    "timeZone": "시간대",
+    "site-theme": "테마"
+  },
+  "alert": {
+    "title": "공지",
+    "message": "Discord 봇이 업데이트되었습니다! 자세한 내용은 X를 확인하세요!"
+  },
+  "videoModal": {
+    "tabLabels": {
+      "overview": "개요",
+      "relatedVideos": "관련 영상",
+      "chat": "라이브 채팅"
+    },
+    "watch": "시청",
+    "share": "공유"
+  },
+  "relatedVideos": {
+    "dataLoadError": "데이터 로드 오류.",
+    "loadMore": "더 많은 영상"
+  },
+  "breadcrumbs": {
+    "pages": {
+      "home": "홈",
+      "site-news": "사이트 뉴스"
+    }
+  }
+}
