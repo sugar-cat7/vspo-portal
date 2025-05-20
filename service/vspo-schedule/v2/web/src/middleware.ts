@@ -5,7 +5,6 @@ import {
   LOCALE_COOKIE,
   SESSION_ID_COOKIE,
   TIME_ZONE_COOKIE,
-  TIME_ZONE_HEADER,
 } from "./lib/Const";
 
 const publicFileRegex = /\.(.*)$/;
@@ -57,12 +56,10 @@ const setLocale = (req: NextRequest, res: NextResponse) => {
 
 /**
  * Set the time zone cookie to the first valid time zone in:
- * - x-vercel-ip-timezone header
  * - default app time zone
  */
 const setTimeZone = (req: NextRequest, res: NextResponse) => {
-  const timeZone =
-    getCookieTimeZone(req) ?? getHeaderTimeZone(req) ?? DEFAULT_TIME_ZONE;
+  const timeZone = getCookieTimeZone(req) ?? DEFAULT_TIME_ZONE;
   setCookie(res, TIME_ZONE_COOKIE, timeZone);
 };
 
@@ -98,10 +95,6 @@ const getHeaderLocale = (req: NextRequest) => {
 
 const getCookieTimeZone = (req: NextRequest) => {
   return req.cookies.get(TIME_ZONE_COOKIE)?.value;
-};
-
-const getHeaderTimeZone = (req: NextRequest) => {
-  return req.headers.get(TIME_ZONE_HEADER) ?? undefined;
 };
 
 /**

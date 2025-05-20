@@ -7,7 +7,7 @@ Join the Spodule Discord for developers by clicking [here](https://discord.gg/Q7
 
 | Service Name                                          | Description                                                                                                | Repository                                |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [Spodule](https://www.vspo-schedule.com/schedule/all) | A site where you can check the streams (YouTube/Twitch/Twitcasting/Niconico) and clips of Vspo members. | [vspo-schedule](./service/vspo-schedule/web/README.md) |
+| [Spodule](https://www.vspo-schedule.com/schedule/all) | A site where you can check the streams (YouTube/Twitch/Twitcasting/Niconico) and clips of Vspo members. | [vspo-schedule](./service/vspo-schedule/v2/web/README.md) |
 | Server | Backend services for Vspo Portal | [server](./service/server/README.md) |
 
 ## Packages
