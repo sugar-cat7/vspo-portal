@@ -1,0 +1,15 @@
+{
+  "title": "すぽじゅーるからのお知らせ",
+  "description": "バグ改善や新機能追加に関してのお知らせを表示します。",
+  "updateDate": "更新日",
+  "tags": "タグ",
+  "tableHeaders": {
+    "summary": "内容",
+    "updateDate": "更新日",
+    "tags": "タグ"
+  },
+  "tagLabels": {
+    "feat": "新機能追加",
+    "fix": "バグ修正"
+  }
+}

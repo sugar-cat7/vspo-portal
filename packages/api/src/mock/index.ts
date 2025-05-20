@@ -1,6 +1,8 @@
 // Import dependencies
+import type { AxiosRequestConfig } from "axios";
 import type * as apiGen from "../gen/openapi";
 
+import type { VSPOApiOptions } from "../client";
 import { creators } from "./data/creators";
 import { events } from "./data/events";
 import { freechats } from "./data/freechats";
@@ -10,6 +12,7 @@ import { twitchClips } from "./data/twitchClips";
 import { youtubeClips } from "./data/youtubeClips";
 import { youtubeShorts } from "./data/youtubeShorts";
 
+// Using type assertion since we don't have wrangler file for CF bindings
 export const ENV = process.env.ENV || "development";
 
 interface MockData {
@@ -124,6 +127,6 @@ export const MockHandler = {
   },
 };
 
-export function isLocalEnv(): boolean {
-  return ENV === "local";
+export function isLocalEnv(opts?: Pick<VSPOApiOptions, "baseUrl">): boolean {
+  return ENV === "local" || (opts?.baseUrl?.includes("localhost") ?? false);
 }

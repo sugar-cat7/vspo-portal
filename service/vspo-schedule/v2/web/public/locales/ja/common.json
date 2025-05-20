@@ -1,0 +1,65 @@
+{
+  "spodule": "すぽじゅーる",
+  "vspo": "ぶいすぽっ！",
+  "search": "検索",
+  "cancel": "キャンセル",
+  "back": "戻る",
+  "liveStatus": {
+    "live": "Live",
+    "upcoming": "配信予定"
+  },
+  "footer": {
+    "lastUpdated": "最終更新日時: {{date}}",
+    "pages": {
+      "home": "ホーム",
+      "terms": "利用規約",
+      "privacy": "プライバシーポリシー"
+    }
+  },
+  "bottomNav": {
+    "pages": {
+      "list": "配信一覧",
+      "clip": "切り抜き/ショート",
+      "event": "イベント"
+    }
+  },
+  "drawer": {
+    "pages": {
+      "live": "配信中",
+      "upcoming": "配信予定",
+      "archive": "アーカイブ",
+      "freechat": "フリーチャット",
+      "clip": "切り抜き/ショート一覧",
+      "about": "すぽじゅーるについて",
+      "site-news": "お知らせ",
+      "qa": "お問い合わせ",
+      "discord": "Discord Bot"
+    },
+    "language": "言語",
+    "timeZone": "タイムゾーン",
+    "site-theme": "背景のテーマ"
+  },
+  "alert": {
+    "title": "お知らせ",
+    "message": "Discord Botがアップデートされました！詳しくはXをチェック！"
+  },
+  "videoModal": {
+    "tabLabels": {
+      "overview": "概要",
+      "relatedVideos": "関連動画",
+      "chat": "ライブチャット"
+    },
+    "watch": "視聴",
+    "share": "共有"
+  },
+  "relatedVideos": {
+    "dataLoadError": "データの取得に失敗しました。",
+    "loadMore": "もっと見る"
+  },
+  "breadcrumbs": {
+    "pages": {
+      "home": "ホーム",
+      "site-news": "お知らせ"
+    }
+  }
+}
