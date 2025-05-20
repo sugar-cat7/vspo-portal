@@ -7,7 +7,6 @@ import { VideoModalContextProvider } from "@/context/VideoModalContext";
 import { GoogleAnalytics } from "@/features/shared/components/Elements";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { AppCacheProvider } from "@mui/material-nextjs/v14-pagesRouter";
-import { Analytics } from "@vercel/analytics/react";
 import { NextPage } from "next";
 import { appWithTranslation } from "next-i18next";
 import type { AppProps } from "next/app";
@@ -39,7 +38,6 @@ function App({ Component, pageProps, ...props }: AppPropsWithLayout) {
           </TimeZoneContextProvider>
         </ThemeModeProvider>
       </AppCacheProvider>
-      <Analytics />
       <GoogleAnalytics />
     </>
   );
