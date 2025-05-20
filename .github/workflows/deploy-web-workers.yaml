@@ -1,0 +1,66 @@
+name: Deploy Web
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'service/vspo-schedule/v2/web/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: ${{ github.ref == 'refs/heads/main' && 'web-production' || 'web-development' }}
+    strategy:
+      matrix:
+        include:
+          - name: "vspo-portal-web"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.10.0
+          run_install: false
+      - name: Install dependencies
+        run: pnpm install
+      - name: Turbo Build(Package)
+        run: pnpm build
+      - name: Web Deploy Worker
+        uses: cloudflare/wrangler-action@v3.14.1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          packageManager: pnpm
+          wranglerVersion: "4.6.0"
+          workingDirectory: service/vspo-schedule/v2/web/config/wrangler/${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}
+          command: deploy
+          preCommands: |
+            cp -R ./ ../../..
+          quiet: true
+          secrets: |
+            ENV
+            API_KEY_V2
+            API_URL_V2
+            CF_ACCESS_CLIENT_ID
+            CF_ACCESS_CLIENT_SECRET
+            NEXT_PUBLIC_AD_CLIENT
+            NEXT_PUBLIC_AD_SLOT
+            NEXT_PUBLIC_ADS_GOOGLE
+            NEXT_PUBLIC_GOOGLE_ANALYTICS
+            NEXT_PUBLIC_FORM
+            NEXT_PUBLIC_DISCORD_LINK
+        env:
+          ENV: ${{ github.ref == 'refs/heads/main' && 'production' || 'development' }}
+          API_KEY_V2: ${{ secrets.API_KEY_V2 }}
+          API_URL_V2: ${{ secrets.API_URL_V2 }}
+          CF_ACCESS_CLIENT_ID: ${{ secrets.CF_ACCESS_CLIENT_ID }}
+          CF_ACCESS_CLIENT_SECRET: ${{ secrets.CF_ACCESS_CLIENT_SECRET }}
+          NEXT_PUBLIC_AD_CLIENT: ${{ secrets.NEXT_PUBLIC_AD_CLIENT }}
+          NEXT_PUBLIC_AD_SLOT: ${{ secrets.NEXT_PUBLIC_AD_SLOT }}
+          NEXT_PUBLIC_ADS_GOOGLE: ${{ secrets.NEXT_PUBLIC_ADS_GOOGLE }}
+          NEXT_PUBLIC_GOOGLE_ANALYTICS: ${{ secrets.NEXT_PUBLIC_GOOGLE_ANALYTICS }}
+          NEXT_PUBLIC_FORM: ${{ secrets.NEXT_PUBLIC_FORM }}
+          NEXT_PUBLIC_DISCORD_LINK: ${{ secrets.NEXT_PUBLIC_DISCORD_LINK }}

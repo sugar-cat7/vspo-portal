@@ -2,6 +2,7 @@ import { AppError, Err, Ok, type Result } from "@vspo-lab/error";
 import type { AxiosRequestConfig } from "axios";
 import axios from "axios";
 import type * as apiGen from "./gen/openapi";
+import { MockHandler, isLocalEnv } from "./mock";
 
 interface ApiErrorResponse {
   error: {
@@ -52,7 +53,7 @@ export interface VSPOApiOptions {
 
   /**
    * Base URL for API requests
-   * @default "https://api.vspo-portal.com"
+   *
    */
   baseUrl?: string;
 
@@ -225,6 +226,12 @@ export class VSPOApi {
         params: apiGen.ListStreamsParams,
         options?: AxiosRequestConfig,
       ): Promise<Result<apiGen.ListStreams200, AppError>> => {
+        // Use mock data if in local environment
+        if (isLocalEnv({ baseUrl: this.baseUrl })) {
+          const mockData = MockHandler.getStreams(params);
+          return Promise.resolve(Ok(mockData));
+        }
+
         return this.request<apiGen.ListStreams200>({
           ...options,
           method: "GET",
@@ -237,6 +244,12 @@ export class VSPOApi {
         body: apiGen.PostStreamBody,
         options?: AxiosRequestConfig,
       ): Promise<Result<apiGen.PostStream200, AppError>> => {
+        // Use mock data if in local environment
+        if (isLocalEnv({ baseUrl: this.baseUrl })) {
+          const mockData = MockHandler.searchStreams(body);
+          return Promise.resolve(Ok(mockData));
+        }
+
         return this.request<apiGen.PostStream200>({
           ...options,
           method: "POST",
@@ -253,6 +266,12 @@ export class VSPOApi {
         params: apiGen.ListCreatorsParams,
         options?: AxiosRequestConfig,
       ): Promise<Result<apiGen.ListCreators200, AppError>> => {
+        // Use mock data if in local environment
+        if (isLocalEnv({ baseUrl: this.baseUrl })) {
+          const mockData = MockHandler.getCreators(params);
+          return Promise.resolve(Ok(mockData));
+        }
+
         return this.request<apiGen.ListCreators200>({
           ...options,
           method: "GET",
@@ -269,6 +288,12 @@ export class VSPOApi {
         params: apiGen.ListClipsParams,
         options?: AxiosRequestConfig,
       ): Promise<Result<apiGen.ListClips200, AppError>> => {
+        // Use mock data if in local environment
+        if (isLocalEnv({ baseUrl: this.baseUrl })) {
+          const mockData = MockHandler.getClips(params);
+          return Promise.resolve(Ok(mockData));
+        }
+
         return this.request<apiGen.ListClips200>({
           ...options,
           method: "GET",
@@ -285,6 +310,12 @@ export class VSPOApi {
         params: apiGen.ListEventsParams,
         options?: AxiosRequestConfig,
       ): Promise<Result<apiGen.ListEvents200, AppError>> => {
+        // Use mock data if in local environment
+        if (isLocalEnv({ baseUrl: this.baseUrl })) {
+          const mockData = MockHandler.getEvents(params);
+          return Promise.resolve(Ok(mockData));
+        }
+
         return this.request<apiGen.ListEvents200>({
           ...options,
           method: "GET",
@@ -297,6 +328,8 @@ export class VSPOApi {
         body: apiGen.CreateEventBody,
         options?: AxiosRequestConfig,
       ): Promise<Result<apiGen.CreateEvent201, AppError>> => {
+        // Note: For creation endpoints, we still make the API call
+        // as mocking creation would require storing state
         return this.request<apiGen.CreateEvent201>({
           ...options,
           method: "POST",
@@ -309,6 +342,24 @@ export class VSPOApi {
         id: string,
         options?: AxiosRequestConfig,
       ): Promise<Result<apiGen.GetEvent200, AppError>> => {
+        // Use mock data if in local environment
+        if (isLocalEnv({ baseUrl: this.baseUrl })) {
+          try {
+            const mockData = MockHandler.getEvent(id);
+            return Promise.resolve(Ok(mockData));
+          } catch (error) {
+            // If event not found, return a NOT_FOUND error
+            return Promise.resolve(
+              Err(
+                new AppError({
+                  message: `Event with ID ${id} not found`,
+                  code: "NOT_FOUND",
+                }),
+              ),
+            );
+          }
+        }
+
         return this.request<apiGen.GetEvent200>({
           ...options,
           method: "GET",
@@ -324,6 +375,12 @@ export class VSPOApi {
         params: apiGen.ListFreechatsParams,
         options?: AxiosRequestConfig,
       ): Promise<Result<apiGen.ListFreechats200, AppError>> => {
+        // Use mock data if in local environment
+        if (isLocalEnv({ baseUrl: this.baseUrl })) {
+          const mockData = MockHandler.getFreechats(params);
+          return Promise.resolve(Ok(mockData));
+        }
+
         return this.request<apiGen.ListFreechats200>({
           ...options,
           method: "GET",

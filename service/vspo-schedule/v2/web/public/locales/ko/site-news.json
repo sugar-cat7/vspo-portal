@@ -1,0 +1,15 @@
+{
+  "title": "사이트 뉴스",
+  "description": "주요 버그 수정 및 기능 추가를 포함한 사이트 업데이트를 확인하세요.",
+  "updateDate": "업데이트 날짜",
+  "tags": "태그",
+  "tableHeaders": {
+    "summary": "요약",
+    "updateDate": "업데이트 날짜",
+    "tags": "태그"
+  },
+  "tagLabels": {
+    "feat": "새로운 기능",
+    "fix": "버그 수정"
+  }
+}

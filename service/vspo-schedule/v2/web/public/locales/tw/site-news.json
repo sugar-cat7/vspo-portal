@@ -1,0 +1,15 @@
+{
+  "title": "Spodule 的公告",
+  "description": "顯示有關錯誤修復和新功能添加的公告。",
+  "updateDate": "更新日期",
+  "tags": "標籤",
+  "tableHeaders": {
+    "summary": "內容摘要",
+    "updateDate": "更新日期",
+    "tags": "標籤"
+  },
+  "tagLabels": {
+    "feat": "新功能添加",
+    "fix": "錯誤修復"
+  }
+}

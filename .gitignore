@@ -69,3 +69,5 @@ dist
 .env.*
 
 .turbo
+
+**/.open-next

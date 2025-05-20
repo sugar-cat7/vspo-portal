@@ -1,0 +1,2 @@
+ENV=local
+API_URL_V2=http://localhost:4000

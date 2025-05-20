@@ -1,0 +1,67 @@
+{
+  "spodule": "Spodule",
+  "vspo": "VSPO",
+  "search": "搜尋",
+  "cancel": "取消",
+  "back": "返回",
+  "liveStatus": {
+    "live": "直播",
+    "upcoming": "即將直播"
+  },
+  "footer": {
+    "lastUpdated": "最後更新時間: {{date}}",
+    "pages": {
+      "home": "首頁",
+      "terms": "服務條款",
+      "privacy": "隱私政策"
+    }
+  },
+  "bottomNav": {
+    "pages": {
+      "list": "直播列表",
+      "clip": "剪輯",
+      "twitch-clip": "Twitch 剪輯",
+      "event": "活動"
+    }
+  },
+  "drawer": {
+    "pages": {
+      "live": "直播中",
+      "upcoming": "即將直播",
+      "archive": "直播存檔",
+      "freechat": "自由聊天",
+      "clip": "剪輯列表",
+      "twitch-clip": "Twitch 剪輯列表",
+      "about": "關於 Spodule",
+      "site-news": "網站公告",
+      "qa": "聯繫我們",
+      "discord": "Discord 機器人"
+    },
+    "language": "語言",
+    "timeZone": "時區",
+    "site-theme": "主題"
+  },
+  "alert": {
+    "title": "通知",
+    "message": "Discord 機器人已更新！請查看 X 獲取更多詳情！"
+  },
+  "videoModal": {
+    "tabLabels": {
+      "overview": "概覽",
+      "relatedVideos": "相關影片",
+      "chat": "直播聊天"
+    },
+    "watch": "觀看",
+    "share": "分享"
+  },
+  "relatedVideos": {
+    "dataLoadError": "數據加載失敗。",
+    "loadMore": "查看更多"
+  },
+  "breadcrumbs": {
+    "pages": {
+      "home": "首頁",
+      "site-news": "網站公告"
+    }
+  }
+}
