@@ -3,7 +3,7 @@ on:
   pull_request:
     paths:
       - 'service/server/**'
-      - 'service/vspo-schedule/web/**'
+      - 'service/vspo-schedule/v2/web/**'
       - '.github/workflows/pr-check.yaml'
 
 jobs:
