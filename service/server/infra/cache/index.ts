@@ -10,7 +10,7 @@ import { AppLogger } from "@vspo-lab/logging";
 import { withTracerResult } from "../http/trace/cloudflare";
 
 export const cacheKey = {
-  discord: (serverId: string) => `discord-serber-${serverId}`,
+  discordServer: (serverId: string) => `discord-server-${serverId}`,
   creator: (memberType: string) => `creator-${memberType}`,
   streamList: (params: {
     limit: number;
@@ -87,6 +87,36 @@ export const cacheKey = {
       key += `:after-${formatDate(params.afterPublishedAtDate)}`;
     if (params.beforePublishedAtDate)
       key += `:before-${formatDate(params.beforePublishedAtDate)}`;
+
+    return key;
+  },
+  creatorList: (params: {
+    limit: number;
+    page: number;
+    memberType?: string;
+    languageCode?: string;
+  }) => {
+    let key = `creator:list:limit-${params.limit}:page-${params.page}`;
+
+    if (params.languageCode) key += `:lang-${params.languageCode}`;
+    if (params.memberType) key += `:member-${params.memberType}`;
+
+    return key;
+  },
+  eventList: (params: {
+    limit: number;
+    page: number;
+    orderBy?: "asc" | "desc";
+    visibility?: string;
+    startedDateFrom?: string;
+    startedDateTo?: string;
+  }) => {
+    let key = `event:list:limit-${params.limit}:page-${params.page}`;
+
+    if (params.orderBy) key += `:order-${params.orderBy}`;
+    if (params.visibility) key += `:visibility-${params.visibility}`;
+    if (params.startedDateFrom) key += `:from-${params.startedDateFrom}`;
+    if (params.startedDateTo) key += `:to-${params.startedDateTo}`;
 
     return key;
   },

@@ -500,7 +500,7 @@ export class DiscordService implements IDiscordService {
 
         // set channel list to cache
         const r = await this.dependencies.cacheClient.set(
-          cacheKey.discord(options.serverId),
+          cacheKey.discordServer(options.serverId),
           updatedServer,
           // Limit
           2147483647,

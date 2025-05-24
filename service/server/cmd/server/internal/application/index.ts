@@ -4,6 +4,7 @@ import {
   type AppWorkerEnv,
   zAppWorkerEnv,
 } from "../../../../config/env/internal";
+import type { DiscordServer } from "../../../../domain/discord";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { cacheKey } from "../../../../infra/cache";
 import type { ICacheClient } from "../../../../infra/cache";
@@ -25,8 +26,10 @@ import type {
   IEventInteractor,
   IStreamInteractor,
   ListByMemberTypeParam,
+  ListCreatorsResponse,
   ListDiscordServerParam,
   ListEventsQuery,
+  ListEventsResponse,
   ListParam,
   ListResponse,
   SearchByChannelIdsParam,
@@ -48,7 +51,6 @@ import type {
   IFreechatInteractor,
   ListFreechatsQuery,
 } from "../../../../usecase/freechat";
-import { Clips } from "../../../../domain/clip";
 
 // Utility function to safely send batches respecting size limits
 export async function safeSendBatch<T, U>(
@@ -294,7 +296,7 @@ export class ClipService extends RpcTarget {
         return result;
       }
 
-      this.#ctx.waitUntil(this.#cache.set(key, result.val, 30));
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 3600));
       return result;
     });
   }
@@ -335,10 +337,19 @@ export class ClipService extends RpcTarget {
 export class CreatorService extends RpcTarget {
   #usecase: ICreatorInteractor;
   #queue: Queue<MessageParam>;
-  constructor(usecase: ICreatorInteractor, queue: Queue<MessageParam>) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+  constructor(
+    usecase: ICreatorInteractor,
+    queue: Queue<MessageParam>,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async batchUpsertEnqueue(params: BatchUpsertCreatorsParam) {
@@ -393,7 +404,21 @@ export class CreatorService extends RpcTarget {
 
   async list(params: ListByMemberTypeParam) {
     return withTracerResult("CreatorService", "list", async () => {
-      return this.#usecase.list(params);
+      const key = cacheKey.creatorList(params);
+      const cache = await this.#cache.get<ListCreatorsResponse>(key, {
+        type: "json",
+      });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.list(params);
+      if (result.err) {
+        return result;
+      }
+
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 3600));
+      return result;
     });
   }
 }
@@ -401,10 +426,19 @@ export class CreatorService extends RpcTarget {
 export class DiscordService extends RpcTarget {
   #usecase: IDiscordInteractor;
   #queue: Queue<MessageParam>;
-  constructor(usecase: IDiscordInteractor, queue: Queue<MessageParam>) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+  constructor(
+    usecase: IDiscordInteractor,
+    queue: Queue<MessageParam>,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async sendStreamsToMultipleChannels(params: SendMessageParams) {
@@ -425,7 +459,19 @@ export class DiscordService extends RpcTarget {
 
   async get(serverId: string) {
     return withTracerResult("DiscordService", "get", async () => {
-      return this.#usecase.get(serverId);
+      const key = cacheKey.discordServer(serverId);
+      const cache = await this.#cache.get<DiscordServer>(key, {
+        type: "json",
+      });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.get(serverId);
+      if (result.err) {
+        return result;
+      }
+      return result;
     });
   }
 
@@ -506,14 +552,37 @@ export class DiscordService extends RpcTarget {
 
 export class EventService extends RpcTarget {
   #usecase: IEventInteractor;
-  constructor(usecase: IEventInteractor) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+
+  constructor(
+    usecase: IEventInteractor,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async list(params: ListEventsQuery) {
     return withTracerResult("EventService", "list", async () => {
-      return this.#usecase.list(params);
+      const key = cacheKey.eventList(params);
+      const cache = await this.#cache.get<ListEventsResponse>(key, {
+        type: "json",
+      });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.list(params);
+      if (result.err) {
+        return result;
+      }
+
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 3600));
+      return result;
     });
   }
 
@@ -575,12 +644,22 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
 
   newCreatorUsecase() {
     const d = this.setup();
-    return new CreatorService(d.creatorInteractor, this.env.WRITE_QUEUE);
+    return new CreatorService(
+      d.creatorInteractor,
+      this.env.WRITE_QUEUE,
+      this.ctx,
+      d.cacheClient,
+    );
   }
 
   newDiscordUsecase() {
     const d = this.setup();
-    return new DiscordService(d.discordInteractor, this.env.WRITE_QUEUE);
+    return new DiscordService(
+      d.discordInteractor,
+      this.env.WRITE_QUEUE,
+      this.ctx,
+      d.cacheClient,
+    );
   }
 
   newClipUsecase() {
@@ -595,8 +674,9 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
 
   newEventUsecase() {
     const d = this.setup();
-    return new EventService(d.eventInteractor);
+    return new EventService(d.eventInteractor, this.ctx, d.cacheClient);
   }
+
   newFreechatUsecase() {
     const d = this.setup();
     return new FreechatService(d.freechatInteractor);
