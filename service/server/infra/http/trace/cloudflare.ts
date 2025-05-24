@@ -42,10 +42,10 @@ export const withTracerResult = async <T, E extends AppError = AppError>(
       const traceId = span.spanContext().traceId;
       const spanId = span.spanContext().spanId;
 
-      AppLogger.info(spanName, {
+      AppLogger.info(`${spanName} started`, {
         trace_id: traceId,
         span_id: spanId,
-        tracer_name: tracerName,
+        tracer_name: `${tracerName}-${spanName}`,
         start_time: startTime,
         time_origin: performance.timeOrigin,
       });
@@ -55,7 +55,7 @@ export const withTracerResult = async <T, E extends AppError = AppError>(
           additionalFields: {
             trace_id: traceId,
             span_id: spanId,
-            tracer_name: tracerName,
+            tracer_name: `${tracerName}-${spanName}`,
             span_name: spanName,
           },
         },
@@ -132,10 +132,10 @@ export const withTracer = async <T>(
       const traceId = span.spanContext().traceId;
       const spanId = span.spanContext().spanId;
 
-      AppLogger.info(spanName, {
+      AppLogger.info(`${spanName} started`, {
         trace_id: traceId,
         span_id: spanId,
-        tracer_name: tracerName,
+        tracer_name: `${tracerName}-${spanName}`,
         start_time: startTime,
         time_origin: performance.timeOrigin,
       });
@@ -145,7 +145,7 @@ export const withTracer = async <T>(
           additionalFields: {
             trace_id: traceId,
             span_id: spanId,
-            tracer_name: tracerName,
+            tracer_name: `${tracerName}-${spanName}`,
             span_name: spanName,
           },
         },
