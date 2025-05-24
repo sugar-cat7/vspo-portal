@@ -13,7 +13,7 @@ To set up the development environment, run the following commands:
 
 ```bash
 # root directory(packages build)
-ppm build
+pnpm build
 
 # change dir(service/vspo-schedule/v2/web)
 # Install dependencies
