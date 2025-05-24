@@ -1,6 +1,6 @@
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { Clip, ClipFilter, Pagination } from "../domain/clip";
-import { paginationSchema } from "../domain/clip";
+import { Clip, ClipFilter, Pagination } from "../../shared/domain/clip";
+import { paginationSchema } from "../../shared/domain/clip";
 
 /**
  * Calculate the start date for a timeframe filter

@@ -1,17 +1,12 @@
-import { Event } from "@/features/events/domain";
-import {
-  fetchEvents,
-  fetchLivestreams,
-} from "@/features/schedule/api/scheduleService";
-import { Livestream } from "@/features/schedule/domain";
+import { fetchSchedule } from "@/features/schedule/api/scheduleService";
+import { Event } from "@/features/shared/domain";
+import { Livestream } from "@/features/shared/domain/livestream";
 import { DEFAULT_TIME_ZONE } from "@/lib/Const";
 import { TIME_ZONE_COOKIE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { serverSideTranslations } from "@/lib/i18n/server";
 import {
   formatDate,
   getInitializedI18nInstance,
-  getSessionId,
   getSetCookieTimeZone,
   groupBy,
 } from "@/lib/utils";
@@ -70,77 +65,35 @@ export const getLivestreamsServerSideProps: GetServerSideProps<
 
   const platform =
     typeof customPlatform === "string" ? customPlatform : undefined;
-  console.log({
-    limit,
-    lang: locale ?? "default",
-    status: (status as "live" | "upcoming" | "archive" | "all") || "all",
-    order: order,
-    timezone: timeZone,
+
+  // Fetch data using fetchSchedule
+  const schedule = await fetchSchedule({
     startedDate,
+    limit,
+    locale: locale ?? "ja",
+    status: (status as "live" | "upcoming" | "archive" | "all") || "all",
+    order: order as "asc" | "desc",
+    timeZone,
     memberType,
     platform,
-    sessionId: getSessionId(req),
+    req,
   });
-  // Fetch data in parallel using Promise.allSettled
-  const [eventsResult, livestreamsResult, translationsResult] =
-    await Promise.allSettled([
-      fetchEvents({
-        startedDate,
-        sessionId: getSessionId(req),
-      }),
-      fetchLivestreams({
-        limit,
-        lang: locale ?? "default",
-        status: (status as "live" | "upcoming" | "archive" | "all") || "all",
-        order: order,
-        timezone: timeZone,
-        startedDate,
-        memberType,
-        platform,
-        sessionId: getSessionId(req),
-      }),
-      serverSideTranslations(locale || "ja", ["common", "streams", "schedule"]),
-    ]);
 
   const lastUpdateTimestamp = Date.now();
 
-  // Extract results or use defaults
-  const events =
-    eventsResult.status === "fulfilled"
-      ? eventsResult.value.val?.events || []
-      : [];
-
-  if (eventsResult.status === "rejected") {
-    console.error("Error fetching events:", eventsResult.reason);
-  }
-
-  const livestreams =
-    livestreamsResult.status === "fulfilled"
-      ? livestreamsResult.value
-      : { val: { livestreams: [] } };
-
-  if (livestreamsResult.status === "rejected") {
-    console.error("Error fetching livestreams:", livestreamsResult.reason);
-  }
-
-  const translations =
-    translationsResult.status === "fulfilled" ? translationsResult.value : {};
-
-  if (translationsResult.status === "rejected") {
-    console.error("Error loading translations:", translationsResult.reason);
-  }
+  // Extract data from schedule
+  const events = schedule.events;
+  const livestreams = schedule.livestreams;
+  const translations = schedule.translations;
 
   // Group livestreams by date
-  const livestreamsByDate = groupBy(
-    livestreams.val?.livestreams ?? [],
-    (livestream) =>
-      formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", { timeZone }),
+  const livestreamsByDate = groupBy(livestreams, (livestream) =>
+    formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", { timeZone }),
   );
 
   // Set up metadata and footer message
   const { t } = getInitializedI18nInstance(translations, "streams");
   const footerMessage = t("membersOnlyStreamsHidden");
-  console.log(t("membersOnlyStreamsHidden"));
   // Create metadata based on the status
   let title = "";
   let headTitle = "";

@@ -1,5 +1,5 @@
-import { Clip, Pagination } from "@/features/clips/domain/clip";
 import { Loading } from "@/features/shared/components/Elements";
+import { Clip, Pagination } from "@/features/shared/domain/clip";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import {

@@ -1,4 +1,4 @@
-import { Clip } from "@/features/clips/domain";
+import { Clip } from "@/features/shared/domain";
 import { useVideoModalContext } from "@/hooks";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";

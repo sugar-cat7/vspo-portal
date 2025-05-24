@@ -1,13 +1,8 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { serverSideTranslations } from "@/lib/i18n/server";
-import {
-  getInitializedI18nInstance,
-  getSessionId,
-  matchesDateFormat,
-} from "@/lib/utils";
+import { getInitializedI18nInstance, matchesDateFormat } from "@/lib/utils";
 import { GetServerSideProps } from "next";
-import { fetchEvents } from "../../api";
+import { fetchEventService } from "../../api/eventService";
 import { MonthEventsProps } from "./container";
 
 type Params = {
@@ -25,64 +20,44 @@ export const getServerSideProps: GetServerSideProps<
   const isValidYearMonth =
     yearMonth !== undefined && matchesDateFormat(yearMonth, "yyyy-MM");
   if (!isValidYearMonth) {
-    console.error("Invalid yearMonth format:", yearMonth);
     return {
       notFound: true,
     };
   }
 
-  try {
-    const eventsResult = await fetchEvents({
+  const eventService = await fetchEventService({
+    startedDateFrom: `${yearMonth}-01`,
+    startedDateTo: `${yearMonth}-31`,
+    locale,
+    req,
+  });
+
+  const events = eventService.events;
+  const translations = eventService.translations;
+
+  if (events.length === 0) {
+    console.error("No events found for period:", {
+      yearMonth,
       startedDateFrom: `${yearMonth}-01`,
       startedDateTo: `${yearMonth}-31`,
-      sessionId: getSessionId(req),
     });
-
-    if (eventsResult.err) {
-      console.error("Error fetching events:", eventsResult.err, {
-        yearMonth,
-        startedDateFrom: `${yearMonth}-01`,
-        startedDateTo: `${yearMonth}-31`,
-      });
-      return {
-        notFound: true,
-      };
-    }
-
-    const fetchedEvents = eventsResult.val.events;
-    if (fetchedEvents.length === 0) {
-      console.error("No events found for period:", {
-        yearMonth,
-        startedDateFrom: `${yearMonth}-01`,
-        startedDateTo: `${yearMonth}-31`,
-      });
-      return {
-        notFound: true,
-      };
-    }
-
-    const translations = await serverSideTranslations(locale, [
-      "common",
-      "events",
-    ]);
-    const { t } = getInitializedI18nInstance(translations);
-
-    return {
-      props: {
-        ...translations,
-        events: fetchedEvents,
-        yearMonth,
-        lastUpdateTimestamp: getCurrentUTCDate().getTime(),
-        meta: {
-          title: t("title", { ns: "events" }),
-          description: t("description", { ns: "events" }),
-        },
-      },
-    };
-  } catch (error) {
-    console.error("Unexpected error in getServerSideProps:", error);
     return {
       notFound: true,
     };
   }
+
+  const { t } = getInitializedI18nInstance(translations);
+
+  return {
+    props: {
+      ...translations,
+      events,
+      yearMonth,
+      lastUpdateTimestamp: getCurrentUTCDate().getTime(),
+      meta: {
+        title: t("title", { ns: "events" }),
+        description: t("description", { ns: "events" }),
+      },
+    },
+  };
 };

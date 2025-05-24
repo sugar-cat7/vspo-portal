@@ -1,7 +1,5 @@
-import { videoSchema } from "@/features/shared/domain";
+import { videoSchema } from "@/features/shared/domain/video";
 import { z } from "zod";
-
-export type Platform = "youtube" | "twitch";
 
 /**
  * Zod schema for clips

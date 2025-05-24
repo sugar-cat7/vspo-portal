@@ -1,5 +1,5 @@
-import { Livestream } from "@/features/schedule/domain";
 import { VideoCard } from "@/features/shared/components/Elements/Card/VideoCard";
+import { Livestream } from "@/features/shared/domain/livestream";
 import { formatDate } from "@/lib/utils";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import {

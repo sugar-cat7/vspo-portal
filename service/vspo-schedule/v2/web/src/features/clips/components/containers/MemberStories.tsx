@@ -1,4 +1,4 @@
-import { Channel } from "@/features/clips/domain";
+import { Channel } from "@/features/shared/domain";
 import React from "react";
 import { MemberStoriesPresenter } from "../presenters/MemberStoriesPresenter";
 

@@ -11,7 +11,7 @@ import {
 import { styled } from "@mui/material/styles";
 import { Box } from "@mui/system";
 import React from "react";
-import { Freechat } from "../../domain";
+import { Freechat } from "../../../shared/domain/freechat";
 
 // Styled components
 const StyledCard = styled(Card)(() => ({

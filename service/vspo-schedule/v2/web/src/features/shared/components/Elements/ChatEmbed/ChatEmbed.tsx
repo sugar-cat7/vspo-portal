@@ -1,5 +1,5 @@
-import { Freechat } from "@/features/freechat/domain";
-import { Livestream } from "@/features/schedule/domain";
+import { Freechat } from "@/features/shared/domain/freechat";
+import { Livestream } from "@/features/shared/domain/livestream";
 import { convertChatPlayerLink } from "@/features/shared/utils";
 import { styled, useColorScheme } from "@mui/material/styles";
 import React from "react";

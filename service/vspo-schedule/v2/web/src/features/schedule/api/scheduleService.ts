@@ -1,184 +1,91 @@
-import { Event, eventSchema } from "@/features/events/domain";
-import { addDaysAndConvertToUTC, convertToUTCTimestamp } from "@/lib/dayjs";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import {
-  ListStreamsMemberType,
-  ListStreamsParams,
-  ListStreamsPlatform,
-  VSPOApi,
-} from "@vspo-lab/api";
-import { BaseError, Err, Ok, Result } from "@vspo-lab/error";
-import { Livestream, Status, livestreamSchema } from "../domain";
+import { IncomingMessage } from "http";
+import { fetchEvents } from "@/features/shared/api/event";
+import { fetchLivestreams } from "@/features/shared/api/livestream";
+import { Event, Livestream } from "@/features/shared/domain";
+import { serverSideTranslations } from "@/lib/i18n/server";
+import { getSessionId } from "@/lib/utils";
+import { SSRConfig } from "next-i18next";
 
-export type FetchLivestreamsParams = {
+type Schedule = {
+  events: Event[];
+  livestreams: Livestream[];
+  translations: SSRConfig;
+};
+
+type FetchScheduleParams = {
+  startedDate: string;
   limit: number;
-  lang: string;
+  locale: string;
   status: "live" | "upcoming" | "archive" | "all";
   order: "asc" | "desc";
-  timezone: string;
-  startedDate?: string;
+  timeZone: string;
   memberType?: string;
   platform?: string;
-  sessionId?: string;
+  req: IncomingMessage;
 };
 
-export type FetchEventsParams = {
-  lang: string;
-};
+const fetchSchedule = async (
+  params: FetchScheduleParams,
+): Promise<Schedule> => {
+  const {
+    startedDate,
+    limit,
+    locale,
+    status,
+    order,
+    timeZone,
+    memberType,
+    platform,
+    req,
+  } = params;
 
-export type LivestreamFetchResult = Result<
-  {
-    livestreams: Livestream[];
-  },
-  BaseError
->;
+  const sessionId = getSessionId(req);
 
-export type EventFetchResult = Result<
-  {
-    events: Event[];
-  },
-  BaseError
->;
+  const results = await Promise.allSettled([
+    fetchEvents({
+      startedDateFrom: startedDate,
+      startedDateTo: startedDate,
+      lang: locale,
+      sessionId,
+    }),
+    fetchLivestreams({
+      limit,
+      lang: locale ?? "default",
+      status: status || "all",
+      order: order,
+      timezone: timeZone,
+      startedDate,
+      memberType,
+      platform,
+      sessionId,
+    }),
+    serverSideTranslations(locale || "ja", ["common", "streams", "schedule"]),
+  ]);
 
-/**
- * Fetch livestreams from the API
- */
-export const fetchLivestreams = async (
-  params: FetchLivestreamsParams,
-): Promise<LivestreamFetchResult> => {
-  // Initialize API client
-  const client = new VSPOApi({
-    apiKey: getCloudflareContext().env.API_KEY_V2,
-    baseUrl: getCloudflareContext().env.API_URL_V2,
-    cfAccessClientId: getCloudflareContext().env.CF_ACCESS_CLIENT_ID,
-    cfAccessClientSecret: getCloudflareContext().env.CF_ACCESS_CLIENT_SECRET,
-    sessionId: params.sessionId,
-  });
+  const events =
+    results[0].status === "fulfilled" && !results[0].value.err
+      ? results[0].value.val?.events || []
+      : [];
 
-  const statusMap: Record<string, Status | undefined> = {
-    live: "live",
-    upcoming: "upcoming",
-    archive: "ended",
-    all: undefined,
-  };
+  const livestreams =
+    results[1].status === "fulfilled" && !results[1].value.err
+      ? results[1].value.val?.livestreams || []
+      : [];
 
-  const lang = params.lang === "ja" ? "default" : params.lang;
+  const translations =
+    results[2].status === "fulfilled"
+      ? results[2].value
+      : await serverSideTranslations(locale || "ja", [
+          "common",
+          "streams",
+          "schedule",
+        ]);
 
-  const startDateFrom = params.startedDate
-    ? convertToUTCTimestamp(params.startedDate, params.timezone)
-    : undefined;
-
-  const startDateTo = params.startedDate
-    ? addDaysAndConvertToUTC(params.startedDate, 1, params.timezone)
-    : undefined;
-
-  const param: ListStreamsParams = {
-    limit: params.limit.toString(),
-    page: "0", // Default to first page
-    status: statusMap[params.status] || undefined,
-    orderBy: params.order,
-    languageCode: lang,
-    memberType: (params.memberType || "vspo_all") as ListStreamsMemberType,
-  };
-
-  // Add platform filter if provided
-  if (params.platform) {
-    param.platform = params.platform as ListStreamsPlatform;
-  }
-
-  if (params.status === "all") {
-    param.startDateFrom = startDateFrom;
-    param.startDateTo = startDateTo;
-  }
-
-  // Add 30 day limit for ended (archive) streams
-  if (params.status === "archive") {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    param.startDateFrom = convertToUTCTimestamp(
-      thirtyDaysAgo.toISOString(),
-      params.timezone,
-    );
-  }
-
-  // Cast to any to allow the new parameter names until the API client is updated
-  const result = await client.streams.list(param);
-  if (result.err) {
-    return Err(result.err);
-  }
-
-  // Transform API data to domain model
-  const livestreams = result.val.streams.map((stream) => {
-    const livestream = {
-      id: stream.rawId,
-      type: "livestream",
-      title: stream.title,
-      description: stream.description,
-      platform: stream.platform,
-      thumbnailUrl: stream.thumbnailURL,
-      viewCount: stream.viewCount,
-      status: stream.status,
-      scheduledStartTime: stream.startedAt || "",
-      scheduledEndTime: stream.endedAt,
-      channelId: stream.rawChannelID,
-      channelTitle: stream.creatorName || "",
-      channelThumbnailUrl: stream.creatorThumbnailURL || "",
-      link: stream.link || "",
-      videoPlayerLink: stream.videoPlayerLink || "",
-      chatPlayerLink: stream.chatPlayerLink || "",
-      tags: stream.tags,
-    } satisfies Livestream;
-    return livestreamSchema.parse(livestream);
-  });
-  return Ok({
-    livestreams,
-  });
-};
-
-/**
- * Fetch events from the API
- */
-export const fetchEvents = async ({
-  startedDate,
-  sessionId,
-}: {
-  startedDate?: string;
-  sessionId?: string;
-}): Promise<EventFetchResult> => {
-  // Initialize API client
-  const client = new VSPOApi({
-    apiKey: getCloudflareContext().env.API_KEY_V2,
-    baseUrl: getCloudflareContext().env.API_URL_V2,
-    cfAccessClientId: getCloudflareContext().env.CF_ACCESS_CLIENT_ID,
-    cfAccessClientSecret: getCloudflareContext().env.CF_ACCESS_CLIENT_SECRET,
-    sessionId: sessionId,
-  });
-
-  const result = await client.events.list({
-    limit: "50",
-    page: "0",
-    visibility: "public",
-    startedDateFrom: startedDate,
-    startedDateTo: startedDate,
-  });
-
-  if (result.err) {
-    return Err(result.err);
-  }
-  // Transform API data to domain model
-  const events = result.val.events.map((event) => {
-    const eventData = {
-      id: event.id || "",
-      type: "event",
-      title: event.title,
-      startedDate: event.startedDate || "",
-      contentSummary: {},
-      isNotLink: false,
-    } satisfies Event;
-    return eventSchema.parse(eventData);
-  });
-
-  return Ok({
+  return {
     events,
-  });
+    livestreams,
+    translations,
+  };
 };
+
+export { fetchSchedule, type Schedule, type FetchScheduleParams };

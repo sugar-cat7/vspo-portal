@@ -1,4 +1,4 @@
-import { Channel } from "@/features/clips/domain";
+import { Channel } from "@/features/shared/domain";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";

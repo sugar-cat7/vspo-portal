@@ -1,4 +1,4 @@
-import { videoSchema } from "@/features/shared/domain";
+import { videoSchema } from "@/features/shared/domain/video";
 import { z } from "zod";
 
 // Status types

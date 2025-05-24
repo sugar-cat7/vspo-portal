@@ -1,4 +1,4 @@
-import { Clip } from "@/features/clips/domain";
+import { Clip } from "@/features/shared/domain";
 import React from "react";
 import { ClipSectionPresenter } from "../presenters/ClipSectionPresenter";
 
