@@ -1,5 +1,6 @@
 import {
   boolean,
+  index,
   integer,
   pgTable,
   text,
@@ -31,71 +32,123 @@ export const creatorTranslationTable = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (t) => [unique().on(t.creatorId, t.languageCode)],
+  (t) => ({
+    uniqueCreatorLang: unique().on(t.creatorId, t.languageCode),
+    langCodeIdx: index("creator_translation_lang_code_idx").on(t.languageCode),
+    creatorIdIdx: index("creator_translation_creator_id_idx").on(t.creatorId),
+    defaultLangCreatorIdx: index(
+      "creator_translation_default_lang_creator_idx",
+    ).on(t.languageCode, t.creatorId),
+  }),
 );
 
 // Channel information table
-export const channelTable = pgTable("channel", {
-  id: text("id").primaryKey(), // Unique identifier
-  platformChannelId: text("platform_channel_id").notNull().unique(), // Channel ID on the platform
-  creatorId: text("creator_id")
-    .notNull()
-    .references(() => creatorTable.id, { onDelete: "cascade" }), // Creator ID
-  platformType: text("platform_type").notNull(), // Platform type
-  title: text("title").notNull(), // Channel title
-  description: text("description").notNull(), // Channel description
-  publishedAt: timestamp("published_at", { withTimezone: true }).notNull(), // Channel creation date and time
-  subscriberCount: integer("subscriber_count").notNull(), // Number of channel subscribers
-  thumbnailUrl: text("thumbnail_url").notNull(), // Channel's thumbnail URL
-});
+export const channelTable = pgTable(
+  "channel",
+  {
+    id: text("id").primaryKey(), // Unique identifier
+    platformChannelId: text("platform_channel_id").notNull().unique(), // Channel ID on the platform
+    creatorId: text("creator_id")
+      .notNull()
+      .references(() => creatorTable.id, { onDelete: "cascade" }), // Creator ID
+    platformType: text("platform_type").notNull(), // Platform type
+    title: text("title").notNull(), // Channel title
+    description: text("description").notNull(), // Channel description
+    publishedAt: timestamp("published_at", { withTimezone: true }).notNull(), // Channel creation date and time
+    subscriberCount: integer("subscriber_count").notNull(), // Number of channel subscribers
+    thumbnailUrl: text("thumbnail_url").notNull(), // Channel's thumbnail URL
+  },
+  (table) => ({
+    platformChannelIdIdx: index("channel_platform_channel_id_idx").on(
+      table.platformChannelId,
+    ),
+    creatorIdIdx: index("channel_creator_id_idx").on(table.creatorId),
+  }),
+);
 
 // Video information table
-export const videoTable = pgTable("video", {
-  id: text("id").primaryKey(), // Unique identifier
-  rawId: text("raw_id").notNull().unique(), // Video ID on the platform
-  channelId: text("channel_id")
-    .notNull()
-    .references(() => channelTable.platformChannelId, { onDelete: "cascade" }), // Channel ID
-  platformType: text("platform_type").notNull(), // Platform type
-  videoType: text("video_type").notNull(), // Type of video(vspo_stream, clip(short, clip))
-  publishedAt: timestamp("published_at", {
-    withTimezone: true,
-    mode: "date",
-  }).notNull(), // Publication date and time
-  tags: text("tags").notNull(), // Video tags
-  thumbnailUrl: text("thumbnail_url").notNull(), // Video's thumbnail URL
-  link: text("link"), // Video's link
-  deleted: boolean("deleted").notNull().default(false), // Deleted flag
-});
+export const videoTable = pgTable(
+  "video",
+  {
+    id: text("id").primaryKey(), // Unique identifier
+    rawId: text("raw_id").notNull().unique(), // Video ID on the platform
+    channelId: text("channel_id")
+      .notNull()
+      .references(() => channelTable.platformChannelId, {
+        onDelete: "cascade",
+      }), // Channel ID
+    platformType: text("platform_type").notNull(), // Platform type
+    videoType: text("video_type").notNull(), // Type of video(vspo_stream, clip(short, clip))
+    publishedAt: timestamp("published_at", {
+      withTimezone: true,
+      mode: "date",
+    }).notNull(), // Publication date and time
+    tags: text("tags").notNull(), // Video tags
+    thumbnailUrl: text("thumbnail_url").notNull(), // Video's thumbnail URL
+    link: text("link"), // Video's link
+    deleted: boolean("deleted").notNull().default(false), // Deleted flag
+  },
+  (table) => ({
+    videoTypeIdx: index("video_video_type_idx").on(table.videoType),
+    deletedIdx: index("video_deleted_idx").on(table.deleted),
+    videoTypeDeletedIdx: index("video_type_deleted_idx").on(
+      table.videoType,
+      table.deleted,
+    ),
+    clipsFilterIdx: index("video_clips_filter_idx").on(
+      table.videoType,
+      table.deleted,
+      table.platformType,
+      table.publishedAt,
+    ),
+    publishedAtIdx: index("video_published_at_idx").on(table.publishedAt),
+  }),
+);
 
 // Clip statistics and metadata table
-export const clipStatsTable = pgTable("clip_stats", {
-  id: text("id").primaryKey(), // Unique identifier
-  videoId: text("video_id")
-    .notNull()
-    .references(() => videoTable.rawId, { onDelete: "cascade" })
-    .unique(), // Video ID
-  viewCount: integer("view_count").notNull(), // View count
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
-    .notNull()
-    .defaultNow(), // Last updated date and time
-});
+export const clipStatsTable = pgTable(
+  "clip_stats",
+  {
+    id: text("id").primaryKey(), // Unique identifier
+    videoId: text("video_id")
+      .notNull()
+      .references(() => videoTable.rawId, { onDelete: "cascade" })
+      .unique(), // Video ID
+    viewCount: integer("view_count").notNull(), // View count
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(), // Last updated date and time
+  },
+  (table) => ({
+    viewCountIdx: index("clip_stats_view_count_desc_idx").on(
+      table.viewCount.desc(),
+    ),
+    videoIdIdx: index("clip_stats_video_id_idx").on(table.videoId),
+  }),
+);
 
 // Stream status table
-export const streamStatusTable = pgTable("stream_status", {
-  id: text("id").primaryKey(), // Unique identifier
-  videoId: text("video_id")
-    .notNull()
-    .references(() => videoTable.rawId, { onDelete: "cascade" })
-    .unique(), // Video ID
-  status: text("status").notNull(), // Stream status
-  startedAt: timestamp("started_at", { withTimezone: true, mode: "date" }), // Start date and time
-  endedAt: timestamp("ended_at", { withTimezone: true, mode: "date" }), // End date and time
-  viewCount: integer("view_count").notNull(), // View count
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
-    .notNull()
-    .defaultNow(), // Last updated date and time
-});
+export const streamStatusTable = pgTable(
+  "stream_status",
+  {
+    id: text("id").primaryKey(), // Unique identifier
+    videoId: text("video_id")
+      .notNull()
+      .references(() => videoTable.rawId, { onDelete: "cascade" })
+      .unique(), // Video ID
+    status: text("status").notNull(), // Stream status
+    startedAt: timestamp("started_at", { withTimezone: true, mode: "date" }), // Start date and time
+    endedAt: timestamp("ended_at", { withTimezone: true, mode: "date" }), // End date and time
+    viewCount: integer("view_count").notNull(), // View count
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .notNull()
+      .defaultNow(), // Last updated date and time
+  },
+  (table) => ({
+    videoIdIdx: index("stream_status_video_id_idx").on(table.videoId),
+    startedAtIdx: index("stream_status_started_at_idx").on(table.startedAt),
+  }),
+);
 
 export const videoTranslationTable = pgTable(
   "video_translation",
@@ -111,7 +164,14 @@ export const videoTranslationTable = pgTable(
       .notNull()
       .defaultNow(),
   },
-  (t) => [unique().on(t.videoId, t.languageCode)],
+  (t) => ({
+    uniqueVideoLang: unique().on(t.videoId, t.languageCode),
+    langCodeIdx: index("video_translation_lang_code_idx").on(t.languageCode),
+    langCodeVideoIdx: index("video_translation_lang_video_idx").on(
+      t.languageCode,
+      t.videoId,
+    ),
+  }),
 );
 
 /**

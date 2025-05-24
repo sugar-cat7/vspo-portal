@@ -2,6 +2,7 @@ import { type AppError, Ok, type Result } from "@vspo-lab/error";
 import type { EventVisibility, VspoEvent, VspoEvents } from "../domain/event";
 import { type Page, createPage } from "../domain/pagination";
 import type { IAppContext } from "../infra/dependency";
+import { withTracerResult } from "../infra/http/trace";
 
 export type UpsertEventParam = VspoEvent;
 export type BatchUpsertEventParam = VspoEvent[];
@@ -37,59 +38,79 @@ export class EventInteractor implements IEventInteractor {
   async list(
     query: ListEventsQuery,
   ): Promise<Result<ListEventsResponse, AppError>> {
-    return this.context.runInTx(async (repos, _services) => {
-      const events = await repos.eventRepository.list(query);
+    return await withTracerResult("EventInteractor", "list", async () => {
+      return this.context.runInTx(async (repos, _services) => {
+        const events = await repos.eventRepository.list(query);
 
-      if (events.err) {
-        return events;
-      }
+        if (events.err) {
+          return events;
+        }
 
-      const pagination = await repos.eventRepository.count(query);
+        const pagination = await repos.eventRepository.count(query);
 
-      if (pagination.err) {
-        return pagination;
-      }
+        if (pagination.err) {
+          return pagination;
+        }
 
-      return Ok({
-        events: events.val,
-        pagination: createPage({
-          currentPage: query.page,
-          limit: query.limit,
-          totalCount: pagination.val,
-        }),
+        return Ok({
+          events: events.val,
+          pagination: createPage({
+            currentPage: query.page,
+            limit: query.limit,
+            totalCount: pagination.val,
+          }),
+        });
       });
     });
   }
 
   async upsert(params: UpsertEventParam): Promise<Result<VspoEvent, AppError>> {
-    return this.context.runInTx(async (repos, _services) => {
-      return repos.eventRepository.upsert(params);
+    return await withTracerResult("EventInteractor", "upsert", async () => {
+      return this.context.runInTx(async (repos, _services) => {
+        return repos.eventRepository.upsert(params);
+      });
     });
   }
 
   async get(id: string): Promise<Result<VspoEvent | null, AppError>> {
-    return this.context.runInTx(async (repos, _services) => {
-      return repos.eventRepository.get(id);
+    return await withTracerResult("EventInteractor", "get", async () => {
+      return this.context.runInTx(async (repos, _services) => {
+        return repos.eventRepository.get(id);
+      });
     });
   }
 
   async delete(eventId: string): Promise<Result<void, AppError>> {
-    return this.context.runInTx(async (repos, _services) => {
-      return repos.eventRepository.delete(eventId);
+    return await withTracerResult("EventInteractor", "delete", async () => {
+      return this.context.runInTx(async (repos, _services) => {
+        return repos.eventRepository.delete(eventId);
+      });
     });
   }
 
   async batchUpsert(
     events: BatchUpsertEventParam,
   ): Promise<Result<VspoEvents, AppError>> {
-    return this.context.runInTx(async (repos, _services) => {
-      return repos.eventRepository.batchUpsert(events);
-    });
+    return await withTracerResult(
+      "EventInteractor",
+      "batchUpsert",
+      async () => {
+        return this.context.runInTx(async (repos, _services) => {
+          return repos.eventRepository.batchUpsert(events);
+        });
+      },
+    );
   }
 
   async batchDelete(eventIds: string[]): Promise<Result<void, AppError>> {
-    return this.context.runInTx(async (repos, _services) => {
-      return repos.eventRepository.batchDelete(eventIds);
-    });
+    return await withTracerResult(
+      "EventInteractor",
+      "batchDelete",
+      async () => {
+        return this.context.runInTx(async (repos, _services) => {
+          return repos.eventRepository.batchDelete(eventIds);
+        });
+      },
+    );
   }
 }

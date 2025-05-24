@@ -9,11 +9,31 @@ import type { CommonEnv } from "../../../config/env/common";
 import type { AppWorkerEnv } from "../../../config/env/internal";
 import type { BindingWorkflowEnv } from "../../../config/env/workflow";
 
+type PerformanceTiming = {
+  start: number;
+  end: number;
+  duration: number;
+  timeOrigin: number;
+};
+
+const measurePerformance = (startTime: number): PerformanceTiming => {
+  const endTime = performance.now();
+  return {
+    start: startTime,
+    end: endTime,
+    duration: endTime - startTime,
+    timeOrigin: performance.timeOrigin,
+  };
+};
+
 export const withTracerResult = async <T, E extends AppError = AppError>(
   tracerName: string,
   spanName: string,
   callback: (span: Span) => Promise<Result<T, E>>,
 ): Promise<Result<T, E>> => {
+  // Start performance measurement
+  const startTime = performance.now();
+
   return Sentry.startSpan(
     {
       name: spanName,
@@ -22,10 +42,12 @@ export const withTracerResult = async <T, E extends AppError = AppError>(
       const traceId = span.spanContext().traceId;
       const spanId = span.spanContext().spanId;
 
-      AppLogger.info(spanName, {
+      AppLogger.info(`${spanName} started`, {
         trace_id: traceId,
         span_id: spanId,
-        tracer_name: tracerName,
+        tracer_name: `${tracerName}-${spanName}`,
+        start_time: startTime,
+        time_origin: performance.timeOrigin,
       });
 
       return await AppLogger.runWithContext(
@@ -33,18 +55,31 @@ export const withTracerResult = async <T, E extends AppError = AppError>(
           additionalFields: {
             trace_id: traceId,
             span_id: spanId,
-            tracer_name: tracerName,
+            tracer_name: `${tracerName}-${spanName}`,
             span_name: spanName,
           },
         },
         async () => {
           try {
             const result = await callback(span);
+
+            // Measure performance and add to span
+            const timing = measurePerformance(startTime);
+
+            AppLogger.info(`${spanName} completed`, {
+              trace_id: traceId,
+              span_id: spanId,
+              performance_duration_ms: timing.duration,
+              success: !result.err,
+            });
+
             if (result.err) {
               span.recordException(result.err);
             }
             return result;
           } catch (error) {
+            // Measure performance even on error
+            const timing = measurePerformance(startTime);
             let appError: E;
             if (error instanceof AppError) {
               appError = error as E;
@@ -61,6 +96,14 @@ export const withTracerResult = async <T, E extends AppError = AppError>(
                 cause: new Error(String(error)),
               }) as E;
             }
+
+            AppLogger.error(`${spanName} failed`, {
+              trace_id: traceId,
+              span_id: spanId,
+              performance_duration_ms: timing.duration,
+              error: appError.message,
+            });
+
             span.recordException(appError);
             Sentry.captureException(appError);
             return Err(appError);
@@ -78,6 +121,9 @@ export const withTracer = async <T>(
   spanName: string,
   callback: (span: Span) => Promise<T>,
 ): Promise<T> => {
+  // Start performance measurement
+  const startTime = performance.now();
+
   return Sentry.startSpan(
     {
       name: spanName,
@@ -86,10 +132,12 @@ export const withTracer = async <T>(
       const traceId = span.spanContext().traceId;
       const spanId = span.spanContext().spanId;
 
-      AppLogger.info(spanName, {
+      AppLogger.info(`${spanName} started`, {
         trace_id: traceId,
         span_id: spanId,
-        tracer_name: tracerName,
+        tracer_name: `${tracerName}-${spanName}`,
+        start_time: startTime,
+        time_origin: performance.timeOrigin,
       });
 
       return await AppLogger.runWithContext(
@@ -97,14 +145,35 @@ export const withTracer = async <T>(
           additionalFields: {
             trace_id: traceId,
             span_id: spanId,
-            tracer_name: tracerName,
+            tracer_name: `${tracerName}-${spanName}`,
             span_name: spanName,
           },
         },
         async () => {
           try {
-            return await callback(span);
+            const result = await callback(span);
+
+            // Measure performance and add to span
+            const timing = measurePerformance(startTime);
+
+            AppLogger.info(`${spanName} completed`, {
+              trace_id: traceId,
+              span_id: spanId,
+              performance_duration_ms: timing.duration,
+            });
+
+            return result;
           } catch (error) {
+            // Measure performance even on error
+            const timing = measurePerformance(startTime);
+
+            AppLogger.error(`${spanName} failed`, {
+              trace_id: traceId,
+              span_id: spanId,
+              performance_duration_ms: timing.duration,
+              error: error instanceof Error ? error.message : String(error),
+            });
+
             span.recordException(error);
             Sentry.captureException(error);
             throw error;

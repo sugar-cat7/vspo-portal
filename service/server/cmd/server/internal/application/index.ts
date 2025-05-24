@@ -1,10 +1,15 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
+import { Ok } from "@vspo-lab/error";
 import {
   type AppWorkerEnv,
   zAppWorkerEnv,
 } from "../../../../config/env/internal";
+import type { DiscordServer } from "../../../../domain/discord";
 import { TargetLangSchema } from "../../../../domain/translate";
+import { cacheKey } from "../../../../infra/cache";
+import type { ICacheClient } from "../../../../infra/cache";
 import { Container } from "../../../../infra/dependency";
+import { withTracer, withTracerResult } from "../../../../infra/http/trace";
 import {
   type MessageParam,
   queueHandler,
@@ -21,9 +26,12 @@ import type {
   IEventInteractor,
   IStreamInteractor,
   ListByMemberTypeParam,
+  ListCreatorsResponse,
   ListDiscordServerParam,
   ListEventsQuery,
+  ListEventsResponse,
   ListParam,
+  ListResponse,
   SearchByChannelIdsParam,
   SearchByMemberTypeParam,
   SearchByStreamIdsAndCreateParam,
@@ -37,6 +45,7 @@ import type {
   BatchUpsertClipsParam,
   IClipInteractor,
   ListClipsQuery,
+  ListClipsResponse,
 } from "../../../../usecase/clip";
 import type {
   IFreechatInteractor,
@@ -119,259 +128,492 @@ export async function batchEnqueueWithChunks<T, U>(
 export class StreamService extends RpcTarget {
   #usecase: IStreamInteractor;
   #queue: Queue<MessageParam>;
-  constructor(usecase: IStreamInteractor, queue: Queue<MessageParam>) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+  constructor(
+    usecase: IStreamInteractor,
+    queue: Queue<MessageParam>,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async batchUpsertEnqueue(params: BatchUpsertStreamsParam) {
-    return batchEnqueueWithChunks(
-      params,
-      50,
-      (stream) => ({ body: { ...stream, kind: "upsert-stream" as const } }),
-      this.#queue,
-    );
+    return withTracer("StreamService", "batchUpsertEnqueue", async () => {
+      return batchEnqueueWithChunks(
+        params,
+        50,
+        (stream) => ({ body: { ...stream, kind: "upsert-stream" as const } }),
+        this.#queue,
+      );
+    });
   }
 
   async batchUpsert(params: BatchUpsertStreamsParam) {
-    return this.#usecase.batchUpsert(params);
+    return withTracerResult("StreamService", "batchUpsert", async () => {
+      return this.#usecase.batchUpsert(params);
+    });
   }
 
   async searchLive() {
-    return this.#usecase.searchLive();
+    return withTracerResult("StreamService", "searchLive", async () => {
+      return this.#usecase.searchLive();
+    });
   }
 
   async searchExist() {
-    return this.#usecase.searchExist();
+    return withTracerResult("StreamService", "searchExist", async () => {
+      return this.#usecase.searchExist();
+    });
   }
 
   async list(params: ListParam) {
-    return this.#usecase.list(params);
+    return withTracerResult("StreamService", "list", async () => {
+      const key = cacheKey.streamList(params);
+      const cache = await this.#cache.get<ListResponse>(key, { type: "json" });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.list(params);
+      if (result.err) {
+        return result;
+      }
+
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 60));
+      return result;
+    });
   }
 
   async searchDeletedCheck() {
-    return this.#usecase.searchDeletedCheck();
+    return withTracerResult("StreamService", "searchDeletedCheck", async () => {
+      return this.#usecase.searchDeletedCheck();
+    });
   }
 
   async batchDeleteByStreamIds(params: BatchDeleteByStreamIdsParam) {
-    return this.#usecase.batchDeleteByStreamIds(params);
-  }
-
-  async translateStreamEnqueue(params: TranslateStreamParam) {
-    return batchEnqueueWithChunks(
-      params.streams,
-      50,
-      (stream) => ({
-        body: {
-          ...stream,
-          languageCode: TargetLangSchema.parse(params.languageCode),
-          kind: "translate-stream" as const,
-        },
-      }),
-      this.#queue,
+    return withTracerResult(
+      "StreamService",
+      "batchDeleteByStreamIds",
+      async () => {
+        return this.#usecase.batchDeleteByStreamIds(params);
+      },
     );
   }
 
+  async translateStreamEnqueue(params: TranslateStreamParam) {
+    return withTracer("StreamService", "translateStreamEnqueue", async () => {
+      return batchEnqueueWithChunks(
+        params.streams,
+        50,
+        (stream) => ({
+          body: {
+            ...stream,
+            languageCode: TargetLangSchema.parse(params.languageCode),
+            kind: "translate-stream" as const,
+          },
+        }),
+        this.#queue,
+      );
+    });
+  }
+
   async getMemberStreams() {
-    return this.#usecase.getMemberStreams();
+    return withTracerResult("StreamService", "getMemberStreams", async () => {
+      return this.#usecase.getMemberStreams();
+    });
   }
 
   async deletedListIds() {
-    return this.#usecase.deletedListIds();
+    return withTracerResult("StreamService", "deletedListIds", async () => {
+      return this.#usecase.deletedListIds();
+    });
   }
 
   async searchByStreamsIdsAndCreate(params: SearchByStreamIdsAndCreateParam) {
-    return this.#usecase.searchByStreamsIdsAndCreate(params);
+    return withTracerResult(
+      "StreamService",
+      "searchByStreamsIdsAndCreate",
+      async () => {
+        return this.#usecase.searchByStreamsIdsAndCreate(params);
+      },
+    );
   }
 }
 
 export class ClipService extends RpcTarget {
   #usecase: IClipInteractor;
   #queue: Queue<MessageParam>;
-  constructor(usecase: IClipInteractor, queue: Queue<MessageParam>) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+  constructor(
+    usecase: IClipInteractor,
+    queue: Queue<MessageParam>,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async batchUpsertEnqueue(params: BatchUpsertClipsParam) {
-    return batchEnqueueWithChunks(
-      params,
-      50,
-      (clip) => ({ body: { ...clip, kind: "upsert-clip" as const } }),
-      this.#queue,
-    );
+    return withTracer("ClipService", "batchUpsertEnqueue", async () => {
+      return batchEnqueueWithChunks(
+        params,
+        50,
+        (clip) => ({ body: { ...clip, kind: "upsert-clip" as const } }),
+        this.#queue,
+      );
+    });
   }
 
   async batchUpsert(params: BatchUpsertClipsParam) {
-    return this.#usecase.batchUpsert(params);
+    return withTracerResult("ClipService", "batchUpsert", async () => {
+      return this.#usecase.batchUpsert(params);
+    });
   }
 
   async list(params: ListClipsQuery) {
-    return this.#usecase.list(params);
+    return withTracerResult("ClipService", "list", async () => {
+      const key = cacheKey.clipList(params);
+      const cache = await this.#cache.get<ListClipsResponse>(key, {
+        type: "json",
+      });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.list(params);
+      if (result.err) {
+        return result;
+      }
+
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 3600));
+      return result;
+    });
   }
 
   async searchNewVspoClipsAndNewCreators() {
-    return this.#usecase.searchNewVspoClipsAndNewCreators();
+    return withTracerResult(
+      "ClipService",
+      "searchNewVspoClipsAndNewCreators",
+      async () => {
+        return this.#usecase.searchNewVspoClipsAndNewCreators();
+      },
+    );
   }
 
   async searchExistVspoClips({ clipIds }: { clipIds: string[] }) {
-    return this.#usecase.searchExistVspoClips({ clipIds });
+    return withTracerResult("ClipService", "searchExistVspoClips", async () => {
+      return this.#usecase.searchExistVspoClips({ clipIds });
+    });
   }
 
   async searchNewClipsByVspoMemberName() {
-    return this.#usecase.searchNewClipsByVspoMemberName();
+    return withTracerResult(
+      "ClipService",
+      "searchNewClipsByVspoMemberName",
+      async () => {
+        return this.#usecase.searchNewClipsByVspoMemberName();
+      },
+    );
   }
 
   async deleteClips({ clipIds }: { clipIds: string[] }) {
-    return this.#usecase.deleteClips({ clipIds });
+    return withTracerResult("ClipService", "deleteClips", async () => {
+      return this.#usecase.deleteClips({ clipIds });
+    });
   }
 }
 
 export class CreatorService extends RpcTarget {
   #usecase: ICreatorInteractor;
   #queue: Queue<MessageParam>;
-  constructor(usecase: ICreatorInteractor, queue: Queue<MessageParam>) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+  constructor(
+    usecase: ICreatorInteractor,
+    queue: Queue<MessageParam>,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async batchUpsertEnqueue(params: BatchUpsertCreatorsParam) {
-    return batchEnqueueWithChunks(
-      params,
-      50,
-      (creator) => ({ body: { ...creator, kind: "upsert-creator" as const } }),
-      this.#queue,
-    );
+    return withTracer("CreatorService", "batchUpsertEnqueue", async () => {
+      return batchEnqueueWithChunks(
+        params,
+        50,
+        (creator) => ({
+          body: { ...creator, kind: "upsert-creator" as const },
+        }),
+        this.#queue,
+      );
+    });
   }
 
   async translateCreatorEnqueue(params: TranslateCreatorParam) {
-    return batchEnqueueWithChunks(
-      params.creators,
-      50,
-      (creator) => ({
-        body: {
-          ...creator,
-          languageCode: params.languageCode,
-          kind: "translate-creator" as const,
-        },
-      }),
-      this.#queue,
-    );
+    return withTracer("CreatorService", "translateCreatorEnqueue", async () => {
+      return batchEnqueueWithChunks(
+        params.creators,
+        50,
+        (creator) => ({
+          body: {
+            ...creator,
+            languageCode: params.languageCode,
+            kind: "translate-creator" as const,
+          },
+        }),
+        this.#queue,
+      );
+    });
   }
 
   async searchByChannelIds(params: SearchByChannelIdsParam) {
-    return this.#usecase.searchByChannelIds(params);
+    return withTracerResult(
+      "CreatorService",
+      "searchByChannelIds",
+      async () => {
+        return this.#usecase.searchByChannelIds(params);
+      },
+    );
   }
 
   async searchByMemberType(params: SearchByMemberTypeParam) {
-    return this.#usecase.searchByMemberType(params);
+    return withTracerResult(
+      "CreatorService",
+      "searchByMemberType",
+      async () => {
+        return this.#usecase.searchByMemberType(params);
+      },
+    );
   }
 
   async list(params: ListByMemberTypeParam) {
-    return this.#usecase.list(params);
+    return withTracerResult("CreatorService", "list", async () => {
+      const key = cacheKey.creatorList(params);
+      const cache = await this.#cache.get<ListCreatorsResponse>(key, {
+        type: "json",
+      });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.list(params);
+      if (result.err) {
+        return result;
+      }
+
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 3600));
+      return result;
+    });
   }
 }
 
 export class DiscordService extends RpcTarget {
   #usecase: IDiscordInteractor;
   #queue: Queue<MessageParam>;
-  constructor(usecase: IDiscordInteractor, queue: Queue<MessageParam>) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+  constructor(
+    usecase: IDiscordInteractor,
+    queue: Queue<MessageParam>,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async sendStreamsToMultipleChannels(params: SendMessageParams) {
-    return this.#usecase.batchSendMessages(params);
-  }
-
-  async adjustBotChannel(params: AdjustBotChannelParams) {
-    return this.#usecase.adjustBotChannel(params);
-  }
-
-  async get(serverId: string) {
-    return this.#usecase.get(serverId);
-  }
-
-  async batchUpsertEnqueue(params: BatchUpsertDiscordServersParam) {
-    return batchEnqueueWithChunks(
-      params,
-      50,
-      (server) => ({
-        body: { ...server, kind: "upsert-discord-server" as const },
-      }),
-      this.#queue,
+    return withTracerResult(
+      "DiscordService",
+      "sendStreamsToMultipleChannels",
+      async () => {
+        return this.#usecase.batchSendMessages(params);
+      },
     );
   }
 
+  async adjustBotChannel(params: AdjustBotChannelParams) {
+    return withTracerResult("DiscordService", "adjustBotChannel", async () => {
+      return this.#usecase.adjustBotChannel(params);
+    });
+  }
+
+  async get(serverId: string) {
+    return withTracerResult("DiscordService", "get", async () => {
+      const key = cacheKey.discordServer(serverId);
+      const cache = await this.#cache.get<DiscordServer>(key, {
+        type: "json",
+      });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.get(serverId);
+      if (result.err) {
+        return result;
+      }
+      return result;
+    });
+  }
+
+  async batchUpsertEnqueue(params: BatchUpsertDiscordServersParam) {
+    return withTracer("DiscordService", "batchUpsertEnqueue", async () => {
+      return batchEnqueueWithChunks(
+        params,
+        50,
+        (server) => ({
+          body: { ...server, kind: "upsert-discord-server" as const },
+        }),
+        this.#queue,
+      );
+    });
+  }
+
   async batchDeleteChannelsByRowChannelIds(params: string[]) {
-    return this.#usecase.batchDeleteChannelsByRowChannelIds(params);
+    return withTracerResult(
+      "DiscordService",
+      "batchDeleteChannelsByRowChannelIds",
+      async () => {
+        return this.#usecase.batchDeleteChannelsByRowChannelIds(params);
+      },
+    );
   }
 
   async list(params: ListDiscordServerParam) {
-    return this.#usecase.list(params);
+    return withTracerResult("DiscordService", "list", async () => {
+      return this.#usecase.list(params);
+    });
   }
 
   async deleteAllMessagesInChannel(channelId: string) {
-    return this.#usecase.deleteAllMessagesInChannel(channelId);
+    return withTracerResult(
+      "DiscordService",
+      "deleteAllMessagesInChannel",
+      async () => {
+        return this.#usecase.deleteAllMessagesInChannel(channelId);
+      },
+    );
   }
 
   async exists(serverId: string) {
-    return this.#usecase.exists(serverId);
+    return withTracerResult("DiscordService", "exists", async () => {
+      return this.#usecase.exists(serverId);
+    });
   }
 
   async existsChannel(channelId: string) {
-    return this.#usecase.existsChannel(channelId);
+    return withTracerResult("DiscordService", "existsChannel", async () => {
+      return this.#usecase.existsChannel(channelId);
+    });
   }
 
   async sendAdminMessage(message: SendAdminMessageParams) {
-    return this.#usecase.sendAdminMessage(message);
+    return withTracerResult("DiscordService", "sendAdminMessage", async () => {
+      return this.#usecase.sendAdminMessage(message);
+    });
   }
 
   async deleteMessageInChannelEnqueue(channelId: string) {
-    return batchEnqueueWithChunks(
-      [channelId],
-      50,
-      (channelId) => ({
-        body: { channelId, kind: "delete-message-in-channel" as const },
-      }),
-      this.#queue,
+    return withTracer(
+      "DiscordService",
+      "deleteMessageInChannelEnqueue",
+      async () => {
+        return batchEnqueueWithChunks(
+          [channelId],
+          50,
+          (channelId) => ({
+            body: { channelId, kind: "delete-message-in-channel" as const },
+          }),
+          this.#queue,
+        );
+      },
     );
   }
 }
 
 export class EventService extends RpcTarget {
   #usecase: IEventInteractor;
-  constructor(usecase: IEventInteractor) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+
+  constructor(
+    usecase: IEventInteractor,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async list(params: ListEventsQuery) {
-    return this.#usecase.list(params);
+    return withTracerResult("EventService", "list", async () => {
+      const key = cacheKey.eventList(params);
+      const cache = await this.#cache.get<ListEventsResponse>(key, {
+        type: "json",
+      });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.list(params);
+      if (result.err) {
+        return result;
+      }
+
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 3600));
+      return result;
+    });
   }
 
   async upsert(params: UpsertEventParam) {
-    return this.#usecase.upsert(params);
+    return withTracerResult("EventService", "upsert", async () => {
+      return this.#usecase.upsert(params);
+    });
   }
 
   async get(id: string) {
-    return this.#usecase.get(id);
+    return withTracerResult("EventService", "get", async () => {
+      return this.#usecase.get(id);
+    });
   }
 
   async delete(id: string) {
-    return this.#usecase.delete(id);
+    return withTracerResult("EventService", "delete", async () => {
+      return this.#usecase.delete(id);
+    });
   }
 
   async batchDelete(ids: string[]) {
-    return this.#usecase.batchDelete(ids);
+    return withTracerResult("EventService", "batchDelete", async () => {
+      return this.#usecase.batchDelete(ids);
+    });
   }
 
   async batchUpsert(params: BatchUpsertEventParam) {
-    return this.#usecase.batchUpsert(params);
+    return withTracerResult("EventService", "batchUpsert", async () => {
+      return this.#usecase.batchUpsert(params);
+    });
   }
 }
 
@@ -383,35 +625,58 @@ export class FreechatService extends RpcTarget {
   }
 
   async list(params: ListFreechatsQuery) {
-    return this.#usecase.list(params);
+    return withTracerResult("FreechatService", "list", async () => {
+      return this.#usecase.list(params);
+    });
   }
 }
 
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   newStreamUsecase() {
     const d = this.setup();
-    return new StreamService(d.streamInteractor, this.env.WRITE_QUEUE);
+    return new StreamService(
+      d.streamInteractor,
+      this.env.WRITE_QUEUE,
+      this.ctx,
+      d.cacheClient,
+    );
   }
 
   newCreatorUsecase() {
     const d = this.setup();
-    return new CreatorService(d.creatorInteractor, this.env.WRITE_QUEUE);
+    return new CreatorService(
+      d.creatorInteractor,
+      this.env.WRITE_QUEUE,
+      this.ctx,
+      d.cacheClient,
+    );
   }
 
   newDiscordUsecase() {
     const d = this.setup();
-    return new DiscordService(d.discordInteractor, this.env.WRITE_QUEUE);
+    return new DiscordService(
+      d.discordInteractor,
+      this.env.WRITE_QUEUE,
+      this.ctx,
+      d.cacheClient,
+    );
   }
 
   newClipUsecase() {
     const d = this.setup();
-    return new ClipService(d.clipInteractor, this.env.WRITE_QUEUE);
+    return new ClipService(
+      d.clipInteractor,
+      this.env.WRITE_QUEUE,
+      this.ctx,
+      d.cacheClient,
+    );
   }
 
   newEventUsecase() {
     const d = this.setup();
-    return new EventService(d.eventInteractor);
+    return new EventService(d.eventInteractor, this.ctx, d.cacheClient);
   }
+
   newFreechatUsecase() {
     const d = this.setup();
     return new FreechatService(d.freechatInteractor);

@@ -29,6 +29,7 @@ import { deleteStreamsWorkflow } from "../../infra/http/workflow/stream/delete";
 import { searchStreamsWorkflow } from "../../infra/http/workflow/stream/search";
 import { searchMemberStreamsByChannelWorkflow } from "../../infra/http/workflow/stream/searchMemberStreamByChannel";
 import { translateStreamsWorkflow } from "../../infra/http/workflow/stream/trasnlate";
+import { accessVspoScheduleSiteWorkflow } from "../../infra/http/workflow/web/access";
 import { createUUID } from "../../pkg/uuid";
 
 export class SearchChannelsWorkflow extends WorkflowEntrypoint<
@@ -179,6 +180,16 @@ export class SearchClipsByVspoMemberNameWorkflow extends WorkflowEntrypoint<
   }
 }
 
+export class AccessVspoScheduleSiteWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  Params
+> {
+  async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await setFeatureFlagProvider(this.env);
+    await accessVspoScheduleSiteWorkflow().handler()(this.env, _event, step);
+  }
+}
+
 export default createHandler({
   scheduled: async (
     controller: ScheduledController,
@@ -190,46 +201,100 @@ export default createHandler({
       await setFeatureFlagProvider(env);
       switch (controller.cron) {
         case "0 0,7,18 * * *":
-          AppLogger.info("search-channels");
-          span.setAttribute("workflow", "search-channels");
-          await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
+          await withTracer(
+            "CronJob",
+            "search-channels",
+            async (searchChannelsSpan) => {
+              AppLogger.info("search-channels");
+              searchChannelsSpan.setAttribute("workflow", "search-channels");
+              await env.SEARCH_CHANNELS_WORKFLOW.create({ id: createUUID() });
+            },
+          );
           break;
         case "5 0,7,18 * * *":
-          AppLogger.info("translate-creators");
-          span.setAttribute("workflow", "translate-creators");
-          await env.TRANSLATE_CREATORS_WORKFLOW.create({ id: createUUID() });
+          await withTracer(
+            "CronJob",
+            "translate-creators",
+            async (translateCreatorsSpan) => {
+              AppLogger.info("translate-creators");
+              translateCreatorsSpan.setAttribute(
+                "workflow",
+                "translate-creators",
+              );
+              await env.TRANSLATE_CREATORS_WORKFLOW.create({
+                id: createUUID(),
+              });
+            },
+          );
           break;
         case "*/1 * * * *":
-          AppLogger.info("search-streams");
-          span.setAttribute("workflow", "search-streams");
-          await env.SEARCH_STREAMS_WORKFLOW.create({ id: createUUID() });
+          await withTracer(
+            "CronJob",
+            "search-streams",
+            async (searchStreamsSpan) => {
+              AppLogger.info("search-streams");
+              searchStreamsSpan.setAttribute("workflow", "search-streams");
+              await env.SEARCH_STREAMS_WORKFLOW.create({ id: createUUID() });
+              await env.ACCESS_VSPO_SCHEDULE_SITE_WORKFLOW.create({
+                id: createUUID(),
+              });
+            },
+          );
           break;
         case "*/2 * * * *":
-          AppLogger.info("discord-send-messages");
-          span.setAttribute("workflow", "search-streams");
-          await env.TRANSLATE_STREAMS_WORKFLOW.create({ id: createUUID() });
-          await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({ id: createUUID() });
+          await withTracer(
+            "CronJob",
+            "discord-send-messages",
+            async (discordSpan) => {
+              AppLogger.info("discord-send-messages");
+              discordSpan.setAttribute("workflow", "discord-send-messages");
+              await env.TRANSLATE_STREAMS_WORKFLOW.create({ id: createUUID() });
+              await env.DISCORD_SEND_MESSAGES_WORKFLOW.create({
+                id: createUUID(),
+              });
+            },
+          );
           break;
         case "*/30 * * * *":
-          AppLogger.info("search-member-streams-by-channel");
-          span.setAttribute("workflow", "search-member-streams-by-channel");
-          await env.SEARCH_MEMBER_STREAMS_BY_CHANNEL_WORKFLOW.create({
-            id: createUUID(),
-          });
-          await env.DELETE_STREAMS_WORKFLOW.create({ id: createUUID() });
+          await withTracer(
+            "CronJob",
+            "search-member-streams-by-channel",
+            async (memberStreamsSpan) => {
+              AppLogger.info("search-member-streams-by-channel");
+              memberStreamsSpan.setAttribute(
+                "workflow",
+                "search-member-streams-by-channel",
+              );
+              await env.SEARCH_MEMBER_STREAMS_BY_CHANNEL_WORKFLOW.create({
+                id: createUUID(),
+              });
+              await env.DELETE_STREAMS_WORKFLOW.create({ id: createUUID() });
+            },
+          );
           break;
         case "15 * * * *":
-          AppLogger.info("exist-clips");
-          span.setAttribute("workflow", "clips-hourly");
-          await env.EXIST_CLIPS_WORKFLOW.create({ id: createUUID() });
-          await env.SEARCH_CLIPS_WORKFLOW.create({ id: createUUID() });
+          await withTracer("CronJob", "clips-hourly", async (clipsSpan) => {
+            AppLogger.info("exist-clips");
+            clipsSpan.setAttribute("workflow", "clips-hourly");
+            await env.EXIST_CLIPS_WORKFLOW.create({ id: createUUID() });
+            await env.SEARCH_CLIPS_WORKFLOW.create({ id: createUUID() });
+          });
           break;
         case "30 21 * * *":
-          AppLogger.info("search-clips-by-vspo-member-name");
-          span.setAttribute("workflow", "search-clips-by-vspo-member-name");
-          await env.SEARCH_CLIPS_BY_VSPO_MEMBER_NAME_WORKFLOW.create({
-            id: createUUID(),
-          });
+          await withTracer(
+            "CronJob",
+            "search-clips-by-vspo-member-name",
+            async (vspoClipsSpan) => {
+              AppLogger.info("search-clips-by-vspo-member-name");
+              vspoClipsSpan.setAttribute(
+                "workflow",
+                "search-clips-by-vspo-member-name",
+              );
+              await env.SEARCH_CLIPS_BY_VSPO_MEMBER_NAME_WORKFLOW.create({
+                id: createUUID(),
+              });
+            },
+          );
           break;
         default:
           console.error("Unknown cron", controller.cron);

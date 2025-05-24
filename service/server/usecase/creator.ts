@@ -20,7 +20,7 @@ export type ListByMemberTypeParam = {
   languageCode?: string;
 };
 
-type ListResponse = {
+export type ListCreatorsResponse = {
   creators: Creators;
   pagination: Page;
 };
@@ -44,7 +44,9 @@ export interface ICreatorInteractor {
   batchUpsert(
     params: BatchUpsertCreatorsParam,
   ): Promise<Result<Creators, AppError>>;
-  list(params: ListByMemberTypeParam): Promise<Result<ListResponse, AppError>>;
+  list(
+    params: ListByMemberTypeParam,
+  ): Promise<Result<ListCreatorsResponse, AppError>>;
   translateCreator(
     params: TranslateCreatorParam,
   ): Promise<Result<Creators, AppError>>;
@@ -112,7 +114,7 @@ export class CreatorInteractor implements ICreatorInteractor {
 
   async list(
     params: ListByMemberTypeParam,
-  ): Promise<Result<ListResponse, AppError>> {
+  ): Promise<Result<ListCreatorsResponse, AppError>> {
     return await withTracerResult("CreatorInteractor", "list", async () => {
       return this.context.runInTx(async (repos, _services) => {
         const c = await repos.creatorRepository.list(params);
