@@ -175,7 +175,7 @@ export class Container {
   private readonly discordClient: IDiscordClient;
   private readonly aiService: IAIService;
   private readonly txManager: TxManager;
-  private readonly cacheClient: ICacheClient;
+  cacheClient: ICacheClient;
   creatorInteractor: ICreatorInteractor;
   streamInteractor: IStreamInteractor;
   clipInteractor: IClipInteractor;

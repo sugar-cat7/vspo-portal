@@ -1,9 +1,12 @@
 import { RpcTarget, WorkerEntrypoint } from "cloudflare:workers";
+import { Ok } from "@vspo-lab/error";
 import {
   type AppWorkerEnv,
   zAppWorkerEnv,
 } from "../../../../config/env/internal";
 import { TargetLangSchema } from "../../../../domain/translate";
+import { cacheKey } from "../../../../infra/cache";
+import type { ICacheClient } from "../../../../infra/cache";
 import { Container } from "../../../../infra/dependency";
 import { withTracer, withTracerResult } from "../../../../infra/http/trace";
 import {
@@ -25,6 +28,7 @@ import type {
   ListDiscordServerParam,
   ListEventsQuery,
   ListParam,
+  ListResponse,
   SearchByChannelIdsParam,
   SearchByMemberTypeParam,
   SearchByStreamIdsAndCreateParam,
@@ -38,11 +42,13 @@ import type {
   BatchUpsertClipsParam,
   IClipInteractor,
   ListClipsQuery,
+  ListClipsResponse,
 } from "../../../../usecase/clip";
 import type {
   IFreechatInteractor,
   ListFreechatsQuery,
 } from "../../../../usecase/freechat";
+import { Clips } from "../../../../domain/clip";
 
 // Utility function to safely send batches respecting size limits
 export async function safeSendBatch<T, U>(
@@ -120,10 +126,19 @@ export async function batchEnqueueWithChunks<T, U>(
 export class StreamService extends RpcTarget {
   #usecase: IStreamInteractor;
   #queue: Queue<MessageParam>;
-  constructor(usecase: IStreamInteractor, queue: Queue<MessageParam>) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+  constructor(
+    usecase: IStreamInteractor,
+    queue: Queue<MessageParam>,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async batchUpsertEnqueue(params: BatchUpsertStreamsParam) {
@@ -157,7 +172,19 @@ export class StreamService extends RpcTarget {
 
   async list(params: ListParam) {
     return withTracerResult("StreamService", "list", async () => {
-      return this.#usecase.list(params);
+      const key = cacheKey.streamList(params);
+      const cache = await this.#cache.get<ListResponse>(key, { type: "json" });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.list(params);
+      if (result.err) {
+        return result;
+      }
+
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 30));
+      return result;
     });
   }
 
@@ -220,10 +247,19 @@ export class StreamService extends RpcTarget {
 export class ClipService extends RpcTarget {
   #usecase: IClipInteractor;
   #queue: Queue<MessageParam>;
-  constructor(usecase: IClipInteractor, queue: Queue<MessageParam>) {
+  #ctx: ExecutionContext;
+  #cache: ICacheClient;
+  constructor(
+    usecase: IClipInteractor,
+    queue: Queue<MessageParam>,
+    ctx: ExecutionContext,
+    cache: ICacheClient,
+  ) {
     super();
     this.#usecase = usecase;
     this.#queue = queue;
+    this.#ctx = ctx;
+    this.#cache = cache;
   }
 
   async batchUpsertEnqueue(params: BatchUpsertClipsParam) {
@@ -245,7 +281,21 @@ export class ClipService extends RpcTarget {
 
   async list(params: ListClipsQuery) {
     return withTracerResult("ClipService", "list", async () => {
-      return this.#usecase.list(params);
+      const key = cacheKey.clipList(params);
+      const cache = await this.#cache.get<ListClipsResponse>(key, {
+        type: "json",
+      });
+      if (!cache.err && cache.val) {
+        return Ok(cache.val);
+      }
+
+      const result = await this.#usecase.list(params);
+      if (result.err) {
+        return result;
+      }
+
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 30));
+      return result;
     });
   }
 
@@ -515,7 +565,12 @@ export class FreechatService extends RpcTarget {
 export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
   newStreamUsecase() {
     const d = this.setup();
-    return new StreamService(d.streamInteractor, this.env.WRITE_QUEUE);
+    return new StreamService(
+      d.streamInteractor,
+      this.env.WRITE_QUEUE,
+      this.ctx,
+      d.cacheClient,
+    );
   }
 
   newCreatorUsecase() {
@@ -530,7 +585,12 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
 
   newClipUsecase() {
     const d = this.setup();
-    return new ClipService(d.clipInteractor, this.env.WRITE_QUEUE);
+    return new ClipService(
+      d.clipInteractor,
+      this.env.WRITE_QUEUE,
+      this.ctx,
+      d.cacheClient,
+    );
   }
 
   newEventUsecase() {
