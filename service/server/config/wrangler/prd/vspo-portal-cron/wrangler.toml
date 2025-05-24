@@ -81,6 +81,11 @@ name = "prd-search-clips-by-vspo-member-name-workflow"
 binding = "SEARCH_CLIPS_BY_VSPO_MEMBER_NAME_WORKFLOW"
 class_name = "SearchClipsByVspoMemberNameWorkflow"
 
+[[workflows]]
+name = "prd-access-vspo-schedule-site-workflow"
+binding = "ACCESS_VSPO_SCHEDULE_SITE_WORKFLOW"
+class_name = "AccessVspoScheduleSiteWorkflow"
+
 [vars]
 SERVICE_NAME = "prd-vspo-portal-cron"
 ENVIRONMENT = "production"

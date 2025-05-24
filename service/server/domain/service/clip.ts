@@ -196,25 +196,31 @@ export class ClipService implements IClipService {
   }: { clipIds: string[] }): Promise<
     Result<{ clips: Clips; notExistsClipIds: string[] }, AppError>
   > {
-    const clipsResult = await this.deps.youtubeClient.getClips({
-      videoIds: clipIds,
-    });
-    if (clipsResult.err) {
-      return clipsResult;
-    }
-    const clips = clipsResult.val;
-    const notExistsClipIds = clipIds.filter(
-      (id) => !clips.some((c) => c.rawId === id),
+    return withTracerResult(
+      this.SERVICE_NAME,
+      "searchExistVspoClips",
+      async (span) => {
+        const clipsResult = await this.deps.youtubeClient.getClips({
+          videoIds: clipIds,
+        });
+        if (clipsResult.err) {
+          return clipsResult;
+        }
+        const clips = clipsResult.val;
+        const notExistsClipIds = clipIds.filter(
+          (id) => !clips.some((c) => c.rawId === id),
+        );
+        AppLogger.info("Found clips", {
+          service: this.SERVICE_NAME,
+          clipsCount: clips.length,
+          notExistsClipIdsCount: notExistsClipIds.length,
+        });
+        return Ok({
+          clips,
+          notExistsClipIds,
+        });
+      },
     );
-    AppLogger.info("Found clips", {
-      service: this.SERVICE_NAME,
-      clipsCount: clips.length,
-      notExistsClipIdsCount: notExistsClipIds.length,
-    });
-    return Ok({
-      clips,
-      notExistsClipIds,
-    });
   }
 
   async searchNewClipsByVspoMemberName(): Promise<

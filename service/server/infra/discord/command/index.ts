@@ -76,7 +76,7 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
       }
       const cache = new CloudflareKVCacheClient(c.env.APP_KV);
       const serverCacheResult = await cache.get<DiscordServer>(
-        cacheKey.discord(
+        cacheKey.discordServer(
           c.interaction.guild_id || c.interaction.guild?.id || "",
         ),
       );
