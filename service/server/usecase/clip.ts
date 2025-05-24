@@ -3,6 +3,7 @@ import type { Clips } from "../domain/clip";
 import type { Creators } from "../domain/creator";
 import { type Page, createPage } from "../domain/pagination";
 import type { IAppContext } from "../infra/dependency";
+import { withTracerResult } from "../infra/http/trace";
 
 export type BatchUpsertClipsParam = Clips;
 
@@ -51,26 +52,28 @@ export class ClipInteractor implements IClipInteractor {
   async list(
     query: ListClipsQuery,
   ): Promise<Result<ListClipsResponse, AppError>> {
-    return this.context.runInTx(async (repos, _services) => {
-      const clips = await repos.clipRepository.list(query);
+    return await withTracerResult("ClipInteractor", "list", async () => {
+      return this.context.runInTx(async (repos, _services) => {
+        const clips = await repos.clipRepository.list(query);
 
-      if (clips.err) {
-        return clips;
-      }
+        if (clips.err) {
+          return clips;
+        }
 
-      const pagination = await repos.clipRepository.count(query);
+        const pagination = await repos.clipRepository.count(query);
 
-      if (pagination.err) {
-        return pagination;
-      }
+        if (pagination.err) {
+          return pagination;
+        }
 
-      return Ok({
-        clips: clips.val,
-        pagination: createPage({
-          currentPage: query.page,
-          limit: query.limit,
-          totalCount: pagination.val,
-        }),
+        return Ok({
+          clips: clips.val,
+          pagination: createPage({
+            currentPage: query.page,
+            limit: query.limit,
+            totalCount: pagination.val,
+          }),
+        });
       });
     });
   }
@@ -78,17 +81,25 @@ export class ClipInteractor implements IClipInteractor {
   async batchUpsert(
     params: BatchUpsertClipsParam,
   ): Promise<Result<Clips, AppError>> {
-    return this.context.runInTx(async (repos, _services) => {
-      return repos.clipRepository.batchUpsert(params);
+    return await withTracerResult("ClipInteractor", "batchUpsert", async () => {
+      return this.context.runInTx(async (repos, _services) => {
+        return repos.clipRepository.batchUpsert(params);
+      });
     });
   }
 
   async searchNewVspoClipsAndNewCreators(): Promise<
     Result<{ newCreators: Creators; clips: Clips }, AppError>
   > {
-    return this.context.runInTx(async (repos, services) => {
-      return services.clipService.searchNewVspoClipsAndNewCreators();
-    });
+    return await withTracerResult(
+      "ClipInteractor",
+      "searchNewVspoClipsAndNewCreators",
+      async () => {
+        return this.context.runInTx(async (repos, services) => {
+          return services.clipService.searchNewVspoClipsAndNewCreators();
+        });
+      },
+    );
   }
 
   async searchExistVspoClips({
@@ -96,24 +107,38 @@ export class ClipInteractor implements IClipInteractor {
   }: { clipIds: string[] }): Promise<
     Result<{ clips: Clips; notExistsClipIds: string[] }, AppError>
   > {
-    return this.context.runInTx(async (repos, services) => {
-      return services.clipService.searchExistVspoClips({ clipIds });
-    });
+    return await withTracerResult(
+      "ClipInteractor",
+      "searchExistVspoClips",
+      async () => {
+        return this.context.runInTx(async (repos, services) => {
+          return services.clipService.searchExistVspoClips({ clipIds });
+        });
+      },
+    );
   }
 
   async searchNewClipsByVspoMemberName(): Promise<
     Result<{ newCreators: Creators; clips: Clips }, AppError>
   > {
-    return this.context.runInTx(async (repos, services) => {
-      return services.clipService.searchNewClipsByVspoMemberName();
-    });
+    return await withTracerResult(
+      "ClipInteractor",
+      "searchNewClipsByVspoMemberName",
+      async () => {
+        return this.context.runInTx(async (repos, services) => {
+          return services.clipService.searchNewClipsByVspoMemberName();
+        });
+      },
+    );
   }
 
   async deleteClips({
     clipIds,
   }: { clipIds: string[] }): Promise<Result<void, AppError>> {
-    return this.context.runInTx(async (repos, services) => {
-      return repos.clipRepository.batchDelete(clipIds);
+    return await withTracerResult("ClipInteractor", "deleteClips", async () => {
+      return this.context.runInTx(async (repos, services) => {
+        return repos.clipRepository.batchDelete(clipIds);
+      });
     });
   }
 }

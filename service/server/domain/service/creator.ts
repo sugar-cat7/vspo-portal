@@ -121,55 +121,62 @@ export class CreatorService implements ICreatorService {
       memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
     }[],
   ): Promise<Result<Creators, AppError>> {
-    AppLogger.info("Searching creators by channel IDs", {
-      service: this.SERVICE_NAME,
-      channelCount: params.length,
-    });
+    return withTracerResult(
+      this.SERVICE_NAME,
+      "searchCreatorsByChannelIds",
+      async (span) => {
+        AppLogger.info("Searching creators by channel IDs", {
+          service: this.SERVICE_NAME,
+          channelCount: params.length,
+        });
 
-    const chs = await this.deps.youtubeClient.getChannels({
-      channelIds: params.map((v) => v.channelId),
-    });
+        const chs = await this.deps.youtubeClient.getChannels({
+          channelIds: params.map((v) => v.channelId),
+        });
 
-    if (chs.err) {
-      AppLogger.error("Failed to get YouTube channels", {
-        service: this.SERVICE_NAME,
-        error: chs.err,
-      });
-      return chs;
-    }
+        if (chs.err) {
+          AppLogger.error("Failed to get YouTube channels", {
+            service: this.SERVICE_NAME,
+            error: chs.err,
+          });
+          return chs;
+        }
 
-    const creators = [];
-    for (const ch of chs.val) {
-      if (!ch.youtube) {
-        continue;
-      }
-      const creatorId = createUUID();
-      const channelId = createUUID();
-      const creator = createCreator({
-        id: creatorId,
-        name: ch.youtube.name,
-        languageCode: "default",
-        memberType:
-          params.find((v) => v.channelId === ch.id)?.memberType || "general",
-        thumbnailURL: ch.youtube.thumbnailURL,
-        channel: {
-          id: channelId,
-          creatorID: creatorId,
-          youtube: ch.youtube,
-          twitCasting: null,
-          twitch: null,
-          niconico: null,
-        },
-        translated: false,
-      });
-      creators.push(creator);
-    }
+        const creators = [];
+        for (const ch of chs.val) {
+          if (!ch.youtube) {
+            continue;
+          }
+          const creatorId = createUUID();
+          const channelId = createUUID();
+          const creator = createCreator({
+            id: creatorId,
+            name: ch.youtube.name,
+            languageCode: "default",
+            memberType:
+              params.find((v) => v.channelId === ch.id)?.memberType ||
+              "general",
+            thumbnailURL: ch.youtube.thumbnailURL,
+            channel: {
+              id: channelId,
+              creatorID: creatorId,
+              youtube: ch.youtube,
+              twitCasting: null,
+              twitch: null,
+              niconico: null,
+            },
+            translated: false,
+          });
+          creators.push(creator);
+        }
 
-    AppLogger.info("Successfully created creators", {
-      service: this.SERVICE_NAME,
-      count: creators.length,
-    });
-    return Ok(creators);
+        AppLogger.info("Successfully created creators", {
+          service: this.SERVICE_NAME,
+          count: creators.length,
+        });
+        return Ok(creators);
+      },
+    );
   }
 
   async translateCreators({
@@ -179,34 +186,40 @@ export class CreatorService implements ICreatorService {
     languageCode: string;
     creators: Creators;
   }): Promise<Result<Creators, AppError>> {
-    AppLogger.info("Translating creators", {
-      service: this.SERVICE_NAME,
-      languageCode,
-      creatorCount: creators.length,
-    });
+    return withTracerResult(
+      this.SERVICE_NAME,
+      "translateCreators",
+      async (span) => {
+        AppLogger.info("Translating creators", {
+          service: this.SERVICE_NAME,
+          languageCode,
+          creatorCount: creators.length,
+        });
 
-    const translatePromises = creators.map((creator) =>
-      this.deps.aiService.translateText(creator.name ?? "", languageCode),
+        const translatePromises = creators.map((creator) =>
+          this.deps.aiService.translateText(creator.name ?? "", languageCode),
+        );
+        const translatedResults = await Promise.allSettled(translatePromises);
+        const translatedCreators = creators.map((creator, i) => {
+          const translatedText =
+            translatedResults[i].status === "fulfilled"
+              ? (translatedResults[i].value.val?.translatedText ?? creator.name)
+              : creator.name;
+          return {
+            ...creator,
+            name: translatedText,
+            languageCode: languageCode,
+            translated: true,
+          };
+        });
+
+        AppLogger.info("Successfully translated creators", {
+          service: this.SERVICE_NAME,
+          count: translatedCreators.length,
+        });
+        return Ok(translatedCreators);
+      },
     );
-    const translatedResults = await Promise.allSettled(translatePromises);
-    const translatedCreators = creators.map((creator, i) => {
-      const translatedText =
-        translatedResults[i].status === "fulfilled"
-          ? (translatedResults[i].value.val?.translatedText ?? creator.name)
-          : creator.name;
-      return {
-        ...creator,
-        name: translatedText,
-        languageCode: languageCode,
-        translated: true,
-      };
-    });
-
-    AppLogger.info("Successfully translated creators", {
-      service: this.SERVICE_NAME,
-      count: translatedCreators.length,
-    });
-    return Ok(translatedCreators);
   }
 
   private diff(a: Creator, b: Creator): boolean {
