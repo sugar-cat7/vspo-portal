@@ -185,7 +185,7 @@ export class StreamService extends RpcTarget {
         return result;
       }
 
-      this.#ctx.waitUntil(this.#cache.set(key, result.val, 30));
+      this.#ctx.waitUntil(this.#cache.set(key, result.val, 60));
       return result;
     });
   }

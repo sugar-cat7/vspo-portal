@@ -29,6 +29,7 @@ import { deleteStreamsWorkflow } from "../../infra/http/workflow/stream/delete";
 import { searchStreamsWorkflow } from "../../infra/http/workflow/stream/search";
 import { searchMemberStreamsByChannelWorkflow } from "../../infra/http/workflow/stream/searchMemberStreamByChannel";
 import { translateStreamsWorkflow } from "../../infra/http/workflow/stream/trasnlate";
+import { accessVspoScheduleSiteWorkflow } from "../../infra/http/workflow/web/access";
 import { createUUID } from "../../pkg/uuid";
 
 export class SearchChannelsWorkflow extends WorkflowEntrypoint<
@@ -179,6 +180,16 @@ export class SearchClipsByVspoMemberNameWorkflow extends WorkflowEntrypoint<
   }
 }
 
+export class AccessVspoScheduleSiteWorkflow extends WorkflowEntrypoint<
+  BindingAppWorkerEnv,
+  Params
+> {
+  async run(_event: WorkflowEvent<Params>, step: WorkflowStep) {
+    await setFeatureFlagProvider(this.env);
+    await accessVspoScheduleSiteWorkflow().handler()(this.env, _event, step);
+  }
+}
+
 export default createHandler({
   scheduled: async (
     controller: ScheduledController,
@@ -224,6 +235,9 @@ export default createHandler({
               AppLogger.info("search-streams");
               searchStreamsSpan.setAttribute("workflow", "search-streams");
               await env.SEARCH_STREAMS_WORKFLOW.create({ id: createUUID() });
+              await env.ACCESS_VSPO_SCHEDULE_SITE_WORKFLOW.create({
+                id: createUUID(),
+              });
             },
           );
           break;
