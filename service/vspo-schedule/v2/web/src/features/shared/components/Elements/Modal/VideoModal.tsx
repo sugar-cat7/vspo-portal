@@ -1,8 +1,7 @@
-import { Platform } from "@/features/clips";
-import { Clip } from "@/features/clips/domain";
-import { Freechat } from "@/features/freechat/domain";
-import { Livestream } from "@/features/schedule/domain";
-import { Video } from "@/features/shared/domain";
+import { Clip } from "@/features/shared/domain/clip";
+import { Freechat } from "@/features/shared/domain/freechat";
+import { Livestream } from "@/features/shared/domain/livestream";
+import { Platform, Video } from "@/features/shared/domain/video";
 import { convertVideoPlayerLink } from "@/features/shared/utils";
 import { useTimeZoneContext, useVideoModalContext } from "@/hooks";
 import { formatDate } from "@/lib/utils";

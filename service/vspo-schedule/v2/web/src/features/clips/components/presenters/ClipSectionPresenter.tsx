@@ -1,4 +1,4 @@
-import { Clip } from "@/features/clips/domain";
+import { Clip } from "@/features/shared/domain";
 import { useVideoModalContext } from "@/hooks/video-modal";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import VisibilityIcon from "@mui/icons-material/Visibility";

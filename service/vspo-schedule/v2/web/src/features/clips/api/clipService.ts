@@ -1,96 +1,192 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { ListClips200ClipsItem, VSPOApi } from "@vspo-lab/api";
-import { BaseError, Err, Ok, Result } from "@vspo-lab/error";
-import {
-  Clip,
-  Pagination,
-  Platform,
-  clipSchema,
-  paginationSchema,
-} from "../domain";
+import { IncomingMessage } from "http";
+import { Channel, Clip, Pagination } from "@/features/shared/domain";
+import { serverSideTranslations } from "@/lib/i18n/server";
+import { getSessionId } from "@/lib/utils";
+import { SSRConfig } from "next-i18next";
+import { fetchVspoMembers } from "../../shared/api/channel";
+import { fetchClips } from "../../shared/api/clip";
 
-export type FetchClipsParams = {
+type ClipService = {
+  popularYoutubeClips: Clip[];
+  popularShortsClips: Clip[];
+  popularTwitchClips: Clip[];
+  vspoMembers: Channel[];
+  translations: SSRConfig;
+};
+
+type FetchClipServiceParams = {
+  beforePublishedAtDate?: string;
+  afterPublishedAtDate?: string;
+  locale: string;
+  req: IncomingMessage;
+};
+
+const fetchClipService = async (
+  params: FetchClipServiceParams,
+): Promise<ClipService> => {
+  const { beforePublishedAtDate, afterPublishedAtDate, locale, req } = params;
+
+  const ITEMS_PER_CATEGORY = 10;
+  const sessionId = getSessionId(req);
+
+  const results = await Promise.allSettled([
+    fetchClips({
+      platform: "youtube",
+      page: 0,
+      limit: ITEMS_PER_CATEGORY,
+      clipType: "clip",
+      order: "desc",
+      orderKey: "viewCount",
+      beforePublishedAtDate,
+      afterPublishedAtDate,
+      sessionId,
+    }),
+    fetchClips({
+      platform: "youtube",
+      page: 0,
+      limit: ITEMS_PER_CATEGORY,
+      clipType: "short",
+      order: "desc",
+      orderKey: "viewCount",
+      beforePublishedAtDate,
+      afterPublishedAtDate,
+      sessionId,
+    }),
+    fetchClips({
+      platform: "twitch",
+      page: 0,
+      limit: ITEMS_PER_CATEGORY,
+      clipType: "clip",
+      order: "desc",
+      orderKey: "viewCount",
+      beforePublishedAtDate,
+      afterPublishedAtDate,
+      sessionId,
+    }),
+    fetchVspoMembers({
+      sessionId,
+    }),
+    serverSideTranslations(locale, ["common", "clips"]),
+  ]);
+
+  const popularYoutubeClips =
+    results[0].status === "fulfilled" && !results[0].value.err
+      ? results[0].value.val?.clips || []
+      : [];
+
+  const popularShortsClips =
+    results[1].status === "fulfilled" && !results[1].value.err
+      ? results[1].value.val?.clips || []
+      : [];
+
+  const popularTwitchClips =
+    results[2].status === "fulfilled" && !results[2].value.err
+      ? results[2].value.val?.clips || []
+      : [];
+
+  const vspoMembers =
+    results[3].status === "fulfilled" && !results[3].value.err
+      ? results[3].value.val?.members || []
+      : [];
+
+  const translations =
+    results[4].status === "fulfilled"
+      ? results[4].value
+      : await serverSideTranslations(locale, ["common", "clips"]);
+
+  return {
+    popularYoutubeClips,
+    popularShortsClips,
+    popularTwitchClips,
+    vspoMembers,
+    translations,
+  };
+};
+
+type SingleClipService = {
+  clips: Clip[];
+  pagination: Pagination;
+  translations: SSRConfig;
+};
+
+type FetchSingleClipServiceParams = {
   page: number;
   limit: number;
-  // locale?: string;
   platform: "youtube" | "twitch";
   clipType: "clip" | "short";
   order: "asc" | "desc";
   orderKey: "viewCount" | "publishedAt";
-  beforePublishedAtDate?: string;
   afterPublishedAtDate?: string;
-  sessionId?: string;
+  locale: string;
+  req: IncomingMessage;
 };
 
-export type ClipFetchResult = Result<
-  {
-    clips: Clip[];
-    pagination: Pagination;
-  },
-  BaseError
->;
-
-const mapToClip = (apiClip: ListClips200ClipsItem): Clip => {
-  return clipSchema.parse({
-    id: apiClip.rawId,
-    type: "clip",
-    title: apiClip.title,
-    description: apiClip.description,
-    thumbnailUrl: apiClip.thumbnailURL,
-    platform: apiClip.platform as Platform,
-    link: apiClip.link || "",
-    viewCount: apiClip.viewCount,
-    channelId: apiClip.rawChannelID,
-    channelTitle: apiClip.creatorName || "",
-    channelThumbnailUrl: apiClip.creatorThumbnailURL || "",
-    videoPlayerLink: apiClip.videoPlayerLink || "",
-    publishedAt: apiClip.publishedAt,
-    tags: apiClip.tags || [],
-  } satisfies Clip);
-};
-
-/**
- * Fetch clips from the API
- */
-export const fetchClips = async (
-  params: FetchClipsParams,
-): Promise<ClipFetchResult> => {
-  const { page, limit, platform, order, orderKey } = params;
-  // Initialize API client
-  const client = new VSPOApi({
-    apiKey: getCloudflareContext().env.API_KEY_V2,
-    baseUrl: getCloudflareContext().env.API_URL_V2,
-    cfAccessClientId: getCloudflareContext().env.CF_ACCESS_CLIENT_ID,
-    cfAccessClientSecret: getCloudflareContext().env.CF_ACCESS_CLIENT_SECRET,
-    sessionId: params.sessionId,
-  });
-  const result = await client.clips.list({
-    limit: limit.toString(),
-    page: page.toString(),
+const fetchSingleClipService = async (
+  params: FetchSingleClipServiceParams,
+): Promise<SingleClipService> => {
+  const {
+    page,
+    limit,
     platform,
-    clipType: params.clipType,
-    languageCode: "default",
-    orderBy: order,
-    orderKey: orderKey,
-    beforePublishedAtDate: params.beforePublishedAtDate,
-    afterPublishedAtDate: params.afterPublishedAtDate,
-  });
+    clipType,
+    order,
+    orderKey,
+    afterPublishedAtDate,
+    locale,
+    req,
+  } = params;
 
-  if (!result.val) {
-    return Err(result.err);
-  }
+  const sessionId = getSessionId(req);
 
-  const clips = result.val.clips.map(mapToClip);
+  const results = await Promise.allSettled([
+    fetchClips({
+      page,
+      limit,
+      platform,
+      clipType,
+      order,
+      orderKey,
+      afterPublishedAtDate,
+      sessionId,
+    }),
+    serverSideTranslations(locale, ["common", "clips"]),
+  ]);
 
-  const pagination = paginationSchema.parse({
-    currentPage: result.val.pagination.currentPage,
-    totalPages: result.val.pagination.totalPage,
-    totalItems: result.val.pagination.totalCount,
-    itemsPerPage: limit,
-  });
+  const clipResult =
+    results[0].status === "fulfilled" && !results[0].value.err
+      ? results[0].value.val
+      : {
+          clips: [],
+          pagination: {
+            currentPage: 0,
+            totalPages: 0,
+            totalItems: 0,
+            itemsPerPage: limit,
+          },
+        };
 
-  return Ok({
-    clips,
-    pagination,
-  });
+  const translations =
+    results[1].status === "fulfilled"
+      ? results[1].value
+      : await serverSideTranslations(locale, ["common", "clips"]);
+
+  return {
+    clips: clipResult.clips || [],
+    pagination: clipResult.pagination || {
+      currentPage: 0,
+      totalPages: 0,
+      totalItems: 0,
+      itemsPerPage: limit,
+    },
+    translations,
+  };
+};
+
+export {
+  fetchClipService,
+  fetchSingleClipService,
+  type ClipService,
+  type FetchClipServiceParams,
+  type SingleClipService,
+  type FetchSingleClipServiceParams,
 };

@@ -1,8 +1,8 @@
-import { Event } from "@/features/events/domain";
+import { Event } from "@/features/shared/domain";
 import { formatDate } from "@/lib/utils";
 import { useRouter } from "next/router";
 import React, { useMemo, useState, useEffect } from "react";
-import { Livestream } from "../../domain";
+import { Livestream } from "../../../shared/domain/livestream";
 import { ScheduleStatusPresenter } from "./presenter";
 
 // Props received from getServerSideProps

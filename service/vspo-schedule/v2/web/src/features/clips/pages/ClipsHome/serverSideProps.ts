@@ -1,9 +1,8 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { serverSideTranslations } from "@/lib/i18n/server";
-import { getInitializedI18nInstance, getSessionId } from "@/lib/utils";
+import { getInitializedI18nInstance } from "@/lib/utils";
 import { GetServerSidePropsContext } from "next";
-import { fetchHomePageData } from "../../api";
+import { fetchClipService } from "../../api/clipService";
 import { ClipsHomeProps } from "./container";
 
 // Get date for N days ago in ISO format
@@ -43,64 +42,27 @@ export const getServerSideProps = async (
       break;
   }
 
-  // Fetch translations and home page data in parallel
-  const [translationsResult, homePageDataResult] = await Promise.allSettled([
-    serverSideTranslations(locale, ["common", "clips"]),
-    fetchHomePageData({
-      afterPublishedAtDate: afterDate,
-      sessionId: getSessionId(context.req),
-    }),
-  ]);
+  const clipService = await fetchClipService({
+    afterPublishedAtDate: afterDate,
+    locale,
+    req: context.req,
+  });
 
-  // Extract results or use defaults
-  const translations =
-    translationsResult.status === "fulfilled" ? translationsResult.value : {};
-  const homePageData =
-    homePageDataResult.status === "fulfilled"
-      ? homePageDataResult.value
-      : { err: true };
+  const popularYoutubeClips = clipService.popularYoutubeClips;
+  const popularShortsClips = clipService.popularShortsClips;
+  const popularTwitchClips = clipService.popularTwitchClips;
+  const vspoMembers = clipService.vspoMembers;
+  const translations = clipService.translations;
 
-  // Get translations instance
   const { t } = getInitializedI18nInstance(translations, "clips");
 
-  // Meta content
   const title = t("home.meta.title", "ぶいすぽっ!クリップ集");
   const description = t(
     "home.meta.description",
     "ぶいすぽっ!メンバーのストリーム動画クリップ集。",
   );
 
-  // Get the last update timestamp
   const lastUpdateTimestamp = getCurrentUTCDate().getTime();
-
-  // Error handling
-  if (homePageData.err) {
-    console.error("Failed to fetch home page data:", homePageData.err);
-    // Return empty data on error
-    return {
-      props: {
-        popularYoutubeClips: [],
-        popularShortsClips: [],
-        popularTwitchClips: [],
-        vspoMembers: [],
-        lastUpdateTimestamp,
-        meta: {
-          title,
-          description,
-        },
-        currentPeriod: period || "week",
-        ...translations,
-      } as ClipsHomeProps,
-    };
-  }
-
-  // Return data fetched from API on success
-  const {
-    popularYoutubeClips = [],
-    popularShortsClips = [],
-    popularTwitchClips = [],
-    vspoMembers = [],
-  } = "val" in homePageData ? homePageData.val : {};
 
   return {
     props: {
@@ -115,6 +77,6 @@ export const getServerSideProps = async (
       },
       currentPeriod: period || "week",
       ...translations,
-    },
+    } as ClipsHomeProps,
   };
 };

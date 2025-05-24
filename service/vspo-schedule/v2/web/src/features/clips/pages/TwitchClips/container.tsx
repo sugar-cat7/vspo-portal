@@ -1,7 +1,7 @@
 import { ContentLayout } from "@/features/shared/components/Layout";
+import { Clip, Pagination } from "@/features/shared/domain";
 import { NextPageWithLayout } from "@/pages/_app";
 import React, { useEffect, useState } from "react";
-import { Clip, Pagination } from "../../domain";
 import { Presenter } from "./presenter";
 
 export type TwitchClipsProps = {

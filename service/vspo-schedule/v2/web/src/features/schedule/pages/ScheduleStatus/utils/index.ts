@@ -1,4 +1,4 @@
-import { Livestream } from "@/features/schedule/domain";
+import { Livestream } from "@/features/shared/domain/livestream";
 import { utcToZonedTime } from "date-fns-tz";
 
 // Time blocks for grouping livestreams

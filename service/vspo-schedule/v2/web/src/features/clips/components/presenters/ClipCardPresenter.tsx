@@ -1,7 +1,7 @@
 import { VideoCard } from "@/features/shared/components/Elements/Card/VideoCard";
 import { Box, Card, CardContent, Typography } from "@mui/material";
 import React from "react";
-import { Clip } from "../../domain/clip";
+import { Clip } from "../../../shared/domain/clip";
 export type ClipCardPresenterProps = {
   clip: Clip;
 };

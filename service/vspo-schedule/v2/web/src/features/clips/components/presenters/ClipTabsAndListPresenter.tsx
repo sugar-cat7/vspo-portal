@@ -2,7 +2,10 @@ import { Box, Grid, Pagination, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";
 import React, { useEffect } from "react";
-import { Clip, Pagination as PaginationType } from "../../domain/clip";
+import {
+  Clip,
+  Pagination as PaginationType,
+} from "../../../shared/domain/clip";
 import { ClipCardPresenter } from "./ClipCardPresenter";
 
 export type TabOption = {

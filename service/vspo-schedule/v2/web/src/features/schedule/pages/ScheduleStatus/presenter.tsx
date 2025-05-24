@@ -1,11 +1,11 @@
-import { Event } from "@/features/events/domain";
 import { Loading } from "@/features/shared/components/Elements/Loading/Loading";
+import { Event } from "@/features/shared/domain";
 import SearchIcon from "@mui/icons-material/Search";
 import { Box, Container, Fab, Paper, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";
 import React from "react";
-import { Livestream } from "../../domain";
+import { Livestream } from "../../../shared/domain/livestream";
 import {
   DateSearchDialogContainer,
   EventsContent,

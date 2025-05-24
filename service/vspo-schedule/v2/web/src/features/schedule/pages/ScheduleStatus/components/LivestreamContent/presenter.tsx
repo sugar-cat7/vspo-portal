@@ -1,4 +1,4 @@
-import { Livestream } from "@/features/schedule/domain";
+import { Livestream } from "@/features/shared/domain/livestream";
 import { formatDate } from "@/lib/utils";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";

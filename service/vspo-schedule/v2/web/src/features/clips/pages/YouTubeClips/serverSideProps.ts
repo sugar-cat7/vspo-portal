@@ -1,9 +1,8 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { serverSideTranslations } from "@/lib/i18n/server";
-import { getInitializedI18nInstance, getSessionId } from "@/lib/utils";
+import { getInitializedI18nInstance } from "@/lib/utils";
 import { GetServerSidePropsContext } from "next";
-import { fetchClips } from "../../api";
+import { fetchSingleClipService } from "../../api/clipService";
 import { YouTubeClipsProps } from "./container";
 
 // Get date for N days ago in ISO format
@@ -73,18 +72,10 @@ export const getYouTubeClipsServerSideProps = (options: YouTubeClipOptions) => {
 
     const ITEMS_PER_PAGE = 24;
 
-    // Get translations
-    const translations = await serverSideTranslations(locale, [
-      "common",
-      "clips",
-    ]);
-    const { t } = getInitializedI18nInstance(translations, "clips");
-
     // Get clip type from options (default to "clip")
     const clipType = options.type || "clip";
 
-    // Fetch clips
-    const response = await fetchClips({
+    const clipService = await fetchSingleClipService({
       platform: "youtube",
       page,
       limit: ITEMS_PER_PAGE,
@@ -92,16 +83,15 @@ export const getYouTubeClipsServerSideProps = (options: YouTubeClipOptions) => {
       order: order as "asc" | "desc",
       orderKey: orderKey as "publishedAt" | "viewCount",
       afterPublishedAtDate: afterDate,
-      sessionId: getSessionId(context.req),
+      locale,
+      req: context.req,
     });
 
-    // Check for errors in the API response
-    if (!response.val) {
-      console.error(`Failed to fetch YouTube ${clipType}s:`, response.err);
-    }
+    const clips = clipService.clips;
+    const pagination = clipService.pagination;
+    const translations = clipService.translations;
 
-    // Format the clips
-    const clips = response.val ? response.val.clips : [];
+    const { t } = getInitializedI18nInstance(translations, "clips");
 
     // Meta content
     const title =
@@ -113,16 +103,6 @@ export const getYouTubeClipsServerSideProps = (options: YouTubeClipOptions) => {
 
     // Get the last update timestamp
     const lastUpdateTimestamp = getCurrentUTCDate().getTime();
-
-    // Pagination
-    const pagination = response.val
-      ? response.val.pagination
-      : {
-          currentPage: 0,
-          totalPages: 0,
-          totalItems: 0,
-          itemsPerPage: ITEMS_PER_PAGE,
-        };
 
     return {
       props: {

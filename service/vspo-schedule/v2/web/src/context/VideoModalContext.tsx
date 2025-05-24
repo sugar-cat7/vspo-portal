@@ -1,5 +1,5 @@
-import { Clip } from "@/features/clips";
-import { Video } from "@/features/shared/domain";
+import { Clip } from "@/features/shared/domain";
+import { Video } from "@/features/shared/domain/video";
 import dynamic from "next/dynamic";
 import { createContext, useCallback, useState } from "react";
 

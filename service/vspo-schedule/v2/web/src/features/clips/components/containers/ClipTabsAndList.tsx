@@ -1,7 +1,7 @@
 import { useMediaQuery, useTheme } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useState, useEffect } from "react";
-import { Clip, Pagination } from "../../domain/clip";
+import { Clip, Pagination } from "../../../shared/domain/clip";
 import { ClipTabsAndListPresenter, TabOption } from "../presenters";
 
 export type ClipTabsAndListProps = {
