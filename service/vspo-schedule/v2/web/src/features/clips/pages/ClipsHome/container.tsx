@@ -1,7 +1,7 @@
 import { ContentLayout } from "@/features/shared/components/Layout";
+import { Channel, Clip } from "@/features/shared/domain";
 import { NextPageWithLayout } from "@/pages/_app";
 import React, { useEffect, useState } from "react";
-import { Channel, Clip } from "../../domain";
 import { Presenter } from "./presenter";
 
 export type ClipsHomeProps = {

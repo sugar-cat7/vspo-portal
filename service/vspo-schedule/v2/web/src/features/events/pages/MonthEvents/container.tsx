@@ -1,8 +1,8 @@
 import { ContentLayout } from "@/features/shared/components/Layout";
+import { Event } from "@/features/shared/domain";
 import { NextPageWithLayout } from "@/pages/_app";
 import dayjs from "dayjs";
 import React, { useState, useEffect, useMemo } from "react";
-import { Event } from "../../domain";
 import { Presenter } from "./presenter";
 
 export type MonthEventsProps = {

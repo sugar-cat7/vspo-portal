@@ -1,4 +1,4 @@
-import { Event } from "@/features/events/domain";
+import { Event } from "@/features/shared/domain";
 import React from "react";
 import { EventsContentPresenter } from "./presenter";
 

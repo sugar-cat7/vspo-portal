@@ -15,8 +15,8 @@ import {
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { Clip, Pagination } from "../../../shared/domain/clip";
 import { ClipTabsAndList } from "../../components";
-import { Clip, Pagination } from "../../domain/clip";
 
 // Styled container for filter section
 const FilterContainer = styled(Paper)(({ theme }) => ({

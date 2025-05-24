@@ -1,9 +1,8 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { getCurrentUTCDate } from "@/lib/dayjs";
-import { serverSideTranslations } from "@/lib/i18n/server";
-import { getInitializedI18nInstance, getSessionId } from "@/lib/utils";
+import { getInitializedI18nInstance } from "@/lib/utils";
 import { GetServerSideProps } from "next";
-import { fetchClips } from "../../api";
+import { fetchSingleClipService } from "../../api/clipService";
 import { paginateClips } from "../../utils/clipUtils";
 import { TwitchClipsProps } from "./container";
 
@@ -55,71 +54,41 @@ export const getTwitchClipsServerSideProps: GetServerSideProps<
   // Items per page for server-side pagination
   const ITEMS_PER_PAGE = 24;
 
-  // Get translations
-  const translations = await serverSideTranslations(locale, [
-    "common",
-    "clips",
-  ]);
-  const { t } = getInitializedI18nInstance(translations, "clips");
-
-  // Fetch clips from API
-  const clipsResult = await fetchClips({
+  const clipService = await fetchSingleClipService({
     page: currentPage,
     limit: ITEMS_PER_PAGE,
     platform: "twitch",
     clipType: "clip",
-    order: order,
-    orderKey: orderKey,
+    order,
+    orderKey,
     afterPublishedAtDate: afterDate,
-    sessionId: getSessionId(req),
+    locale,
+    req,
   });
 
-  // Handler function for getCurrentUTCDate to avoid repeated type assertions
+  const clips = clipService.clips;
+  const pagination = clipService.pagination;
+  const translations = clipService.translations;
+
+  const { t } = getInitializedI18nInstance(translations, "clips");
+
   const getTimestamp = (): number => {
     return getCurrentUTCDate().getTime();
   };
 
-  // Handle API error
-  if (!clipsResult.val) {
-    console.error("Failed to fetch Twitch clips:", clipsResult.err);
-    return {
-      props: {
-        ...translations,
-        clips: [],
-        pagination: {
-          currentPage: 0, // Use 0-indexed pagination
-          totalPages: 0,
-          totalItems: 0,
-          itemsPerPage: ITEMS_PER_PAGE,
-        },
-        lastUpdateTimestamp: getTimestamp(),
-        meta: {
-          title: t("twitchClips.title"),
-          description: t("twitchClips.description"),
-        },
-        order: order,
-        orderKey: orderKey,
-        currentPeriod: period,
-      },
-    };
-  }
-
-  // Get the total count from the API response
-  const totalItems = clipsResult.val.pagination.totalItems;
-
   // Apply pagination with the total count from the API
-  const { clips: paginatedClips, pagination } = paginateClips(
-    clipsResult.val.clips,
+  const { clips: paginatedClips, pagination: finalPagination } = paginateClips(
+    clips,
     currentPage,
     ITEMS_PER_PAGE,
-    totalItems,
+    pagination.totalItems,
   );
 
   return {
     props: {
       ...translations,
       clips: paginatedClips,
-      pagination,
+      pagination: finalPagination,
       lastUpdateTimestamp: getTimestamp(),
       meta: {
         title: t("twitchClips.title"),

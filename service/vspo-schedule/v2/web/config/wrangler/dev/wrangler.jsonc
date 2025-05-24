@@ -18,12 +18,12 @@
   "build": {
     "command": "pnpm cf:build",
     "watch_dir": "."
-  }
+  },
   /**
    * Smart Placement
    * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
    */
-  // "placement": { "mode": "smart" },
+  "placement": { "mode": "smart" },
 
   /**
    * Bindings
@@ -52,5 +52,11 @@
    * Service Bindings (communicate between multiple Workers)
    * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
    */
-  // "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
+  "services": [
+    {
+      "binding": "APP_WORKER",
+      "service": "dev-vspo-portal-app",
+      "entrypoint": "ApplicationService"
+    }
+  ]
 }

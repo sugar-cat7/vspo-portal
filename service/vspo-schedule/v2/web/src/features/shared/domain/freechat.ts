@@ -1,4 +1,4 @@
-import { livestreamSchema } from "@/features/schedule/domain";
+import { livestreamSchema } from "@/features/shared/domain/livestream";
 import { z } from "zod";
 
 // Freechat model that extends the Livestream type
