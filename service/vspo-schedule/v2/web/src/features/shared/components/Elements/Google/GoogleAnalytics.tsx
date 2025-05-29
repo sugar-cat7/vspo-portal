@@ -2,7 +2,7 @@ import Script from "next/script";
 import { FC } from "react";
 
 export const GoogleAnalytics: FC = () => {
-  if (process.env.ENV !== "production") {
+  if (process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS === "") {
     return <></>;
   }
 
