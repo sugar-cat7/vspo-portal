@@ -28,6 +28,7 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm build
+        working-directory: service/agent
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3.14.1
         with:
@@ -35,8 +36,8 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           packageManager: pnpm
           wranglerVersion: "4.6.0"
-          workingDirectory: service/agent/.mastra/output
-          command: deploy --name ${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}-vspo-portal-agent
+          workingDirectory: service/agent
+          command: deploy --config .mastra/output/wrangler.json --name ${{ github.ref == 'refs/heads/main' && 'prd' || 'dev' }}-vspo-portal-agent
           quiet: true
           secrets: |
             CLOUDFLARE_ACCOUNT_ID
