@@ -8,12 +8,11 @@ import {
   formatDate,
   getInitializedI18nInstance,
   getSetCookieTimeZone,
-  groupBy,
 } from "@/lib/utils";
 import { GetServerSideProps } from "next";
 
 export type ScheduleStatusPageProps = {
-  livestreamsByDate: Record<string, Livestream[]>;
+  livestreams: Livestream[];
   events: Event[];
   timeZone: string;
   locale: string;
@@ -83,13 +82,8 @@ export const getLivestreamsServerSideProps: GetServerSideProps<
 
   // Extract data from schedule
   const events = schedule.events;
-  const livestreams = schedule.livestreams;
+  const livestreams = schedule.livestreams || [];
   const translations = schedule.translations;
-
-  // Group livestreams by date
-  const livestreamsByDate = groupBy(livestreams, (livestream) =>
-    formatDate(livestream.scheduledStartTime, "yyyy-MM-dd", { timeZone }),
-  );
 
   // Set up metadata and footer message
   const { t } = getInitializedI18nInstance(translations, "streams");
@@ -119,18 +113,12 @@ export const getLivestreamsServerSideProps: GetServerSideProps<
   }
 
   // Create livestream description from titles
-  const allLivestreams = Object.values(livestreamsByDate).flat();
-  const livestreamDescription =
-    allLivestreams
-      .slice(-50)
-      .reverse()
-      .map((livestream) => livestream.title)
-      .join(", ") || "";
+  const livestreamDescription = livestreams.at(0)?.title || "";
 
   description = `${t("description")}\n${livestreamDescription}`;
   return {
     props: {
-      livestreamsByDate,
+      livestreams,
       events,
       timeZone,
       locale: locale || "ja",
