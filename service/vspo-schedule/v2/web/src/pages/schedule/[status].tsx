@@ -11,7 +11,7 @@ const SchedulePage: NextPageWithLayout<ScheduleStatusPageProps> = (
 ) => {
   return (
     <ScheduleStatus
-      livestreamsByDate={pageProps.livestreamsByDate}
+      livestreams={pageProps.livestreams}
       events={pageProps.events}
       timeZone={pageProps.timeZone}
       locale={pageProps.locale}

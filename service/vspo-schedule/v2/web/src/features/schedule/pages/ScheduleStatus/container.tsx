@@ -1,13 +1,13 @@
 import { Event } from "@/features/shared/domain";
-import { formatDate } from "@/lib/utils";
 import { useRouter } from "next/router";
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Livestream } from "../../../shared/domain/livestream";
+import { useGroupedLivestreams } from "../../hooks/useGroupedLivestreams";
 import { ScheduleStatusPresenter } from "./presenter";
 
 // Props received from getServerSideProps
 type ScheduleStatusContainerProps = {
-  livestreamsByDate: Record<string, Livestream[]>;
+  livestreams: Livestream[];
   events: Event[];
   initialDate?: string;
   timeZone: string;
@@ -20,7 +20,7 @@ type ScheduleStatusContainerProps = {
 export const ScheduleStatusContainer: React.FC<
   ScheduleStatusContainerProps
 > = ({
-  livestreamsByDate,
+  livestreams,
   events,
   timeZone = "Asia/Tokyo", // Default to JST if not provided
   locale = "ja-JP", // Default to Japanese if not provided
@@ -39,85 +39,14 @@ export const ScheduleStatusContainer: React.FC<
   const [isLoading, setIsLoading] = useState(false);
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
 
-  // Get first date for the All tab
-  const firstDate = useMemo(() => {
-    // Only calculate for All tab
-    if (currentStatusFilter !== "all") {
-      return null;
-    }
-
-    // Get all dates sorted
-    const dates = Object.keys(livestreamsByDate).sort();
-    return dates.length > 0 ? dates[0] : null;
-  }, [livestreamsByDate, currentStatusFilter]);
-
-  // Format first date for display in All tab
-  const formattedDate = useMemo(() => {
-    if (!firstDate) {
-      return "";
-    }
-
-    return formatDate(firstDate, "M/d", { localeCode: locale, timeZone });
-  }, [firstDate, locale, timeZone]);
-
-  // Filter livestreams based on the current status
-  const filteredLivestreamsByDate = useMemo(() => {
-    if (currentStatusFilter === "all") {
-      // For archive pages, we need to sort dates in descending order but streams in ascending order
-      if (liveStatus === "archive") {
-        const sortedByDate: Record<string, Livestream[]> = {};
-        // Sort dates in descending order (newest dates first)
-        const sortedDates = Object.keys(livestreamsByDate).sort().reverse();
-
-        sortedDates.forEach((date) => {
-          // Sort the streams within each date in ascending order by scheduledStartTime
-          sortedByDate[date] = [...livestreamsByDate[date]].sort(
-            (a, b) =>
-              new Date(a.scheduledStartTime).getTime() -
-              new Date(b.scheduledStartTime).getTime(),
-          );
-        });
-
-        return sortedByDate;
-      }
-      return livestreamsByDate;
-    }
-
-    const filtered: Record<string, Livestream[]> = {};
-
-    // For filtered views, also apply the same sorting pattern for archive pages
-    const entries =
-      liveStatus === "archive"
-        ? Object.entries(livestreamsByDate).sort((a, b) =>
-            b[0].localeCompare(a[0]),
-          ) // Sort dates in descending order
-        : Object.entries(livestreamsByDate);
-
-    entries.forEach(([date, streams]) => {
-      let filteredStreams = streams.filter((stream) => {
-        if (currentStatusFilter === "live") {
-          return stream.status === "live";
-        }
-        // At this point, currentStatusFilter must be 'upcoming'
-        return stream.status === "upcoming";
-      });
-
-      if (liveStatus === "archive") {
-        // Sort streams by scheduled start time in ascending order for archive pages
-        filteredStreams = filteredStreams.sort(
-          (a, b) =>
-            new Date(a.scheduledStartTime).getTime() -
-            new Date(b.scheduledStartTime).getTime(),
-        );
-      }
-
-      if (filteredStreams.length > 0) {
-        filtered[date] = filteredStreams;
-      }
-    });
-
-    return filtered;
-  }, [livestreamsByDate, currentStatusFilter, liveStatus]);
+  // Use the custom hook for grouping and filtering logic
+  const { livestreamsByDate, allTabLabel } = useGroupedLivestreams({
+    livestreams,
+    timeZone,
+    locale,
+    currentStatusFilter,
+    liveStatus,
+  });
 
   // Setup router events for loading state
   useEffect(() => {
@@ -159,15 +88,9 @@ export const ScheduleStatusContainer: React.FC<
     setIsSearchDialogOpen(false);
   };
 
-  // Prepare tab labels
-  const allTabLabel =
-    liveStatus === "all" && formattedDate
-      ? `すべて (${formattedDate})`
-      : "すべて";
-
   return (
     <ScheduleStatusPresenter
-      livestreamsByDate={filteredLivestreamsByDate}
+      livestreamsByDate={livestreamsByDate}
       events={events}
       timeZone={timeZone}
       statusFilter={currentStatusFilter}
