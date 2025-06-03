@@ -1,7 +1,7 @@
 import { Box, Grid, Pagination, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Clip,
   Pagination as PaginationType,
@@ -46,17 +46,6 @@ export const ClipTabsAndListPresenter: React.FC<
 }) => {
   const { t } = useTranslation("clips");
   const { t: tCommon } = useTranslation("common");
-
-  // Log pagination values for debugging
-  useEffect(() => {
-    console.log("Pagination values:", {
-      currentPage: pagination.currentPage,
-      displayPage: pagination.currentPage + 1,
-      totalPages: pagination.totalPages,
-      totalItems: pagination.totalItems,
-      itemsPerPage: pagination.itemsPerPage,
-    });
-  }, [pagination]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     onTabChange(newValue);

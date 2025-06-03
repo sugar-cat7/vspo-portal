@@ -1,12 +1,12 @@
 import AboutPageComponent from "@/features/about/pages/AboutPage";
 import {
   AboutPageProps,
-  getStaticProps as aboutGetStaticProps,
+  getServerSideProps as aboutGetServerSideProps,
 } from "@/features/about/pages/AboutPage/serverSideProps";
 import { ContentLayout } from "@/features/shared/components/Layout";
 import { NextPageWithLayout } from "./_app";
 
-export const getStaticProps = aboutGetStaticProps;
+export const getServerSideProps = aboutGetServerSideProps;
 
 const AboutPage: NextPageWithLayout<AboutPageProps> = ({ sections }) => {
   return <AboutPageComponent sections={sections} />;

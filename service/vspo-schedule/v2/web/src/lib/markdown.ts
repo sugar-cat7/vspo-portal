@@ -5,7 +5,6 @@ import {
   getCloudflareContext,
 } from "@opennextjs/cloudflare";
 import { AppError, Err, Ok, Result } from "@vspo-lab/error";
-import matter from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
 
@@ -107,6 +106,86 @@ async function fetchMarkdownFromAssets(
 }
 
 /**
+ * Content manifest type definition
+ */
+type ContentManifest = {
+  locales: Record<string, Record<string, string[]>>;
+};
+
+/**
+ * Fetch directory listing from Cloudflare Assets
+ *
+ * Uses the content-manifest.json file to get the list of available markdown files.
+ */
+async function fetchDirectoryFromAssets(
+  locale: string,
+  category: string,
+): Promise<Result<string[]>> {
+  // Map "default" locale to "ja"
+  const actualLocale = locale === "default" ? "ja" : locale;
+
+  let context: CloudflareContext;
+  try {
+    context = await getCloudflareContext({ async: true });
+  } catch (error) {
+    return Err(
+      new AppError({
+        message: "Failed to get Cloudflare context",
+        code: "INTERNAL_SERVER_ERROR",
+        cause: error,
+        context: {},
+      }),
+    );
+  }
+
+  const { env } = context;
+  if (!env.ASSETS) {
+    return Err(
+      new AppError({
+        message: "ASSETS binding not available",
+        code: "INTERNAL_SERVER_ERROR",
+        context: {},
+      }),
+    );
+  }
+
+  // Fetch the content manifest file
+  const manifestPath = `/content/content-manifest.json`;
+
+  try {
+    const manifestResponse = await env.ASSETS.fetch(
+      `https://placeholder${manifestPath}`,
+    );
+    if (manifestResponse.ok) {
+      const manifest = (await manifestResponse.json()) as ContentManifest;
+      const files = manifest.locales[actualLocale]?.[category] || [];
+      return Ok(
+        files
+          .filter((file) => file.endsWith(".md"))
+          .map((file) => file.replace(/\.md$/, "")),
+      );
+    } else {
+      return Err(
+        new AppError({
+          message: `Content manifest not found: ${manifestPath}`,
+          code: "NOT_FOUND",
+          context: { locale: actualLocale, category },
+        }),
+      );
+    }
+  } catch (error) {
+    return Err(
+      new AppError({
+        message: "Failed to fetch content manifest",
+        code: "INTERNAL_SERVER_ERROR",
+        cause: error,
+        context: { locale: actualLocale, category },
+      }),
+    );
+  }
+}
+
+/**
  * Read markdown content from filesystem (for development)
  */
 function readMarkdownFromFilesystem(
@@ -128,6 +207,117 @@ function readMarkdownFromFilesystem(
 }
 
 /**
+ * Read directory listing from filesystem (for development)
+ *
+ * Reads content-manifest.json from the content root directory.
+ */
+function readDirectoryFromFilesystem(
+  locale: string,
+  category: string,
+): string[] {
+  // Map "default" locale to "ja"
+  const actualLocale = locale === "default" ? "ja" : locale;
+
+  const contentDirectory = path.join(process.cwd(), "public/content");
+
+  // Read content-manifest.json
+  const manifestPath = path.join(contentDirectory, "content-manifest.json");
+  try {
+    if (fs.existsSync(manifestPath)) {
+      const manifestContent = fs.readFileSync(manifestPath, "utf8");
+      const manifest = JSON.parse(manifestContent) as ContentManifest;
+      const files = manifest.locales[actualLocale]?.[category] || [];
+      return files
+        .filter((file) => file.endsWith(".md"))
+        .map((file) => file.replace(/\.md$/, ""));
+    } else {
+      console.error("Content manifest not found:", manifestPath);
+      return [];
+    }
+  } catch (error) {
+    console.error("Error reading content-manifest.json:", error);
+    return [];
+  }
+}
+
+/**
+ * Parse frontmatter and content from markdown string
+ */
+function parseFrontmatter(fileContents: string): {
+  data: Record<string, unknown>;
+  content: string;
+} {
+  const frontmatterRegex = /^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/;
+  const match = fileContents.match(frontmatterRegex);
+
+  if (!match) {
+    return {
+      data: {},
+      content: fileContents,
+    };
+  }
+
+  const frontmatterString = match[1];
+  const content = match[2];
+
+  // Parse YAML-like frontmatter
+  const data: Record<string, unknown> = {};
+  const lines = frontmatterString.split("\n");
+
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (!trimmedLine || trimmedLine.startsWith("#")) continue;
+
+    const colonIndex = trimmedLine.indexOf(":");
+    if (colonIndex === -1) continue;
+
+    const key = trimmedLine.substring(0, colonIndex).trim();
+    let value = trimmedLine.substring(colonIndex + 1).trim();
+
+    // Remove quotes if present
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    // Handle arrays (simple format: [item1, item2])
+    if (value.startsWith("[") && value.endsWith("]")) {
+      const arrayContent = value.slice(1, -1);
+      if (arrayContent.trim()) {
+        data[key] = arrayContent
+          .split(",")
+          .map((item) => item.trim().replace(/^["']|["']$/g, ""));
+      } else {
+        data[key] = [];
+      }
+    }
+    // Handle dates
+    else if (value.match(/^\d{4}-\d{2}-\d{2}/)) {
+      data[key] = new Date(value);
+    }
+    // Handle numbers
+    else if (!isNaN(Number(value)) && value !== "") {
+      data[key] = Number(value);
+    }
+    // Handle booleans
+    else if (value === "true" || value === "false") {
+      data[key] = value === "true";
+    }
+    // Handle strings
+    else {
+      data[key] = value;
+    }
+  }
+
+  return {
+    data,
+    content,
+  };
+}
+
+/**
  * Get markdown content (works in both Cloudflare and Node.js environments)
  */
 export async function getMarkdownContent(
@@ -138,28 +328,50 @@ export async function getMarkdownContent(
   let fileContents: string | null = null;
 
   // Check if running in Cloudflare environment
-  if (await isCloudflareEdgeEnvironment()) {
+  const isCloudflareEnv = await isCloudflareEdgeEnvironment();
+
+  if (isCloudflareEnv) {
     // Use Cloudflare Assets API
     const result = await fetchMarkdownFromAssets(locale, category, slug);
     if (!result.err) {
       fileContents = result.val;
-    } else if (locale !== "ja") {
-      // Fallback to Japanese if translation doesn't exist
-      const fallbackResult = await fetchMarkdownFromAssets(
-        "ja",
-        category,
-        slug,
-      );
-      if (!fallbackResult.err) {
-        fileContents = fallbackResult.val;
+    } else {
+      if (locale !== "ja") {
+        // Fallback to Japanese if translation doesn't exist
+        const fallbackResult = await fetchMarkdownFromAssets(
+          "ja",
+          category,
+          slug,
+        );
+        if (!fallbackResult.err) {
+          fileContents = fallbackResult.val;
+        } else {
+          console.error(
+            "Failed to fetch Japanese fallback from Cloudflare Assets:",
+            fallbackResult.err,
+            fallbackResult.val,
+          );
+        }
       }
     }
   } else {
     // Use filesystem for development
-    fileContents = readMarkdownFromFilesystem(locale, category, slug);
+    try {
+      fileContents = readMarkdownFromFilesystem(locale, category, slug);
+    } catch (error) {
+      console.log("Failed to read from filesystem:", error);
+      fileContents = null;
+    }
+
     if (!fileContents && locale !== "ja") {
       // Fallback to Japanese if translation doesn't exist
-      fileContents = readMarkdownFromFilesystem("ja", category, slug);
+      console.log("Trying Japanese fallback from filesystem");
+      try {
+        fileContents = readMarkdownFromFilesystem("ja", category, slug);
+        console.log("Successfully read Japanese fallback from filesystem");
+      } catch (error) {
+        console.log("Failed to read Japanese fallback from filesystem:", error);
+      }
     }
   }
 
@@ -167,17 +379,18 @@ export async function getMarkdownContent(
     return null;
   }
 
-  const { data, content } = matter(fileContents);
+  const { data, content } = parseFrontmatter(fileContents);
 
   // Convert markdown to HTML
   const processedContent = await remark().use(html).process(content);
   const contentHtml = processedContent.toString();
 
-  return {
+  const result = {
     content,
     data,
     html: contentHtml,
   };
+  return result;
 }
 
 /**
@@ -194,28 +407,47 @@ export function getMarkdownContentSync(
       // Fallback to Japanese if translation doesn't exist
       const fallbackContents = readMarkdownFromFilesystem("ja", category, slug);
       if (fallbackContents) {
-        const { data, content } = matter(fallbackContents);
+        const { data, content } = parseFrontmatter(fallbackContents);
         return { content, data, html: undefined };
       }
     }
     return null;
   }
 
-  const { data, content } = matter(fileContents);
+  const { data, content } = parseFrontmatter(fileContents);
   return { content, data, html: undefined };
 }
 
 /**
- * Get all markdown slugs for a category
+ * Get all markdown slugs for a category (works in both Cloudflare and Node.js environments)
  */
-export function getAllMarkdownSlugs(category: string): string[] {
-  const contentDirectory = path.join(process.cwd(), "public/content");
-  const categoryPath = path.join(contentDirectory, "ja", category);
-  const files = fs.readdirSync(categoryPath);
+export async function getAllMarkdownSlugs(
+  category: string,
+  locale: string = "ja",
+): Promise<string[]> {
+  // Check if running in Cloudflare environment
+  if (await isCloudflareEdgeEnvironment()) {
+    // Use Cloudflare Assets API
+    const result = await fetchDirectoryFromAssets(locale, category);
+    if (!result.err) {
+      return result.val;
+    }
+    console.error("Error fetching directory from assets:", result.err);
+    return [];
+  } else {
+    // Use filesystem for development
+    return readDirectoryFromFilesystem(locale, category);
+  }
+}
 
-  return files
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => file.replace(/\.md$/, ""));
+/**
+ * Get all markdown slugs for a category (synchronous - only works in Node.js environment)
+ */
+export function getAllMarkdownSlugsSync(
+  category: string,
+  locale: string = "ja",
+): string[] {
+  return readDirectoryFromFilesystem(locale, category);
 }
 
 /**
@@ -248,10 +480,53 @@ export type SiteNewsMarkdownItem = {
 };
 
 /**
- * Get all site news items from markdown
+ * Get all site news items from markdown (works in both Cloudflare and Node.js environments)
  */
-export function getAllSiteNewsItems(locale: string): SiteNewsMarkdownItem[] {
-  const slugs = getAllMarkdownSlugs("site-news");
+export async function getAllSiteNewsItems(
+  locale: string,
+): Promise<SiteNewsMarkdownItem[]> {
+  const slugs = await getAllMarkdownSlugs("site-news", locale);
+
+  const results = await Promise.all(
+    slugs.map(async (slug): Promise<SiteNewsMarkdownItem | null> => {
+      const markdownContent = await getMarkdownContent(
+        locale,
+        "site-news",
+        slug,
+      );
+      if (!markdownContent) return null;
+
+      const id = parseInt(slug, 10);
+      if (isNaN(id)) return null;
+
+      return {
+        id,
+        title: extractString(markdownContent.data.title),
+        content: markdownContent.content,
+        html: markdownContent.html || null,
+        updated: markdownContent.data.updated
+          ? markdownContent.data.updated instanceof Date
+            ? markdownContent.data.updated.toISOString()
+            : String(markdownContent.data.updated)
+          : "",
+        tags: extractStringArray(markdownContent.data.tags),
+        tweetLink: extractString(markdownContent.data.tweetLink) || null,
+      };
+    }),
+  );
+
+  return results
+    .filter((item): item is SiteNewsMarkdownItem => item !== null)
+    .sort((a, b) => b.id - a.id); // Sort by ID descending
+}
+
+/**
+ * Get all site news items from markdown (synchronous - only works in Node.js environment)
+ */
+export function getAllSiteNewsItemsSync(
+  locale: string,
+): SiteNewsMarkdownItem[] {
+  const slugs = getAllMarkdownSlugsSync("site-news", locale);
 
   return slugs
     .flatMap((slug): SiteNewsMarkdownItem[] => {
@@ -288,12 +563,18 @@ export async function getSiteNewsItem(
   id: string,
 ): Promise<SiteNewsMarkdownItem | null> {
   const markdownContent = await getMarkdownContent(locale, "site-news", id);
-  if (!markdownContent) return null;
+
+  if (!markdownContent) {
+    return null;
+  }
 
   const numericId = parseInt(id, 10);
-  if (isNaN(numericId)) return null;
 
-  return {
+  if (isNaN(numericId)) {
+    return null;
+  }
+
+  const result = {
     id: numericId,
     title: extractString(markdownContent.data.title),
     content: markdownContent.content,
@@ -306,4 +587,5 @@ export async function getSiteNewsItem(
     tags: extractStringArray(markdownContent.data.tags),
     tweetLink: extractString(markdownContent.data.tweetLink) || null,
   };
+  return result;
 }

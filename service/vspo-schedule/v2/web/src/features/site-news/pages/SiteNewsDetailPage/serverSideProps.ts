@@ -1,15 +1,8 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { serverSideTranslations } from "@/lib/i18n/server";
-import {
-  SiteNewsMarkdownItem,
-  getAllMarkdownSlugs,
-  getSiteNewsItem,
-} from "@/lib/markdown";
-import {
-  generateStaticPathsForLocales,
-  getInitializedI18nInstance,
-} from "@/lib/utils";
-import { GetStaticPaths, GetStaticProps } from "next";
+import { SiteNewsMarkdownItem, getSiteNewsItem } from "@/lib/markdown";
+import { getInitializedI18nInstance } from "@/lib/utils";
+import { GetServerSideProps } from "next";
 
 type Params = {
   id: string;
@@ -22,7 +15,7 @@ export type SiteNewsDetailPageProps = {
   };
 };
 
-export const getStaticProps: GetStaticProps<
+export const getServerSideProps: GetServerSideProps<
   SiteNewsDetailPageProps,
   Params
 > = async ({ params, locale = DEFAULT_LOCALE }) => {
@@ -34,6 +27,7 @@ export const getStaticProps: GetStaticProps<
 
   const id = params.id;
   const siteNewsItem = await getSiteNewsItem(locale, id);
+
   if (!siteNewsItem) {
     return {
       notFound: true,
@@ -55,16 +49,4 @@ export const getStaticProps: GetStaticProps<
       },
     },
   };
-};
-
-// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
-export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
-  const slugs = getAllMarkdownSlugs("site-news");
-  const paths = generateStaticPathsForLocales(
-    slugs.map((slug) => ({
-      params: { id: slug },
-    })),
-    locales,
-  );
-  return { paths, fallback: false };
 };

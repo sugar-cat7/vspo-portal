@@ -2,13 +2,11 @@ import { ContentLayout } from "@/features/shared/components/Layout";
 import SiteNewsDetailPageComponent from "@/features/site-news/pages/SiteNewsDetailPage";
 import {
   SiteNewsDetailPageProps,
-  getStaticPaths,
-  getStaticProps as siteNewsDetailGetStaticProps,
+  getServerSideProps as siteNewsDetailGetServerSideProps,
 } from "@/features/site-news/pages/SiteNewsDetailPage/serverSideProps";
 import { NextPageWithLayout } from "../_app";
 
-export const getStaticProps = siteNewsDetailGetStaticProps;
-export { getStaticPaths };
+export const getServerSideProps = siteNewsDetailGetServerSideProps;
 
 const SiteNewsItemPage: NextPageWithLayout<SiteNewsDetailPageProps> = ({
   siteNewsItem,
