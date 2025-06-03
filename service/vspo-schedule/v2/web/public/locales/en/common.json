@@ -63,5 +63,12 @@
       "home": "Home",
       "site-news": "Site News"
     }
+  },
+  "pagination": {
+    "goToPage": "Go to page {{page}}",
+    "firstPage": "Go to first page",
+    "lastPage": "Go to last page",
+    "nextPage": "Go to next page",
+    "previousPage": "Go to previous page"
   }
 }

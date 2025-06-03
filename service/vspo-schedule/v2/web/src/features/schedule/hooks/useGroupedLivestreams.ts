@@ -1,4 +1,5 @@
 import { formatDate, groupBy } from "@/lib/utils";
+import { useTranslation } from "next-i18next";
 import { useMemo } from "react";
 import { Livestream } from "../../shared/domain/livestream";
 
@@ -26,6 +27,7 @@ export const useGroupedLivestreams = ({
   currentStatusFilter,
   liveStatus,
 }: UseGroupedLivestreamsParams): UseGroupedLivestreamsReturn => {
+  const { t } = useTranslation("schedule");
   // Group livestreams by date on the client side
   const livestreamsByDate = useMemo(() => {
     // Ensure livestreams is an array before grouping
@@ -107,8 +109,8 @@ export const useGroupedLivestreams = ({
     // Prepare tab label
     const allTabLabel =
       liveStatus === "all" && formattedDate
-        ? `すべて (${formattedDate})`
-        : "すべて";
+        ? t("tabs.allWithDate", { date: formattedDate })
+        : t("tabs.all");
 
     return {
       livestreamsByDate: filteredLivestreamsByDate,
@@ -116,7 +118,7 @@ export const useGroupedLivestreams = ({
       formattedDate,
       allTabLabel,
     };
-  }, [livestreamsByDate, currentStatusFilter, liveStatus, locale, timeZone]);
+  }, [livestreamsByDate, currentStatusFilter, liveStatus, locale, timeZone, t]);
 
   return processedData;
 };

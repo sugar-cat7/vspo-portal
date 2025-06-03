@@ -1,7 +1,7 @@
 import { Box, Grid, Pagination, Tab, Tabs } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useTranslation } from "next-i18next";
-import React, { useEffect } from "react";
+import React from "react";
 import {
   Clip,
   Pagination as PaginationType,
@@ -45,17 +45,7 @@ export const ClipTabsAndListPresenter: React.FC<
   isMobile = false,
 }) => {
   const { t } = useTranslation("clips");
-
-  // Log pagination values for debugging
-  useEffect(() => {
-    console.log("Pagination values:", {
-      currentPage: pagination.currentPage,
-      displayPage: pagination.currentPage + 1,
-      totalPages: pagination.totalPages,
-      totalItems: pagination.totalItems,
-      itemsPerPage: pagination.itemsPerPage,
-    });
-  }, [pagination]);
+  const { t: tCommon } = useTranslation("common");
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
     onTabChange(newValue);
@@ -123,15 +113,15 @@ export const ClipTabsAndListPresenter: React.FC<
             }}
             getItemAriaLabel={(type, page) => {
               if (type === "page") {
-                return `${page}ページ目に移動`;
+                return tCommon("pagination.goToPage", { page });
               }
               return type === "first"
-                ? "最初のページに移動"
+                ? tCommon("pagination.firstPage")
                 : type === "last"
-                  ? "最後のページに移動"
+                  ? tCommon("pagination.lastPage")
                   : type === "next"
-                    ? "次のページに移動"
-                    : "前のページに移動";
+                    ? tCommon("pagination.nextPage")
+                    : tCommon("pagination.previousPage");
             }}
           />
         )}

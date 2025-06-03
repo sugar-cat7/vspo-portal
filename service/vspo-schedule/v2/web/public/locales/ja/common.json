@@ -61,5 +61,12 @@
       "home": "ホーム",
       "site-news": "お知らせ"
     }
+  },
+  "pagination": {
+    "goToPage": "{{page}}ページ目に移動",
+    "firstPage": "最初のページに移動",
+    "lastPage": "最後のページに移動",
+    "nextPage": "次のページに移動",
+    "previousPage": "前のページに移動"
   }
 }

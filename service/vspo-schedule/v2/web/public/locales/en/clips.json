@@ -22,7 +22,8 @@
       "exploreClips": "Explore Clips"
     },
     "members": {
-      "title": "VSPO Members"
+      "title": "VSPO Members",
+      "sectionTitle": "Members"
     },
     "sections": {
       "popularYoutubeClips": "Popular Clips",
@@ -52,6 +53,7 @@
     "title":"$t(common:vspo) Twitch Clips",
     "description": "View Twitch clips of $t(common:vspo) members."
   },
+  "viewCount": "{{views, number}} views",
   "viewCountLabel": "{{views, number}}+ views",
   "searchDialog": {
     "title": "Clip search",

@@ -22,7 +22,8 @@
       "exploreClips": "클립 둘러보기"
     },
     "members": {
-      "title": "VSPO 멤버"
+      "title": "VSPO 멤버",
+      "sectionTitle": "멤버"
     },
     "sections": {
       "popularYoutubeClips": "인기 클립",
@@ -52,6 +53,7 @@
     "title": "$t(common:vspo) Twitch 클립",
     "description": "$t(common:vspo) 멤버들의 Twitch 클립을 확인하세요."
   },
+  "viewCount": "조회수 {{views, number}}회",
   "viewCountLabel": "조회수 {{views, number}}+",
   "searchDialog": {
     "title": "클립 검색",

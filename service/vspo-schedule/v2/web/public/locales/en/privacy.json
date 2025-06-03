@@ -1,4 +1,61 @@
 {
   "title": "Privacy Policy",
-  "description": "View Spodule's privacy policy."
+  "description": "View Spodule's privacy policy.",
+  "pageTitle": "Privacy Policy",
+  "intro": "This Privacy Policy sets forth the privacy policy (hereinafter referred to as \"this Policy\") for the services (hereinafter referred to as \"the Service\") provided by the service provider on this website.",
+  "article1": {
+    "title": "Article 1 (Privacy Information)",
+    "paragraph1": "\"Personal information\" in privacy information refers to \"personal information\" as defined in the Personal Information Protection Act, and refers to information about a living individual that can identify a specific individual by name, date of birth, address, telephone number, contact information, or other descriptions contained in such information.",
+    "paragraph2": "\"History information and characteristic information\" in privacy information refers to information other than \"personal information\" defined above, including the history of services used, products purchased, pages and advertisements viewed, search keywords searched by users, dates and times of use, methods of use, usage environment, postal codes, gender, occupation, age, user's IP address, cookie information, location information, and individual identification information of devices."
+  },
+  "article2": {
+    "title": "Article 2 (Method of Collecting Privacy Information)",
+    "content": "The service provider collects history information and characteristic information about users, such as services and software used, pages and advertisements viewed, search keywords searched, dates and times of use, methods of use, usage environment (including communication status of mobile devices when used through mobile devices and various setting information at the time of use), IP addresses, cookie information, location information, and individual identification information of devices, when users view pages."
+  },
+  "article3": {
+    "title": "Article 3 (Purpose of Collecting and Using Personal Information)",
+    "intro": "The purposes for which the service provider collects and uses personal information are as follows:",
+    "purposes": [
+      "Use for maintenance and management of the Service, such as stable system operation",
+      "Use for recommending content that matches users' needs, interests, and concerns",
+      "Use for analysis such as measuring advertising effectiveness",
+      "Purposes incidental to the above purposes of use"
+    ]
+  },
+  "article4": {
+    "title": "Article 4 (Provision of Personal Information to Third Parties)",
+    "content": "The service provider will not provide personal information to third parties without obtaining the user's consent in advance, except as required by law. However, this excludes cases permitted under the Personal Information Protection Act and other laws and regulations."
+  },
+  "article5": {
+    "title": "Article 5 (Third-Party Privacy Policy)",
+    "paragraph1": "This Service uses Google Analytics, Google Ads, and other services provided by Google Inc. (hereinafter referred to as \"Google\") as third-party services (hereinafter referred to as \"these third-party services\") for the purposes of analyzing for improvement of the Service, delivering behaviorally targeted advertising, and delivering content.",
+    "paragraph2": "These third-party services may analyze usage through cookies, and in this process, some user information such as IP addresses may be collected by the operating companies of these third-party services. By using this Service, users are deemed to have granted permission for data processing performed by these third-party service operators for the above methods and purposes.",
+    "links": [
+      {
+        "text": "About information collection through Google Ads cookies",
+        "url": "https://policies.google.com/technologies/ads"
+      },
+      {
+        "text": "About how Google Ads uses collected data and where ads are displayed",
+        "url": "https://privacy.google.com/intl/en/how-ads-work.html"
+      },
+      {
+        "text": "About Google's privacy policy for services provided",
+        "url": "https://policies.google.com/privacy"
+      }
+    ]
+  },
+  "article6": {
+    "title": "Article 6 (Changes to Privacy Policy)",
+    "items": [
+      "The contents of this Policy may be changed without notice to users.",
+      "Unless otherwise specified by the service provider, the changed privacy policy shall take effect when posted on this website."
+    ]
+  },
+  "article7": {
+    "title": "Article 7 (Contact Information)",
+    "content": "For inquiries regarding this Policy, please contact ",
+    "linkText": "our inquiry desk",
+    "suffix": "."
+  }
 }

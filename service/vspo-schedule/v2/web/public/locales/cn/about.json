@@ -1,4 +1,26 @@
 {
   "title": "关于$t(common:spodule)",
-  "description": "概述$t(common:spodule)的内容和网站功能。"
+  "description": "概述$t(common:spodule)的内容和网站功能。",
+  "sections": {
+    "siteOverview": {
+      "title": "网站概述",
+      "content": "SPODULE（以下简称\"本站\"）是一个介绍VSPO!直播、剪辑视频和活动信息的非官方粉丝网站。\n※不刊登会员限定直播。\n\n由于本站由个人运营，对咨询的回复和功能添加可能会有所延迟。\n\n所有通过广告等获得的收益均用于本站的运营（服务器费用等）。\n如果您愿意通过留言或改进来支持本站，请使用下方的OFUSE。\n[OFUSE](https://ofuse.me/d202a56f)"
+    },
+    "contents": {
+      "title": "关于内容",
+      "content": "①直播列表页面\n列出VSPO!成员直播的页面。\n直播视频在YouTube上发布后约1-5分钟内出现在本站。\n刷新页面查看最新信息。\n\n![image](/about/page/live.png)\n\n②剪辑页面\n展示与VSPO!成员相关的剪辑视频。※1,2\n※1.仅列出有许可编号的剪辑。\n※2.可显示最近一个月的剪辑。\n\n![image](/about/page/clips.png)\n\n③剪辑页面（Twitch）\n展示与VSPO!成员相关的Twitch剪辑。※1,2\n※1.出于过滤目的，仅列出具有一定观看次数的剪辑。\n※2.可显示最近一个月的剪辑。\n\n![image](/about/page/twitch-clips.png)\n\n④自由聊天页面\nVSPO!成员的\"自由聊天\"直播列表。\n\n![image](/about/page/freechat.png)\n\n⑤活动页面\nVSPO!成员的活动列表。\n包括官方活动和外部比赛的参赛日期。\n\n![image](/about/page/events.png)\n\n⑥公告页面\n关于本站内容更新的信息。\n\n![image](/about/page/site-news.png)"
+    },
+    "linksAndScreenshots": {
+      "title": "关于链接和截图",
+      "content": "本站所有页面均可\"自由链接\"。\n但在以下情况下禁止链接：\n・链接网站包含非法内容时。\n・将本站内容显示为链接网站的一部分时（如使用框架）。\n・引用本站截图或内容时，请务必注明主页或引用页面的URL。"
+    },
+    "dataUsage": {
+      "title": "关于数据使用",
+      "content": "禁止使用程序（网络爬虫等）机械地获取本站介绍的\"视频和缩略图信息\"。\n如需\"视频和缩略图信息\"，请使用服务提供商（YouTube、Twitch、Twitter等）的\"API\"。\n详情请阅读各服务提供商的使用条款。"
+    },
+    "features": {
+      "title": "便捷功能",
+      "content": "①深色模式切换\n点击侧边栏的\"设置\"可在\"深色模式\"和\"浅色模式\"之间切换。\n再次访问网站时模式会保持不变。\n\n![image](/about/darkmode.png)\n\n②页面更新时间\n在某些页面的底部显示\"最后更新\"时间。\n\n![image](/about/update.png)\n\n③视频筛选\n在直播和剪辑列表页面，点击右下角的放大镜图标可按各种搜索条件进行筛选。\n支持结合特定成员、发布日期等的多重搜索。\n\n![image](/about/filter.png)\n\n④视频列表链接\n点击\"视频缩略图\"或\"视频标题\"会显示YouTube概览。\n您可以在YouTube上观看或直接在SPODULE内播放。\n\n![image](/about/link.png)\n\n⑤PWA支持\n本站支持PWA，可安装到您的设备上。\n・Android设备\n![image](/about/pwa-android.png)\n\n・iOS设备\n![image](/about/pwa-ios.png)"
+    }
+  }
 }

@@ -22,7 +22,8 @@
       "exploreClips": "瀏覽剪輯"
     },
     "members": {
-      "title": "VSPO 成員"
+      "title": "VSPO 成員",
+      "sectionTitle": "成員"
     },
     "sections": {
       "popularYoutubeClips": "熱門剪輯",
@@ -52,6 +53,7 @@
     "title":"$t(common:vspo) Twitch 剪輯",
     "description": "查看 $t(common:vspo) 成員的 Twitch 剪輯影片。"
   },
+  "viewCount": "{{views, number}} 次觀看",
   "viewCountLabel": "{{views, number}}+ 次觀看",
   "searchDialog": {
     "title": "剪輯搜尋",

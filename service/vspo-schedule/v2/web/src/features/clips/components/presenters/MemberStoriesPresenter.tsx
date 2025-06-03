@@ -3,6 +3,7 @@ import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Avatar, Box, IconButton, Typography } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import React, { useRef } from "react";
 
@@ -54,6 +55,7 @@ export type MemberStoriesPresenterProps = {
 export const MemberStoriesPresenter: React.FC<MemberStoriesPresenterProps> = ({
   vspoMembers,
 }) => {
+  const { t } = useTranslation("clips");
   const router = useRouter();
   const storyScrollRef = useRef<HTMLDivElement>(null);
 
@@ -76,7 +78,7 @@ export const MemberStoriesPresenter: React.FC<MemberStoriesPresenterProps> = ({
     <StoryContainer>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <Typography variant="h6" fontWeight={600} sx={{ flexGrow: 1 }}>
-          メンバー
+          {t("home.members.sectionTitle")}
         </Typography>
         <Box>
           <IconButton onClick={() => scrollStories("left")} size="small">

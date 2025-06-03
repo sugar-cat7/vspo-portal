@@ -20,5 +20,9 @@
   "navigation": {
     "previousDay": "前一天",
     "nextDay": "後一天"
+  },
+  "tabs": {
+    "all": "全部",
+    "allWithDate": "全部 ({{date}})"
   }
 } 
