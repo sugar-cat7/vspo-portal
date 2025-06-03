@@ -1,12 +1,12 @@
 import { Breadcrumb, TweetEmbed } from "@/features/shared/components/Elements";
 import { formatDate, getSiteNewsTagColor } from "@/lib/utils";
-import { SiteNewsItem } from "@/types/site-news";
+import { SiteNewsMarkdownItem } from "@/lib/markdown";
 import { Box, Chip, Toolbar, Typography } from "@mui/material";
 import { TFunction } from "next-i18next";
 import * as React from "react";
 
 type SiteNewsDetailPagePresenterProps = {
-  siteNewsItem: SiteNewsItem;
+  siteNewsItem: SiteNewsMarkdownItem;
   locale: string;
   t: TFunction;
 };
@@ -48,9 +48,18 @@ export const SiteNewsDetailPagePresenter: React.FC<
             />
           ))}
         </Typography>
-        <Typography variant="body1" sx={{ marginBottom: "16px" }}>
-          {siteNewsItem.content}
-        </Typography>
+        {siteNewsItem.html ? (
+          <Box
+            sx={{ marginBottom: "16px" }}
+            dangerouslySetInnerHTML={{
+              __html: siteNewsItem.html,
+            }}
+          />
+        ) : (
+          <Typography variant="body1" sx={{ marginBottom: "16px" }}>
+            {siteNewsItem.content}
+          </Typography>
+        )}
         {siteNewsItem.tweetLink && (
           <TweetEmbed tweetLink={siteNewsItem.tweetLink} />
         )}

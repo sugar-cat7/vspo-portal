@@ -63,5 +63,12 @@
       "home": "首頁",
       "site-news": "網站公告"
     }
+  },
+  "pagination": {
+    "goToPage": "跳轉到第{{page}}頁",
+    "firstPage": "跳轉到第一頁",
+    "lastPage": "跳轉到最後一頁",
+    "nextPage": "跳轉到下一頁",
+    "previousPage": "跳轉到上一頁"
   }
 }

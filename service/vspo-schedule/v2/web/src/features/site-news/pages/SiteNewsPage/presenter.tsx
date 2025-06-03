@@ -1,6 +1,6 @@
 import { Breadcrumb } from "@/features/shared/components/Elements";
 import { formatDate, getSiteNewsTagColor } from "@/lib/utils";
-import { SiteNewsItem } from "@/types/site-news";
+import { SiteNewsMarkdownItem } from "@/lib/markdown";
 import {
   Box,
   Chip,
@@ -18,7 +18,7 @@ import Link from "next/link";
 import * as React from "react";
 
 type SiteNewsPagePresenterProps = {
-  siteNewsItems: SiteNewsItem[];
+  siteNewsItems: SiteNewsMarkdownItem[];
   locale: string;
   t: TFunction;
 };

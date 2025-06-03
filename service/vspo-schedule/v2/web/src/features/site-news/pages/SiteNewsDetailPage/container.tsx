@@ -1,12 +1,12 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
-import { SiteNewsItem } from "@/types/site-news";
+import { SiteNewsMarkdownItem } from "@/lib/markdown";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { SiteNewsDetailPagePresenter } from "./presenter";
 
 type SiteNewsDetailPageContainerProps = {
-  siteNewsItem: SiteNewsItem;
+  siteNewsItem: SiteNewsMarkdownItem;
 };
 
 export const SiteNewsDetailPageContainer: React.FC<

@@ -8,8 +8,10 @@ import { NextPageWithLayout } from "../_app";
 
 export const getStaticProps = siteNewsGetStaticProps;
 
-const SiteNewsPage: NextPageWithLayout<SiteNewsPageProps> = () => {
-  return <SiteNewsPageComponent />;
+const SiteNewsPage: NextPageWithLayout<SiteNewsPageProps> = ({
+  siteNewsItems,
+}) => {
+  return <SiteNewsPageComponent siteNewsItems={siteNewsItems} />;
 };
 
 SiteNewsPage.getLayout = (page, pageProps) => {

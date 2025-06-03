@@ -1,11 +1,20 @@
-import { getAboutSections } from "@/data/content/about-sections";
-import { useTranslation } from "next-i18next";
+import { useRouter } from "next/router";
 import * as React from "react";
 import { AboutPagePresenter } from "./presenter";
 
-export const AboutPageContainer: React.FC = () => {
-  const { t } = useTranslation("about");
-  const sections = getAboutSections(t);
+type AboutPageContainerProps = {
+  sections: Array<{
+    slug: string;
+    title: string;
+    content: string;
+  }>;
+};
+
+export const AboutPageContainer: React.FC<AboutPageContainerProps> = ({
+  sections,
+}) => {
+  const router = useRouter();
+  const locale = router.locale || "ja";
   
-  return <AboutPagePresenter sections={sections} />;
+  return <AboutPagePresenter sections={sections} locale={locale} />;
 };

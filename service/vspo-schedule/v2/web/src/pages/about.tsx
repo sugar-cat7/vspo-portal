@@ -8,8 +8,8 @@ import { NextPageWithLayout } from "./_app";
 
 export const getStaticProps = aboutGetStaticProps;
 
-const AboutPage: NextPageWithLayout<AboutPageProps> = () => {
-  return <AboutPageComponent />;
+const AboutPage: NextPageWithLayout<AboutPageProps> = ({ sections }) => {
+  return <AboutPageComponent sections={sections} />;
 };
 
 AboutPage.getLayout = (page, pageProps) => {

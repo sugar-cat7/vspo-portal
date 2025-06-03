@@ -34,7 +34,7 @@ export default function MyDocument(
         <meta charSet="utf-8" />
         <meta
           name="keywords"
-          content="ぶいすぽっ！, ぶいすぽ, 配信スケジュール, VSPO!, Vspo, streaming schedule"
+          content="VSPO!, Vspo, ぶいすぽっ！, ぶいすぽ, streaming schedule, 配信スケジュール, 直播时间表, 直播時間表, 스트리밍 일정, virtual esports, vtuber, esports, gaming"
         />
         <meta property="og:type" content="website" />
         <meta

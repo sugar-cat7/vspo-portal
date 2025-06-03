@@ -1,5 +1,6 @@
 import { VideoCard } from "@/features/shared/components/Elements/Card/VideoCard";
 import { Box, Card, CardContent, Typography } from "@mui/material";
+import { useTranslation } from "next-i18next";
 import React from "react";
 import { Clip } from "../../../shared/domain/clip";
 export type ClipCardPresenterProps = {
@@ -9,6 +10,7 @@ export type ClipCardPresenterProps = {
 export const ClipCardPresenter: React.FC<ClipCardPresenterProps> = ({
   clip,
 }) => {
+  const { t } = useTranslation("clips");
   return (
     <VideoCard video={clip}>
       <Card sx={{ maxWidth: 345, height: "100%" }}>
@@ -38,7 +40,7 @@ export const ClipCardPresenter: React.FC<ClipCardPresenterProps> = ({
               {clip.channelTitle}
             </Typography>
             <Typography variant="body2" color="text.secondary" noWrap>
-              {clip.viewCount} 回
+              {t("viewCount", { views: clip.viewCount })}
             </Typography>
           </Box>
         </CardContent>

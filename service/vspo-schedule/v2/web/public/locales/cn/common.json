@@ -63,5 +63,12 @@
       "home": "主页",
       "site-news": "网站新闻"
     }
+  },
+  "pagination": {
+    "goToPage": "跳转到第{{page}}页",
+    "firstPage": "跳转到第一页",
+    "lastPage": "跳转到最后一页",
+    "nextPage": "跳转到下一页",
+    "previousPage": "跳转到上一页"
   }
 }

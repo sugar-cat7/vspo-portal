@@ -45,6 +45,7 @@ export const ClipTabsAndListPresenter: React.FC<
   isMobile = false,
 }) => {
   const { t } = useTranslation("clips");
+  const { t: tCommon } = useTranslation("common");
 
   // Log pagination values for debugging
   useEffect(() => {
@@ -123,15 +124,15 @@ export const ClipTabsAndListPresenter: React.FC<
             }}
             getItemAriaLabel={(type, page) => {
               if (type === "page") {
-                return `${page}ページ目に移動`;
+                return tCommon("pagination.goToPage", { page });
               }
               return type === "first"
-                ? "最初のページに移動"
+                ? tCommon("pagination.firstPage")
                 : type === "last"
-                  ? "最後のページに移動"
+                  ? tCommon("pagination.lastPage")
                   : type === "next"
-                    ? "次のページに移動"
-                    : "前のページに移動";
+                    ? tCommon("pagination.nextPage")
+                    : tCommon("pagination.previousPage");
             }}
           />
         )}

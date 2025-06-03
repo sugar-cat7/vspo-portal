@@ -1,11 +1,17 @@
-import { siteNewsItems } from "@/data/content/site-news";
 import { DEFAULT_LOCALE } from "@/lib/Const";
+import { SiteNewsMarkdownItem } from "@/lib/markdown";
 import { useTranslation } from "next-i18next";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { SiteNewsPagePresenter } from "./presenter";
 
-export const SiteNewsPageContainer: React.FC = () => {
+export type SiteNewsPageContainerProps = {
+  siteNewsItems: SiteNewsMarkdownItem[];
+};
+
+export const SiteNewsPageContainer: React.FC<SiteNewsPageContainerProps> = ({
+  siteNewsItems,
+}) => {
   const router = useRouter();
   const locale = router.locale ?? DEFAULT_LOCALE;
   const { t } = useTranslation("site-news");
