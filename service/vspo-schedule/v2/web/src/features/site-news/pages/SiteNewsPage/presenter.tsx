@@ -1,6 +1,7 @@
 import { Breadcrumb } from "@/features/shared/components/Elements";
-import { formatDate, getSiteNewsTagColor } from "@/lib/utils";
 import { SiteNewsMarkdownItem } from "@/lib/markdown";
+import { formatDate, getSiteNewsTagColor } from "@/lib/utils";
+import { SiteNewsTag } from "@/types/site-news";
 import {
   Box,
   Chip,
@@ -98,7 +99,7 @@ export const SiteNewsPagePresenter: React.FC<SiteNewsPagePresenterProps> = ({
                       key={tag}
                       label={t(`tagLabels.${tag}`)}
                       variant="outlined"
-                      color={getSiteNewsTagColor(tag)}
+                      color={getSiteNewsTagColor(tag as SiteNewsTag)}
                       sx={{ m: 0.5 }}
                     />
                   ))}

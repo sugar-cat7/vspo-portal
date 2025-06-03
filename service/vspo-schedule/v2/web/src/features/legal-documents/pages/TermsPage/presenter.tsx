@@ -6,7 +6,9 @@ type TermsPagePresenterProps = {
   t: TFunction;
 };
 
-export const TermsPagePresenter: React.FC<TermsPagePresenterProps> = ({ t }) => {
+export const TermsPagePresenter: React.FC<TermsPagePresenterProps> = ({
+  t,
+}) => {
   return (
     <AgreementDocument>
       <h1>{t("pageTitle")}</h1>

@@ -1,14 +1,17 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { AppError, Err, Ok, Result, wrap } from "@vspo-lab/error";
 import fs from "fs";
-import matter from "gray-matter";
 import path from "path";
+import {
+  CloudflareContext,
+  getCloudflareContext,
+} from "@opennextjs/cloudflare";
+import { AppError, Err, Ok, Result } from "@vspo-lab/error";
+import matter from "gray-matter";
 import { remark } from "remark";
 import html from "remark-html";
 
 export type MarkdownContent = {
   content: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   html?: string;
 };
 
@@ -32,7 +35,10 @@ async function fetchMarkdownFromAssets(
   category: string,
   slug: string,
 ): Promise<Result<string>> {
-  let context: any;
+  // Map "default" locale to "ja"
+  const actualLocale = locale === "default" ? "ja" : locale;
+
+  let context: CloudflareContext;
   try {
     context = await getCloudflareContext({ async: true });
   } catch (error) {
@@ -57,8 +63,8 @@ async function fetchMarkdownFromAssets(
     );
   }
 
-  const assetPath = `/content/${locale}/${category}/${slug}.md`;
-  
+  const assetPath = `/content/${actualLocale}/${category}/${slug}.md`;
+
   let response: Response;
   try {
     response = await env.ASSETS.fetch(`https://placeholder${assetPath}`);
@@ -108,13 +114,17 @@ function readMarkdownFromFilesystem(
   category: string,
   slug: string,
 ): string | null {
-  try {
-    const contentDirectory = path.join(process.cwd(), "public/content");
-    const fullPath = path.join(contentDirectory, locale, category, `${slug}.md`);
-    return fs.readFileSync(fullPath, "utf8");
-  } catch (error) {
-    return null;
-  }
+  // Map "default" locale to "ja"
+  const actualLocale = locale === "default" ? "ja" : locale;
+
+  const contentDirectory = path.join(process.cwd(), "public/content");
+  const fullPath = path.join(
+    contentDirectory,
+    actualLocale,
+    category,
+    `${slug}.md`,
+  );
+  return fs.readFileSync(fullPath, "utf8");
 }
 
 /**
@@ -135,7 +145,11 @@ export async function getMarkdownContent(
       fileContents = result.val;
     } else if (locale !== "ja") {
       // Fallback to Japanese if translation doesn't exist
-      const fallbackResult = await fetchMarkdownFromAssets("ja", category, slug);
+      const fallbackResult = await fetchMarkdownFromAssets(
+        "ja",
+        category,
+        slug,
+      );
       if (!fallbackResult.err) {
         fileContents = fallbackResult.val;
       }
@@ -154,11 +168,11 @@ export async function getMarkdownContent(
   }
 
   const { data, content } = matter(fileContents);
-  
+
   // Convert markdown to HTML
   const processedContent = await remark().use(html).process(content);
   const contentHtml = processedContent.toString();
-  
+
   return {
     content,
     data,
@@ -195,17 +209,29 @@ export function getMarkdownContentSync(
  * Get all markdown slugs for a category
  */
 export function getAllMarkdownSlugs(category: string): string[] {
-  try {
-    const contentDirectory = path.join(process.cwd(), "public/content");
-    const categoryPath = path.join(contentDirectory, "ja", category);
-    const files = fs.readdirSync(categoryPath);
-    
-    return files
-      .filter((file) => file.endsWith(".md"))
-      .map((file) => file.replace(/\.md$/, ""));
-  } catch (error) {
-    return [];
-  }
+  const contentDirectory = path.join(process.cwd(), "public/content");
+  const categoryPath = path.join(contentDirectory, "ja", category);
+  const files = fs.readdirSync(categoryPath);
+
+  return files
+    .filter((file) => file.endsWith(".md"))
+    .map((file) => file.replace(/\.md$/, ""));
+}
+
+/**
+ * Safely extract string value from unknown
+ */
+function extractString(value: unknown): string {
+  return typeof value === "string" ? value : "";
+}
+
+/**
+ * Safely extract string array from unknown
+ */
+function extractStringArray(value: unknown): string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === "string")
+    ? value
+    : [];
 }
 
 /**
@@ -226,28 +252,30 @@ export type SiteNewsMarkdownItem = {
  */
 export function getAllSiteNewsItems(locale: string): SiteNewsMarkdownItem[] {
   const slugs = getAllMarkdownSlugs("site-news");
-  
+
   return slugs
     .flatMap((slug): SiteNewsMarkdownItem[] => {
       const markdownContent = getMarkdownContentSync(locale, "site-news", slug);
       if (!markdownContent) return [];
-      
+
       const id = parseInt(slug, 10);
       if (isNaN(id)) return [];
-      
-      return [{
-        id,
-        title: markdownContent.data.title || "",
-        content: markdownContent.content,
-        html: markdownContent.html || null,
-        updated: markdownContent.data.updated 
-          ? (markdownContent.data.updated instanceof Date 
-             ? markdownContent.data.updated.toISOString() 
-             : String(markdownContent.data.updated))
-          : "",
-        tags: markdownContent.data.tags || [],
-        tweetLink: markdownContent.data.tweetLink || null,
-      }];
+
+      return [
+        {
+          id,
+          title: extractString(markdownContent.data.title),
+          content: markdownContent.content,
+          html: markdownContent.html || null,
+          updated: markdownContent.data.updated
+            ? markdownContent.data.updated instanceof Date
+              ? markdownContent.data.updated.toISOString()
+              : String(markdownContent.data.updated)
+            : "",
+          tags: extractStringArray(markdownContent.data.tags),
+          tweetLink: extractString(markdownContent.data.tweetLink) || null,
+        },
+      ];
     })
     .sort((a, b) => b.id - a.id); // Sort by ID descending
 }
@@ -261,21 +289,21 @@ export async function getSiteNewsItem(
 ): Promise<SiteNewsMarkdownItem | null> {
   const markdownContent = await getMarkdownContent(locale, "site-news", id);
   if (!markdownContent) return null;
-  
+
   const numericId = parseInt(id, 10);
   if (isNaN(numericId)) return null;
-  
+
   return {
     id: numericId,
-    title: markdownContent.data.title || "",
+    title: extractString(markdownContent.data.title),
     content: markdownContent.content,
     html: markdownContent.html || null,
-    updated: markdownContent.data.updated 
-      ? (markdownContent.data.updated instanceof Date 
-         ? markdownContent.data.updated.toISOString() 
-         : String(markdownContent.data.updated))
+    updated: markdownContent.data.updated
+      ? markdownContent.data.updated instanceof Date
+        ? markdownContent.data.updated.toISOString()
+        : String(markdownContent.data.updated)
       : "",
-    tags: markdownContent.data.tags || [],
-    tweetLink: markdownContent.data.tweetLink || null,
+    tags: extractStringArray(markdownContent.data.tags),
+    tweetLink: extractString(markdownContent.data.tweetLink) || null,
   };
 }

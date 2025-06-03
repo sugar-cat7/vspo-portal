@@ -15,6 +15,6 @@ export const AboutPageContainer: React.FC<AboutPageContainerProps> = ({
 }) => {
   const router = useRouter();
   const locale = router.locale || "ja";
-  
+
   return <AboutPagePresenter sections={sections} locale={locale} />;
 };

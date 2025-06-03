@@ -1,6 +1,5 @@
 import { ServerResponse } from "http";
 import { ParsedUrlQuery } from "querystring";
-import { SiteNewsTag } from "@/types/site-news";
 import { Locale, isMatch } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { enUS, ja, ko, zhCN, zhTW } from "date-fns/locale";
@@ -94,7 +93,7 @@ export const matchesDateFormat = (dateString: string, dateFormat: string) => {
   return isMatch(dateString, dateFormat);
 };
 
-export const getSiteNewsTagColor = (tag: SiteNewsTag) => {
+export const getSiteNewsTagColor = (tag: string) => {
   switch (tag) {
     case "feat":
       return "primary";

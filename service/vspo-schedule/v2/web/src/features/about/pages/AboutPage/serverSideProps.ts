@@ -31,15 +31,17 @@ export const getStaticProps: GetStaticProps<AboutPageProps> = async ({
     .map((slug) => {
       const content = getMarkdownContentSync(locale, "about", slug);
       if (!content) return null;
-      
+
       return {
         slug,
-        title: content.data.title || slug,
+        title: String(content.data.title || slug),
         content: content.content,
-        order: content.data.order || 999,
+        order: Number(content.data.order) || 999,
       };
     })
-    .filter((section): section is NonNullable<typeof section> => section !== null)
+    .filter(
+      (section): section is NonNullable<typeof section> => section !== null,
+    )
     .sort((a, b) => a.order - b.order)
     .map(({ slug, title, content }) => ({ slug, title, content }));
 

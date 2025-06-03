@@ -1,6 +1,6 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { serverSideTranslations } from "@/lib/i18n/server";
-import { getAllSiteNewsItems, SiteNewsMarkdownItem } from "@/lib/markdown";
+import { SiteNewsMarkdownItem, getAllSiteNewsItems } from "@/lib/markdown";
 import { getInitializedI18nInstance } from "@/lib/utils";
 import { GetStaticProps } from "next";
 

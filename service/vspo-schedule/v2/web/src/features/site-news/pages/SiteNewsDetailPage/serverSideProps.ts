@@ -1,9 +1,9 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
 import { serverSideTranslations } from "@/lib/i18n/server";
 import {
+  SiteNewsMarkdownItem,
   getAllMarkdownSlugs,
   getSiteNewsItem,
-  SiteNewsMarkdownItem,
 } from "@/lib/markdown";
 import {
   generateStaticPathsForLocales,

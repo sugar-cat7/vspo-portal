@@ -20,11 +20,10 @@ type AboutPagePresenterProps = {
 
 export const AboutPagePresenter: React.FC<AboutPagePresenterProps> = ({
   sections,
-  locale,
 }) => {
   return (
     <Stack direction="column" spacing={2}>
-      {sections.map((section, index) => (
+      {sections.map((section) => (
         <Accordion disableGutters key={section.slug}>
           <AccordionSummary expandIcon={<ExpandMoreIcon />}>
             <Typography component="span" variant="h5">
