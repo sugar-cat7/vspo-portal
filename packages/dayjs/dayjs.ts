@@ -25,6 +25,22 @@ const convertToUTCDate = (input: Date | string | number) => {
   return dayjs.tz(input).utc().toDate();
 };
 
+const convertToUTCTimestamp = (
+  dateStr: Date | string | number,
+  tz: string,
+): string => {
+  return dayjs.tz(dateStr, tz).utc().format();
+};
+
+const addDaysAndConvertToUTC = (
+  dateStr: Date | string | number,
+  days: number,
+  tz: string,
+): string => {
+  return dayjs.tz(dateStr, tz).add(days, "day").utc().format();
+};
+
+
 /**
  * Returns a date formatted according to the specified language and time zone.
  * @param input Date | string | number (ISO8601, UNIX timestamp, Date object)
@@ -55,4 +71,6 @@ export {
   getCurrentUTCDate,
   getCurrentUTCString,
   formatToLocalizedDate,
+  convertToUTCTimestamp,
+  addDaysAndConvertToUTC,
 };

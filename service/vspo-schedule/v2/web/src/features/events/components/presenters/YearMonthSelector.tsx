@@ -1,4 +1,4 @@
-import { convertToUTCDate } from "@/lib/dayjs";
+import { convertToUTCDate } from "@vspo-lab/dayjs";
 import { Button, Typography } from "@mui/material";
 import { useTranslation } from "next-i18next";
 import Link from "next/link";

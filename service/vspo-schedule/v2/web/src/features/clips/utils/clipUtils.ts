@@ -1,4 +1,4 @@
-import { getCurrentUTCDate } from "@/lib/dayjs";
+import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { Clip, ClipFilter, Pagination } from "../../shared/domain/clip";
 import { paginationSchema } from "../../shared/domain/clip";
 

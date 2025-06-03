@@ -1,5 +1,5 @@
 import { DISCORD_LINK, QA_LINK } from "@/lib/Const";
-import { getCurrentUTCDate } from "@/lib/dayjs";
+import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { formatDate } from "@/lib/utils";
 
 const internalRoutes = {

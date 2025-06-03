@@ -4,7 +4,7 @@ import {
   CloudflareContext,
   getCloudflareContext,
 } from "@opennextjs/cloudflare";
-import { AppError, Err, Ok, Result } from "@vspo-lab/error";
+import { AppError, Err, Ok, Result, wrap } from "@vspo-lab/error";
 import { remark } from "remark";
 import html from "remark-html";
 
@@ -18,12 +18,19 @@ export type MarkdownContent = {
  * Check if running in Cloudflare Edge environment
  */
 async function isCloudflareEdgeEnvironment(): Promise<boolean> {
-  try {
-    const context = await getCloudflareContext({ async: true });
-    return context?.env?.ASSETS !== undefined;
-  } catch {
+  const contextResult = await wrap(
+    getCloudflareContext({ async: true }),
+    () =>
+      new AppError({
+        message: "Failed to get Cloudflare context",
+        code: "INTERNAL_SERVER_ERROR",
+        context: {},
+      }),
+  );
+  if (contextResult.err) {
     return false;
   }
+  return contextResult.val?.env?.ASSETS !== undefined;
 }
 
 /**
@@ -37,21 +44,22 @@ async function fetchMarkdownFromAssets(
   // Map "default" locale to "ja"
   const actualLocale = locale === "default" ? "ja" : locale;
 
-  let context: CloudflareContext;
-  try {
-    context = await getCloudflareContext({ async: true });
-  } catch (error) {
-    return Err(
+  const contextResult = await wrap(
+    getCloudflareContext({ async: true }),
+    (error) =>
       new AppError({
         message: "Failed to get Cloudflare context",
         code: "INTERNAL_SERVER_ERROR",
         cause: error,
         context: {},
       }),
-    );
+  );
+
+  if (contextResult.err) {
+    return Err(contextResult.err);
   }
 
-  const { env } = context;
+  const { env } = contextResult.val;
   if (!env.ASSETS) {
     return Err(
       new AppError({
@@ -64,20 +72,22 @@ async function fetchMarkdownFromAssets(
 
   const assetPath = `/content/${actualLocale}/${category}/${slug}.md`;
 
-  let response: Response;
-  try {
-    response = await env.ASSETS.fetch(`https://placeholder${assetPath}`);
-  } catch (error) {
-    return Err(
+  const responseResult = await wrap(
+    env.ASSETS.fetch(`https://placeholder${assetPath}`),
+    (error) =>
       new AppError({
         message: `Failed to fetch asset: ${assetPath}`,
         code: "INTERNAL_SERVER_ERROR",
         cause: error,
         context: {},
       }),
-    );
+  );
+
+  if (responseResult.err) {
+    return Err(responseResult.err);
   }
 
+  const response = responseResult.val;
   if (!response.ok) {
     return Err(
       new AppError({
@@ -88,21 +98,22 @@ async function fetchMarkdownFromAssets(
     );
   }
 
-  let text: string;
-  try {
-    text = await response.text();
-  } catch (error) {
-    return Err(
+  const textResult = await wrap(
+    response.text(),
+    (error) =>
       new AppError({
         message: "Failed to read asset text",
         code: "INTERNAL_SERVER_ERROR",
         cause: error,
         context: {},
       }),
-    );
+  );
+
+  if (textResult.err) {
+    return Err(textResult.err);
   }
 
-  return Ok(text);
+  return Ok(textResult.val);
 }
 
 /**
@@ -124,21 +135,22 @@ async function fetchDirectoryFromAssets(
   // Map "default" locale to "ja"
   const actualLocale = locale === "default" ? "ja" : locale;
 
-  let context: CloudflareContext;
-  try {
-    context = await getCloudflareContext({ async: true });
-  } catch (error) {
-    return Err(
+  const contextResult = await wrap(
+    getCloudflareContext({ async: true }),
+    (error) =>
       new AppError({
         message: "Failed to get Cloudflare context",
         code: "INTERNAL_SERVER_ERROR",
         cause: error,
         context: {},
       }),
-    );
+  );
+
+  if (contextResult.err) {
+    return Err(contextResult.err);
   }
 
-  const { env } = context;
+  const { env } = contextResult.val;
   if (!env.ASSETS) {
     return Err(
       new AppError({
@@ -152,37 +164,53 @@ async function fetchDirectoryFromAssets(
   // Fetch the content manifest file
   const manifestPath = `/content/content-manifest.json`;
 
-  try {
-    const manifestResponse = await env.ASSETS.fetch(
-      `https://placeholder${manifestPath}`,
-    );
-    if (manifestResponse.ok) {
-      const manifest = (await manifestResponse.json()) as ContentManifest;
-      const files = manifest.locales[actualLocale]?.[category] || [];
-      return Ok(
-        files
-          .filter((file) => file.endsWith(".md"))
-          .map((file) => file.replace(/\.md$/, "")),
-      );
-    } else {
-      return Err(
-        new AppError({
-          message: `Content manifest not found: ${manifestPath}`,
-          code: "NOT_FOUND",
-          context: { locale: actualLocale, category },
-        }),
-      );
-    }
-  } catch (error) {
-    return Err(
+  const manifestResponse = await wrap(
+    env.ASSETS.fetch(`https://placeholder${manifestPath}`),
+    (error) =>
       new AppError({
         message: "Failed to fetch content manifest",
         code: "INTERNAL_SERVER_ERROR",
         cause: error,
         context: { locale: actualLocale, category },
       }),
+  );
+
+  if (manifestResponse.err) {
+    return Err(manifestResponse.err);
+  }
+
+  if (!manifestResponse.val.ok) {
+    return Err(
+      new AppError({
+        message: `Content manifest not found: ${manifestPath}`,
+        code: "NOT_FOUND",
+        context: { locale: actualLocale, category },
+      }),
     );
   }
+
+  const manifestResult = await wrap(
+    manifestResponse.val.json() as Promise<ContentManifest>,
+    (error) =>
+      new AppError({
+        message: "Failed to parse content manifest JSON",
+        code: "INTERNAL_SERVER_ERROR",
+        cause: error,
+        context: { locale: actualLocale, category },
+      }),
+  );
+
+  if (manifestResult.err) {
+    return Err(manifestResult.err);
+  }
+
+  const manifest = manifestResult.val;
+  const files = manifest.locales[actualLocale]?.[category] || [];
+  return Ok(
+    files
+      .filter((file: string) => file.endsWith(".md"))
+      .map((file: string) => file.replace(/\.md$/, "")),
+  );
 }
 
 /**
@@ -192,7 +220,7 @@ function readMarkdownFromFilesystem(
   locale: string,
   category: string,
   slug: string,
-): string | null {
+): Result<string> {
   // Map "default" locale to "ja"
   const actualLocale = locale === "default" ? "ja" : locale;
 
@@ -203,7 +231,20 @@ function readMarkdownFromFilesystem(
     category,
     `${slug}.md`,
   );
-  return fs.readFileSync(fullPath, "utf8");
+
+  try {
+    const content = fs.readFileSync(fullPath, "utf8");
+    return Ok(content);
+  } catch (error) {
+    return Err(
+      new AppError({
+        message: `Failed to read markdown file: ${fullPath}`,
+        code: "NOT_FOUND",
+        cause: error,
+        context: { locale: actualLocale, category, slug },
+      }),
+    );
+  }
 }
 
 /**
@@ -214,7 +255,7 @@ function readMarkdownFromFilesystem(
 function readDirectoryFromFilesystem(
   locale: string,
   category: string,
-): string[] {
+): Result<string[]> {
   // Map "default" locale to "ja"
   const actualLocale = locale === "default" ? "ja" : locale;
 
@@ -222,21 +263,46 @@ function readDirectoryFromFilesystem(
 
   // Read content-manifest.json
   const manifestPath = path.join(contentDirectory, "content-manifest.json");
+
+  if (!fs.existsSync(manifestPath)) {
+    return Err(
+      new AppError({
+        message: `Content manifest not found: ${manifestPath}`,
+        code: "NOT_FOUND",
+        context: { locale: actualLocale, category },
+      }),
+    );
+  }
+
   try {
-    if (fs.existsSync(manifestPath)) {
-      const manifestContent = fs.readFileSync(manifestPath, "utf8");
-      const manifest = JSON.parse(manifestContent) as ContentManifest;
-      const files = manifest.locales[actualLocale]?.[category] || [];
-      return files
-        .filter((file) => file.endsWith(".md"))
-        .map((file) => file.replace(/\.md$/, ""));
-    } else {
-      console.error("Content manifest not found:", manifestPath);
-      return [];
-    }
+    const rawContent = fs.readFileSync(manifestPath, "utf8");
+    const manifest = JSON.parse(rawContent) as ContentManifest;
+    const files = manifest.locales[actualLocale]?.[category] || [];
+    return Ok(
+      files
+        .filter((file: string) => file.endsWith(".md"))
+        .map((file: string) => file.replace(/\.md$/, "")),
+    );
   } catch (error) {
-    console.error("Error reading content-manifest.json:", error);
-    return [];
+    if (error instanceof SyntaxError) {
+      return Err(
+        new AppError({
+          message: "Error parsing content-manifest.json",
+          code: "INTERNAL_SERVER_ERROR",
+          cause: error,
+          context: { locale: actualLocale, category },
+        }),
+      );
+    } else {
+      return Err(
+        new AppError({
+          message: "Error reading content-manifest.json",
+          code: "INTERNAL_SERVER_ERROR",
+          cause: error,
+          context: { locale: actualLocale, category },
+        }),
+      );
+    }
   }
 }
 
@@ -356,21 +422,26 @@ export async function getMarkdownContent(
     }
   } else {
     // Use filesystem for development
-    try {
-      fileContents = readMarkdownFromFilesystem(locale, category, slug);
-    } catch (error) {
-      console.log("Failed to read from filesystem:", error);
+    const readResult = readMarkdownFromFilesystem(locale, category, slug);
+    if (!readResult.err) {
+      fileContents = readResult.val;
+    } else {
+      console.log("Failed to read from filesystem:", readResult.err);
       fileContents = null;
     }
 
     if (!fileContents && locale !== "ja") {
       // Fallback to Japanese if translation doesn't exist
       console.log("Trying Japanese fallback from filesystem");
-      try {
-        fileContents = readMarkdownFromFilesystem("ja", category, slug);
+      const fallbackResult = readMarkdownFromFilesystem("ja", category, slug);
+      if (!fallbackResult.err) {
+        fileContents = fallbackResult.val;
         console.log("Successfully read Japanese fallback from filesystem");
-      } catch (error) {
-        console.log("Failed to read Japanese fallback from filesystem:", error);
+      } else {
+        console.log(
+          "Failed to read Japanese fallback from filesystem:",
+          fallbackResult.err,
+        );
       }
     }
   }
@@ -401,20 +472,20 @@ export function getMarkdownContentSync(
   category: string,
   slug: string,
 ): MarkdownContent | null {
-  const fileContents = readMarkdownFromFilesystem(locale, category, slug);
-  if (!fileContents) {
+  const fileContentsResult = readMarkdownFromFilesystem(locale, category, slug);
+  if (fileContentsResult.err) {
     if (locale !== "ja") {
       // Fallback to Japanese if translation doesn't exist
-      const fallbackContents = readMarkdownFromFilesystem("ja", category, slug);
-      if (fallbackContents) {
-        const { data, content } = parseFrontmatter(fallbackContents);
+      const fallbackResult = readMarkdownFromFilesystem("ja", category, slug);
+      if (!fallbackResult.err) {
+        const { data, content } = parseFrontmatter(fallbackResult.val);
         return { content, data, html: undefined };
       }
     }
     return null;
   }
 
-  const { data, content } = parseFrontmatter(fileContents);
+  const { data, content } = parseFrontmatter(fileContentsResult.val);
   return { content, data, html: undefined };
 }
 
@@ -436,7 +507,8 @@ export async function getAllMarkdownSlugs(
     return [];
   } else {
     // Use filesystem for development
-    return readDirectoryFromFilesystem(locale, category);
+    const result = readDirectoryFromFilesystem(locale, category);
+    return result.err ? [] : result.val;
   }
 }
 
@@ -447,7 +519,8 @@ export function getAllMarkdownSlugsSync(
   category: string,
   locale: string = "ja",
 ): string[] {
-  return readDirectoryFromFilesystem(locale, category);
+  const result = readDirectoryFromFilesystem(locale, category);
+  return result.err ? [] : result.val;
 }
 
 /**

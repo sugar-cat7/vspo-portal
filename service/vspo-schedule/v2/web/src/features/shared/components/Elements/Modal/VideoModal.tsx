@@ -264,15 +264,15 @@ const LivestreamInfoTabsPresenter: React.FC<
                 startIcon={<ShareIcon />}
                 onClick={async () => {
                   if (navigator.share) {
-                    try {
-                      await navigator.share({
+                    await navigator
+                      .share({
                         title: video.title,
                         text: video.title,
                         url: video.link,
+                      })
+                      .catch((error) => {
+                        console.error("Share failed:", error);
                       });
-                    } catch (error) {
-                      console.error("Share failed:", error);
-                    }
                   } else {
                     console.log(
                       "Your system does not support the Web Share API",
@@ -430,15 +430,15 @@ const FreechatInfoTabsPresenter: React.FC<
                 startIcon={<ShareIcon />}
                 onClick={async () => {
                   if (navigator.share) {
-                    try {
-                      await navigator.share({
+                    await navigator
+                      .share({
                         title: video.title,
                         text: video.title,
                         url: video.link,
+                      })
+                      .catch((error) => {
+                        console.error("Share failed:", error);
                       });
-                    } catch (error) {
-                      console.error("Share failed:", error);
-                    }
                   } else {
                     console.log(
                       "Your system does not support the Web Share API",
@@ -562,15 +562,15 @@ const ClipInfoTabsPresenter: React.FC<
                 startIcon={<ShareIcon />}
                 onClick={async () => {
                   if (navigator.share) {
-                    try {
-                      await navigator.share({
+                    await navigator
+                      .share({
                         title: video.title,
                         text: video.title,
                         url: video.link,
+                      })
+                      .catch((error) => {
+                        console.error("Share failed:", error);
                       });
-                    } catch (error) {
-                      console.error("Share failed:", error);
-                    }
                   } else {
                     console.log(
                       "Your system does not support the Web Share API",

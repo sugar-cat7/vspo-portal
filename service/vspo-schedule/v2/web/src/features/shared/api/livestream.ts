@@ -1,5 +1,5 @@
 import { getCloudflareEnvironmentContext } from "@/lib/cloudflare/context";
-import { addDaysAndConvertToUTC, convertToUTCTimestamp } from "@/lib/dayjs";
+import { addDaysAndConvertToUTC, convertToUTCTimestamp } from "@vspo-lab/dayjs";
 import {
   ListStreams200StreamsItem,
   ListStreamsMemberType,

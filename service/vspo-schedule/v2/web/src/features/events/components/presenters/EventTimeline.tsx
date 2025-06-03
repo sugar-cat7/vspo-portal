@@ -1,5 +1,5 @@
 import { EventsByDate } from "@/features/shared/domain";
-import { convertToUTCDate, getCurrentUTCDate } from "@/lib/dayjs";
+import { convertToUTCDate, getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { formatDate } from "@/lib/utils";
 import Timeline from "@mui/lab/Timeline";
 import TimelineConnector from "@mui/lab/TimelineConnector";
