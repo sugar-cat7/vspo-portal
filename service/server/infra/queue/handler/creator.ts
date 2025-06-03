@@ -3,7 +3,7 @@ import type { MessageParam } from ".";
 import { batchEnqueueWithChunks } from "../../../cmd/server/internal/application";
 import { type Creator, CreatorsSchema } from "../../../domain";
 import type { ICreatorInteractor } from "../../../usecase";
-import { BaseHandler } from "./base";
+import type { QueueHandler } from "./base";
 
 type TranslateCreator = Creator & {
   kind: "translate-creator";
@@ -13,20 +13,34 @@ type UpsertCreator = Creator & { kind: "upsert-creator" };
 
 export type CreatorMessage = TranslateCreator | UpsertCreator;
 
-export class CreatorHandler extends BaseHandler<CreatorMessage> {
-  #creatorInteractor: ICreatorInteractor;
-  #queue: Queue<MessageParam>;
+// Type guard functions
+export function isTranslateCreator(
+  message: unknown,
+): message is TranslateCreator {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "translate-creator"
+  );
+}
 
-  constructor(
-    creatorInteractor: ICreatorInteractor,
-    queue: Queue<MessageParam>,
-  ) {
-    super();
-    this.#creatorInteractor = creatorInteractor;
-    this.#queue = queue;
-  }
+export function isUpsertCreator(message: unknown): message is UpsertCreator {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "upsert-creator"
+  );
+}
 
-  async processUpsertCreator(messages: UpsertCreator[]): Promise<void> {
+export function createCreatorHandler(
+  creatorInteractor: ICreatorInteractor,
+  queue: Queue<MessageParam>,
+): QueueHandler {
+  async function processUpsertCreator(
+    messages: UpsertCreator[],
+  ): Promise<void> {
     AppLogger.info(
       `Processing ${messages.length} messages of kind: upsert-creator`,
     );
@@ -37,14 +51,16 @@ export class CreatorHandler extends BaseHandler<CreatorMessage> {
       return;
     }
 
-    const r = await this.#creatorInteractor.batchUpsert(creators.data);
+    const r = await creatorInteractor.batchUpsert(creators.data);
     if (r.err) {
       AppLogger.error(`Failed to upsert creators: ${r.err.message}`);
       throw r.err;
     }
   }
 
-  async processTranslateCreator(messages: TranslateCreator[]): Promise<void> {
+  async function processTranslateCreator(
+    messages: TranslateCreator[],
+  ): Promise<void> {
     AppLogger.info(
       `Processing ${messages.length} messages of kind: translate-creator`,
     );
@@ -81,7 +97,7 @@ export class CreatorHandler extends BaseHandler<CreatorMessage> {
         `Processing ${creators.length} creators for language: ${langCode}`,
       );
 
-      const tc = await this.#creatorInteractor.translateCreator({
+      const tc = await creatorInteractor.translateCreator({
         languageCode: langCode,
         creators: creators,
       });
@@ -104,47 +120,31 @@ export class CreatorHandler extends BaseHandler<CreatorMessage> {
         (creator: Creator) => ({
           body: { ...creator, kind: "upsert-creator" } as MessageParam,
         }),
-        this.#queue,
+        queue,
       );
     }
   }
 
-  isTranslateCreator(message: unknown): message is TranslateCreator {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "kind" in message &&
-      message.kind === "translate-creator"
-    );
-  }
+  return {
+    async process(messages: unknown[]): Promise<void> {
+      const translateCreators: TranslateCreator[] = [];
+      const upsertCreators: UpsertCreator[] = [];
 
-  isUpsertCreator(message: unknown): message is UpsertCreator {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "kind" in message &&
-      message.kind === "upsert-creator"
-    );
-  }
-
-  async process(messages: unknown[]): Promise<void> {
-    const translateCreators: TranslateCreator[] = [];
-    const upsertCreators: UpsertCreator[] = [];
-
-    for (const message of messages) {
-      if (this.isTranslateCreator(message)) {
-        translateCreators.push(message);
-      } else if (this.isUpsertCreator(message)) {
-        upsertCreators.push(message);
+      for (const message of messages) {
+        if (isTranslateCreator(message)) {
+          translateCreators.push(message);
+        } else if (isUpsertCreator(message)) {
+          upsertCreators.push(message);
+        }
       }
-    }
 
-    if (upsertCreators.length > 0) {
-      await this.processUpsertCreator(upsertCreators);
-    }
+      if (upsertCreators.length > 0) {
+        await processUpsertCreator(upsertCreators);
+      }
 
-    if (translateCreators.length > 0) {
-      await this.processTranslateCreator(translateCreators);
-    }
-  }
+      if (translateCreators.length > 0) {
+        await processTranslateCreator(translateCreators);
+      }
+    },
+  };
 }

@@ -5,15 +5,15 @@ import { TargetLangSchema } from "../domain/translate";
 import type { IAppContext } from "../infra/dependency";
 import { createUUID } from "../pkg/uuid";
 import { setupTxManager } from "../test/setup";
-import { CreatorInteractor } from "./creator";
+import { type ICreatorInteractor, createCreatorInteractor } from "./creator";
 
 describe.concurrent("CreatorInteractor", () => {
   let context: IAppContext;
-  let interactor: CreatorInteractor;
+  let interactor: ICreatorInteractor;
 
   beforeEach(async () => {
     context = await setupTxManager();
-    interactor = new CreatorInteractor(context);
+    interactor = createCreatorInteractor(context);
   });
 
   describe.concurrent("searchByChannelIds", () => {

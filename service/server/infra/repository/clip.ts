@@ -59,18 +59,61 @@ export interface IClipRepository {
   batchDelete(clipIds: string[]): Promise<Result<void, AppError>>;
 }
 
-export class ClipRepository implements IClipRepository {
-  constructor(private readonly db: DB) {}
+function buildFilters(query: ListQuery): SQL[] {
+  const filters: SQL[] = [];
+  const languageCode = query.languageCode || "default";
 
-  async list(query: ListQuery): Promise<Result<Clips, AppError>> {
+  if (query.platform) {
+    filters.push(eq(videoTable.platformType, query.platform));
+  }
+  // Always filter for clip type
+  filters.push(eq(videoTable.videoType, query.clipType ?? "clip"));
+
+  if (!query.includeDeleted) {
+    filters.push(eq(videoTable.deleted, false));
+  }
+
+  // Always add language filters with default fallback
+  filters.push(eq(videoTranslationTable.languageCode, languageCode));
+  filters.push(eq(creatorTranslationTable.languageCode, languageCode));
+
+  if (query.memberType) {
+    if (query.memberType !== "vspo_all") {
+      filters.push(eq(creatorTable.memberType, query.memberType));
+    }
+  }
+  if (query.channelIds && query.channelIds.length > 0) {
+    filters.push(inArray(videoTable.channelId, query.channelIds));
+  }
+
+  if (query.afterPublishedAtDate) {
+    filters.push(
+      gte(videoTable.publishedAt, convertToUTCDate(query.afterPublishedAtDate)),
+    );
+  }
+
+  if (query.beforePublishedAtDate) {
+    filters.push(
+      lte(
+        videoTable.publishedAt,
+        convertToUTCDate(query.beforePublishedAtDate),
+      ),
+    );
+  }
+
+  return filters;
+}
+
+export function createClipRepository(db: DB): IClipRepository {
+  const list = async (query: ListQuery): Promise<Result<Clips, AppError>> => {
     return withTracerResult("ClipRepository", "list", async (span) => {
       AppLogger.info("ClipRepository list", {
         query,
       });
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const clipResult = await wrap(
-        this.db
+        db
           .select()
           .from(videoTable)
           .innerJoin(
@@ -149,14 +192,14 @@ export class ClipRepository implements IClipRepository {
         ),
       );
     });
-  }
+  };
 
-  async count(query: ListQuery): Promise<Result<number, AppError>> {
+  const count = async (query: ListQuery): Promise<Result<number, AppError>> => {
     return withTracerResult("ClipRepository", "count", async (span) => {
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const clipResult = await wrap(
-        this.db
+        db
           .select({ value: countDistinct(videoTable.id) })
           .from(videoTable)
           .innerJoin(
@@ -192,9 +235,11 @@ export class ClipRepository implements IClipRepository {
 
       return Ok(clipResult.val.at(0)?.value ?? 0);
     });
-  }
+  };
 
-  async batchUpsert(clips: Clips): Promise<Result<Clips, AppError>> {
+  const batchUpsert = async (
+    clips: Clips,
+  ): Promise<Result<Clips, AppError>> => {
     return withTracerResult("ClipRepository", "batchUpsert", async (span) => {
       const dbVideos: InsertVideo[] = [];
       const dbClipStats: InsertClipStats[] = [];
@@ -255,7 +300,7 @@ export class ClipRepository implements IClipRepository {
         Ok([]);
       if (dbVideos.length > 0) {
         videoResult = await wrap(
-          this.db
+          db
             .insert(videoTable)
             .values(dbVideos)
             .onConflictDoUpdate({
@@ -288,7 +333,7 @@ export class ClipRepository implements IClipRepository {
       > = Ok([]);
       if (dbClipStats.length > 0) {
         clipStatsResult = await wrap(
-          this.db
+          db
             .insert(clipStatsTable)
             .values(dbClipStats)
             .onConflictDoUpdate({
@@ -319,7 +364,7 @@ export class ClipRepository implements IClipRepository {
       > = Ok([]);
       if (dbVideoTranslation.length > 0) {
         videoTranslationResult = await wrap(
-          this.db
+          db
             .insert(videoTranslationTable)
             .values(dbVideoTranslation)
             .onConflictDoUpdate({
@@ -380,15 +425,14 @@ export class ClipRepository implements IClipRepository {
         ),
       );
     });
-  }
+  };
 
-  async batchDelete(clipIds: string[]): Promise<Result<void, AppError>> {
+  const batchDelete = async (
+    clipIds: string[],
+  ): Promise<Result<void, AppError>> => {
     return withTracerResult("ClipRepository", "batchDelete", async (span) => {
       const result = await wrap(
-        this.db
-          .delete(videoTable)
-          .where(inArray(videoTable.id, clipIds))
-          .execute(),
+        db.delete(videoTable).where(inArray(videoTable.id, clipIds)).execute(),
         (err) =>
           new AppError({
             message: `Database error during clip batch delete: ${err.message}`,
@@ -403,53 +447,12 @@ export class ClipRepository implements IClipRepository {
 
       return Ok();
     });
-  }
+  };
 
-  private buildFilters(query: ListQuery): SQL[] {
-    const filters: SQL[] = [];
-    const languageCode = query.languageCode || "default";
-
-    if (query.platform) {
-      filters.push(eq(videoTable.platformType, query.platform));
-    }
-    // Always filter for clip type
-    filters.push(eq(videoTable.videoType, query.clipType ?? "clip"));
-
-    if (!query.includeDeleted) {
-      filters.push(eq(videoTable.deleted, false));
-    }
-
-    // Always add language filters with default fallback
-    filters.push(eq(videoTranslationTable.languageCode, languageCode));
-    filters.push(eq(creatorTranslationTable.languageCode, languageCode));
-
-    if (query.memberType) {
-      if (query.memberType !== "vspo_all") {
-        filters.push(eq(creatorTable.memberType, query.memberType));
-      }
-    }
-    if (query.channelIds && query.channelIds.length > 0) {
-      filters.push(inArray(videoTable.channelId, query.channelIds));
-    }
-
-    if (query.afterPublishedAtDate) {
-      filters.push(
-        gte(
-          videoTable.publishedAt,
-          convertToUTCDate(query.afterPublishedAtDate),
-        ),
-      );
-    }
-
-    if (query.beforePublishedAtDate) {
-      filters.push(
-        lte(
-          videoTable.publishedAt,
-          convertToUTCDate(query.beforePublishedAtDate),
-        ),
-      );
-    }
-
-    return filters;
-  }
+  return {
+    list,
+    count,
+    batchUpsert,
+    batchDelete,
+  };
 }

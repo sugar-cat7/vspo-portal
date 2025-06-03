@@ -34,23 +34,15 @@ export interface IStorage {
 /**
  * Implementation of storage using Cloudflare R2
  */
-export class R2Storage implements IStorage {
-  private readonly SERVICE_NAME = "R2Storage";
-  private bucket: R2Bucket;
+export const createR2Storage = (bucket: R2Bucket): IStorage => {
+  const SERVICE_NAME = "R2Storage";
 
-  constructor(bucket: R2Bucket) {
-    this.bucket = bucket;
-  }
-
-  /**
-   * Upload data to R2 bucket
-   */
-  async put(
+  const put = async (
     key: string,
     body: ReadableStream | ArrayBuffer | string,
-  ): Promise<Result<void, AppError>> {
-    return withTracerResult(this.SERVICE_NAME, "put", async (span) => {
-      const result = await wrap(this.bucket.put(key, body), (error) => {
+  ): Promise<Result<void, AppError>> => {
+    return withTracerResult(SERVICE_NAME, "put", async (span) => {
+      const result = await wrap(bucket.put(key, body), (error) => {
         AppLogger.error(
           `Failed to upload object with key ${key}: ${error.message}`,
         );
@@ -68,15 +60,12 @@ export class R2Storage implements IStorage {
       AppLogger.info(`Successfully uploaded object with key: ${key}`);
       return Ok();
     });
-  }
+  };
 
-  /**
-   * Get data from R2 bucket
-   */
-  async get(key: string): Promise<Result<R2ObjectBody, AppError>> {
-    return withTracerResult(this.SERVICE_NAME, "get", async (span) => {
+  const get = async (key: string): Promise<Result<R2ObjectBody, AppError>> => {
+    return withTracerResult(SERVICE_NAME, "get", async (span) => {
       const result = await wrap(
-        this.bucket.get(key),
+        bucket.get(key),
         (error) =>
           new AppError({
             message: `Failed to get object with key ${key}`,
@@ -103,14 +92,11 @@ export class R2Storage implements IStorage {
       AppLogger.info(`Successfully retrieved object with key: ${key}`);
       return Ok(result.val);
     });
-  }
+  };
 
-  /**
-   * Delete data from R2 bucket
-   */
-  async delete(key: string): Promise<Result<void, AppError>> {
-    return withTracerResult(this.SERVICE_NAME, "delete", async (span) => {
-      const result = await wrap(this.bucket.delete(key), (error) => {
+  const deleteObject = async (key: string): Promise<Result<void, AppError>> => {
+    return withTracerResult(SERVICE_NAME, "delete", async (span) => {
+      const result = await wrap(bucket.delete(key), (error) => {
         AppLogger.error(
           `Failed to delete object with key ${key}: ${error.message}`,
         );
@@ -128,17 +114,16 @@ export class R2Storage implements IStorage {
       AppLogger.info(`Successfully deleted object with key: ${key}`);
       return Ok();
     });
-  }
+  };
 
-  /**
-   * List objects in R2 bucket
-   */
-  async list(prefix?: string): Promise<Result<R2Objects, AppError>> {
-    return withTracerResult(this.SERVICE_NAME, "list", async (span) => {
+  const list = async (
+    prefix?: string,
+  ): Promise<Result<R2Objects, AppError>> => {
+    return withTracerResult(SERVICE_NAME, "list", async (span) => {
       const options: R2ListOptions = prefix ? { prefix } : {};
 
       const result = await wrap(
-        this.bucket.list(options),
+        bucket.list(options),
         (error) =>
           new AppError({
             message: `Failed to list objects${prefix ? ` with prefix ${prefix}` : ""}`,
@@ -159,5 +144,12 @@ export class R2Storage implements IStorage {
       );
       return Ok(result.val);
     });
-  }
-}
+  };
+
+  return {
+    put,
+    get,
+    delete: deleteObject,
+    list,
+  };
+};

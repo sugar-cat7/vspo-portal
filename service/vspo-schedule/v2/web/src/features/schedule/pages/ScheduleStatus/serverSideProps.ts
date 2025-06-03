@@ -3,12 +3,12 @@ import { Event } from "@/features/shared/domain";
 import { Livestream } from "@/features/shared/domain/livestream";
 import { DEFAULT_TIME_ZONE } from "@/lib/Const";
 import { TIME_ZONE_COOKIE } from "@/lib/Const";
-import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 import {
   formatDate,
   getInitializedI18nInstance,
   getSetCookieTimeZone,
 } from "@/lib/utils";
+import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { GetServerSideProps } from "next";
 
 export type ScheduleStatusPageProps = {

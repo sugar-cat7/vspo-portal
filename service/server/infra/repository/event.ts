@@ -44,18 +44,36 @@ export interface IEventRepository {
   batchUpsert(events: VspoEvent[]): Promise<Result<VspoEvents, AppError>>;
 }
 
-export class EventRepository implements IEventRepository {
-  constructor(private readonly db: DB) {}
+function buildFilters(query: ListQuery): SQL[] {
+  const filters: SQL[] = [];
 
-  async list(query: ListQuery): Promise<Result<VspoEvents, AppError>> {
+  if (query.visibility) {
+    filters.push(eq(eventTable.visibility, query.visibility));
+  }
+
+  if (query.startedDateFrom) {
+    filters.push(gte(eventTable.startedDate, query.startedDateFrom));
+  }
+
+  if (query.startedDateTo) {
+    filters.push(lte(eventTable.startedDate, query.startedDateTo));
+  }
+
+  return filters;
+}
+
+export function createEventRepository(db: DB): IEventRepository {
+  const list = async (
+    query: ListQuery,
+  ): Promise<Result<VspoEvents, AppError>> => {
     return withTracerResult("EventRepository", "list", async (span) => {
       AppLogger.info("EventRepository list", {
         query,
       });
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const eventResult = await wrap(
-        this.db
+        db
           .select()
           .from(eventTable)
           .where(and(...filters))
@@ -102,16 +120,14 @@ export class EventRepository implements IEventRepository {
         ),
       );
     });
-  }
+  };
 
-  async get(id: string): Promise<Result<VspoEvent | null, AppError>> {
+  const get = async (
+    id: string,
+  ): Promise<Result<VspoEvent | null, AppError>> => {
     return withTracerResult("EventRepository", "get", async (span) => {
       const eventResult = await wrap(
-        this.db
-          .select()
-          .from(eventTable)
-          .where(eq(eventTable.id, id))
-          .execute(),
+        db.select().from(eventTable).where(eq(eventTable.id, id)).execute(),
         (err) =>
           new AppError({
             message: `Database error during event get query: ${err.message}`,
@@ -141,14 +157,14 @@ export class EventRepository implements IEventRepository {
         }),
       );
     });
-  }
+  };
 
-  async count(query: ListQuery): Promise<Result<number, AppError>> {
+  const count = async (query: ListQuery): Promise<Result<number, AppError>> => {
     return withTracerResult("EventRepository", "count", async (span) => {
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const countResult = await wrap(
-        this.db
+        db
           .select({ value: countDistinct(eventTable.id) })
           .from(eventTable)
           .where(and(...filters))
@@ -167,9 +183,11 @@ export class EventRepository implements IEventRepository {
 
       return Ok(countResult.val.at(0)?.value ?? 0);
     });
-  }
+  };
 
-  async upsert(event: VspoEvent): Promise<Result<VspoEvent, AppError>> {
+  const upsert = async (
+    event: VspoEvent,
+  ): Promise<Result<VspoEvent, AppError>> => {
     return withTracerResult("EventRepository", "upsert", async (span) => {
       const dbEvent = createInsertEvent({
         id: event.id,
@@ -182,7 +200,7 @@ export class EventRepository implements IEventRepository {
       });
 
       const result = await wrap(
-        this.db
+        db
           .insert(eventTable)
           .values(dbEvent)
           .onConflictDoUpdate({
@@ -224,12 +242,14 @@ export class EventRepository implements IEventRepository {
         }),
       );
     });
-  }
+  };
 
-  async delete(eventId: string): Promise<Result<void, AppError>> {
+  const deleteFunc = async (
+    eventId: string,
+  ): Promise<Result<void, AppError>> => {
     return withTracerResult("EventRepository", "delete", async (span) => {
       const result = await wrap(
-        this.db.delete(eventTable).where(eq(eventTable.id, eventId)).execute(),
+        db.delete(eventTable).where(eq(eventTable.id, eventId)).execute(),
         (err) =>
           new AppError({
             message: `Database error during event delete: ${err.message}`,
@@ -244,15 +264,14 @@ export class EventRepository implements IEventRepository {
 
       return Ok();
     });
-  }
+  };
 
-  async batchDelete(eventIds: string[]): Promise<Result<void, AppError>> {
+  const batchDelete = async (
+    eventIds: string[],
+  ): Promise<Result<void, AppError>> => {
     return withTracerResult("EventRepository", "batchDelete", async (span) => {
       const result = await wrap(
-        this.db
-          .delete(eventTable)
-          .where(inArray(eventTable.id, eventIds))
-          .execute(),
+        db.delete(eventTable).where(inArray(eventTable.id, eventIds)).execute(),
         (err) =>
           new AppError({
             message: `Database error during event batch delete: ${err.message}`,
@@ -267,11 +286,11 @@ export class EventRepository implements IEventRepository {
 
       return Ok();
     });
-  }
+  };
 
-  async batchUpsert(
+  const batchUpsert = async (
     events: VspoEvent[],
-  ): Promise<Result<VspoEvents, AppError>> {
+  ): Promise<Result<VspoEvents, AppError>> => {
     return withTracerResult("EventRepository", "batchUpsert", async (span) => {
       const dbEvents = events.map((event) =>
         createInsertEvent({
@@ -286,7 +305,7 @@ export class EventRepository implements IEventRepository {
       );
 
       const result = await wrap(
-        this.db
+        db
           .insert(eventTable)
           .values(dbEvents)
           .onConflictDoUpdate({
@@ -329,23 +348,15 @@ export class EventRepository implements IEventRepository {
 
       return Ok(vspoEvents);
     });
-  }
+  };
 
-  private buildFilters(query: ListQuery): SQL[] {
-    const filters: SQL[] = [];
-
-    if (query.visibility) {
-      filters.push(eq(eventTable.visibility, query.visibility));
-    }
-
-    if (query.startedDateFrom) {
-      filters.push(gte(eventTable.startedDate, query.startedDateFrom));
-    }
-
-    if (query.startedDateTo) {
-      filters.push(lte(eventTable.startedDate, query.startedDateTo));
-    }
-
-    return filters;
-  }
+  return {
+    list,
+    get,
+    upsert,
+    count,
+    delete: deleteFunc,
+    batchDelete,
+    batchUpsert,
+  };
 }

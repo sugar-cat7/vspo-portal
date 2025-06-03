@@ -1,12 +1,12 @@
 import { AppLogger } from "@vspo-lab/logging";
 import { type AppWorkerEnv, zAppWorkerEnv } from "../../../config/env/internal";
 import { setFeatureFlagProvider } from "../../../config/featureFlag";
-import { Container } from "../../dependency";
+import { createContainer } from "../../dependency";
 import { createHandler, withTracer } from "../../http/trace";
-import { ClipHandler } from "./clip";
-import { CreatorHandler } from "./creator";
-import { DiscordHandler } from "./discord";
-import { StreamHandler } from "./stream";
+import { createClipHandler } from "./clip";
+import { createCreatorHandler } from "./creator";
+import { createDiscordHandler } from "./discord";
+import { createStreamHandler } from "./stream";
 
 // Define all message types
 export type Kind =
@@ -25,7 +25,7 @@ export const queueHandler = createHandler({
   queue: async (
     batch: MessageBatch<MessageParam>,
     env: AppWorkerEnv,
-    executionContext: ExecutionContext,
+    _executionContext: ExecutionContext,
   ) => {
     setFeatureFlagProvider(env);
     return await withTracer("QueueHandler", "queue.consumer", async (span) => {
@@ -34,7 +34,7 @@ export const queueHandler = createHandler({
         console.log(e.error.message);
         return;
       }
-      const c = new Container(e.data);
+      const c = createContainer(e.data);
       const logger = AppLogger.getInstance(e.data);
 
       // Group messages by their kind for logging
@@ -75,16 +75,16 @@ export const queueHandler = createHandler({
         .filter((body): body is MessageParam => !!body);
 
       // Initialize handlers
-      const creatorHandler = new CreatorHandler(
+      const creatorHandler = createCreatorHandler(
         c.creatorInteractor,
         env.WRITE_QUEUE,
       );
-      const discordHandler = new DiscordHandler(c.discordInteractor);
-      const streamHandler = new StreamHandler(
+      const discordHandler = createDiscordHandler(c.discordInteractor);
+      const streamHandler = createStreamHandler(
         c.streamInteractor,
         env.WRITE_QUEUE,
       );
-      const clipHandler = new ClipHandler(c.clipInteractor);
+      const clipHandler = createClipHandler(c.clipInteractor);
 
       // Process messages with each handler in order
       await creatorHandler.process(messages);

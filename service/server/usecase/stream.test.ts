@@ -15,15 +15,19 @@ import {
   JP_YOUTUBE_CHANNELS,
 } from "../test/fixtures";
 import { setupTxManager } from "../test/setup";
-import { type ListParam, StreamInteractor } from "./stream";
+import {
+  type IStreamInteractor,
+  type ListParam,
+  createStreamInteractor,
+} from "./stream";
 
 describe.concurrent("StreamInteractor", () => {
   let context: IAppContext;
-  let interactor: StreamInteractor;
+  let interactor: IStreamInteractor;
 
   beforeEach(async () => {
     context = await setupTxManager();
-    interactor = new StreamInteractor(context);
+    interactor = createStreamInteractor(context);
   });
 
   describe.concurrent("searchLive", () => {

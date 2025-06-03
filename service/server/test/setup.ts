@@ -11,10 +11,10 @@ import { Client } from "pg";
 import { afterEach } from "vitest";
 import { vi } from "vitest";
 import { zAppWorkerEnv } from "../config/env/internal";
-import { AIService } from "../infra/ai";
-import { CloudflareKVCacheClient } from "../infra/cache";
-import { AppContext } from "../infra/dependency";
-import { DiscordClient } from "../infra/discord";
+import { createAIService } from "../infra/ai";
+import { createCloudflareKVCacheClient } from "../infra/cache";
+import { createAppContext } from "../infra/dependency";
+import { createDiscordClient } from "../infra/discord";
 import {
   type InsertVideo,
   channelTable,
@@ -196,18 +196,18 @@ export const setupTxManager = async () => {
     await container.stop();
   });
 
-  return new AppContext(
+  return createAppContext(
     new TestTxManager(dbConfig),
     youtubeService,
     twitchService,
     twitcastingService,
-    new AIService({
+    createAIService({
       apiKey: env.OPENAI_API_KEY,
       organization: env.OPENAI_ORGANIZATION,
       project: env.OPENAI_PROJECT,
       baseURL: env.OPENAI_BASE_URL,
     }),
-    new DiscordClient(env),
-    new CloudflareKVCacheClient(env.APP_KV),
+    createDiscordClient(env),
+    createCloudflareKVCacheClient(env.APP_KV),
   );
 };

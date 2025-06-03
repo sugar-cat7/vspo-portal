@@ -28,14 +28,16 @@ export interface IFreechatInteractor {
   ): Promise<Result<ListFreechatsResponse, AppError>>;
 }
 
-export class FreechatInteractor implements IFreechatInteractor {
-  constructor(private readonly context: IAppContext) {}
+export const createFreechatInteractor = (
+  context: IAppContext,
+): IFreechatInteractor => {
+  const INTERACTOR_NAME = "FreechatInteractor";
 
-  async list(
+  const list = async (
     query: ListFreechatsQuery,
-  ): Promise<Result<ListFreechatsResponse, AppError>> {
-    return await withTracerResult("FreechatInteractor", "list", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  ): Promise<Result<ListFreechatsResponse, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "list", async () => {
+      return context.runInTx(async (repos, _services) => {
         const freechats = await repos.freechatRepository.list(query);
 
         if (freechats.err) {
@@ -58,5 +60,9 @@ export class FreechatInteractor implements IFreechatInteractor {
         });
       });
     });
-  }
-}
+  };
+
+  return {
+    list,
+  };
+};

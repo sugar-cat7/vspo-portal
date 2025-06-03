@@ -40,7 +40,6 @@ const addDaysAndConvertToUTC = (
   return dayjs.tz(dateStr, tz).add(days, "day").utc().format();
 };
 
-
 /**
  * Returns a date formatted according to the specified language and time zone.
  * @param input Date | string | number (ISO8601, UNIX timestamp, Date object)

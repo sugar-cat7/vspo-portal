@@ -1,5 +1,4 @@
 import { EventsByDate } from "@/features/shared/domain";
-import { convertToUTCDate, getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { formatDate } from "@/lib/utils";
 import Timeline from "@mui/lab/Timeline";
 import TimelineConnector from "@mui/lab/TimelineConnector";
@@ -9,6 +8,7 @@ import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineOppositeContent from "@mui/lab/TimelineOppositeContent";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import { Typography, useMediaQuery } from "@mui/material";
+import { convertToUTCDate, getCurrentUTCDate } from "@vspo-lab/dayjs";
 import React, { useRef } from "react";
 import { EventCard } from "./EventCard";
 

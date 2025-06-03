@@ -15,7 +15,7 @@ import {
   t,
 } from "../../../domain/service/i18n";
 import { LangCodeLabelMapping } from "../../../domain/translate";
-import { CloudflareKVCacheClient, cacheKey } from "../../cache";
+import { cacheKey, createCloudflareKVCacheClient } from "../../cache";
 
 const MemberTypeLabelMapping = {
   vspo_jp: "VSPO JP Members / ぶいすぽっ！JPメンバー",
@@ -74,7 +74,7 @@ export const spoduleSettingCommand: IDiscordSlashDefinition<DiscordCommandEnv> =
           ),
         });
       }
-      const cache = new CloudflareKVCacheClient(c.env.APP_KV);
+      const cache = createCloudflareKVCacheClient(c.env.APP_KV);
       const serverCacheResult = await cache.get<DiscordServer>(
         cacheKey.discordServer(
           c.interaction.guild_id || c.interaction.guild?.id || "",

@@ -7,7 +7,6 @@ import { AppError, Err, Ok, type Result, wrap } from "@vspo-lab/error";
 import { AppLogger } from "@vspo-lab/logging";
 import { asc, count, eq, inArray } from "drizzle-orm";
 import {
-  DiscordMessage,
   type DiscordServer,
   type DiscordServers,
   createDiscordServers,
@@ -45,16 +44,18 @@ export interface IDiscordServerRepository {
   >;
 }
 
-export class DiscordServerRepository implements IDiscordServerRepository {
-  constructor(private readonly db: DB) {}
-
-  async list(query: ListQuery): Promise<Result<DiscordServers, AppError>> {
+export function createDiscordServerRepository(
+  db: DB,
+): IDiscordServerRepository {
+  const list = async (
+    query: ListQuery,
+  ): Promise<Result<DiscordServers, AppError>> => {
     return withTracerResult("DiscordServerRepository", "list", async (span) => {
       AppLogger.info("DiscordServerRepository list", {
         query,
       });
       const discordServerResult = await wrap(
-        this.db
+        db
           .select()
           .from(discordServerTable)
           .leftJoin(
@@ -120,15 +121,17 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         ),
       );
     });
-  }
+  };
 
-  async count(query: ListQuery): Promise<Result<number, AppError>> {
+  const countFunc = async (
+    query: ListQuery,
+  ): Promise<Result<number, AppError>> => {
     return withTracerResult(
       "DiscordServerRepository",
       "count",
       async (span) => {
         const discordServerResult = await wrap(
-          this.db
+          db
             .select({ count: count() })
             .from(discordServerTable)
             // .where(and(...filters))
@@ -148,11 +151,11 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         return Ok(discordServerResult.val.at(0)?.count ?? 0);
       },
     );
-  }
+  };
 
-  async batchUpsert(
+  const batchUpsert = async (
     discordServers: DiscordServers,
-  ): Promise<Result<DiscordServers, AppError>> {
+  ): Promise<Result<DiscordServers, AppError>> => {
     return withTracerResult(
       "DiscordServerRepository",
       "batchUpsert",
@@ -198,7 +201,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         );
 
         const discordServerResult = await wrap(
-          this.db
+          db
             .insert(discordServerTable)
             .values(dbDiscordServers)
             .onConflictDoUpdate({
@@ -237,7 +240,7 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         );
 
         const discordChannelResult = await wrap(
-          this.db
+          db
             .insert(discordChannelTable)
             .values(dbDiscordChannels)
             .onConflictDoUpdate({
@@ -293,17 +296,17 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         );
       },
     );
-  }
+  };
 
-  async batchDeleteChannelsByRowChannelIds(
+  const batchDeleteChannelsByRowChannelIds = async (
     discordChannelIds: string[],
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<void, AppError>> => {
     return withTracerResult(
       "DiscordServerRepository",
       "batchDeleteChannelsByRowChannelIds",
       async (span) => {
         const discordChannelResult = await wrap(
-          this.db
+          db
             .delete(discordChannelTable)
             .where(inArray(discordChannelTable.channelId, discordChannelIds))
             .execute(),
@@ -320,14 +323,14 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         return Ok();
       },
     );
-  }
+  };
 
-  async get(query: { serverId: string }): Promise<
+  const get = async (query: { serverId: string }): Promise<
     Result<DiscordServer, AppError>
-  > {
+  > => {
     return withTracerResult("DiscordServerRepository", "get", async (span) => {
       const discordServerResult = await wrap(
-        this.db
+        db
           .select()
           .from(discordServerTable)
           .leftJoin(
@@ -382,17 +385,17 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         updatedAt: convertToUTC(discordServer.discord_server.updatedAt),
       });
     });
-  }
+  };
 
-  async exists(query: { serverId: string }): Promise<
+  const exists = async (query: { serverId: string }): Promise<
     Result<boolean, AppError>
-  > {
+  > => {
     return withTracerResult(
       "DiscordServerRepository",
       "exists",
       async (span) => {
         const discordServerResult = await wrap(
-          this.db
+          db
             .select()
             .from(discordServerTable)
             .where(eq(discordServerTable.serverId, query.serverId))
@@ -412,17 +415,17 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         return Ok(discordServerResult.val.length > 0);
       },
     );
-  }
+  };
 
-  async existsChannel(query: { channelId: string }): Promise<
+  const existsChannel = async (query: { channelId: string }): Promise<
     Result<boolean, AppError>
-  > {
+  > => {
     return withTracerResult(
       "DiscordServerRepository",
       "existsChannel",
       async (span) => {
         const discordChannelResult = await wrap(
-          this.db
+          db
             .select()
             .from(discordChannelTable)
             .where(eq(discordChannelTable.channelId, query.channelId))
@@ -442,5 +445,15 @@ export class DiscordServerRepository implements IDiscordServerRepository {
         return Ok(discordChannelResult.val.length > 0);
       },
     );
-  }
+  };
+
+  return {
+    list,
+    count: countFunc,
+    batchUpsert,
+    batchDeleteChannelsByRowChannelIds,
+    get,
+    exists,
+    existsChannel,
+  };
 }

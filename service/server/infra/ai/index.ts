@@ -55,33 +55,26 @@ export interface IAIService {
   summarizeURL(url: string): Promise<Result<string, AppError>>;
 }
 
-export class AIService implements IAIService {
-  private openai: OpenAI;
+type AIConfig = {
+  apiKey: string;
+  organization: string;
+  project: string;
+  baseURL: string;
+};
 
-  constructor({
-    apiKey,
-    organization,
-    project,
-    baseURL,
-  }: {
-    apiKey: string;
-    organization: string;
-    project: string;
-    baseURL: string;
-  }) {
-    this.openai = new OpenAI({
-      apiKey,
-      organization,
-      project,
-      baseURL,
-    });
-  }
+export const createAIService = (config: AIConfig): IAIService => {
+  const openai = new OpenAI({
+    apiKey: config.apiKey,
+    organization: config.organization,
+    project: config.project,
+    baseURL: config.baseURL,
+  });
 
-  async translateText(
+  const translateText = async (
     text: string,
     targetLang: string,
     prompt?: string,
-  ): Promise<Result<{ translatedText: string }, AppError>> {
+  ): Promise<Result<{ translatedText: string }, AppError>> => {
     return withTracerResult("ai", "translateText", async (span) => {
       const parseResult = TargetLangSchema.safeParse(targetLang);
       if (!parseResult.success) {
@@ -99,9 +92,9 @@ export class AIService implements IAIService {
       const targetLanguage = languageCodeMapping[parseResult.data] || "English";
 
       const keywordMapString = JSON.stringify(vspoKeywordMap, null, 2);
-      const systemPrompt = `Please translate the following user message into ${targetLanguage}. Ensure consistency in name translations according to the following mapping: ${keywordMapString}. Return the translation in a JSON object with the key \"content\".`;
+      const systemPrompt = `Please translate the following user message into ${targetLanguage}. Ensure consistency in name translations according to the following mapping: ${keywordMapString}. Return the translation in a JSON object with the key "content".`;
       const responseResult = await wrap(
-        this.openai.chat.completions.create({
+        openai.chat.completions.create({
           model: "gpt-4o-mini-2024-07-18",
           messages: [
             prompt
@@ -147,9 +140,11 @@ export class AIService implements IAIService {
 
       return Ok({ translatedText: parsedResponse.data.content });
     });
-  }
+  };
 
-  async summarizeURL(url: string): Promise<Result<string, AppError>> {
+  const summarizeURL = async (
+    url: string,
+  ): Promise<Result<string, AppError>> => {
     const keywordMapString = JSON.stringify(vspoKeywordMap, null, 2);
     const prompt = `
     Please extract information from the following URL and output it as structured data in Japanese.
@@ -178,7 +173,7 @@ export class AIService implements IAIService {
     Please respond in Japanese.
     `;
     const responseResult = await wrap(
-      this.openai.responses.create({
+      openai.responses.create({
         input: url,
         instructions: prompt,
         model: "gpt-4o-2024-08-06",
@@ -206,5 +201,10 @@ export class AIService implements IAIService {
     }
 
     return Ok(response);
-  }
-}
+  };
+
+  return {
+    translateText,
+    summarizeURL,
+  };
+};

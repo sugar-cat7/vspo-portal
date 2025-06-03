@@ -8,7 +8,7 @@ import type { DiscordServer } from "../../../../domain/discord";
 import { TargetLangSchema } from "../../../../domain/translate";
 import { cacheKey } from "../../../../infra/cache";
 import type { ICacheClient } from "../../../../infra/cache";
-import { Container } from "../../../../infra/dependency";
+import { createContainer } from "../../../../infra/dependency";
 import { withTracer, withTracerResult } from "../../../../infra/http/trace";
 import {
   type MessageParam,
@@ -687,7 +687,7 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
     if (!e.success) {
       throw new Error(e.error.message);
     }
-    return new Container(e.data);
+    return createContainer(e.data);
   }
 }
 

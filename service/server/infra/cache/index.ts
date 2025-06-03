@@ -174,18 +174,14 @@ export interface ICacheClient {
 /**
  * Cloudflare KV implementation of the cache client
  */
-export class CloudflareKVCacheClient implements ICacheClient {
-  private kv: KVNamespace;
-
-  constructor(kv: KVNamespace) {
-    this.kv = kv;
-  }
-
-  async set<T>(
+export const createCloudflareKVCacheClient = (
+  kv: KVNamespace,
+): ICacheClient => {
+  const set = async <T>(
     key: string,
     value: T,
     ttlSeconds?: number,
-  ): Promise<Result<T, AppError>> {
+  ): Promise<Result<T, AppError>> => {
     return withTracerResult("cache", "set", async () => {
       AppLogger.info("Setting cache value in KV", { key });
       const options: KVNamespacePutOptions = {};
@@ -196,7 +192,7 @@ export class CloudflareKVCacheClient implements ICacheClient {
 
       // First put the value in the cache
       const putResult = await wrap(
-        this.kv.put(key, JSON.stringify(value), options),
+        kv.put(key, JSON.stringify(value), options),
         (error: Error) =>
           new AppError({
             message: `Failed to set cache value in KV for key ${key}`,
@@ -217,22 +213,22 @@ export class CloudflareKVCacheClient implements ICacheClient {
       // Otherwise, return the original value
       return Ok(value);
     });
-  }
+  };
 
-  async get<T>(
+  const get = async <T>(
     key: string,
     options?: { type?: "json" | "text"; cacheTtl?: number },
-  ): Promise<Result<T | null, AppError>> {
+  ): Promise<Result<T | null, AppError>> => {
     return withTracerResult("cache", "get", async () => {
       AppLogger.info("Getting cache value from KV", { key });
 
       const result = await wrap(
         options?.type === "json"
-          ? this.kv.get(key, {
+          ? kv.get(key, {
               type: "json",
               ...(options.cacheTtl && { cacheTtl: options.cacheTtl }),
             })
-          : this.kv.get(key, {
+          : kv.get(key, {
               type: "text",
               ...(options?.cacheTtl && { cacheTtl: options.cacheTtl }),
             }),
@@ -268,12 +264,12 @@ export class CloudflareKVCacheClient implements ICacheClient {
       // Otherwise, we got a string that needs to be parsed
       return Ok(JSON.parse(value as string) as T);
     });
-  }
+  };
 
-  async getBulk<T>(
+  const getBulk = async <T>(
     keys: string[],
     cacheTtl?: number,
-  ): Promise<Result<Map<string, T | null>, AppError>> {
+  ): Promise<Result<Map<string, T | null>, AppError>> => {
     return withTracerResult("cache", "getBulk", async () => {
       AppLogger.info("Getting multiple cache values from KV using bulk read", {
         keys,
@@ -310,7 +306,7 @@ export class CloudflareKVCacheClient implements ICacheClient {
 
       // Use Cloudflare KV bulk read with json type for better performance
       const result = await wrap(
-        this.kv.get(keys, options),
+        kv.get(keys, options),
         (error: Error) =>
           new AppError({
             message: `Failed to bulk read cache values from KV for ${keys.length} keys`,
@@ -350,20 +346,20 @@ export class CloudflareKVCacheClient implements ICacheClient {
 
       return Ok(typedMap);
     });
-  }
+  };
 
-  async delete(key: string): Promise<Result<boolean, AppError>> {
+  const deleteKey = async (key: string): Promise<Result<boolean, AppError>> => {
     return withTracerResult("cache", "delete", async () => {
       AppLogger.info("Deleting cache value from KV", { key });
 
       // Check if the key exists first
-      const exists = await this.exists(key);
+      const exists = await existsKey(key);
       if (exists.err) return Err(exists.err);
 
       const keyExists = exists.val;
 
       const result = await wrap(
-        this.kv.delete(key),
+        kv.delete(key),
         (error: Error) =>
           new AppError({
             message: `Failed to delete cache value from KV for key ${key}`,
@@ -382,14 +378,14 @@ export class CloudflareKVCacheClient implements ICacheClient {
 
       return Ok(keyExists);
     });
-  }
+  };
 
-  async exists(key: string): Promise<Result<boolean, AppError>> {
+  const existsKey = async (key: string): Promise<Result<boolean, AppError>> => {
     return withTracerResult("cache", "exists", async () => {
       AppLogger.info("Checking if key exists in KV", { key });
 
       const result = await wrap(
-        this.kv.get(key, { type: "text" }),
+        kv.get(key, { type: "text" }),
         (error: Error) =>
           new AppError({
             message: `Failed to check if key exists in KV for key ${key}`,
@@ -408,5 +404,13 @@ export class CloudflareKVCacheClient implements ICacheClient {
 
       return Ok(result.val !== null);
     });
-  }
-}
+  };
+
+  return {
+    set,
+    get,
+    getBulk,
+    delete: deleteKey,
+    exists: existsKey,
+  };
+};

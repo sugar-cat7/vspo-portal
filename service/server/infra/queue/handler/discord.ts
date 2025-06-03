@@ -2,7 +2,7 @@ import { AppLogger } from "@vspo-lab/logging";
 import type { DiscordServer, Stream } from "../../../domain";
 import { t } from "../../../domain/service/i18n";
 import type { IDiscordInteractor } from "../../../usecase";
-import { BaseHandler } from "./base";
+import type { QueueHandler } from "./base";
 
 type DiscordSend = Stream & { kind: "discord-send-message" };
 type UpsertDiscordServer = DiscordServer & { kind: "upsert-discord-server" };
@@ -16,15 +16,33 @@ export type DiscordMessage =
   | UpsertDiscordServer
   | DeleteMessageInChannel;
 
-export class DiscordHandler extends BaseHandler<DiscordMessage> {
-  #discordInteractor: IDiscordInteractor;
+// Type guard functions
+export function isUpsertDiscordServer(
+  message: unknown,
+): message is UpsertDiscordServer {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "upsert-discord-server"
+  );
+}
 
-  constructor(discordInteractor: IDiscordInteractor) {
-    super();
-    this.#discordInteractor = discordInteractor;
-  }
+export function isDeleteMessageInChannel(
+  message: unknown,
+): message is DeleteMessageInChannel {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "delete-message-in-channel"
+  );
+}
 
-  async processUpsertDiscordServer(
+export function createDiscordHandler(
+  discordInteractor: IDiscordInteractor,
+): QueueHandler {
+  async function processUpsertDiscordServer(
     messages: UpsertDiscordServer[],
   ): Promise<void> {
     AppLogger.info(
@@ -36,7 +54,7 @@ export class DiscordHandler extends BaseHandler<DiscordMessage> {
       servers: messages,
     });
 
-    const sv = await this.#discordInteractor.batchUpsert(messages);
+    const sv = await discordInteractor.batchUpsert(messages);
     if (sv.err) {
       AppLogger.error(`Failed to upsert discord servers: ${sv.err.message}`);
       throw sv.err;
@@ -54,7 +72,7 @@ export class DiscordHandler extends BaseHandler<DiscordMessage> {
 
       await Promise.allSettled(
         initialAddChannel.map((ch) =>
-          this.#discordInteractor.sendAdminMessage({
+          discordInteractor.sendAdminMessage({
             channelId: ch.rawId,
             content: t("initialAddChannel.success"),
           }),
@@ -63,7 +81,7 @@ export class DiscordHandler extends BaseHandler<DiscordMessage> {
     }
   }
 
-  async processDeleteMessageInChannel(
+  async function processDeleteMessageInChannel(
     messages: DeleteMessageInChannel[],
   ): Promise<void> {
     AppLogger.info(
@@ -81,49 +99,31 @@ export class DiscordHandler extends BaseHandler<DiscordMessage> {
 
     await Promise.allSettled(
       messages.map((msg) =>
-        this.#discordInteractor.deleteAllMessagesInChannel(msg.channelId),
+        discordInteractor.deleteAllMessagesInChannel(msg.channelId),
       ),
     );
   }
 
-  isUpsertDiscordServer(message: unknown): message is UpsertDiscordServer {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "kind" in message &&
-      message.kind === "upsert-discord-server"
-    );
-  }
+  return {
+    async process(messages: unknown[]): Promise<void> {
+      const upsertDiscordServers: UpsertDiscordServer[] = [];
+      const deleteMessageInChannels: DeleteMessageInChannel[] = [];
 
-  isDeleteMessageInChannel(
-    message: unknown,
-  ): message is DeleteMessageInChannel {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "kind" in message &&
-      message.kind === "delete-message-in-channel"
-    );
-  }
-
-  async process(messages: unknown[]): Promise<void> {
-    const upsertDiscordServers: UpsertDiscordServer[] = [];
-    const deleteMessageInChannels: DeleteMessageInChannel[] = [];
-
-    for (const message of messages) {
-      if (this.isUpsertDiscordServer(message)) {
-        upsertDiscordServers.push(message);
-      } else if (this.isDeleteMessageInChannel(message)) {
-        deleteMessageInChannels.push(message);
+      for (const message of messages) {
+        if (isUpsertDiscordServer(message)) {
+          upsertDiscordServers.push(message);
+        } else if (isDeleteMessageInChannel(message)) {
+          deleteMessageInChannels.push(message);
+        }
       }
-    }
 
-    if (upsertDiscordServers.length > 0) {
-      await this.processUpsertDiscordServer(upsertDiscordServers);
-    }
+      if (upsertDiscordServers.length > 0) {
+        await processUpsertDiscordServer(upsertDiscordServers);
+      }
 
-    if (deleteMessageInChannels.length > 0) {
-      await this.processDeleteMessageInChannel(deleteMessageInChannels);
-    }
-  }
+      if (deleteMessageInChannels.length > 0) {
+        await processDeleteMessageInChannel(deleteMessageInChannels);
+      }
+    },
+  };
 }

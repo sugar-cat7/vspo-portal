@@ -1,6 +1,6 @@
 import { DISCORD_LINK, QA_LINK } from "@/lib/Const";
-import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { formatDate } from "@/lib/utils";
+import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 
 const internalRoutes = {
   list: "/schedule/all",
