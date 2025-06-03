@@ -1,80 +1,17 @@
-import { siteNewsItems } from "@/data/content/site-news";
-import { Breadcrumb, TweetEmbed } from "@/features/shared/components/Elements";
 import { ContentLayout } from "@/features/shared/components/Layout";
-import { DEFAULT_LOCALE } from "@/lib/Const";
-import { serverSideTranslations } from "@/lib/i18n/server";
+import SiteNewsDetailPageComponent from "@/features/site-news/pages/SiteNewsDetailPage";
 import {
-  formatDate,
-  generateStaticPathsForLocales,
-  getInitializedI18nInstance,
-  getSiteNewsTagColor,
-} from "@/lib/utils";
-import { SiteNewsItem } from "@/types/site-news";
-import { Box, Chip, Toolbar, Typography } from "@mui/material";
-import { GetStaticPaths, GetStaticProps } from "next";
-import { useTranslation } from "next-i18next";
-import { useRouter } from "next/router";
+  SiteNewsDetailPageProps,
+  getServerSideProps as siteNewsDetailGetServerSideProps,
+} from "@/features/site-news/pages/SiteNewsDetailPage/serverSideProps";
 import { NextPageWithLayout } from "../_app";
 
-type Params = {
-  id: string;
-};
+export const getServerSideProps = siteNewsDetailGetServerSideProps;
 
-type Props = {
-  siteNewsItem: SiteNewsItem;
-  meta: {
-    title: string;
-  };
-};
-
-const SiteNewsItemPage: NextPageWithLayout<Props> = ({ siteNewsItem }) => {
-  const router = useRouter();
-  const locale = router.locale ?? DEFAULT_LOCALE;
-  const { t } = useTranslation("site-news");
-
-  const formattedDate = formatDate(siteNewsItem.updated, "PPP", {
-    localeCode: locale,
-  });
-
-  return (
-    <>
-      <Toolbar disableGutters variant="dense" sx={{ alignItems: "end" }}>
-        <Breadcrumb />
-      </Toolbar>
-
-      <Box>
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          sx={{ marginTop: "10px" }}
-        >
-          {siteNewsItem.title}
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          {t("updateDate")}: {formattedDate}
-        </Typography>
-        <Typography variant="subtitle1" gutterBottom>
-          {t("tags")}:
-          {siteNewsItem.tags.map((tag) => (
-            <Chip
-              key={tag}
-              label={t(`tagLabels.${tag}`)}
-              variant="outlined"
-              color={getSiteNewsTagColor(tag)}
-              sx={{ m: 0.5 }}
-            />
-          ))}
-        </Typography>
-        <Typography variant="body1" sx={{ marginBottom: "16px" }}>
-          {siteNewsItem.content}
-        </Typography>
-        {siteNewsItem.tweetLink && (
-          <TweetEmbed tweetLink={siteNewsItem.tweetLink} />
-        )}
-      </Box>
-    </>
-  );
+const SiteNewsItemPage: NextPageWithLayout<SiteNewsDetailPageProps> = ({
+  siteNewsItem,
+}) => {
+  return <SiteNewsDetailPageComponent siteNewsItem={siteNewsItem} />;
 };
 
 SiteNewsItemPage.getLayout = (page, pageProps) => {
@@ -88,54 +25,6 @@ SiteNewsItemPage.getLayout = (page, pageProps) => {
       {page}
     </ContentLayout>
   );
-};
-
-export const getStaticProps: GetStaticProps<Props, Params> = async ({
-  params,
-  locale = DEFAULT_LOCALE,
-}) => {
-  if (!params) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const id = params.id;
-  const siteNewsItem = siteNewsItems.find(
-    (siteNewsItem) => siteNewsItem.id === Number(id),
-  );
-  if (!siteNewsItem) {
-    return {
-      notFound: true,
-    };
-  }
-
-  const translations = await serverSideTranslations(locale, [
-    "common",
-    "site-news",
-  ]);
-  const { t } = getInitializedI18nInstance(translations, "site-news");
-
-  return {
-    props: {
-      ...translations,
-      siteNewsItem,
-      meta: {
-        title: t("title"),
-      },
-    },
-  };
-};
-
-// https://nextjs.org/docs/pages/building-your-application/routing/internationalization#how-does-this-work-with-static-generation
-export const getStaticPaths: GetStaticPaths<Params> = ({ locales }) => {
-  const paths = generateStaticPathsForLocales(
-    siteNewsItems.map((item) => ({
-      params: { id: item.id.toString() },
-    })),
-    locales,
-  );
-  return { paths, fallback: false };
 };
 
 export default SiteNewsItemPage;

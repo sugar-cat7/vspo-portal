@@ -1,4 +1,26 @@
 {
   "title": "$t(common:spodule)에 대한 정보",
-  "description": "$t(common:spodule), 그 내용 및 사이트 기능에 대한 정보입니다."
+  "description": "$t(common:spodule), 그 내용 및 사이트 기능에 대한 정보입니다.",
+  "sections": {
+    "siteOverview": {
+      "title": "사이트 개요",
+      "content": "SPODULE(이하 \"본 사이트\"라고 함)은 VSPO! 방송, 클립 영상, 이벤트 정보를 소개하는 비공식 팬 사이트입니다.\n※멤버 한정 방송은 게재하지 않습니다.\n\n본 사이트는 개인이 운영하므로 문의 답변이나 기능 추가가 지연될 수 있습니다.\n\n광고 등으로 얻은 모든 수익은 본 사이트 운영(서버 비용 등)에 사용됩니다.\n메시지나 개선을 통해 사이트를 지원하고 싶으신 분은 아래 OFUSE를 이용해 주세요.\n[OFUSE](https://ofuse.me/d202a56f)"
+    },
+    "contents": {
+      "title": "콘텐츠 소개",
+      "content": "①방송 목록 페이지\nVSPO! 멤버의 방송을 나열하는 페이지입니다.\n라이브 영상이 YouTube에 게시된 후 약 1-5분 내에 본 사이트에 나타납니다.\n페이지를 새로고침하여 최신 정보를 확인하세요.\n\n![image](/about/page/live.png)\n\n②클립 페이지\nVSPO! 멤버와 관련된 클립 영상을 보여줍니다. ※1,2\n※1. 허가 번호가 있는 클립만 게재됩니다.\n※2. 최대 최근 한 달의 클립을 표시할 수 있습니다.\n\n![image](/about/page/clips.png)\n\n③클립 페이지 (Twitch)\nVSPO! 멤버와 관련된 Twitch 클립을 보여줍니다. ※1,2\n※1. 필터링을 위해 일정 조회수 이상의 클립만 게재됩니다.\n※2. 최대 최근 한 달의 클립을 표시할 수 있습니다.\n\n![image](/about/page/twitch-clips.png)\n\n④프리챗 페이지\nVSPO! 멤버의 \"프리챗\" 방송 목록입니다.\n\n![image](/about/page/freechat.png)\n\n⑤이벤트 페이지\nVSPO! 멤버의 이벤트 목록입니다.\n공식 이벤트 및 외부 대회 참가 날짜를 포함합니다.\n\n![image](/about/page/events.png)\n\n⑥공지사항 페이지\n본 사이트 콘텐츠 업데이트에 대한 정보입니다.\n\n![image](/about/page/site-news.png)"
+    },
+    "linksAndScreenshots": {
+      "title": "링크 및 스크린샷 정보",
+      "content": "본 사이트의 모든 페이지는 \"링크 프리\"입니다.\n단, 다음과 같은 경우에는 링크가 금지됩니다:\n・링크 사이트에 불법 콘텐츠가 포함된 경우.\n・본 사이트의 콘텐츠를 링크 사이트의 일부인 것처럼 표시하는 경우(프레임 사용 등).\n・본 사이트의 스크린샷이나 콘텐츠를 인용할 때는 반드시 메인 페이지 또는 인용한 페이지의 URL을 포함해 주세요."
+    },
+    "dataUsage": {
+      "title": "데이터 사용에 대하여",
+      "content": "프로그램(웹 스크래핑 등)을 사용하여 본 사이트에서 소개하는 \"동영상 및 썸네일 정보\"를 기계적으로 취득하는 것은 금지됩니다.\n\"동영상 및 썸네일 정보\"가 필요한 경우 서비스 제공업체(YouTube, Twitch, Twitter 등)의 \"API\"를 사용하세요.\n자세한 내용은 각 서비스 제공업체의 이용약관을 참조하세요."
+    },
+    "features": {
+      "title": "편리한 기능",
+      "content": "①다크 모드 전환\n사이드바의 \"설정\"을 탭하여 \"다크 모드\"와 \"라이트 모드\"를 전환할 수 있습니다.\n사이트를 다시 방문할 때도 모드가 유지됩니다.\n\n![image](/about/darkmode.png)\n\n②페이지 업데이트 시간\n일부 페이지에서는 하단에 \"마지막 업데이트\" 시간이 표시됩니다.\n\n![image](/about/update.png)\n\n③동영상 필터링\n방송 및 클립 목록 페이지에서 오른쪽 하단의 돋보기 아이콘을 탭하여 다양한 검색 조건으로 필터링할 수 있습니다.\n특정 멤버, 게시 날짜 등을 결합한 다중 검색을 지원합니다.\n\n![image](/about/filter.png)\n\n④동영상 목록 링크\n\"동영상 썸네일\" 또는 \"동영상 제목\"을 탭하면 YouTube 개요가 표시됩니다.\nYouTube에서 시청하거나 SPODULE 내에서 직접 재생할 수 있습니다.\n\n![image](/about/link.png)\n\n⑤PWA 지원\n본 사이트는 PWA를 지원하며 기기에 설치할 수 있습니다.\n・Android의 경우\n![image](/about/pwa-android.png)\n\n・iOS의 경우\n![image](/about/pwa-ios.png)"
+    }
+  }
 }

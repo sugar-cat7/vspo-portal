@@ -1,4 +1,108 @@
 {
   "title": "Terms of Use",
-  "description": "View Spodule's terms of use agreement."
+  "description": "View Spodule's terms of use agreement.",
+  "pageTitle": "Terms of Use",
+  "intro": "These Terms of Use (hereinafter referred to as \"Terms\") set forth the conditions of use of the services provided on this website (hereinafter referred to as \"Service\") by the service provider.",
+  "article1": {
+    "title": "Article 1 (Application)",
+    "content": "These Terms shall apply to all relationships related to the use of the Service between users and the service provider."
+  },
+  "article2": {
+    "title": "Article 2 (Prohibited Matters)",
+    "intro": "Users must not engage in the following actions when using the Service:",
+    "items": [
+      "Actions that violate laws or public order and morals",
+      "Actions related to criminal activities",
+      "Actions that may interfere with the operation of the service provider's services",
+      "Actions that collect or accumulate personal information about other users",
+      "Actions that impersonate other users",
+      "Actions that directly or indirectly provide benefits to antisocial forces in connection with the service provider's services",
+      "Actions that infringe on the intellectual property rights, portrait rights, privacy, honor, or other rights or interests of the service provider, other users of the Service, or third parties"
+    ]
+  },
+  "article3": {
+    "title": "Article 3 (Suspension of Service Provision)",
+    "paragraph1": "The service provider may suspend or interrupt the provision of all or part of the Service without prior notice to users when the service provider determines that any of the following reasons exist:",
+    "items": [
+      "When performing maintenance, inspection, or updates of the computer system related to the Service",
+      "When it becomes difficult to provide the Service due to force majeure such as earthquakes, lightning strikes, fires, power outages, or natural disasters",
+      "When computers or communication lines are stopped due to accidents",
+      "In other cases where the service provider determines that it is difficult to provide the Service"
+    ],
+    "paragraph2": "The service provider shall not be liable for any disadvantages or damages suffered by users or third parties due to the suspension or interruption of the Service provision, regardless of the reason."
+  },
+  "article4": {
+    "title": "Article 4 (Copyright)",
+    "content": "The copyright of all images, videos, etc., belongs to the original rights holders."
+  },
+  "article5": {
+    "title": "Article 5 (Disclaimer of Warranties and Disclaimer)",
+    "paragraph1": "The service provider does not warrant, either explicitly or implicitly, that the Service is free from defects in fact or law (including defects, errors and bugs, and rights infringements related to safety, reliability, accuracy, completeness, validity, fitness for specific purposes, and security).",
+    "paragraph2": "The service provider shall not be liable for any damages incurred by users arising from the Service."
+  },
+  "article6": {
+    "title": "Article 6 (Third Party Terms of Use)",
+    "paragraph1": "The following APIs are used in the operation of this Service:",
+    "apis": [
+      "YouTube API provided by Google Inc.",
+      "Twitch API provided by Twitch Interactive, Inc.",
+      "TwitCasting API provided by Moi Corp."
+    ],
+    "paragraph2": "This Service stores video names, thumbnails, and posting dates from the video information obtained through each API. By using this Service, users are deemed to have agreed to and granted permission for the data processing of each API for the above methods and purposes in accordance with the related terms of use below.",
+    "links": [
+      {
+        "text": "YouTube Terms of Service",
+        "url": "https://www.youtube.com/t/terms"
+      },
+      {
+        "text": "YouTube API Terms of Service",
+        "url": "https://developers.google.com/youtube/terms/developer-policies#definition-youtube-api-services"
+      },
+      {
+        "text": "Google Privacy Policy",
+        "url": "https://policies.google.com/privacy?hl=en"
+      },
+      {
+        "text": "Google Security Settings",
+        "url": "https://myaccount.google.com/permissions"
+      },
+      {
+        "text": "Twitch Terms of Service",
+        "url": "https://www.twitch.tv/p/en/legal/terms-of-service/"
+      },
+      {
+        "text": "Twitch Developer Services Agreement",
+        "url": "https://www.twitch.tv/p/en/legal/developer-agreement/"
+      },
+      {
+        "text": "TwitCasting Terms of Service",
+        "url": "https://twitcasting.tv/indexlicense.php"
+      },
+      {
+        "text": "TwitCasting API Terms of Service",
+        "url": "https://twitcasting.tv/indexapi.php?lang=en"
+      }
+    ]
+  },
+  "article7": {
+    "title": "Article 7 (Changes to Service Content)",
+    "content": "The service provider may change the content of the Service or discontinue the provision of the Service without notifying users, and shall not be liable for any damages incurred by users as a result."
+  },
+  "article8": {
+    "title": "Article 8 (Changes to Terms of Use)",
+    "content": "The service provider may change these Terms at any time without notifying users when deemed necessary."
+  },
+  "article9": {
+    "title": "Article 9 (Notifications or Communications)",
+    "content": "Notifications or communications between users and the service provider shall be made in the manner prescribed by the service provider."
+  },
+  "article10": {
+    "title": "Article 10 (Prohibition of Transfer of Rights and Obligations)",
+    "content": "Users may not transfer their position under the usage agreement or rights or obligations based on these Terms to third parties or provide them as collateral without the prior written consent of the service provider."
+  },
+  "article11": {
+    "title": "Article 11 (Governing Law and Jurisdiction)",
+    "paragraph1": "The interpretation of these Terms shall be governed by Japanese law.",
+    "paragraph2": "In the event of any dispute regarding the Service, the court having jurisdiction over the location of the service provider's head office shall have exclusive jurisdiction."
+  }
 }

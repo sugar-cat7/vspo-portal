@@ -1,4 +1,26 @@
 {
   "title": "About $t(common:spodule)",
-  "description": "Information about $t(common:spodule), its contents, and site features."
+  "description": "Information about $t(common:spodule), its contents, and site features.",
+  "sections": {
+    "siteOverview": {
+      "title": "Site Overview",
+      "content": "SPODULE (hereinafter referred to as \"this site\") is an unofficial fan site that introduces VSPO! streams, clipped videos, and event information.\n※Members-only streams are not listed.\n\nAs this site is operated by an individual, responses to inquiries and feature additions may be delayed.\n\nAll revenue obtained from advertisements is used for site operation (server costs, etc.).\nIf you would like to support the site through messages or improvements, please use OFUSE below.\n[OFUSE](https://ofuse.me/d202a56f)"
+    },
+    "contents": {
+      "title": "About Contents",
+      "content": "① Stream List Page\nA page listing VSPO! members' streams.\nLive videos appear on this site approximately 1-5 minutes after being posted on YouTube.\nRefresh the page to see the latest information.\n\n![image](/about/page/live.png)\n\n② Clips Page\nFeatures clipped videos related to VSPO! members. *1,2\n*1. Only clips with permission numbers are listed.\n*2. Can display clips from up to the past month.\n\n![image](/about/page/clips.png)\n\n③ Clips Page (Twitch)\nFeatures Twitch clips related to VSPO! members. *1,2\n*1. Only clips with a certain number of views are listed for filtering purposes.\n*2. Can display clips from up to the past month.\n\n![image](/about/page/twitch-clips.png)\n\n④ Free Chat Page\nA list of VSPO! members' \"Free Chat\" streams.\n\n![image](/about/page/freechat.png)\n\n⑤ Events Page\nA list of VSPO! members' events.\nIncludes official events and participation dates for external tournaments.\n\n![image](/about/page/events.png)\n\n⑥ Announcements Page\nInformation about updates to this site's content.\n\n![image](/about/page/site-news.png)"
+    },
+    "linksAndScreenshots": {
+      "title": "About Links and Screenshots",
+      "content": "All pages on this site are \"link-free\".\nHowever, links are prohibited in the following cases:\n・When the linking website contains illegal content.\n・When displaying this site's content as if it were part of the linking website (such as using frames).\n・When citing screenshots or content from this site, please include the URL of either the top page or the cited page."
+    },
+    "dataUsage": {
+      "title": "About Data Usage",
+      "content": "Mechanically obtaining \"video and thumbnail information\" introduced on this site using programs (web scraping, etc.) is prohibited.\nIf you need \"video and thumbnail information\", please use the \"APIs\" of service providers (YouTube, Twitch, Twitter, etc.).\nPlease read the terms of service of each service provider for details."
+    },
+    "features": {
+      "title": "Convenient Features",
+      "content": "① Dark Mode Toggle\nTap \"Settings\" in the sidebar to switch between \"Dark Mode\" and \"Light Mode\".\nThe mode is maintained when you revisit the site.\n\n![image](/about/darkmode.png)\n\n② Page Update Time\nOn some pages, the \"Last Updated\" time is displayed at the bottom.\n\n![image](/about/update.png)\n\n③ Video Filtering\nOn stream and clip list pages, tap the magnifying glass icon in the bottom right to filter by various search criteria.\nSupports multiple searches combining specific members, publication dates, etc.\n\n![image](/about/filter.png)\n\n④ Video List Links\nTapping \"video thumbnail\" or \"video title\" displays the YouTube overview.\nYou can watch on YouTube or play directly within SPODULE.\n\n![image](/about/link.png)\n\n⑤ PWA Support\nThis site supports PWA and can be installed on your device.\n・For Android\n![image](/about/pwa-android.png)\n\n・For iOS\n![image](/about/pwa-ios.png)"
+    }
+  }
 }

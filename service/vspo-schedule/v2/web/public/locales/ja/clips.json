@@ -22,7 +22,8 @@
       "exploreClips": "クリップを見る"
     },
     "members": {
-      "title": "ぶいすぽメンバー"
+      "title": "ぶいすぽメンバー",
+      "sectionTitle": "メンバー"
     },
     "sections": {
       "popularYoutubeClips": "人気の切り抜き",
@@ -52,6 +53,7 @@
     "title": "$t(common:vspo)クリップ一覧",
     "description": "$t(common:vspo)メンバーのTwitchクリップをまとめています。"
   },
+  "viewCount": "{{views, number}}回",
   "viewCountLabel": "{{views, number}}以上",
   "searchDialog": {
     "title": "詳細検索",
