@@ -3,7 +3,7 @@ import type { MessageParam } from ".";
 import { batchEnqueueWithChunks } from "../../../cmd/server/internal/application";
 import { type Stream, StreamsSchema } from "../../../domain";
 import type { IStreamInteractor } from "../../../usecase";
-import { BaseHandler } from "./base";
+import type { QueueHandler } from "./base";
 
 type TranslateStream = Stream & {
   kind: "translate-stream";
@@ -13,17 +13,32 @@ type UpsertStream = Stream & { kind: "upsert-stream" };
 
 export type StreamMessage = TranslateStream | UpsertStream;
 
-export class StreamHandler extends BaseHandler<StreamMessage> {
-  #streamInteractor: IStreamInteractor;
-  #queue: Queue<MessageParam>;
+// Type guard functions
+export function isTranslateStream(
+  message: unknown,
+): message is TranslateStream {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "translate-stream"
+  );
+}
 
-  constructor(streamInteractor: IStreamInteractor, queue: Queue<MessageParam>) {
-    super();
-    this.#streamInteractor = streamInteractor;
-    this.#queue = queue;
-  }
+export function isUpsertStream(message: unknown): message is UpsertStream {
+  return (
+    typeof message === "object" &&
+    message !== null &&
+    "kind" in message &&
+    message.kind === "upsert-stream"
+  );
+}
 
-  async processUpsertStream(messages: UpsertStream[]): Promise<void> {
+export function createStreamHandler(
+  streamInteractor: IStreamInteractor,
+  queue: Queue<MessageParam>,
+): QueueHandler {
+  async function processUpsertStream(messages: UpsertStream[]): Promise<void> {
     AppLogger.info(
       `Processing ${messages.length} messages of kind: upsert-stream`,
     );
@@ -43,14 +58,16 @@ export class StreamHandler extends BaseHandler<StreamMessage> {
       return;
     }
 
-    const v = await this.#streamInteractor.batchUpsert(streams.data);
+    const v = await streamInteractor.batchUpsert(streams.data);
     if (v.err) {
       AppLogger.error(`Failed to upsert streams: ${v.err.message}`);
       throw v.err;
     }
   }
 
-  async processTranslateStream(messages: TranslateStream[]): Promise<void> {
+  async function processTranslateStream(
+    messages: TranslateStream[],
+  ): Promise<void> {
     AppLogger.info(
       `Processing ${messages.length} messages of kind: translate-stream`,
     );
@@ -76,7 +93,7 @@ export class StreamHandler extends BaseHandler<StreamMessage> {
 
     // Process each language group separately
     for (const [langCode, streams] of Object.entries(streamsByLang)) {
-      const tv = await this.#streamInteractor.translateStream({
+      const tv = await streamInteractor.translateStream({
         languageCode: langCode,
         streams: streams,
       });
@@ -99,47 +116,31 @@ export class StreamHandler extends BaseHandler<StreamMessage> {
         (stream: Stream) => ({
           body: { ...stream, kind: "upsert-stream" } as MessageParam,
         }),
-        this.#queue,
+        queue,
       );
     }
   }
 
-  isTranslateStream(message: unknown): message is TranslateStream {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "kind" in message &&
-      message.kind === "translate-stream"
-    );
-  }
+  return {
+    async process(messages: unknown[]): Promise<void> {
+      const translatesStreams: TranslateStream[] = [];
+      const upsertStreams: UpsertStream[] = [];
 
-  isUpsertStream(message: unknown): message is UpsertStream {
-    return (
-      typeof message === "object" &&
-      message !== null &&
-      "kind" in message &&
-      message.kind === "upsert-stream"
-    );
-  }
-
-  async process(messages: unknown[]): Promise<void> {
-    const translatesStreams: TranslateStream[] = [];
-    const upsertStreams: UpsertStream[] = [];
-
-    for (const message of messages) {
-      if (this.isTranslateStream(message)) {
-        translatesStreams.push(message);
-      } else if (this.isUpsertStream(message)) {
-        upsertStreams.push(message);
+      for (const message of messages) {
+        if (isTranslateStream(message)) {
+          translatesStreams.push(message);
+        } else if (isUpsertStream(message)) {
+          upsertStreams.push(message);
+        }
       }
-    }
 
-    if (upsertStreams.length > 0) {
-      await this.processUpsertStream(upsertStreams);
-    }
+      if (upsertStreams.length > 0) {
+        await processUpsertStream(upsertStreams);
+      }
 
-    if (translatesStreams.length > 0) {
-      await this.processTranslateStream(translatesStreams);
-    }
-  }
+      if (translatesStreams.length > 0) {
+        await processTranslateStream(translatesStreams);
+      }
+    },
+  };
 }

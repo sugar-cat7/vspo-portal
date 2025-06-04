@@ -9,8 +9,8 @@ import {
   type SQL,
   and,
   asc,
-  count,
   countDistinct,
+  count as drizzleCount,
   eq,
   inArray,
 } from "drizzle-orm";
@@ -49,18 +49,28 @@ export interface ICreatorRepository {
   existsByChannelId(channelId: string): Promise<Result<boolean, AppError>>;
 }
 
-export class CreatorRepository implements ICreatorRepository {
-  constructor(private readonly db: DB) {}
+const buildFilters = (query: ListQuery): SQL[] => {
+  const filters: SQL[] = [];
+  const languageCode = query.languageCode || "default";
+  if (query.memberType) {
+    filters.push(eq(creatorTable.memberType, query.memberType));
+  }
+  filters.push(eq(creatorTranslationTable.languageCode, languageCode));
+  return filters;
+};
 
-  async list(query: ListQuery): Promise<Result<Creators, AppError>> {
+export const createCreatorRepository = (db: DB): ICreatorRepository => {
+  const list = async (
+    query: ListQuery,
+  ): Promise<Result<Creators, AppError>> => {
     return withTracerResult("CreatorRepository", "list", async (span) => {
       AppLogger.info("CreatorRepository list", {
         query,
       });
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const creatorResult = await wrap(
-        this.db
+        db
           .select()
           .from(creatorTable)
           .innerJoin(channelTable, eq(creatorTable.id, channelTable.creatorId))
@@ -162,14 +172,14 @@ export class CreatorRepository implements ICreatorRepository {
 
       return Ok(createCreators(Array.from(creatorMap.values())));
     });
-  }
+  };
 
-  async count(query: ListQuery): Promise<Result<number, AppError>> {
+  const count = async (query: ListQuery): Promise<Result<number, AppError>> => {
     return withTracerResult("CreatorRepository", "count", async (span) => {
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const creatorResult = await wrap(
-        this.db
+        db
           .select({ value: countDistinct(creatorTable.id) })
           .from(creatorTable)
           .innerJoin(channelTable, eq(creatorTable.id, channelTable.creatorId))
@@ -193,9 +203,11 @@ export class CreatorRepository implements ICreatorRepository {
 
       return Ok(creatorResult.val.at(0)?.value ?? 0);
     });
-  }
+  };
 
-  async batchUpsert(creators: Creators): Promise<Result<Creators, AppError>> {
+  const batchUpsert = async (
+    creators: Creators,
+  ): Promise<Result<Creators, AppError>> => {
     return withTracerResult(
       "CreatorRepository",
       "batchUpsert",
@@ -262,7 +274,7 @@ export class CreatorRepository implements ICreatorRepository {
 
         if (dbCreatorss.length > 0) {
           const creatorResult = await wrap(
-            this.db
+            db
               .insert(creatorTable)
               .values(dbCreatorss)
               .onConflictDoUpdate({
@@ -289,7 +301,7 @@ export class CreatorRepository implements ICreatorRepository {
 
         if (dbChannels.length > 0) {
           const channelResult = await wrap(
-            this.db
+            db
               .insert(channelTable)
               .values(dbChannels)
               .onConflictDoUpdate({
@@ -318,7 +330,7 @@ export class CreatorRepository implements ICreatorRepository {
 
         if (dbCreatorTranslations.length > 0) {
           const translationResult = await wrap(
-            this.db
+            db
               .insert(creatorTranslationTable)
               .values(dbCreatorTranslations)
               .onConflictDoUpdate({
@@ -350,15 +362,17 @@ export class CreatorRepository implements ICreatorRepository {
         return Ok(creators);
       },
     );
-  }
+  };
 
-  async batchDelete(creatorIds: string[]): Promise<Result<void, AppError>> {
+  const batchDelete = async (
+    creatorIds: string[],
+  ): Promise<Result<void, AppError>> => {
     return withTracerResult(
       "CreatorRepository",
       "batchDelete",
       async (span) => {
         const creatorResult = await wrap(
-          this.db
+          db
             .delete(creatorTable)
             .where(inArray(creatorTable.id, creatorIds))
             .execute(),
@@ -377,18 +391,18 @@ export class CreatorRepository implements ICreatorRepository {
         return Ok();
       },
     );
-  }
+  };
 
-  async existsByChannelId(
+  const existsByChannelId = async (
     channelId: string,
-  ): Promise<Result<boolean, AppError>> {
+  ): Promise<Result<boolean, AppError>> => {
     return withTracerResult(
       "CreatorRepository",
       "existsByChannelId",
       async (span) => {
         const result = await wrap(
-          this.db
-            .select({ count: count() })
+          db
+            .select({ count: drizzleCount() })
             .from(channelTable)
             .where(eq(channelTable.platformChannelId, channelId))
             .execute(),
@@ -407,15 +421,13 @@ export class CreatorRepository implements ICreatorRepository {
         return Ok((result.val.at(0)?.count ?? 0) > 0);
       },
     );
-  }
+  };
 
-  private buildFilters(query: ListQuery): SQL[] {
-    const filters: SQL[] = [];
-    const languageCode = query.languageCode || "default";
-    if (query.memberType) {
-      filters.push(eq(creatorTable.memberType, query.memberType));
-    }
-    filters.push(eq(creatorTranslationTable.languageCode, languageCode));
-    return filters;
-  }
-}
+  return {
+    list,
+    count,
+    batchUpsert,
+    batchDelete,
+    existsByChannelId,
+  };
+};

@@ -11,28 +11,23 @@ const publicFileRegex = /\.(.*)$/;
 const locales = ["en", "ja", "cn", "tw", "ko"];
 
 export const middleware = (req: NextRequest) => {
-  try {
-    const pathname = req.nextUrl.pathname;
-    if (
-      pathname.startsWith("/_next") ||
-      pathname.includes("/api/") ||
-      publicFileRegex.test(pathname)
-    ) {
-      return;
-    }
-
-    const res = NextResponse.next();
-    const redirect = setLocale(req, res);
-    if (redirect) {
-      return redirect;
-    }
-    setTimeZone(req, res);
-    setSessionId(req, res);
-    return res;
-  } catch (e) {
-    console.error(e);
-    return NextResponse.next();
+  const pathname = req.nextUrl.pathname;
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.includes("/api/") ||
+    publicFileRegex.test(pathname)
+  ) {
+    return;
   }
+
+  const res = NextResponse.next();
+  const redirect = setLocale(req, res);
+  if (redirect) {
+    return redirect;
+  }
+  setTimeZone(req, res);
+  setSessionId(req, res);
+  return res;
 };
 
 /**

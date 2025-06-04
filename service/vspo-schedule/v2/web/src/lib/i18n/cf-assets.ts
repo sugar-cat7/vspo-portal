@@ -1,5 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { AppError, Err, Ok, Result } from "@vspo-lab/error";
+import { AppError, Err, Ok, Result, wrap } from "@vspo-lab/error";
 import { BackendModule, ReadCallback, ResourceKey, Services } from "i18next";
 
 interface BackendOptions {
@@ -108,87 +108,55 @@ export class CloudflareAssetsBackend implements BackendModule {
   }
 
   private async getCloudflareContext(): Promise<Result<CloudflareContextEnv>> {
-    try {
-      // First get the context as unknown
-      const rawContext = (await getCloudflareContext({
-        async: true,
-      })) as unknown;
-      // Then cast to our simplified interface
-      const cloudflareContext = rawContext as CloudflareContextEnv;
-      return Ok(cloudflareContext);
-    } catch (error) {
-      if (error instanceof Error) {
-        return Err(
-          new AppError({
-            message: "Failed to get Cloudflare context",
-            code: "INTERNAL_SERVER_ERROR",
-            cause: error,
-            context: {},
-          }),
-        );
-      }
-      return Err(
+    const contextResult = await wrap(
+      getCloudflareContext({ async: true }),
+      (error) =>
         new AppError({
-          message: "Unknown error getting Cloudflare context",
+          message: "Failed to get Cloudflare context",
           code: "INTERNAL_SERVER_ERROR",
+          cause: error,
           context: {},
         }),
-      );
+    );
+
+    if (contextResult.err) {
+      return Err(contextResult.err);
     }
+
+    // Cast to our simplified interface
+    const cloudflareContext =
+      contextResult.val as unknown as CloudflareContextEnv;
+    return Ok(cloudflareContext);
   }
 
   private async fetchAsset(
     assets: CloudflareAssets,
     loadPath: string,
   ): Promise<Result<Response>> {
-    try {
-      const response = await assets.fetch(`https://placeholder${loadPath}`);
-      return Ok(response);
-    } catch (error) {
-      if (error instanceof Error) {
-        return Err(
-          new AppError({
-            message: `Failed to fetch asset: ${loadPath}`,
-            code: "INTERNAL_SERVER_ERROR",
-            cause: error,
-            context: {},
-          }),
-        );
-      }
-      return Err(
+    return wrap(
+      assets.fetch(`https://placeholder${loadPath}`),
+      (error) =>
         new AppError({
-          message: "Unknown error fetching asset",
+          message: `Failed to fetch asset: ${loadPath}`,
           code: "INTERNAL_SERVER_ERROR",
+          cause: error,
           context: {},
         }),
-      );
-    }
+    );
   }
 
   private async parseJsonResponse(
     response: Response,
   ): Promise<Result<Record<string, unknown>>> {
-    try {
-      const data = await response.json();
-      return Ok(data as Record<string, unknown>);
-    } catch (error) {
-      if (error instanceof Error) {
-        return Err(
-          new AppError({
-            message: "Failed to parse JSON response",
-            code: "INTERNAL_SERVER_ERROR",
-            cause: error,
-            context: {},
-          }),
-        );
-      }
-      return Err(
+    return wrap(
+      response.json() as Promise<Record<string, unknown>>,
+      (error) =>
         new AppError({
-          message: "Unknown error parsing JSON",
+          message: "Failed to parse JSON response",
           code: "INTERNAL_SERVER_ERROR",
+          cause: error,
           context: {},
         }),
-      );
-    }
+    );
   }
 }

@@ -6,18 +6,19 @@ import { createUUID } from "../pkg/uuid";
 import { setupTxManager } from "../test/setup";
 import {
   type BatchUpsertDiscordServersParam,
-  DiscordInteractor,
+  type IDiscordInteractor,
   type ListDiscordServerParam,
   type ListDiscordServerResponse,
+  createDiscordInteractor,
 } from "./discord";
 
 describe.concurrent("DiscordInteractor", () => {
   let context: IAppContext;
-  let interactor: DiscordInteractor;
+  let interactor: IDiscordInteractor;
 
   beforeEach(async () => {
     context = await setupTxManager();
-    interactor = new DiscordInteractor(context);
+    interactor = createDiscordInteractor(context);
   });
 
   describe.concurrent("list", () => {

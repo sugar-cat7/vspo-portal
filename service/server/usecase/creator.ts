@@ -52,17 +52,19 @@ export interface ICreatorInteractor {
   ): Promise<Result<Creators, AppError>>;
 }
 
-export class CreatorInteractor implements ICreatorInteractor {
-  constructor(private readonly context: IAppContext) {}
+export const createCreatorInteractor = (
+  context: IAppContext,
+): ICreatorInteractor => {
+  const INTERACTOR_NAME = "CreatorInteractor";
 
-  async searchByChannelIds(
+  const searchByChannelIds = async (
     params: SearchByChannelIdsParam,
-  ): Promise<Result<Creators, AppError>> {
+  ): Promise<Result<Creators, AppError>> => {
     return await withTracerResult(
-      "CreatorInteractor",
+      INTERACTOR_NAME,
       "searchByChannelIds",
       async () => {
-        return this.context.runInTx(async (_repos, services) => {
+        return context.runInTx(async (_repos, services) => {
           const sv = await services.creatorService.searchCreatorsByChannelIds(
             params.channel.map((v) => ({
               channelId: v.id,
@@ -75,32 +77,28 @@ export class CreatorInteractor implements ICreatorInteractor {
         });
       },
     );
-  }
+  };
 
-  async batchUpsert(
+  const batchUpsert = async (
     params: BatchUpsertCreatorsParam,
-  ): Promise<Result<Creators, AppError>> {
-    return await withTracerResult(
-      "CreatorInteractor",
-      "batchUpsert",
-      async () => {
-        return this.context.runInTx(async (repos, _services) => {
-          const uv = await repos.creatorRepository.batchUpsert(params);
-          if (uv.err) return uv;
-          return Ok(uv.val);
-        });
-      },
-    );
-  }
+  ): Promise<Result<Creators, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "batchUpsert", async () => {
+      return context.runInTx(async (repos, _services) => {
+        const uv = await repos.creatorRepository.batchUpsert(params);
+        if (uv.err) return uv;
+        return Ok(uv.val);
+      });
+    });
+  };
 
-  async searchByMemberType(
+  const searchByMemberType = async (
     params: SearchByMemberTypeParam,
-  ): Promise<Result<Creators, AppError>> {
+  ): Promise<Result<Creators, AppError>> => {
     return await withTracerResult(
-      "CreatorInteractor",
+      INTERACTOR_NAME,
       "searchByMemberType",
       async () => {
-        return this.context.runInTx(async (_repos, services) => {
+        return context.runInTx(async (_repos, services) => {
           const sv = await services.creatorService.searchCreatorsByMemberType({
             memberType: params.memberType,
           });
@@ -110,13 +108,13 @@ export class CreatorInteractor implements ICreatorInteractor {
         });
       },
     );
-  }
+  };
 
-  async list(
+  const list = async (
     params: ListByMemberTypeParam,
-  ): Promise<Result<ListCreatorsResponse, AppError>> {
-    return await withTracerResult("CreatorInteractor", "list", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  ): Promise<Result<ListCreatorsResponse, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "list", async () => {
+      return context.runInTx(async (repos, _services) => {
         const c = await repos.creatorRepository.list(params);
         if (c.err) return c;
 
@@ -133,16 +131,16 @@ export class CreatorInteractor implements ICreatorInteractor {
         });
       });
     });
-  }
+  };
 
-  async translateCreator(
+  const translateCreator = async (
     params: TranslateCreatorParam,
-  ): Promise<Result<Creators, AppError>> {
+  ): Promise<Result<Creators, AppError>> => {
     return await withTracerResult(
-      "CreatorInteractor",
+      INTERACTOR_NAME,
       "translateCreator",
       async () => {
-        return this.context.runInTx(async (_repos, services) => {
+        return context.runInTx(async (_repos, services) => {
           const sv = await services.creatorService.translateCreators(params);
           if (sv.err) {
             return sv;
@@ -151,5 +149,13 @@ export class CreatorInteractor implements ICreatorInteractor {
         });
       },
     );
-  }
-}
+  };
+
+  return {
+    searchByChannelIds,
+    batchUpsert,
+    searchByMemberType,
+    list,
+    translateCreator,
+  };
+};

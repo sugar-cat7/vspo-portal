@@ -56,6 +56,9 @@ importers:
       '@vspo-lab/api':
         specifier: workspace:^
         version: link:../../../../packages/api
+      '@vspo-lab/dayjs':
+        specifier: workspace:^
+        version: link:../../../../packages/dayjs
       '@vspo-lab/error':
         specifier: workspace:^
         version: link:../../../../packages/errors

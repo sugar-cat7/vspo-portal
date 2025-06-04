@@ -62,64 +62,56 @@ export interface IStreamInteractor {
   ): Promise<Result<Streams, AppError>>;
 }
 
-export class StreamInteractor implements IStreamInteractor {
-  constructor(private readonly context: IAppContext) {}
+export const createStreamInteractor = (
+  context: IAppContext,
+): IStreamInteractor => {
+  const INTERACTOR_NAME = "StreamInteractor";
 
   // Fetch new streams from external APIs
-  async searchLive(): Promise<Result<Streams, AppError>> {
-    return await withTracerResult(
-      "StreamInteractor",
-      "searchLive",
-      async () => {
-        return this.context.runInTx(async (_repos, services) => {
-          const sv = await services.streamService.searchAllLiveStreams();
-          if (sv.err) {
-            return sv;
-          }
-          return Ok(sv.val);
-        });
-      },
-    );
-  }
+  const searchLive = async (): Promise<Result<Streams, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "searchLive", async () => {
+      return context.runInTx(async (_repos, services) => {
+        const sv = await services.streamService.searchAllLiveStreams();
+        if (sv.err) {
+          return sv;
+        }
+        return Ok(sv.val);
+      });
+    });
+  };
 
   // Fetch streams from database and external APIs
-  async searchExist(): Promise<Result<Streams, AppError>> {
-    return await withTracerResult(
-      "StreamInteractor",
-      "searchExist",
-      async () => {
-        return this.context.runInTx(async (_repos, services) => {
-          const sv = await services.streamService.searchExistStreams();
-          if (sv.err) {
-            return sv;
-          }
-          return Ok(sv.val);
-        });
-      },
-    );
-  }
+  const searchExist = async (): Promise<Result<Streams, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "searchExist", async () => {
+      return context.runInTx(async (_repos, services) => {
+        const sv = await services.streamService.searchExistStreams();
+        if (sv.err) {
+          return sv;
+        }
+        return Ok(sv.val);
+      });
+    });
+  };
 
-  async batchUpsert(
+  const batchUpsert = async (
     params: BatchUpsertStreamsParam,
-  ): Promise<Result<Streams, AppError>> {
-    return await withTracerResult(
-      "StreamInteractor",
-      "batchUpsert",
-      async () => {
-        return this.context.runInTx(async (repos, _services) => {
-          const uv = await repos.streamRepository.batchUpsert(params);
-          if (uv.err) {
-            return uv;
-          }
-          return Ok(uv.val);
-        });
-      },
-    );
-  }
+  ): Promise<Result<Streams, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "batchUpsert", async () => {
+      return context.runInTx(async (repos, _services) => {
+        const uv = await repos.streamRepository.batchUpsert(params);
+        if (uv.err) {
+          return uv;
+        }
+        return Ok(uv.val);
+      });
+    });
+  };
 
-  async list(params: ListParam): Promise<Result<ListResponse, AppError>> {
-    return await withTracerResult("StreamInteractor", "list", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  const list = async (
+    params: ListParam,
+  ): Promise<Result<ListResponse, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "list", async () => {
+      return context.runInTx(async (repos, _services) => {
         const sv = await repos.streamRepository.list(params);
         if (sv.err) {
           return sv;
@@ -139,14 +131,14 @@ export class StreamInteractor implements IStreamInteractor {
         });
       });
     });
-  }
+  };
 
-  async searchDeletedCheck(): Promise<Result<Streams, AppError>> {
+  const searchDeletedCheck = async (): Promise<Result<Streams, AppError>> => {
     return await withTracerResult(
-      "StreamInteractor",
+      INTERACTOR_NAME,
       "searchDeletedCheck",
       async () => {
-        return this.context.runInTx(async (repos, services) => {
+        return context.runInTx(async (repos, services) => {
           const sv = await services.streamService.searchDeletedStreams();
           if (sv.err) {
             return sv;
@@ -156,16 +148,16 @@ export class StreamInteractor implements IStreamInteractor {
         });
       },
     );
-  }
+  };
 
-  async batchDeleteByStreamIds(
+  const batchDeleteByStreamIds = async (
     params: BatchDeleteByStreamIdsParam,
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<void, AppError>> => {
     return await withTracerResult(
-      "StreamInteractor",
+      INTERACTOR_NAME,
       "batchDeleteByStreamIds",
       async () => {
-        return this.context.runInTx(async (repos, _services) => {
+        return context.runInTx(async (repos, _services) => {
           const uv = await repos.streamRepository.batchDelete(params.streamIds);
           if (uv.err) {
             return uv;
@@ -174,16 +166,16 @@ export class StreamInteractor implements IStreamInteractor {
         });
       },
     );
-  }
+  };
 
-  async translateStream(
+  const translateStream = async (
     params: TranslateStreamParam,
-  ): Promise<Result<Streams, AppError>> {
+  ): Promise<Result<Streams, AppError>> => {
     return await withTracerResult(
-      "StreamInteractor",
+      INTERACTOR_NAME,
       "translateStream",
       async () => {
-        return this.context.runInTx(async (_repos, services) => {
+        return context.runInTx(async (_repos, services) => {
           const sv = await services.streamService.translateStreams(params);
           if (sv.err) {
             return sv;
@@ -192,14 +184,14 @@ export class StreamInteractor implements IStreamInteractor {
         });
       },
     );
-  }
+  };
 
-  async getMemberStreams(): Promise<Result<Streams, AppError>> {
+  const getMemberStreams = async (): Promise<Result<Streams, AppError>> => {
     return await withTracerResult(
-      "StreamInteractor",
+      INTERACTOR_NAME,
       "getMemberStreams",
       async () => {
-        return this.context.runInTx(async (_repos, services) => {
+        return context.runInTx(async (_repos, services) => {
           const sv = await services.streamService.getMemberStreams();
           if (sv.err) {
             return sv;
@@ -208,14 +200,14 @@ export class StreamInteractor implements IStreamInteractor {
         });
       },
     );
-  }
+  };
 
-  async deletedListIds(): Promise<Result<string[], AppError>> {
+  const deletedListIds = async (): Promise<Result<string[], AppError>> => {
     return await withTracerResult(
-      "StreamInteractor",
+      INTERACTOR_NAME,
       "deletedListIds",
       async () => {
-        return this.context.runInTx(async (repos, _services) => {
+        return context.runInTx(async (repos, _services) => {
           const sv = await repos.streamRepository.deletedListIds();
           if (sv.err) {
             return sv;
@@ -227,16 +219,16 @@ export class StreamInteractor implements IStreamInteractor {
         });
       },
     );
-  }
+  };
 
-  async searchByStreamsIdsAndCreate(
+  const searchByStreamsIdsAndCreate = async (
     params: SearchByStreamIdsAndCreateParam,
-  ): Promise<Result<Streams, AppError>> {
+  ): Promise<Result<Streams, AppError>> => {
     return await withTracerResult(
-      "StreamInteractor",
+      INTERACTOR_NAME,
       "searchByStreamsIdAndCreate",
       async () => {
-        return this.context.runInTx(async (repos, services) => {
+        return context.runInTx(async (repos, services) => {
           const vs = await services.streamService.getStreamsByStreamIds(params);
           if (vs.err) {
             return vs;
@@ -253,5 +245,18 @@ export class StreamInteractor implements IStreamInteractor {
         });
       },
     );
-  }
-}
+  };
+
+  return {
+    batchUpsert,
+    searchLive,
+    searchExist,
+    list,
+    searchDeletedCheck,
+    batchDeleteByStreamIds,
+    translateStream,
+    getMemberStreams,
+    deletedListIds,
+    searchByStreamsIdsAndCreate,
+  };
+};

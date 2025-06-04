@@ -32,14 +32,16 @@ export interface IEventInteractor {
   batchDelete(eventIds: string[]): Promise<Result<void, AppError>>;
 }
 
-export class EventInteractor implements IEventInteractor {
-  constructor(private readonly context: IAppContext) {}
+export const createEventInteractor = (
+  context: IAppContext,
+): IEventInteractor => {
+  const INTERACTOR_NAME = "EventInteractor";
 
-  async list(
+  const list = async (
     query: ListEventsQuery,
-  ): Promise<Result<ListEventsResponse, AppError>> {
-    return await withTracerResult("EventInteractor", "list", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  ): Promise<Result<ListEventsResponse, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "list", async () => {
+      return context.runInTx(async (repos, _services) => {
         const events = await repos.eventRepository.list(query);
 
         if (events.err) {
@@ -62,55 +64,64 @@ export class EventInteractor implements IEventInteractor {
         });
       });
     });
-  }
+  };
 
-  async upsert(params: UpsertEventParam): Promise<Result<VspoEvent, AppError>> {
-    return await withTracerResult("EventInteractor", "upsert", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  const upsert = async (
+    params: UpsertEventParam,
+  ): Promise<Result<VspoEvent, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "upsert", async () => {
+      return context.runInTx(async (repos, _services) => {
         return repos.eventRepository.upsert(params);
       });
     });
-  }
+  };
 
-  async get(id: string): Promise<Result<VspoEvent | null, AppError>> {
-    return await withTracerResult("EventInteractor", "get", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  const get = async (
+    id: string,
+  ): Promise<Result<VspoEvent | null, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "get", async () => {
+      return context.runInTx(async (repos, _services) => {
         return repos.eventRepository.get(id);
       });
     });
-  }
+  };
 
-  async delete(eventId: string): Promise<Result<void, AppError>> {
-    return await withTracerResult("EventInteractor", "delete", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  const deleteEvent = async (
+    eventId: string,
+  ): Promise<Result<void, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "delete", async () => {
+      return context.runInTx(async (repos, _services) => {
         return repos.eventRepository.delete(eventId);
       });
     });
-  }
+  };
 
-  async batchUpsert(
+  const batchUpsert = async (
     events: BatchUpsertEventParam,
-  ): Promise<Result<VspoEvents, AppError>> {
-    return await withTracerResult(
-      "EventInteractor",
-      "batchUpsert",
-      async () => {
-        return this.context.runInTx(async (repos, _services) => {
-          return repos.eventRepository.batchUpsert(events);
-        });
-      },
-    );
-  }
+  ): Promise<Result<VspoEvents, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "batchUpsert", async () => {
+      return context.runInTx(async (repos, _services) => {
+        return repos.eventRepository.batchUpsert(events);
+      });
+    });
+  };
 
-  async batchDelete(eventIds: string[]): Promise<Result<void, AppError>> {
-    return await withTracerResult(
-      "EventInteractor",
-      "batchDelete",
-      async () => {
-        return this.context.runInTx(async (repos, _services) => {
-          return repos.eventRepository.batchDelete(eventIds);
-        });
-      },
-    );
-  }
-}
+  const batchDelete = async (
+    eventIds: string[],
+  ): Promise<Result<void, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "batchDelete", async () => {
+      return context.runInTx(async (repos, _services) => {
+        return repos.eventRepository.batchDelete(eventIds);
+      });
+    });
+  };
+
+  return {
+    list,
+    upsert,
+    get,
+    delete: deleteEvent,
+    batchUpsert,
+    batchDelete,
+  };
+};

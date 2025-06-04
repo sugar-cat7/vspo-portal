@@ -27,26 +27,149 @@ export interface IClipService {
   >;
 }
 
-export class ClipService implements IClipService {
-  private readonly SERVICE_NAME = "ClipService";
+// Helper functions for the clip service
+const masterCreators = async (deps: {
+  creatorRepository: ICreatorRepository;
+}): Promise<Result<{ jp: Creator[]; en: Creator[] }, AppError>> => {
+  const jpCreators = await deps.creatorRepository.list({
+    limit: 300,
+    page: 0,
+    memberType: MemberTypeSchema.Enum.vspo_jp,
+    languageCode: "default",
+  });
+  if (jpCreators.err) {
+    return jpCreators;
+  }
 
-  constructor(
-    private readonly deps: {
-      youtubeClient: IYoutubeService;
-      twitchClient: ITwitchService;
-      creatorRepository: ICreatorRepository;
-    },
-  ) {}
+  const enCreators = await deps.creatorRepository.list({
+    limit: 300,
+    page: 0,
+    memberType: MemberTypeSchema.Enum.vspo_en,
+    languageCode: "default",
+  });
+  if (enCreators.err) {
+    return enCreators;
+  }
 
-  async searchNewVspoClipsAndNewCreators(): Promise<
+  return Ok({ jp: jpCreators.val, en: enCreators.val });
+};
+
+export const createClipService = (deps: {
+  youtubeClient: IYoutubeService;
+  twitchClient: ITwitchService;
+  creatorRepository: ICreatorRepository;
+}): IClipService => {
+  const SERVICE_NAME = "ClipService";
+
+  const searchYoutubeVspoClips = async (): Promise<Result<Clips, AppError>> => {
+    AppLogger.info("Searching Vspo related YouTube clips", {
+      service: SERVICE_NAME,
+    });
+
+    const promises = [
+      deps.youtubeClient.searchClips({
+        query: query.VSPO_JP_CLIP,
+        order: "date",
+      }),
+      deps.youtubeClient.searchClips({
+        query: query.VSPO_JP_CLIP,
+        order: "relevance",
+      }),
+      deps.youtubeClient.searchClips({
+        query: query.VSPO_EN_CLIP,
+        order: "date",
+      }),
+      deps.youtubeClient.searchClips({
+        query: query.VSPO_EN_CLIP,
+        order: "relevance",
+      }),
+    ];
+
+    const results = await Promise.allSettled(promises);
+    const scs = results
+      .filter(
+        (r): r is PromiseFulfilledResult<OkResult<Clips>> =>
+          r.status === "fulfilled" && !r.value.err,
+      )
+      .flatMap((r) => r.value.val);
+    const failedResults = results.filter(
+      (r): r is PromiseRejectedResult => r.status === "rejected",
+    );
+
+    if (failedResults.length > 0) {
+      AppLogger.warn("Some YouTube stream searches failed", {
+        service: SERVICE_NAME,
+        failedCount: failedResults.length,
+        errors: failedResults.map((r) => r.reason),
+      });
+    }
+
+    const clipIds = scs.map((c) => c.rawId);
+
+    const clips = await deps.youtubeClient.getClips({
+      videoIds: clipIds,
+    });
+    if (clips.err) {
+      return clips;
+    }
+
+    // Filter clips that are related to Vspo
+    // Ideally we would want to make a strict determination, but currently we're only checking if the license number exists
+    const vspoClips = clips.val.filter((clip) => isVspoClip(clip));
+
+    return Ok(vspoClips);
+  };
+
+  const searchTwitchVspoClips = async (): Promise<Result<Clips, AppError>> => {
+    AppLogger.info("Searching Vspo related Twitch clips", {
+      service: SERVICE_NAME,
+    });
+
+    const cs = await masterCreators({
+      creatorRepository: deps.creatorRepository,
+    });
+    if (cs.err) {
+      return cs;
+    }
+    const twitchIds = cs.val.jp
+      .map((c) => c.channel?.twitch?.rawId ?? "")
+      .concat(cs.val.en.map((c) => c.channel?.twitch?.rawId ?? ""))
+      .filter((id) => id !== "");
+
+    const batchSize = 5;
+    const allClips: Clips = [];
+
+    for (let i = 0; i < twitchIds.length; i += batchSize) {
+      const batch = twitchIds.slice(i, i + batchSize);
+      const batchPromises = batch.map((id) =>
+        deps.twitchClient.getClipsByUserID({
+          userId: id,
+        }),
+      );
+
+      const batchResults = await Promise.all(batchPromises);
+      for (const result of batchResults) {
+        if (result.err) {
+          continue;
+        }
+        allClips.push(...result.val);
+      }
+    }
+
+    return Ok(allClips);
+  };
+
+  const searchNewVspoClipsAndNewCreators = async (): Promise<
     Result<{ newCreators: Creators; clips: Clips }, AppError>
-  > {
+  > => {
     return withTracerResult(
-      this.SERVICE_NAME,
+      SERVICE_NAME,
       "searchNewVspoClipsAndNewCreators",
       async (span) => {
         // Get existing creators to exclude their channels
-        const existingCreators = await this.masterCreators();
+        const existingCreators = await masterCreators({
+          creatorRepository: deps.creatorRepository,
+        });
         if (existingCreators.err) {
           return existingCreators;
         }
@@ -63,13 +186,13 @@ export class ClipService implements IClipService {
         }
 
         AppLogger.info("Excluding clips from existing Vspo channels", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           existingChannelCount: existingChannelIds.size,
         });
 
         const clipSearchPromises = [
-          this.searchYoutubeVspoClips(),
-          this.searchTwitchVspoClips(),
+          searchYoutubeVspoClips(),
+          searchTwitchVspoClips(),
         ];
 
         const results = await Promise.allSettled(clipSearchPromises);
@@ -93,7 +216,7 @@ export class ClipService implements IClipService {
 
         if (failedResults.length > 0) {
           AppLogger.warn("Some clip searches failed", {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             failedCount: failedResults.length,
             errors: failedResults.map((r) =>
               r.status === "rejected" ? r.reason : r.value.err,
@@ -120,7 +243,7 @@ export class ClipService implements IClipService {
         );
 
         AppLogger.info("Filtered out clips from existing channels", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           initialClipsCount,
           filteredClipsCount: vspoClips.length,
           excludedClipsCount: initialClipsCount - vspoClips.length,
@@ -132,12 +255,12 @@ export class ClipService implements IClipService {
           if (uniqueChannelIds.has(clip.rawChannelID)) {
             continue;
           }
-          const cs = await this.deps.creatorRepository.existsByChannelId(
+          const cs = await deps.creatorRepository.existsByChannelId(
             clip.rawChannelID,
           );
           if (cs.err) {
             AppLogger.warn("Failed to check if channel exists", {
-              service: this.SERVICE_NAME,
+              service: SERVICE_NAME,
               error: cs.err,
             });
           }
@@ -147,7 +270,7 @@ export class ClipService implements IClipService {
           }
         }
 
-        const ytChannels = await this.deps.youtubeClient.getChannels({
+        const ytChannels = await deps.youtubeClient.getChannels({
           channelIds: notExistsChannelIds,
         });
         if (ytChannels.err) {
@@ -189,18 +312,18 @@ export class ClipService implements IClipService {
         });
       },
     );
-  }
+  };
 
-  async searchExistVspoClips({
+  const searchExistVspoClips = async ({
     clipIds,
   }: { clipIds: string[] }): Promise<
     Result<{ clips: Clips; notExistsClipIds: string[] }, AppError>
-  > {
+  > => {
     return withTracerResult(
-      this.SERVICE_NAME,
+      SERVICE_NAME,
       "searchExistVspoClips",
       async (span) => {
-        const clipsResult = await this.deps.youtubeClient.getClips({
+        const clipsResult = await deps.youtubeClient.getClips({
           videoIds: clipIds,
         });
         if (clipsResult.err) {
@@ -211,7 +334,7 @@ export class ClipService implements IClipService {
           (id) => !clips.some((c) => c.rawId === id),
         );
         AppLogger.info("Found clips", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           clipsCount: clips.length,
           notExistsClipIdsCount: notExistsClipIds.length,
         });
@@ -221,13 +344,13 @@ export class ClipService implements IClipService {
         });
       },
     );
-  }
+  };
 
-  async searchNewClipsByVspoMemberName(): Promise<
+  const searchNewClipsByVspoMemberName = async (): Promise<
     Result<{ newCreators: Creators; clips: Clips }, AppError>
-  > {
+  > => {
     return withTracerResult(
-      this.SERVICE_NAME,
+      SERVICE_NAME,
       "searchNewClipsByVspoMemberName",
       async (span) => {
         const members = vspoKeywordMap.members.map((m) => m.nameJp);
@@ -237,14 +360,16 @@ export class ClipService implements IClipService {
         AppLogger.info(
           "Searching Vspo related YouTube clips by member names with different order types",
           {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             memberCount: members.length,
             orderTypes,
           },
         );
 
         // Get existing creators to exclude their channels
-        const existingCreators = await this.masterCreators();
+        const existingCreators = await masterCreators({
+          creatorRepository: deps.creatorRepository,
+        });
         if (existingCreators.err) {
           return existingCreators;
         }
@@ -261,7 +386,7 @@ export class ClipService implements IClipService {
         }
 
         AppLogger.info("Excluding clips from existing Vspo channels", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           existingChannelCount: existingChannelIds.size,
         });
 
@@ -278,7 +403,7 @@ export class ClipService implements IClipService {
         for (let i = 0; i < searchRequests.length; i += batchSize) {
           const batch = searchRequests.slice(i, i + batchSize);
           const batchPromises = batch.map((req) =>
-            this.deps.youtubeClient.searchClips({
+            deps.youtubeClient.searchClips({
               query: req.query,
               order: req.order as "date" | "viewCount" | "relevance",
             }),
@@ -299,7 +424,7 @@ export class ClipService implements IClipService {
 
           if (failedResults.length > 0) {
             AppLogger.warn("Some member clip searches failed", {
-              service: this.SERVICE_NAME,
+              service: SERVICE_NAME,
               failedCount: failedResults.length,
               errors: failedResults.map((r) => r.reason),
               batchStart: i,
@@ -325,7 +450,7 @@ export class ClipService implements IClipService {
         );
 
         AppLogger.info("Found new clips", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           totalClipsFound: allClips.length,
           vspoClipsFound: vspoClips.length,
           uniqueClipsCount: uniqueClips.length,
@@ -337,7 +462,7 @@ export class ClipService implements IClipService {
           .map((clip) => clip.rawId);
 
         // Get detailed clip information
-        const detailedClips = await this.deps.youtubeClient.getClips({
+        const detailedClips = await deps.youtubeClient.getClips({
           videoIds: clipIds,
         });
 
@@ -352,7 +477,7 @@ export class ClipService implements IClipService {
         const finalClips = [...detailedClips.val, ...nonYoutubeClips];
 
         AppLogger.info("Retrieved detailed clip information", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           detailedClipsCount: detailedClips.val.length,
           nonYoutubeClipsCount: nonYoutubeClips.length,
           finalClipsCount: finalClips.length,
@@ -367,13 +492,13 @@ export class ClipService implements IClipService {
             continue;
           }
 
-          const cs = await this.deps.creatorRepository.existsByChannelId(
+          const cs = await deps.creatorRepository.existsByChannelId(
             clip.rawChannelID,
           );
 
           if (cs.err) {
             AppLogger.warn("Failed to check if channel exists", {
-              service: this.SERVICE_NAME,
+              service: SERVICE_NAME,
               error: cs.err,
             });
           }
@@ -385,7 +510,7 @@ export class ClipService implements IClipService {
         }
 
         // Fetch details for new channels
-        const ytChannels = await this.deps.youtubeClient.getChannels({
+        const ytChannels = await deps.youtubeClient.getChannels({
           channelIds: notExistsChannelIds,
         });
 
@@ -429,127 +554,11 @@ export class ClipService implements IClipService {
         });
       },
     );
-  }
+  };
 
-  private async searchYoutubeVspoClips(): Promise<Result<Clips, AppError>> {
-    AppLogger.info("Searching Vspo related YouTube clips", {
-      service: this.SERVICE_NAME,
-    });
-
-    const promises = [
-      this.deps.youtubeClient.searchClips({
-        query: query.VSPO_JP_CLIP,
-        order: "date",
-      }),
-      this.deps.youtubeClient.searchClips({
-        query: query.VSPO_JP_CLIP,
-        order: "relevance",
-      }),
-      this.deps.youtubeClient.searchClips({
-        query: query.VSPO_EN_CLIP,
-        order: "date",
-      }),
-      this.deps.youtubeClient.searchClips({
-        query: query.VSPO_EN_CLIP,
-        order: "relevance",
-      }),
-    ];
-
-    const results = await Promise.allSettled(promises);
-    const scs = results
-      .filter(
-        (r): r is PromiseFulfilledResult<OkResult<Clips>> =>
-          r.status === "fulfilled" && !r.value.err,
-      )
-      .flatMap((r) => r.value.val);
-    const failedResults = results.filter(
-      (r): r is PromiseRejectedResult => r.status === "rejected",
-    );
-
-    if (failedResults.length > 0) {
-      AppLogger.warn("Some YouTube stream searches failed", {
-        service: this.SERVICE_NAME,
-        failedCount: failedResults.length,
-        errors: failedResults.map((r) => r.reason),
-      });
-    }
-
-    const clipIds = scs.map((c) => c.rawId);
-
-    const clips = await this.deps.youtubeClient.getClips({
-      videoIds: clipIds,
-    });
-    if (clips.err) {
-      return clips;
-    }
-
-    // Filter clips that are related to Vspo
-    // Ideally we would want to make a strict determination, but currently we're only checking if the license number exists
-    const vspoClips = clips.val.filter((clip) => isVspoClip(clip));
-
-    return Ok(vspoClips);
-  }
-
-  private async searchTwitchVspoClips(): Promise<Result<Clips, AppError>> {
-    AppLogger.info("Searching Vspo related Twitch clips", {
-      service: this.SERVICE_NAME,
-    });
-
-    const cs = await this.masterCreators();
-    if (cs.err) {
-      return cs;
-    }
-    const twitchIds = cs.val.jp
-      .map((c) => c.channel?.twitch?.rawId ?? "")
-      .concat(cs.val.en.map((c) => c.channel?.twitch?.rawId ?? ""))
-      .filter((id) => id !== "");
-
-    const batchSize = 5;
-    const allClips: Clips = [];
-
-    for (let i = 0; i < twitchIds.length; i += batchSize) {
-      const batch = twitchIds.slice(i, i + batchSize);
-      const batchPromises = batch.map((id) =>
-        this.deps.twitchClient.getClipsByUserID({
-          userId: id,
-        }),
-      );
-
-      const batchResults = await Promise.all(batchPromises);
-      for (const result of batchResults) {
-        if (result.err) {
-          continue;
-        }
-        allClips.push(...result.val);
-      }
-    }
-
-    return Ok(allClips);
-  }
-
-  private async masterCreators(): Promise<
-    Result<{ jp: Creator[]; en: Creator[] }, AppError>
-  > {
-    const jpCreators = await this.deps.creatorRepository.list({
-      limit: 300,
-      page: 0,
-      memberType: MemberTypeSchema.Enum.vspo_jp,
-      languageCode: "default",
-    });
-    if (jpCreators.err) {
-      return jpCreators;
-    }
-
-    const enCreators = await this.deps.creatorRepository.list({
-      limit: 300,
-      page: 0,
-      memberType: MemberTypeSchema.Enum.vspo_en,
-      languageCode: "default",
-    });
-    if (enCreators.err) {
-      return enCreators;
-    }
-
-    return Ok({ jp: jpCreators.val, en: enCreators.val });
-  }
-}
+  return {
+    searchNewVspoClipsAndNewCreators,
+    searchExistVspoClips,
+    searchNewClipsByVspoMemberName,
+  };
+};

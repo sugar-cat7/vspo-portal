@@ -39,18 +39,42 @@ export interface IFreechatRepository {
   count(query: ListQuery): Promise<Result<number, AppError>>;
 }
 
-export class FreechatRepository implements IFreechatRepository {
-  constructor(private readonly db: DB) {}
+function buildFilters(query: ListQuery): SQL[] {
+  const filters: SQL[] = [];
+  const languageCode = query.languageCode || "default";
+  filters.push(eq(videoTable.videoType, "freechat"));
+  if (!query.includeDeleted) {
+    filters.push(eq(videoTable.deleted, false));
+  }
 
-  async list(query: ListQuery): Promise<Result<Freechats, AppError>> {
+  // Always add language filters with default fallback
+  filters.push(eq(videoTranslationTable.languageCode, languageCode));
+  filters.push(eq(creatorTranslationTable.languageCode, languageCode));
+
+  if (query.memberType) {
+    if (query.memberType !== "vspo_all") {
+      filters.push(eq(creatorTable.memberType, query.memberType));
+    }
+  }
+  if (query.channelIds && query.channelIds.length > 0) {
+    filters.push(inArray(videoTable.channelId, query.channelIds));
+  }
+
+  return filters;
+}
+
+export function createFreechatRepository(db: DB): IFreechatRepository {
+  const list = async (
+    query: ListQuery,
+  ): Promise<Result<Freechats, AppError>> => {
     return withTracerResult("FreechatRepository", "list", async (span) => {
       AppLogger.info("FreechatRepository list", {
         query,
       });
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const freechatResult = await wrap(
-        this.db
+        db
           .select()
           .from(videoTable)
           .innerJoin(
@@ -120,14 +144,14 @@ export class FreechatRepository implements IFreechatRepository {
         ),
       );
     });
-  }
+  };
 
-  async count(query: ListQuery): Promise<Result<number, AppError>> {
+  const count = async (query: ListQuery): Promise<Result<number, AppError>> => {
     return withTracerResult("FreechatRepository", "count", async (span) => {
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const freechatResult = await wrap(
-        this.db
+        db
           .select({ value: countDistinct(videoTable.id) })
           .from(videoTable)
           .innerJoin(
@@ -159,29 +183,10 @@ export class FreechatRepository implements IFreechatRepository {
 
       return Ok(freechatResult.val.at(0)?.value ?? 0);
     });
-  }
+  };
 
-  private buildFilters(query: ListQuery): SQL[] {
-    const filters: SQL[] = [];
-    const languageCode = query.languageCode || "default";
-    filters.push(eq(videoTable.videoType, "freechat"));
-    if (!query.includeDeleted) {
-      filters.push(eq(videoTable.deleted, false));
-    }
-
-    // Always add language filters with default fallback
-    filters.push(eq(videoTranslationTable.languageCode, languageCode));
-    filters.push(eq(creatorTranslationTable.languageCode, languageCode));
-
-    if (query.memberType) {
-      if (query.memberType !== "vspo_all") {
-        filters.push(eq(creatorTable.memberType, query.memberType));
-      }
-    }
-    if (query.channelIds && query.channelIds.length > 0) {
-      filters.push(inArray(videoTable.channelId, query.channelIds));
-    }
-
-    return filters;
-  }
+  return {
+    list,
+    count,
+  };
 }

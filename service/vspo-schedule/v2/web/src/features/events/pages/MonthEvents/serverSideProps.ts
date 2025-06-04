@@ -1,6 +1,6 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
-import { getCurrentUTCDate } from "@/lib/dayjs";
 import { getInitializedI18nInstance, matchesDateFormat } from "@/lib/utils";
+import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { GetServerSideProps } from "next";
 import { fetchEventService } from "../../api/eventService";
 import { MonthEventsProps } from "./container";

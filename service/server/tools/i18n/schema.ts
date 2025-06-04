@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { z } from "zod";
 import { type TargetLang, TargetLangSchema } from "../../domain/translate";
-import type { AIService } from "../../infra/ai/index";
+import type { IAIService } from "../../infra/ai/index";
 import { vspoKeywordMap } from "../../config/data/keyword";
 
 // Define schemas for different message types
@@ -72,7 +72,7 @@ interface TranslationOptions {
 }
 
 export async function translateMessages(
-  aiService: AIService,
+  aiService: IAIService,
   messageType: MessageType,
   options: TranslationOptions,
 ): Promise<unknown> {

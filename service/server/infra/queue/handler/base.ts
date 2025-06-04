@@ -1,3 +1,3 @@
-export abstract class BaseHandler<T> {
-  abstract process(messages: unknown[]): Promise<void>;
+export interface QueueHandler {
+  process(messages: unknown[]): Promise<void>;
 }

@@ -1,13 +1,12 @@
 import { ServerResponse } from "http";
 import { ParsedUrlQuery } from "querystring";
+import { convertToUTCDate, getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { Locale, isMatch } from "date-fns";
 import { formatInTimeZone } from "date-fns-tz";
 import { enUS, ja, ko, zhCN, zhTW } from "date-fns/locale";
 import { createInstance as createI18nInstance } from "i18next";
 import { SSRConfig } from "next-i18next";
 import { DEFAULT_LOCALE, SESSION_ID_COOKIE, TIME_ZONE_COOKIE } from "./Const";
-import { convertToUTCDate, getCurrentUTCDate } from "./dayjs";
-
 /**
  * Group an array of items by a specified key.
  * @template T - The type of items in the array.
@@ -51,36 +50,6 @@ export const getOneWeekRange = () => {
     oneWeekAgo,
     oneWeekLater,
   };
-};
-
-const locales: Record<string, Locale> = {
-  en: enUS,
-  ja: ja,
-  cn: zhCN,
-  tw: zhTW,
-  ko: ko,
-};
-
-/**
- * Format a date with the given format, locale, and time zone.
- * @param date - The Date object, date string, or timestamp to format.
- * @param dateFormat - The date format pattern to use for formatting.
- * @param localeCode - The code identifying the locale to use for formatting.
- * @param timeZone - The time zone to use for formatting.
- * @returns A formatted date string.
- */
-export const formatDate = (
-  date: Date | number | string,
-  dateFormat: string,
-  {
-    localeCode = DEFAULT_LOCALE,
-    timeZone = "UTC",
-  }: { localeCode?: string; timeZone?: string } = {},
-): string => {
-  const locale = locales[localeCode] ?? enUS;
-  return formatInTimeZone(convertToUTCDate(date), timeZone, dateFormat, {
-    locale,
-  });
 };
 
 /**
@@ -218,4 +187,34 @@ export const getSetCookieTimeZone = (res: ServerResponse) => {
     }
   }
   return undefined;
+};
+
+const locales: Record<string, Locale> = {
+  en: enUS,
+  ja: ja,
+  cn: zhCN,
+  tw: zhTW,
+  ko: ko,
+};
+
+/**
+ * Format a date with the given format, locale, and time zone.
+ * @param date - The Date object, date string, or timestamp to format.
+ * @param dateFormat - The date format pattern to use for formatting.
+ * @param localeCode - The code identifying the locale to use for formatting.
+ * @param timeZone - The time zone to use for formatting.
+ * @returns A formatted date string.
+ */
+export const formatDate = (
+  date: Date | number | string,
+  dateFormat: string,
+  {
+    localeCode = DEFAULT_LOCALE,
+    timeZone = "UTC",
+  }: { localeCode?: string; timeZone?: string } = {},
+): string => {
+  const locale = locales[localeCode] ?? enUS;
+  return formatInTimeZone(convertToUTCDate(date), timeZone, dateFormat, {
+    locale,
+  });
 };

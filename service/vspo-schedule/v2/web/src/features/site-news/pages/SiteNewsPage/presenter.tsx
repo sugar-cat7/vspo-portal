@@ -1,6 +1,7 @@
 import { Breadcrumb } from "@/features/shared/components/Elements";
 import { SiteNewsMarkdownItem } from "@/lib/markdown";
-import { formatDate, getSiteNewsTagColor } from "@/lib/utils";
+import { getSiteNewsTagColor } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { SiteNewsTag } from "@/types/site-news";
 import {
   Box,

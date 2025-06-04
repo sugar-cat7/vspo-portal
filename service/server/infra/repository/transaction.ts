@@ -34,16 +34,14 @@ export const defaultConfig: PgTransactionConfig = {
   deferrable: false,
 };
 
-export class TxManager implements ITxManager {
-  constructor(private readonly dbConfig: IDbConfig) {}
-
-  async runTx<T, E extends BaseError>(
+export const createTxManager = (dbConfig: IDbConfig): ITxManager => {
+  const runTx = async <T, E extends BaseError>(
     operation: (tx: DB) => Promise<Result<T, E>>,
     config?: PgTransactionConfig,
-  ): Promise<Result<T, E>> {
+  ): Promise<Result<T, E>> => {
     const db = drizzle({
-      connection: this.dbConfig.connectionString,
-      logger: this.dbConfig.isQueryLoggingEnabled,
+      connection: dbConfig.connectionString,
+      logger: dbConfig.isQueryLoggingEnabled,
     });
 
     const result = await wrap(
@@ -67,5 +65,7 @@ export class TxManager implements ITxManager {
       throw result.err;
     }
     return result.val;
-  }
-}
+  };
+
+  return { runTx };
+};

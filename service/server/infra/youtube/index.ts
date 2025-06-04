@@ -69,28 +69,105 @@ export interface IYoutubeService {
   getClips(params: GetClipsParams): Promise<Result<Clips, AppError>>;
 }
 
-export class YoutubeService implements IYoutubeService {
-  private youtube: youtube_v3.Youtube;
+const chunkArray = <T>(array: T[], size: number): T[][] => {
+  const result = [];
+  for (let i = 0; i < array.length; i += size) {
+    result.push(array.slice(i, i + size));
+  }
+  return result;
+};
 
-  constructor(apiKey: string) {
-    this.youtube = google.youtube({
-      version: "v3",
-      auth: apiKey,
-    });
+const parseYoutubeDuration = (duration: string): number => {
+  const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
+  if (!match) return 0;
+
+  const hours = match[1] ? Number.parseInt(match[1], 10) : 0;
+  const minutes = match[2] ? Number.parseInt(match[2], 10) : 0;
+  const seconds = match[3] ? Number.parseInt(match[3], 10) : 0;
+
+  return hours * 3600 + minutes * 60 + seconds;
+};
+
+const isYoutubeShort = (v: youtube_v3.Schema$Video): boolean => {
+  if (!v.id) return false;
+
+  // tag
+  const tags = v.snippet?.tags || [];
+  if (tags.includes("shorts")) {
+    return true;
   }
 
-  async getStreams(
+  // title
+  const title = v.snippet?.title || "";
+  if (title.includes("#shorts")) {
+    return true;
+  }
+
+  // duration < 60s
+  const duration = v.contentDetails?.duration || "";
+  const durationInSeconds = parseYoutubeDuration(duration);
+  if (durationInSeconds <= 60) {
+    return true;
+  }
+
+  return false;
+};
+
+const determineStreamStatus = (
+  video: youtube_v3.Schema$Video | youtube_v3.Schema$SearchResult,
+): "live" | "upcoming" | "ended" | "unknown" => {
+  if (video?.snippet?.liveBroadcastContent) {
+    if (video.snippet.liveBroadcastContent === "live") {
+      return "live";
+    }
+
+    if (video.snippet.liveBroadcastContent === "upcoming") {
+      return "upcoming";
+    }
+  }
+
+  if ("liveStreamingDetails" in video) {
+    if (video?.liveStreamingDetails?.actualEndTime) {
+      return "ended";
+    }
+
+    if (
+      video?.liveStreamingDetails?.actualStartTime &&
+      !video?.liveStreamingDetails?.actualEndTime
+    ) {
+      return "live";
+    }
+
+    if (
+      video?.liveStreamingDetails?.scheduledStartTime &&
+      !video.liveStreamingDetails?.actualStartTime
+    ) {
+      return "upcoming";
+    }
+  }
+
+  // Probably a regular video
+  return "ended"; // Regular videos are treated as ended streams
+};
+
+export const createYoutubeService = (apiKey: string): IYoutubeService => {
+  const youtube = google.youtube({
+    version: "v3",
+    auth: apiKey,
+  });
+
+  const getStreams = async (
     params: GetStreamsParams,
-  ): Promise<Result<Streams, AppError>> {
+  ): Promise<Result<Streams, AppError>> => {
     return withTracerResult("YoutubeService", "getStreams", async (span) => {
       AppLogger.info("getStreams", {
         streamIds: params.streamIds,
       });
-      const chunks = this.chunkArray(params.streamIds, 50);
+      const chunks = chunkArray(params.streamIds, 50);
       const videos: youtube_v3.Schema$Video[] = [];
       for (const chunk of chunks) {
         const responseResult = await wrap(
-          this.youtube.videos.list({
+          youtube.videos.list({
             part: ["snippet", "liveStreamingDetails", "statistics"],
             id: chunk,
           }),
@@ -127,7 +204,7 @@ export class YoutubeService implements IYoutubeService {
                 video.liveStreamingDetails?.scheduledEndTime ||
                 null,
               platform: "youtube",
-              status: this.determineStreamStatus(video),
+              status: determineStreamStatus(video),
               tags: video.snippet?.tags || [],
               viewCount: Number.parseInt(
                 video.statistics?.viewCount || "0",
@@ -145,14 +222,14 @@ export class YoutubeService implements IYoutubeService {
         ),
       );
     });
-  }
+  };
 
-  async searchStreams(
+  const searchStreams = async (
     params: SearchStreamsParams,
-  ): Promise<Result<Streams, AppError>> {
+  ): Promise<Result<Streams, AppError>> => {
     return withTracerResult("YoutubeService", "searchStreams", async (span) => {
       const responseResult = await wrap(
-        this.youtube.search.list({
+        youtube.search.list({
           part: ["snippet"],
           q: params.query,
           maxResults: 50,
@@ -200,18 +277,18 @@ export class YoutubeService implements IYoutubeService {
         ),
       );
     });
-  }
+  };
 
-  async getChannels(
+  const getChannels = async (
     params: GetChannelsParams,
-  ): Promise<Result<Channels, AppError>> {
+  ): Promise<Result<Channels, AppError>> => {
     return withTracerResult("YoutubeService", "getChannels", async (span) => {
-      const chunks = this.chunkArray(params.channelIds, 50);
+      const chunks = chunkArray(params.channelIds, 50);
       const channels: youtube_v3.Schema$Channel[] = [];
 
       for (const chunk of chunks) {
         const responseResult = await wrap(
-          this.youtube.channels.list({
+          youtube.channels.list({
             part: ["snippet"],
             id: chunk,
           }),
@@ -255,11 +332,11 @@ export class YoutubeService implements IYoutubeService {
         ),
       );
     });
-  }
+  };
 
-  async getStreamsByChannel(
+  const getStreamsByChannel = async (
     params: GetStreamsByChannelParams,
-  ): Promise<Result<Streams, AppError>> {
+  ): Promise<Result<Streams, AppError>> => {
     return withTracerResult(
       "YoutubeService",
       "getStreamsByChannel",
@@ -285,7 +362,7 @@ export class YoutubeService implements IYoutubeService {
         }
 
         const responseResult = await wrap(
-          this.youtube.search.list(option),
+          youtube.search.list(option),
           (err) =>
             new AppError({
               message: `Network error while fetching videos by channel: ${err.message}`,
@@ -313,7 +390,7 @@ export class YoutubeService implements IYoutubeService {
                 startedAt: null,
                 endedAt: null,
                 platform: "youtube",
-                status: this.determineStreamStatus(video),
+                status: determineStreamStatus(video),
                 tags: [],
                 viewCount: 0,
                 thumbnailURL:
@@ -329,14 +406,14 @@ export class YoutubeService implements IYoutubeService {
         );
       },
     );
-  }
+  };
 
-  async searchClips(
+  const searchClips = async (
     params: SearchClipsParams,
-  ): Promise<Result<Clips, AppError>> {
+  ): Promise<Result<Clips, AppError>> => {
     return withTracerResult("YoutubeService", "searchClips", async (span) => {
       const responseResult = await wrap(
-        this.youtube.search.list({
+        youtube.search.list({
           part: ["snippet"],
           q: params.query,
           maxResults: params.maxResults || 50,
@@ -376,16 +453,18 @@ export class YoutubeService implements IYoutubeService {
         ),
       );
     });
-  }
+  };
 
-  async getClips(params: GetClipsParams): Promise<Result<Clips, AppError>> {
+  const getClips = async (
+    params: GetClipsParams,
+  ): Promise<Result<Clips, AppError>> => {
     return withTracerResult("YoutubeService", "getClips", async (span) => {
-      const chunks = this.chunkArray(params.videoIds, 50);
+      const chunks = chunkArray(params.videoIds, 50);
       const items: youtube_v3.Schema$Video[] = [];
 
       for (const chunk of chunks) {
         const responseResult = await wrap(
-          this.youtube.videos.list({
+          youtube.videos.list({
             part: ["snippet", "contentDetails", "statistics"],
             id: chunk,
           }),
@@ -427,96 +506,20 @@ export class YoutubeService implements IYoutubeService {
                 item.snippet?.thumbnails?.maxres?.url ||
                 item.snippet?.thumbnails?.high?.url ||
                 "",
-              type: this.isYoutubeShort(item) ? "short" : "clip",
+              type: isYoutubeShort(item) ? "short" : "clip",
             });
           }) ?? [],
         ),
       );
     });
-  }
+  };
 
-  /**
-   * Checks if a YouTube video is a short by attempting to access the shorts URL
-   * If the URL redirects to watch?v=, it's a normal video; if not, it's a short
-   */
-  private isYoutubeShort(v: youtube_v3.Schema$Video): boolean {
-    if (!v.id) return false;
-
-    // tag
-    const tags = v.snippet?.tags || [];
-    if (tags.includes("shorts")) {
-      return true;
-    }
-
-    // title
-    const title = v.snippet?.title || "";
-    if (title.includes("#shorts")) {
-      return true;
-    }
-
-    // duration < 60s
-    const duration = v.contentDetails?.duration || "";
-    const durationInSeconds = this.parseYoutubeDuration(duration);
-    if (durationInSeconds <= 60) {
-      return true;
-    }
-
-    return false;
-  }
-
-  private parseYoutubeDuration(duration: string): number {
-    const match = duration.match(/PT(\d+H)?(\d+M)?(\d+S)?/);
-    if (!match) return 0;
-
-    const hours = match[1] ? Number.parseInt(match[1], 10) : 0;
-    const minutes = match[2] ? Number.parseInt(match[2], 10) : 0;
-    const seconds = match[3] ? Number.parseInt(match[3], 10) : 0;
-
-    return hours * 3600 + minutes * 60 + seconds;
-  }
-
-  private chunkArray<T>(array: T[], size: number): T[][] {
-    const result = [];
-    for (let i = 0; i < array.length; i += size) {
-      result.push(array.slice(i, i + size));
-    }
-    return result;
-  }
-
-  private determineStreamStatus(
-    video: youtube_v3.Schema$Video | youtube_v3.Schema$SearchResult,
-  ): "live" | "upcoming" | "ended" | "unknown" {
-    if (video?.snippet?.liveBroadcastContent) {
-      if (video.snippet.liveBroadcastContent === "live") {
-        return "live";
-      }
-
-      if (video.snippet.liveBroadcastContent === "upcoming") {
-        return "upcoming";
-      }
-    }
-
-    if ("liveStreamingDetails" in video) {
-      if (video?.liveStreamingDetails?.actualEndTime) {
-        return "ended";
-      }
-
-      if (
-        video?.liveStreamingDetails?.actualStartTime &&
-        !video?.liveStreamingDetails?.actualEndTime
-      ) {
-        return "live";
-      }
-
-      if (
-        video?.liveStreamingDetails?.scheduledStartTime &&
-        !video.liveStreamingDetails?.actualStartTime
-      ) {
-        return "upcoming";
-      }
-    }
-
-    // Probably a regular video
-    return "ended"; // Regular videos are treated as ended streams
-  }
-}
+  return {
+    getStreams,
+    searchStreams,
+    getChannels,
+    getStreamsByChannel,
+    searchClips,
+    getClips,
+  };
+};
