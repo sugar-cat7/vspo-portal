@@ -67,59 +67,54 @@ export interface IDiscordClient {
   ): Promise<Result<DiscordMessage, AppError>>;
 }
 
-export class DiscordClient implements IDiscordClient {
-  rest: RestManager;
-  botId: string;
+// Helper function to determine the appropriate error code based on Discord API errors
+const getErrorCodeFromDiscordError = (err: Error): ErrorCode => {
+  // https://github.com/discordeno/discordeno/blob/main/packages/rest/src/manager.ts
+  if (err.cause && typeof err.cause === "object" && "status" in err.cause) {
+    const status = (err.cause as { status: number }).status;
 
-  constructor(env: DiscordEnv) {
-    this.rest = createRestManager({
-      token: env.DISCORD_TOKEN,
-    });
-    this.botId = env.DISCORD_APPLICATION_ID;
+    switch (status) {
+      case 429:
+        return "RATE_LIMITED";
+      case 403:
+        return "FORBIDDEN";
+      case 404:
+        return "NOT_FOUND";
+      default:
+        return "INTERNAL_SERVER_ERROR";
+    }
   }
 
-  // Helper function to determine the appropriate error code based on Discord API errors
-  private getErrorCodeFromDiscordError(err: Error): ErrorCode {
-    // https://github.com/discordeno/discordeno/blob/main/packages/rest/src/manager.ts
-    if (err.cause && typeof err.cause === "object" && "status" in err.cause) {
-      const status = (err.cause as { status: number }).status;
-
-      switch (status) {
-        case 429:
-          return "RATE_LIMITED";
-        case 403:
-          return "FORBIDDEN";
-        case 404:
-          return "NOT_FOUND";
-        default:
-          return "INTERNAL_SERVER_ERROR";
-      }
-    }
-
-    // If there's no status in the error, check message for common error strings
-    const errorMessage = err.message.toLowerCase();
-    if (
-      errorMessage.includes("rate limit") ||
-      errorMessage.includes("too many requests")
-    ) {
-      return "RATE_LIMITED";
-    }
-    if (
-      errorMessage.includes("forbidden") ||
-      errorMessage.includes("unauthorized")
-    ) {
-      return "FORBIDDEN";
-    }
-    if (errorMessage.includes("not found")) {
-      return "NOT_FOUND";
-    }
-
-    return "INTERNAL_SERVER_ERROR";
+  // If there's no status in the error, check message for common error strings
+  const errorMessage = err.message.toLowerCase();
+  if (
+    errorMessage.includes("rate limit") ||
+    errorMessage.includes("too many requests")
+  ) {
+    return "RATE_LIMITED";
+  }
+  if (
+    errorMessage.includes("forbidden") ||
+    errorMessage.includes("unauthorized")
+  ) {
+    return "FORBIDDEN";
+  }
+  if (errorMessage.includes("not found")) {
+    return "NOT_FOUND";
   }
 
-  async sendMessage(
+  return "INTERNAL_SERVER_ERROR";
+};
+
+export const createDiscordClient = (env: DiscordEnv): IDiscordClient => {
+  const rest = createRestManager({
+    token: env.DISCORD_TOKEN,
+  });
+  const botId = env.DISCORD_APPLICATION_ID;
+
+  const sendMessage = async (
     params: SendMessageParams,
-  ): Promise<Result<string, AppError>> {
+  ): Promise<Result<string, AppError>> => {
     return withTracerResult("discord", "sendMessage", async (span) => {
       const { channelId, content, embeds } = params;
       AppLogger.info("Sending message to Discord channel", {
@@ -128,7 +123,7 @@ export class DiscordClient implements IDiscordClient {
       });
 
       const responseResult = await wrap(
-        this.rest.sendMessage(channelId, {
+        rest.sendMessage(channelId, {
           content,
           embeds: embeds?.slice(0, 10),
         }),
@@ -138,7 +133,7 @@ export class DiscordClient implements IDiscordClient {
             error: err,
           });
 
-          const errorCode = this.getErrorCodeFromDiscordError(err);
+          const errorCode = getErrorCodeFromDiscordError(err);
 
           return new AppError({
             message: `Failed to send message to channel ${channelId}: ${err.message}`,
@@ -154,11 +149,11 @@ export class DiscordClient implements IDiscordClient {
       });
       return Ok(responseResult.val.id);
     });
-  }
+  };
 
-  async getChannel(
+  const getChannel = async (
     params: GetChannelInfoParams,
-  ): Promise<Result<DiscordChannel, AppError>> {
+  ): Promise<Result<DiscordChannel, AppError>> => {
     return withTracerResult("discord", "getChannel", async (span) => {
       const { channelId, serverId } = params;
       AppLogger.info("Fetching Discord channel info", {
@@ -167,7 +162,7 @@ export class DiscordClient implements IDiscordClient {
       });
 
       const responseResult = await wrap(
-        this.rest.getChannel(channelId),
+        rest.getChannel(channelId),
         (err: Error) => {
           AppLogger.error("Failed to fetch Discord channel info", {
             channel_id: channelId,
@@ -175,7 +170,7 @@ export class DiscordClient implements IDiscordClient {
             error: err,
           });
 
-          const errorCode = this.getErrorCodeFromDiscordError(err);
+          const errorCode = getErrorCodeFromDiscordError(err);
 
           return new AppError({
             message: `Failed to fetch channel info for ${channelId}: ${err.message}`,
@@ -213,11 +208,11 @@ export class DiscordClient implements IDiscordClient {
         }),
       );
     });
-  }
+  };
 
-  async updateMessage(
+  const updateMessage = async (
     params: UpdateMessageParams,
-  ): Promise<Result<string, AppError>> {
+  ): Promise<Result<string, AppError>> => {
     return withTracerResult("discord", "updateMessage", async (span) => {
       const { channelId, messageId, content, embeds } = params;
       AppLogger.info("Updating Discord message", {
@@ -227,7 +222,7 @@ export class DiscordClient implements IDiscordClient {
       });
 
       const responseResult = await wrap(
-        this.rest.editMessage(channelId, messageId, {
+        rest.editMessage(channelId, messageId, {
           content,
           embeds: embeds?.slice(0, 10),
         }),
@@ -238,7 +233,7 @@ export class DiscordClient implements IDiscordClient {
             error: err,
           });
 
-          const errorCode = this.getErrorCodeFromDiscordError(err);
+          const errorCode = getErrorCodeFromDiscordError(err);
 
           return new AppError({
             message: `Failed to update message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
@@ -255,11 +250,11 @@ export class DiscordClient implements IDiscordClient {
       });
       return Ok(messageId);
     });
-  }
+  };
 
-  async deleteMessage(
+  const deleteMessage = async (
     params: DeleteMessageParams,
-  ): Promise<Result<string, AppError>> {
+  ): Promise<Result<string, AppError>> => {
     return withTracerResult("discord", "deleteMessage", async (span) => {
       const { channelId, messageId } = params;
       AppLogger.info("Deleting Discord message", {
@@ -268,7 +263,7 @@ export class DiscordClient implements IDiscordClient {
       });
 
       const getMsgResult = await wrap(
-        this.rest.getMessage(channelId, messageId),
+        rest.getMessage(channelId, messageId),
         (err: Error) => {
           AppLogger.error("Failed to fetch Discord message for deletion", {
             channel_id: channelId,
@@ -276,7 +271,7 @@ export class DiscordClient implements IDiscordClient {
             error: err,
           });
 
-          const errorCode = this.getErrorCodeFromDiscordError(err);
+          const errorCode = getErrorCodeFromDiscordError(err);
 
           return new AppError({
             message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
@@ -287,12 +282,12 @@ export class DiscordClient implements IDiscordClient {
       );
       if (getMsgResult.err) return Err(getMsgResult.err);
       const message = getMsgResult.val;
-      if (!message.author?.bot || message.author.id !== this.botId) {
+      if (!message.author?.bot || message.author.id !== botId) {
         AppLogger.warn("Attempted to delete non-bot message", {
           channel_id: channelId,
           message_id: messageId,
           author_id: message.author?.id,
-          bot_id: this.botId,
+          bot_id: botId,
         });
         return Err(
           new AppError({
@@ -303,7 +298,7 @@ export class DiscordClient implements IDiscordClient {
       }
 
       const deleteResult = await wrap(
-        this.rest.deleteMessage(channelId, messageId),
+        rest.deleteMessage(channelId, messageId),
         (err: Error) => {
           AppLogger.error("Failed to delete Discord message", {
             channel_id: channelId,
@@ -311,7 +306,7 @@ export class DiscordClient implements IDiscordClient {
             error: err,
           });
 
-          const errorCode = this.getErrorCodeFromDiscordError(err);
+          const errorCode = getErrorCodeFromDiscordError(err);
 
           return new AppError({
             message: `Failed to delete message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
@@ -328,11 +323,11 @@ export class DiscordClient implements IDiscordClient {
       });
       return Ok(messageId);
     });
-  }
+  };
 
-  async getLatestBotMessages(
+  const getLatestBotMessages = async (
     channelId: string,
-  ): Promise<Result<DiscordMessage[], AppError>> {
+  ): Promise<Result<DiscordMessage[], AppError>> => {
     return withTracerResult("discord", "getLatestBotMessages", async (span) => {
       AppLogger.info("Fetching latest bot messages from Discord channel", {
         channel_id: channelId,
@@ -340,14 +335,14 @@ export class DiscordClient implements IDiscordClient {
 
       const query = { limit: 100 };
       const responseResult = await wrap(
-        this.rest.getMessages(channelId, query),
+        rest.getMessages(channelId, query),
         (err: Error) => {
           AppLogger.error("Failed to fetch messages from Discord channel", {
             channel_id: channelId,
             error: err,
           });
 
-          const errorCode = this.getErrorCodeFromDiscordError(err);
+          const errorCode = getErrorCodeFromDiscordError(err);
 
           return new AppError({
             message: `Failed to fetch messages in channel ${channelId}: ${err.message}`,
@@ -359,7 +354,7 @@ export class DiscordClient implements IDiscordClient {
       if (responseResult.err) return Err(responseResult.err);
       const messages = responseResult.val;
       const botMessages = messages.filter(
-        (m) => m.author?.bot && m.author.id === this.botId,
+        (m) => m.author?.bot && m.author.id === botId,
       );
 
       AppLogger.info("Successfully fetched bot messages from Discord channel", {
@@ -389,11 +384,11 @@ export class DiscordClient implements IDiscordClient {
         ),
       );
     });
-  }
+  };
 
-  async getMessage(
+  const getMessage = async (
     params: GetMessageParams,
-  ): Promise<Result<DiscordMessage, AppError>> {
+  ): Promise<Result<DiscordMessage, AppError>> => {
     return withTracerResult("discord", "getMessage", async (span) => {
       const { channelId, messageId } = params;
       AppLogger.info("Fetching Discord message", {
@@ -402,7 +397,7 @@ export class DiscordClient implements IDiscordClient {
       });
 
       const responseResult = await wrap(
-        this.rest.getMessage(channelId, messageId),
+        rest.getMessage(channelId, messageId),
         (err: Error) => {
           AppLogger.error("Failed to fetch Discord message", {
             channel_id: channelId,
@@ -410,7 +405,7 @@ export class DiscordClient implements IDiscordClient {
             error: err,
           });
 
-          const errorCode = this.getErrorCodeFromDiscordError(err);
+          const errorCode = getErrorCodeFromDiscordError(err);
 
           return new AppError({
             message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
@@ -446,5 +441,14 @@ export class DiscordClient implements IDiscordClient {
         }),
       );
     });
-  }
-}
+  };
+
+  return {
+    sendMessage,
+    getChannel,
+    updateMessage,
+    deleteMessage,
+    getLatestBotMessages,
+    getMessage,
+  };
+};

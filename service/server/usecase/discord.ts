@@ -76,14 +76,16 @@ export interface IDiscordInteractor {
   ): Promise<Result<boolean, AppError>>;
 }
 
-export class DiscordInteractor implements IDiscordInteractor {
-  constructor(private readonly context: IAppContext) {}
+export const createDiscordInteractor = (
+  context: IAppContext,
+): IDiscordInteractor => {
+  const INTERACTOR_NAME = "DiscordInteractor";
 
-  async list(
+  const list = async (
     params: ListDiscordServerParam,
-  ): Promise<Result<ListDiscordServerResponse, AppError>> {
-    return await withTracerResult("DiscordInteractor", "list", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  ): Promise<Result<ListDiscordServerResponse, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "list", async () => {
+      return context.runInTx(async (repos, _services) => {
         const sv = await repos.discordServerRepository.list(params);
         if (sv.err) {
           return sv;
@@ -103,11 +105,13 @@ export class DiscordInteractor implements IDiscordInteractor {
         });
       });
     });
-  }
+  };
 
-  async get(serverId: string): Promise<Result<DiscordServer, AppError>> {
-    return await withTracerResult("DiscordInteractor", "get", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  const get = async (
+    serverId: string,
+  ): Promise<Result<DiscordServer, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "get", async () => {
+      return context.runInTx(async (repos, _services) => {
         const sv = await repos.discordServerRepository.get({ serverId });
         if (sv.err) {
           return sv;
@@ -115,24 +119,26 @@ export class DiscordInteractor implements IDiscordInteractor {
         return Ok(sv.val);
       });
     });
-  }
+  };
 
-  async exists(serverId: string): Promise<Result<boolean, AppError>> {
-    return await withTracerResult("DiscordInteractor", "exists", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  const exists = async (
+    serverId: string,
+  ): Promise<Result<boolean, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "exists", async () => {
+      return context.runInTx(async (repos, _services) => {
         return await repos.discordServerRepository.exists({ serverId });
       });
     });
-  }
+  };
 
-  async batchSendMessages(
+  const batchSendMessages = async (
     params: SendMessageParams,
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<void, AppError>> => {
     return await withTracerResult(
-      "DiscordInteractor",
+      INTERACTOR_NAME,
       "batchSendMessages",
       async () => {
-        return this.context.runInTx(async (_repos, services) => {
+        return context.runInTx(async (_repos, services) => {
           const v = await services.discordService.sendMessagesToChannel(params);
 
           if (v.err) {
@@ -143,16 +149,16 @@ export class DiscordInteractor implements IDiscordInteractor {
         });
       },
     );
-  }
+  };
 
-  async deleteAllMessagesInChannel(
+  const deleteAllMessagesInChannel = async (
     channelId: string,
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<void, AppError>> => {
     return await withTracerResult(
-      "DiscordInteractor",
+      INTERACTOR_NAME,
       "deleteAllMessagesInChannel",
       async () => {
-        return this.context.runInTx(async (_repos, services) => {
+        return context.runInTx(async (_repos, services) => {
           const sv =
             await services.discordService.deleteAllMessagesInChannel(channelId);
           if (sv.err) {
@@ -162,16 +168,16 @@ export class DiscordInteractor implements IDiscordInteractor {
         });
       },
     );
-  }
+  };
 
-  async adjustBotChannel(
+  const adjustBotChannel = async (
     params: AdjustBotChannelParams,
-  ): Promise<Result<DiscordServer, AppError>> {
+  ): Promise<Result<DiscordServer, AppError>> => {
     return await withTracerResult(
-      "DiscordInteractor",
+      INTERACTOR_NAME,
       "adjustBotChannel",
       async () => {
-        return this.context.runInTx(async (_repos, services) => {
+        return context.runInTx(async (_repos, services) => {
           const sv = await services.discordService.adjustBotChannel(params);
           if (sv.err) {
             return sv;
@@ -180,34 +186,30 @@ export class DiscordInteractor implements IDiscordInteractor {
         });
       },
     );
-  }
+  };
 
-  async batchUpsert(
+  const batchUpsert = async (
     params: BatchUpsertDiscordServersParam,
-  ): Promise<Result<DiscordServers, AppError>> {
-    return await withTracerResult(
-      "DiscordInteractor",
-      "batchUpsert",
-      async () => {
-        return this.context.runInTx(async (repos, _services) => {
-          const sv = await repos.discordServerRepository.batchUpsert(params);
-          if (sv.err) {
-            return sv;
-          }
-          return Ok(sv.val);
-        });
-      },
-    );
-  }
+  ): Promise<Result<DiscordServers, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "batchUpsert", async () => {
+      return context.runInTx(async (repos, _services) => {
+        const sv = await repos.discordServerRepository.batchUpsert(params);
+        if (sv.err) {
+          return sv;
+        }
+        return Ok(sv.val);
+      });
+    });
+  };
 
-  async batchDeleteChannelsByRowChannelIds(
+  const batchDeleteChannelsByRowChannelIds = async (
     channelIds: string[],
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<void, AppError>> => {
     return await withTracerResult(
-      "DiscordInteractor",
+      INTERACTOR_NAME,
       "batchDeleteChannelsByRowChannelIds",
       async () => {
-        return this.context.runInTx(async (repos, _services) => {
+        return context.runInTx(async (repos, _services) => {
           const sv =
             await repos.discordServerRepository.batchDeleteChannelsByRowChannelIds(
               channelIds,
@@ -219,30 +221,32 @@ export class DiscordInteractor implements IDiscordInteractor {
         });
       },
     );
-  }
+  };
 
-  async existsChannel(channelId: string): Promise<Result<boolean, AppError>> {
+  const existsChannel = async (
+    channelId: string,
+  ): Promise<Result<boolean, AppError>> => {
     return await withTracerResult(
-      "DiscordInteractor",
+      INTERACTOR_NAME,
       "existsChannel",
       async () => {
-        return this.context.runInTx(async (repos, _services) => {
+        return context.runInTx(async (repos, _services) => {
           return await repos.discordServerRepository.existsChannel({
             channelId,
           });
         });
       },
     );
-  }
+  };
 
-  async sendAdminMessage(
+  const sendAdminMessage = async (
     message: SendAdminMessageParams,
-  ): Promise<Result<DiscordMessage, AppError>> {
+  ): Promise<Result<DiscordMessage, AppError>> => {
     return await withTracerResult(
-      "DiscordInteractor",
+      INTERACTOR_NAME,
       "sendAdminMessage",
       async () => {
-        return this.context.runInTx(async (repos, _services) => {
+        return context.runInTx(async (repos, _services) => {
           const sv = await _services.discordService.sendAdminMessage(message);
           if (sv.err) {
             return sv;
@@ -264,16 +268,16 @@ export class DiscordInteractor implements IDiscordInteractor {
         });
       },
     );
-  }
+  };
 
-  async isDeletedChannel(
+  const isDeletedChannel = async (
     params: DeletedChannelCheckParams,
-  ): Promise<Result<boolean, AppError>> {
+  ): Promise<Result<boolean, AppError>> => {
     return await withTracerResult(
-      "DiscordInteractor",
+      INTERACTOR_NAME,
       "isDeletedChannel",
       async () => {
-        return this.context.runInTx(async (repos, services) => {
+        return context.runInTx(async (repos, services) => {
           const sv = await services.discordService.isDeletedChannel(params);
           if (sv.err) {
             return sv;
@@ -282,5 +286,19 @@ export class DiscordInteractor implements IDiscordInteractor {
         });
       },
     );
-  }
-}
+  };
+
+  return {
+    batchSendMessages,
+    adjustBotChannel,
+    get,
+    list,
+    deleteAllMessagesInChannel,
+    batchUpsert,
+    batchDeleteChannelsByRowChannelIds,
+    exists,
+    existsChannel,
+    sendAdminMessage,
+    isDeletedChannel,
+  };
+};

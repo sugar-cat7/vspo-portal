@@ -69,64 +69,68 @@ export interface IDiscordService {
   ): Promise<Result<boolean, AppError>>;
 }
 
-export class DiscordService implements IDiscordService {
-  private readonly SERVICE_NAME = "DiscordService";
+// Helper function to process promises in batches with delay
+const processBatchedPromises = async <T>(
+  promises: Promise<T>[],
+  batchSize = 50,
+  delayMs = 1500,
+): Promise<PromiseSettledResult<T>[]> => {
+  const allResults: PromiseSettledResult<T>[] = [];
 
-  // Constructor with dependency injection
-  constructor(
-    private readonly dependencies: {
-      discordClient: IDiscordClient;
-      discordServerRepository: IDiscordServerRepository;
-      discordMessageRepository: IDiscordMessageRepository;
-      streamRepository: IStreamRepository;
-      cacheClient: ICacheClient;
-    },
-  ) {}
+  // Process a single batch
+  const processBatch = async (batch: Promise<T>[]) => {
+    const batchResults = await Promise.allSettled(batch);
+    allResults.push(...batchResults);
 
-  /**
-   * Process promises in batches with a delay between batches
-   * @private
-   */
-  private async processBatchedPromises<T>(
-    promises: Promise<T>[],
-    batchSize = 50,
-    delayMs = 1500,
-  ): Promise<PromiseSettledResult<T>[]> {
-    const allResults: PromiseSettledResult<T>[] = [];
-
-    // Process a single batch
-    const processBatch = async (batch: Promise<T>[]) => {
-      const batchResults = await Promise.allSettled(batch);
-      allResults.push(...batchResults);
-
-      // Add delay between batches if there are more batches to process
-      if (batch.length === batchSize) {
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-      }
-    };
-
-    // Process all batches
-    for (let i = 0; i < promises.length; i += batchSize) {
-      const batch = promises.slice(i, i + batchSize);
-      await processBatch(batch);
+    // Add delay between batches if there are more batches to process
+    if (batch.length === batchSize) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
+  };
 
-    return allResults;
+  // Process all batches
+  for (let i = 0; i < promises.length; i += batchSize) {
+    const batch = promises.slice(i, i + batchSize);
+    await processBatch(batch);
   }
+
+  return allResults;
+};
+
+// Helper function to check if embed needs updating
+const shouldUpdateEmbed = (
+  embed: { title: string; thumbnail: string; startedAt: string },
+  stream: Stream,
+): boolean => {
+  return (
+    embed.title !== stream.title ||
+    embed.thumbnail !== stream.thumbnailURL ||
+    embed.startedAt !== stream.formattedStartedAt
+  );
+};
+
+export const createDiscordService = (dependencies: {
+  discordClient: IDiscordClient;
+  discordServerRepository: IDiscordServerRepository;
+  discordMessageRepository: IDiscordMessageRepository;
+  streamRepository: IStreamRepository;
+  cacheClient: ICacheClient;
+}): IDiscordService => {
+  const SERVICE_NAME = "DiscordService";
 
   /**
    * Send messages to multiple channels.
    * This includes upcoming stream messages and live diff messages.
    */
-  async sendMessagesToChannel(
+  const sendMessagesToChannel = async (
     options: ChannelMessageParams,
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<void, AppError>> => {
     return withTracerResult(
-      this.SERVICE_NAME,
+      SERVICE_NAME,
       "sendMessagesToChannel",
       async (span) => {
         AppLogger.info("Sending messages to channels", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           channelCount: options.channelIds.length,
           languageCode: options.channelLangaugeCode,
         });
@@ -138,8 +142,8 @@ export class DiscordService implements IDiscordService {
 
         // Use runWithLanguage to set the language context for the entire operation
         return runWithLanguage(options.channelLangaugeCode, async () => {
-          const liveStreamListResult =
-            await this.dependencies.streamRepository.list({
+          const liveStreamListResult = await dependencies.streamRepository.list(
+            {
               limit: 1000,
               page: 0,
               languageCode: options.channelLangaugeCode,
@@ -149,10 +153,11 @@ export class DiscordService implements IDiscordService {
               memberType: options.channelMemberType,
               status: "live",
               orderBy: "desc",
-            });
+            },
+          );
           if (liveStreamListResult.err) {
             AppLogger.error("Failed to fetch stream list", {
-              service: this.SERVICE_NAME,
+              service: SERVICE_NAME,
               error: liveStreamListResult.err,
             });
             return Err(liveStreamListResult.err);
@@ -168,7 +173,7 @@ export class DiscordService implements IDiscordService {
           });
 
           const upcomingStreamListResult =
-            await this.dependencies.streamRepository.list({
+            await dependencies.streamRepository.list({
               limit: 1000,
               page: 0,
               languageCode: options.channelLangaugeCode,
@@ -181,7 +186,7 @@ export class DiscordService implements IDiscordService {
             });
           if (upcomingStreamListResult.err) {
             AppLogger.error("Failed to fetch stream list", {
-              service: this.SERVICE_NAME,
+              service: SERVICE_NAME,
               error: upcomingStreamListResult.err,
             });
             return Err(upcomingStreamListResult.err);
@@ -198,12 +203,10 @@ export class DiscordService implements IDiscordService {
 
           const promises = options.channelIds.map(async (channelId) => {
             const latestMessagesResult =
-              await this.dependencies.discordClient.getLatestBotMessages(
-                channelId,
-              );
+              await dependencies.discordClient.getLatestBotMessages(channelId);
             if (latestMessagesResult.err) {
               AppLogger.error("Failed to fetch latest bot messages", {
-                service: this.SERVICE_NAME,
+                service: SERVICE_NAME,
                 channelId,
                 error: latestMessagesResult.err,
               });
@@ -241,7 +244,7 @@ export class DiscordService implements IDiscordService {
 
               if (hasDiff) {
                 messagePromises.push(
-                  this.dependencies.discordClient.updateMessage({
+                  dependencies.discordClient.updateMessage({
                     channelId,
                     messageId: upcomingMessage.rawId,
                     embeds: upcomingStreams.map((stream) =>
@@ -253,7 +256,7 @@ export class DiscordService implements IDiscordService {
             } else {
               if (upcomingStreams.length > 0) {
                 messagePromises.push(
-                  this.dependencies.discordClient.sendMessage({
+                  dependencies.discordClient.sendMessage({
                     channelId,
                     content: "",
                     embeds: upcomingStreams.map((stream) =>
@@ -270,9 +273,9 @@ export class DiscordService implements IDiscordService {
               );
               const lm = liveMessage?.embedStreams[0];
 
-              if (lm && this.shouldUpdateEmbed(lm, liveStream)) {
+              if (lm && shouldUpdateEmbed(lm, liveStream)) {
                 messagePromises.push(
-                  this.dependencies.discordClient.updateMessage({
+                  dependencies.discordClient.updateMessage({
                     channelId,
                     messageId: liveMessage.rawId,
                     embeds: [createStreamEmbed(liveStream)],
@@ -282,7 +285,7 @@ export class DiscordService implements IDiscordService {
 
               if (!liveMessage) {
                 messagePromises.push(
-                  this.dependencies.discordClient.sendMessage({
+                  dependencies.discordClient.sendMessage({
                     channelId,
                     content: "",
                     embeds: [createStreamEmbed(liveStream)],
@@ -300,7 +303,7 @@ export class DiscordService implements IDiscordService {
             );
             for (const msg of deletedMessages) {
               messagePromises.push(
-                this.dependencies.discordClient.deleteMessage({
+                dependencies.discordClient.deleteMessage({
                   channelId,
                   messageId: msg.rawId,
                 }),
@@ -311,7 +314,7 @@ export class DiscordService implements IDiscordService {
               const deletedMessageId = upcomingMessage?.rawId;
               if (deletedMessageId) {
                 messagePromises.push(
-                  this.dependencies.discordClient.deleteMessage({
+                  dependencies.discordClient.deleteMessage({
                     channelId,
                     messageId: deletedMessageId,
                   }),
@@ -320,7 +323,7 @@ export class DiscordService implements IDiscordService {
             }
 
             const processedResults =
-              await this.processBatchedPromises(messagePromises);
+              await processBatchedPromises(messagePromises);
 
             const failedResults = processedResults.filter(
               (r): r is PromiseRejectedResult => r.status === "rejected",
@@ -328,7 +331,7 @@ export class DiscordService implements IDiscordService {
 
             if (failedResults.length > 0) {
               AppLogger.warn("Some message operations failed", {
-                service: this.SERVICE_NAME,
+                service: SERVICE_NAME,
                 channelId,
                 failedCount: failedResults.length,
                 errors: failedResults.map((r) => r.reason),
@@ -338,7 +341,7 @@ export class DiscordService implements IDiscordService {
             return Ok();
           });
 
-          const results = await this.processBatchedPromises(promises);
+          const results = await processBatchedPromises(promises);
 
           const failedResults = results.filter(
             (r): r is PromiseRejectedResult => r.status === "rejected",
@@ -346,7 +349,7 @@ export class DiscordService implements IDiscordService {
 
           if (failedResults.length > 0) {
             AppLogger.warn("Some message operations failed", {
-              service: this.SERVICE_NAME,
+              service: SERVICE_NAME,
               channelCount: options.channelIds.length,
               failedCount: failedResults.length,
               errors: failedResults.map((r) => r.reason),
@@ -354,7 +357,7 @@ export class DiscordService implements IDiscordService {
           }
 
           AppLogger.info("Successfully sent messages to all channels", {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             successCount: results.filter((r) => r.status === "fulfilled")
               .length,
             failureCount: failedResults.length,
@@ -363,185 +366,178 @@ export class DiscordService implements IDiscordService {
         });
       },
     );
-  }
+  };
 
   /**
    * Adjust the channels the bot participates in.
    */
-  async adjustBotChannel(
+  const adjustBotChannel = async (
     options: BotChannelAdjustmentParams,
-  ): Promise<Result<DiscordServer, AppError>> {
-    return withTracerResult(
-      this.SERVICE_NAME,
-      "adjustBotChannel",
-      async (span) => {
-        AppLogger.info("Adjusting bot channel", {
-          service: this.SERVICE_NAME,
-          type: options.type,
+  ): Promise<Result<DiscordServer, AppError>> => {
+    return withTracerResult(SERVICE_NAME, "adjustBotChannel", async (span) => {
+      AppLogger.info("Adjusting bot channel", {
+        service: SERVICE_NAME,
+        type: options.type,
+        serverId: options.serverId,
+        channelId: options.targetChannelId,
+        channelLangaugeCode: options.channelLangaugeCode,
+        serverLangaugeCode: options.serverLangaugeCode,
+        memberType: options.memberType,
+      });
+
+      let server: DiscordServer;
+
+      const serverExists = await dependencies.discordServerRepository.exists({
+        serverId: options.serverId,
+      });
+      if (serverExists.err) {
+        AppLogger.error("Failed to check server existence", {
+          service: SERVICE_NAME,
           serverId: options.serverId,
-          channelId: options.targetChannelId,
-          channelLangaugeCode: options.channelLangaugeCode,
-          serverLangaugeCode: options.serverLangaugeCode,
-          memberType: options.memberType,
+          error: serverExists.err,
         });
+        return serverExists;
+      }
 
-        let server: DiscordServer;
-
-        const serverExists =
-          await this.dependencies.discordServerRepository.exists({
-            serverId: options.serverId,
-          });
-        if (serverExists.err) {
-          AppLogger.error("Failed to check server existence", {
-            service: this.SERVICE_NAME,
-            serverId: options.serverId,
-            error: serverExists.err,
-          });
-          return serverExists;
-        }
-
-        if (!serverExists.val) {
-          const currentTime = getCurrentUTCString();
-          server = createDiscordServer({
-            id: createUUID(),
-            rawId: options.serverId,
-            name: "",
-            languageCode: "default",
-            discordChannels: [],
-            createdAt: currentTime,
-            updatedAt: currentTime,
-          });
-        } else {
-          const serverResult =
-            await this.dependencies.discordServerRepository.get({
-              serverId: options.serverId,
-            });
-          if (serverResult.err) {
-            AppLogger.error("Failed to get server", {
-              service: this.SERVICE_NAME,
-              serverId: options.serverId,
-              error: serverResult.err,
-            });
-            return serverResult;
-          }
-          server = serverResult.val;
-        }
-
-        let channels = server.discordChannels;
-
-        switch (options.type) {
-          case "add": {
-            const channelResult =
-              await this.dependencies.discordClient.getChannel({
-                serverId: options.serverId,
-                channelId: options.targetChannelId,
-              });
-            if (channelResult.err) {
-              AppLogger.error("Failed to get channel info", {
-                service: this.SERVICE_NAME,
-                serverId: options.serverId,
-                channelId: options.targetChannelId,
-                error: channelResult.err,
-              });
-              return channelResult;
-            }
-            // Overwrite channel language code if specified
-            channelResult.val.languageCode =
-              options.channelLangaugeCode ?? channelResult.val.languageCode;
-            // Overwrite server language code if specified
-            server.languageCode =
-              options.serverLangaugeCode ?? server.languageCode;
-
-            const existingIndex = channels.findIndex(
-              (ch) => ch.rawId === channelResult.val.rawId,
-            );
-
-            if (existingIndex >= 0) {
-              // Update existing channel information
-              channels[existingIndex] = {
-                ...channelResult.val,
-                id: channels[existingIndex].id,
-                languageCode:
-                  options.channelLangaugeCode ??
-                  channels[existingIndex].languageCode,
-                memberType:
-                  options.memberType ?? channels[existingIndex].memberType,
-              };
-            } else {
-              // Add new channel
-              channels.push({
-                ...channelResult.val,
-                memberType: options.memberType ?? "vspo_all",
-                isInitialAdd: true,
-              });
-            }
-            break;
-          }
-          case "remove": {
-            channels = channels.filter(
-              (ch) => ch.rawId !== options.targetChannelId,
-            );
-            break;
-          }
-        }
-
-        const updatedServer = discordServer.parse({
-          ...server,
-          discordChannels: channels,
+      if (!serverExists.val) {
+        const currentTime = getCurrentUTCString();
+        server = createDiscordServer({
+          id: createUUID(),
+          rawId: options.serverId,
+          name: "",
+          languageCode: "default",
+          discordChannels: [],
+          createdAt: currentTime,
+          updatedAt: currentTime,
         });
-
-        AppLogger.debug("Successfully adjusted bot channel", {
-          service: this.SERVICE_NAME,
-          type: options.type,
+      } else {
+        const serverResult = await dependencies.discordServerRepository.get({
           serverId: options.serverId,
-          channelId: options.targetChannelId,
-          updatedServer: updatedServer,
         });
-
-        // set channel list to cache
-        const r = await this.dependencies.cacheClient.set(
-          cacheKey.discordServer(options.serverId),
-          updatedServer,
-          // Limit
-          2147483647,
-        );
-        if (r.err) {
-          AppLogger.error("Failed to set channel list to cache", {
-            service: this.SERVICE_NAME,
+        if (serverResult.err) {
+          AppLogger.error("Failed to get server", {
+            service: SERVICE_NAME,
             serverId: options.serverId,
-            error: r.err,
+            error: serverResult.err,
           });
+          return serverResult;
         }
+        server = serverResult.val;
+      }
 
-        return Ok(updatedServer);
-      },
-    );
-  }
+      let channels = server.discordChannels;
+
+      switch (options.type) {
+        case "add": {
+          const channelResult = await dependencies.discordClient.getChannel({
+            serverId: options.serverId,
+            channelId: options.targetChannelId,
+          });
+          if (channelResult.err) {
+            AppLogger.error("Failed to get channel info", {
+              service: SERVICE_NAME,
+              serverId: options.serverId,
+              channelId: options.targetChannelId,
+              error: channelResult.err,
+            });
+            return channelResult;
+          }
+          // Overwrite channel language code if specified
+          channelResult.val.languageCode =
+            options.channelLangaugeCode ?? channelResult.val.languageCode;
+          // Overwrite server language code if specified
+          server.languageCode =
+            options.serverLangaugeCode ?? server.languageCode;
+
+          const existingIndex = channels.findIndex(
+            (ch) => ch.rawId === channelResult.val.rawId,
+          );
+
+          if (existingIndex >= 0) {
+            // Update existing channel information
+            channels[existingIndex] = {
+              ...channelResult.val,
+              id: channels[existingIndex].id,
+              languageCode:
+                options.channelLangaugeCode ??
+                channels[existingIndex].languageCode,
+              memberType:
+                options.memberType ?? channels[existingIndex].memberType,
+            };
+          } else {
+            // Add new channel
+            channels.push({
+              ...channelResult.val,
+              memberType: options.memberType ?? "vspo_all",
+              isInitialAdd: true,
+            });
+          }
+          break;
+        }
+        case "remove": {
+          channels = channels.filter(
+            (ch) => ch.rawId !== options.targetChannelId,
+          );
+          break;
+        }
+      }
+
+      const updatedServer = discordServer.parse({
+        ...server,
+        discordChannels: channels,
+      });
+
+      AppLogger.debug("Successfully adjusted bot channel", {
+        service: SERVICE_NAME,
+        type: options.type,
+        serverId: options.serverId,
+        channelId: options.targetChannelId,
+        updatedServer: updatedServer,
+      });
+
+      // set channel list to cache
+      const r = await dependencies.cacheClient.set(
+        cacheKey.discordServer(options.serverId),
+        updatedServer,
+        // Limit
+        2147483647,
+      );
+      if (r.err) {
+        AppLogger.error("Failed to set channel list to cache", {
+          service: SERVICE_NAME,
+          serverId: options.serverId,
+          error: r.err,
+        });
+      }
+
+      return Ok(updatedServer);
+    });
+  };
 
   /**
    * Delete all bot messages in a channel.
    */
-  async deleteAllMessagesInChannel(
+  const deleteAllMessagesInChannel = async (
     channelId: string,
-  ): Promise<Result<void, AppError>> {
+  ): Promise<Result<void, AppError>> => {
     return withTracerResult(
-      this.SERVICE_NAME,
+      SERVICE_NAME,
       "deleteAllMessagesInChannel",
       async (span) => {
         AppLogger.info("Deleting all messages in channel", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           channelId,
         });
 
         const adminMessagesResult =
-          await this.dependencies.discordMessageRepository.list({
+          await dependencies.discordMessageRepository.list({
             channelId,
             limit: 10,
             page: 0,
           });
         if (adminMessagesResult.err) {
           AppLogger.error("Failed to get admin messages", {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             channelId,
             error: adminMessagesResult.err,
           });
@@ -549,15 +545,15 @@ export class DiscordService implements IDiscordService {
         const adminMessages =
           adminMessagesResult.val?.filter((msg) => msg.type === "admin") ?? [];
         AppLogger.info("Admin messages", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           channelId,
           adminMessages: adminMessages,
         });
         const botMessagesResult =
-          await this.dependencies.discordClient.getLatestBotMessages(channelId);
+          await dependencies.discordClient.getLatestBotMessages(channelId);
         if (botMessagesResult.err) {
           AppLogger.error("Failed to get bot messages", {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             channelId,
             error: botMessagesResult.err,
           });
@@ -567,13 +563,13 @@ export class DiscordService implements IDiscordService {
         const deletePromises = botMessagesResult.val
           .filter((msg) => !adminMessages.some((am) => am.rawId === msg.rawId))
           .map((msg) =>
-            this.dependencies.discordClient.deleteMessage({
+            dependencies.discordClient.deleteMessage({
               channelId,
               messageId: msg.rawId,
             }),
           );
 
-        const p = await this.processBatchedPromises(deletePromises);
+        const p = await processBatchedPromises(deletePromises);
 
         const failedResults = p.filter(
           (r): r is PromiseRejectedResult => r.status === "rejected",
@@ -581,7 +577,7 @@ export class DiscordService implements IDiscordService {
 
         if (failedResults.length > 0) {
           AppLogger.warn("Some message deletions failed", {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             channelId,
             failedCount: failedResults.length,
             errors: failedResults.map((r) => r.reason),
@@ -589,7 +585,7 @@ export class DiscordService implements IDiscordService {
         }
 
         AppLogger.info("Successfully deleted messages", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           channelId,
           successCount: p.filter((r) => r.status === "fulfilled").length,
           failureCount: failedResults.length,
@@ -597,51 +593,51 @@ export class DiscordService implements IDiscordService {
         return Ok();
       },
     );
-  }
+  };
 
-  async sendAdminMessage(
+  const sendAdminMessage = async (
     message: SendAdminMessageParams,
-  ): Promise<Result<string, AppError>> {
+  ): Promise<Result<string, AppError>> => {
     return await withTracerResult(
       "DiscordService",
       "sendAdminMessage",
       async () => {
         AppLogger.debug("Sending admin message", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           channelId: message.channelId,
           content: message.content,
         });
-        const r = await this.dependencies.discordClient.sendMessage({
+        const r = await dependencies.discordClient.sendMessage({
           channelId: message.channelId,
           content: message.content,
           embeds: [],
         });
         if (r.err) {
           AppLogger.error("Failed to send admin message", {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             channelId: message.channelId,
             error: r.err,
           });
           return r;
         }
         AppLogger.debug("Successfully sent admin message", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           channelId: message.channelId,
           messageId: r.val,
         });
         return Ok(r.val);
       },
     );
-  }
+  };
 
-  async isDeletedChannel(
+  const isDeletedChannel = async (
     options: DeletedChannelCheckParams,
-  ): Promise<Result<boolean, AppError>> {
+  ): Promise<Result<boolean, AppError>> => {
     return await withTracerResult(
       "DiscordService",
       "isDeletedChannel",
       async () => {
-        const channelResult = await this.dependencies.discordClient.getChannel({
+        const channelResult = await dependencies.discordClient.getChannel({
           serverId: options.serverId,
           channelId: options.channelId,
         });
@@ -652,7 +648,7 @@ export class DiscordService implements IDiscordService {
             channelResult.err.code === "FORBIDDEN"
           ) {
             AppLogger.info("Channel is deleted", {
-              service: this.SERVICE_NAME,
+              service: SERVICE_NAME,
               channelId: options.channelId,
               serverId: options.serverId,
             });
@@ -663,18 +659,13 @@ export class DiscordService implements IDiscordService {
         return Ok(false);
       },
     );
-  }
-  /**
-   * Check if an embed needs to be updated by comparing key properties.
-   */
-  private shouldUpdateEmbed(
-    embed: { title: string; thumbnail: string; startedAt: string },
-    stream: Stream,
-  ): boolean {
-    return (
-      embed.title !== stream.title ||
-      embed.thumbnail !== stream.thumbnailURL ||
-      embed.startedAt !== stream.formattedStartedAt
-    );
-  }
-}
+  };
+
+  return {
+    sendMessagesToChannel,
+    adjustBotChannel,
+    deleteAllMessagesInChannel,
+    sendAdminMessage,
+    isDeletedChannel,
+  };
+};

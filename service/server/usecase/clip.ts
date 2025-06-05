@@ -46,14 +46,14 @@ export interface IClipInteractor {
   }: { clipIds: string[] }): Promise<Result<void, AppError>>;
 }
 
-export class ClipInteractor implements IClipInteractor {
-  constructor(private readonly context: IAppContext) {}
+export const createClipInteractor = (context: IAppContext): IClipInteractor => {
+  const INTERACTOR_NAME = "ClipInteractor";
 
-  async list(
+  const list = async (
     query: ListClipsQuery,
-  ): Promise<Result<ListClipsResponse, AppError>> {
-    return await withTracerResult("ClipInteractor", "list", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  ): Promise<Result<ListClipsResponse, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "list", async () => {
+      return context.runInTx(async (repos, _services) => {
         const clips = await repos.clipRepository.list(query);
 
         if (clips.err) {
@@ -76,69 +76,78 @@ export class ClipInteractor implements IClipInteractor {
         });
       });
     });
-  }
+  };
 
-  async batchUpsert(
+  const batchUpsert = async (
     params: BatchUpsertClipsParam,
-  ): Promise<Result<Clips, AppError>> {
-    return await withTracerResult("ClipInteractor", "batchUpsert", async () => {
-      return this.context.runInTx(async (repos, _services) => {
+  ): Promise<Result<Clips, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "batchUpsert", async () => {
+      return context.runInTx(async (repos, _services) => {
         return repos.clipRepository.batchUpsert(params);
       });
     });
-  }
+  };
 
-  async searchNewVspoClipsAndNewCreators(): Promise<
+  const searchNewVspoClipsAndNewCreators = async (): Promise<
     Result<{ newCreators: Creators; clips: Clips }, AppError>
-  > {
+  > => {
     return await withTracerResult(
-      "ClipInteractor",
+      INTERACTOR_NAME,
       "searchNewVspoClipsAndNewCreators",
       async () => {
-        return this.context.runInTx(async (repos, services) => {
+        return context.runInTx(async (repos, services) => {
           return services.clipService.searchNewVspoClipsAndNewCreators();
         });
       },
     );
-  }
+  };
 
-  async searchExistVspoClips({
+  const searchExistVspoClips = async ({
     clipIds,
   }: { clipIds: string[] }): Promise<
     Result<{ clips: Clips; notExistsClipIds: string[] }, AppError>
-  > {
+  > => {
     return await withTracerResult(
-      "ClipInteractor",
+      INTERACTOR_NAME,
       "searchExistVspoClips",
       async () => {
-        return this.context.runInTx(async (repos, services) => {
+        return context.runInTx(async (repos, services) => {
           return services.clipService.searchExistVspoClips({ clipIds });
         });
       },
     );
-  }
+  };
 
-  async searchNewClipsByVspoMemberName(): Promise<
+  const searchNewClipsByVspoMemberName = async (): Promise<
     Result<{ newCreators: Creators; clips: Clips }, AppError>
-  > {
+  > => {
     return await withTracerResult(
-      "ClipInteractor",
+      INTERACTOR_NAME,
       "searchNewClipsByVspoMemberName",
       async () => {
-        return this.context.runInTx(async (repos, services) => {
+        return context.runInTx(async (repos, services) => {
           return services.clipService.searchNewClipsByVspoMemberName();
         });
       },
     );
-  }
+  };
 
-  async deleteClips({
+  const deleteClips = async ({
     clipIds,
-  }: { clipIds: string[] }): Promise<Result<void, AppError>> {
-    return await withTracerResult("ClipInteractor", "deleteClips", async () => {
-      return this.context.runInTx(async (repos, services) => {
+  }: { clipIds: string[] }): Promise<Result<void, AppError>> => {
+    return await withTracerResult(INTERACTOR_NAME, "deleteClips", async () => {
+      return context.runInTx(async (repos, services) => {
         return repos.clipRepository.batchDelete(clipIds);
       });
     });
-  }
-}
+  };
+
+  return {
+    list,
+    batchUpsert,
+    searchNewVspoClipsAndNewCreators,
+    searchExistVspoClips,
+    searchNewClipsByVspoMemberName,
+    deleteClips,
+  };
+};

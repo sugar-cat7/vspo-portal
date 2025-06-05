@@ -1,58 +1,67 @@
 import type { AppError, Result } from "@vspo-lab/error";
 import type { PgTransactionConfig } from "drizzle-orm/pg-core";
 import {
-  CreatorService,
   type ICreatorService,
   type IStreamService,
-  StreamService,
+  createCreatorService,
+  createStreamService,
 } from "../../domain";
 import {
-  CreatorRepository,
   type DB,
-  DiscordMessageRepository,
-  DiscordServerRepository,
-  FreechatRepository,
   type ICreatorRepository,
   type IDiscordMessageRepository,
   type IDiscordServerRepository,
   type IFreechatRepository,
   type IStreamRepository,
   type ITxManager,
-  StreamRepository,
-  TxManager,
+  createCreatorRepository,
+  createDiscordMessageRepository,
+  createDiscordServerRepository,
+  createFreechatRepository,
+  createStreamRepository,
+  createTxManager,
 } from "../repository";
-import { type ITwitcastingService, TwitcastingService } from "../twitcasting";
-import { type ITwitchService, TwitchService } from "../twitch";
-import { type IYoutubeService, YoutubeService } from "../youtube";
+import {
+  type ITwitcastingService,
+  createTwitcastingService,
+} from "../twitcasting";
+import { type ITwitchService, createTwitchService } from "../twitch";
+import { type IYoutubeService, createYoutubeService } from "../youtube";
 
 import type { AppWorkerEnv } from "../../config/env/internal";
-import { ClipService, type IClipService } from "../../domain/service/clip";
 import {
-  DiscordService,
+  type IClipService,
+  createClipService,
+} from "../../domain/service/clip";
+import {
   type IDiscordService,
+  createDiscordService,
 } from "../../domain/service/discord";
 import {
-  CreatorInteractor,
-  EventInteractor,
   type ICreatorInteractor,
   type IEventInteractor,
   type IStreamInteractor,
-  StreamInteractor,
+  createCreatorInteractor,
+  createEventInteractor,
+  createStreamInteractor,
 } from "../../usecase";
-import { ClipInteractor, type IClipInteractor } from "../../usecase/clip";
+import { type IClipInteractor, createClipInteractor } from "../../usecase/clip";
 import {
-  DiscordInteractor,
   type IDiscordInteractor,
+  createDiscordInteractor,
 } from "../../usecase/discord";
 import {
-  FreechatInteractor,
   type IFreechatInteractor,
+  createFreechatInteractor,
 } from "../../usecase/freechat";
-import { AIService, type IAIService } from "../ai";
-import { CloudflareKVCacheClient, type ICacheClient } from "../cache";
-import { DiscordClient, type IDiscordClient } from "../discord";
-import { ClipRepository, type IClipRepository } from "../repository/clip";
-import { EventRepository, type IEventRepository } from "../repository/event";
+import { type IAIService, createAIService } from "../ai";
+import { type ICacheClient, createCloudflareKVCacheClient } from "../cache";
+import { type IDiscordClient, createDiscordClient } from "../discord";
+import { type IClipRepository, createClipRepository } from "../repository/clip";
+import {
+  type IEventRepository,
+  createEventRepository,
+} from "../repository/event";
 
 export interface IRepositories {
   creatorRepository: ICreatorRepository;
@@ -66,13 +75,13 @@ export interface IRepositories {
 
 export function createRepositories(tx: DB): IRepositories {
   return {
-    creatorRepository: new CreatorRepository(tx),
-    streamRepository: new StreamRepository(tx),
-    discordServerRepository: new DiscordServerRepository(tx),
-    discordMessageRepository: new DiscordMessageRepository(tx),
-    clipRepository: new ClipRepository(tx),
-    eventRepository: new EventRepository(tx),
-    freechatRepository: new FreechatRepository(tx),
+    creatorRepository: createCreatorRepository(tx),
+    streamRepository: createStreamRepository(tx),
+    discordServerRepository: createDiscordServerRepository(tx),
+    discordMessageRepository: createDiscordMessageRepository(tx),
+    clipRepository: createClipRepository(tx),
+    eventRepository: createEventRepository(tx),
+    freechatRepository: createFreechatRepository(tx),
   };
 }
 
@@ -93,13 +102,13 @@ export function createServices(
   cacheClient: ICacheClient,
 ): IServices {
   return {
-    creatorService: new CreatorService({
+    creatorService: createCreatorService({
       youtubeClient,
       creatorRepository: repos.creatorRepository,
       aiService,
       cacheClient,
     }),
-    streamService: new StreamService({
+    streamService: createStreamService({
       youtubeClient,
       twitchClient,
       twitCastingClient: twitcastingClient,
@@ -108,14 +117,14 @@ export function createServices(
       aiService,
       cacheClient,
     }),
-    discordService: new DiscordService({
+    discordService: createDiscordService({
       discordServerRepository: repos.discordServerRepository,
       discordClient: discordClient,
       streamRepository: repos.streamRepository,
       discordMessageRepository: repos.discordMessageRepository,
       cacheClient,
     }),
-    clipService: new ClipService({
+    clipService: createClipService({
       youtubeClient,
       twitchClient,
       creatorRepository: repos.creatorRepository,
@@ -132,96 +141,101 @@ export interface IAppContext {
   ): Promise<Result<T, AppError>>;
 }
 
-export class AppContext implements IAppContext {
-  constructor(
-    private readonly txManager: ITxManager,
-    private readonly youtubeClient: IYoutubeService,
-    private readonly twitchClient: ITwitchService,
-    private readonly twitcastingClient: ITwitcastingService,
-    private readonly aiService: IAIService,
-    private readonly discordClient: IDiscordClient,
-    private readonly cacheClient: ICacheClient,
-  ) {}
-
-  async runInTx<T>(
+export const createAppContext = (
+  txManager: ITxManager,
+  youtubeClient: IYoutubeService,
+  twitchClient: ITwitchService,
+  twitcastingClient: ITwitcastingService,
+  aiService: IAIService,
+  discordClient: IDiscordClient,
+  cacheClient: ICacheClient,
+): IAppContext => {
+  const runInTx = async <T>(
     operation: (
       repos: IRepositories,
       services: IServices,
     ) => Promise<Result<T, AppError>>,
     config?: PgTransactionConfig,
-  ): Promise<Result<T, AppError>> {
-    return this.txManager.runTx(async (tx) => {
+  ): Promise<Result<T, AppError>> => {
+    return txManager.runTx(async (tx) => {
       const repos = createRepositories(tx);
 
       const services = createServices(
         repos,
-        this.youtubeClient,
-        this.twitchClient,
-        this.twitcastingClient,
-        this.aiService,
-        this.discordClient,
-        this.cacheClient,
+        youtubeClient,
+        twitchClient,
+        twitcastingClient,
+        aiService,
+        discordClient,
+        cacheClient,
       );
 
       return operation(repos, services);
     }, config);
-  }
+  };
+
+  return { runInTx };
+};
+
+export interface IContainer {
+  readonly cacheClient: ICacheClient;
+  readonly creatorInteractor: ICreatorInteractor;
+  readonly streamInteractor: IStreamInteractor;
+  readonly clipInteractor: IClipInteractor;
+  readonly discordInteractor: IDiscordInteractor;
+  readonly eventInteractor: IEventInteractor;
+  readonly freechatInteractor: IFreechatInteractor;
 }
 
-export class Container {
-  private readonly youtubeService: IYoutubeService;
-  private readonly twitchService: ITwitchService;
-  private readonly twitcastingService: ITwitcastingService;
-  private readonly discordClient: IDiscordClient;
-  private readonly aiService: IAIService;
-  private readonly txManager: TxManager;
-  cacheClient: ICacheClient;
-  creatorInteractor: ICreatorInteractor;
-  streamInteractor: IStreamInteractor;
-  clipInteractor: IClipInteractor;
-  discordInteractor: IDiscordInteractor;
-  eventInteractor: IEventInteractor;
-  freechatInteractor: IFreechatInteractor;
-  constructor(private readonly env: AppWorkerEnv) {
-    this.cacheClient = new CloudflareKVCacheClient(this.env.APP_KV);
+export const createContainer = (env: AppWorkerEnv): IContainer => {
+  const cacheClient = createCloudflareKVCacheClient(env.APP_KV);
 
-    this.youtubeService = new YoutubeService(this.env.YOUTUBE_API_KEY);
-    this.twitchService = new TwitchService({
-      clientId: this.env.TWITCH_CLIENT_ID,
-      clientSecret: this.env.TWITCH_CLIENT_SECRET,
-    });
-    this.twitcastingService = new TwitcastingService(
-      this.env.TWITCASTING_ACCESS_TOKEN,
-    );
-    this.txManager = new TxManager({
-      connectionString:
-        this.env.ENVIRONMENT === "local"
-          ? this.env.DEV_DB_CONNECTION_STRING
-          : this.env.DB.connectionString,
-      isQueryLoggingEnabled: this.env.ENVIRONMENT === "local",
-    });
-    this.aiService = new AIService({
-      apiKey: this.env.OPENAI_API_KEY,
-      organization: this.env.OPENAI_ORGANIZATION,
-      project: this.env.OPENAI_PROJECT,
-      baseURL: this.env.OPENAI_BASE_URL,
-    });
+  const youtubeService = createYoutubeService(env.YOUTUBE_API_KEY);
+  const twitchService = createTwitchService({
+    clientId: env.TWITCH_CLIENT_ID,
+    clientSecret: env.TWITCH_CLIENT_SECRET,
+  });
+  const twitcastingService = createTwitcastingService(
+    env.TWITCASTING_ACCESS_TOKEN,
+  );
+  const txManager = createTxManager({
+    connectionString:
+      env.ENVIRONMENT === "local"
+        ? env.DEV_DB_CONNECTION_STRING
+        : env.DB.connectionString,
+    isQueryLoggingEnabled: env.ENVIRONMENT === "local",
+  });
+  const aiService = createAIService({
+    apiKey: env.OPENAI_API_KEY,
+    organization: env.OPENAI_ORGANIZATION,
+    project: env.OPENAI_PROJECT,
+    baseURL: env.OPENAI_BASE_URL,
+  });
 
-    this.discordClient = new DiscordClient(this.env);
-    const context = new AppContext(
-      this.txManager,
-      this.youtubeService,
-      this.twitchService,
-      this.twitcastingService,
-      this.aiService,
-      this.discordClient,
-      this.cacheClient,
-    );
-    this.creatorInteractor = new CreatorInteractor(context);
-    this.streamInteractor = new StreamInteractor(context);
-    this.discordInteractor = new DiscordInteractor(context);
-    this.clipInteractor = new ClipInteractor(context);
-    this.eventInteractor = new EventInteractor(context);
-    this.freechatInteractor = new FreechatInteractor(context);
-  }
-}
+  const discordClient = createDiscordClient(env);
+  const context = createAppContext(
+    txManager,
+    youtubeService,
+    twitchService,
+    twitcastingService,
+    aiService,
+    discordClient,
+    cacheClient,
+  );
+  const creatorInteractor = createCreatorInteractor(context);
+  const streamInteractor = createStreamInteractor(context);
+  const discordInteractor = createDiscordInteractor(context);
+  const clipInteractor = createClipInteractor(context);
+  const eventInteractor = createEventInteractor(context);
+  const freechatInteractor = createFreechatInteractor(context);
+
+  return {
+    cacheClient,
+    creatorInteractor,
+    streamInteractor,
+    clipInteractor,
+    discordInteractor,
+    eventInteractor,
+    freechatInteractor,
+  };
+};

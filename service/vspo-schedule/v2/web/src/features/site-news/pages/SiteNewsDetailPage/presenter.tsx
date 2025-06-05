@@ -1,6 +1,7 @@
 import { Breadcrumb, TweetEmbed } from "@/features/shared/components/Elements";
 import { SiteNewsMarkdownItem } from "@/lib/markdown";
-import { formatDate, getSiteNewsTagColor } from "@/lib/utils";
+import { getSiteNewsTagColor } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { Box, Chip, Toolbar, Typography } from "@mui/material";
 import { TFunction } from "next-i18next";
 import * as React from "react";

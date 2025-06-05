@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { type TestCase, mockTwitchResponses } from "../../test/mock/twitch";
-import { TwitchService } from "./index";
+import { type ITwitchService, createTwitchService } from "./index";
 
 const mockConfig = {
   clientId: "dummy_client_id",
@@ -8,10 +8,10 @@ const mockConfig = {
 };
 
 describe("TwitchService", () => {
-  let twitchService: TwitchService;
+  let twitchService: ITwitchService;
 
   beforeEach(() => {
-    twitchService = new TwitchService(mockConfig);
+    twitchService = createTwitchService(mockConfig);
   });
 
   describe("getStreams", () => {

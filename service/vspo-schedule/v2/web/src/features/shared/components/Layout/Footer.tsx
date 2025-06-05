@@ -1,7 +1,7 @@
 import { useTimeZoneContext } from "@/hooks";
-import { getCurrentUTCDate } from "@/lib/dayjs";
 import { formatDate } from "@/lib/utils";
 import { Box, Typography } from "@mui/material";
+import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { useTranslation } from "next-i18next";
 import NextLink from "next/link";
 import React from "react";

@@ -4,7 +4,7 @@ import {
   getCurrentUTCDate,
 } from "@vspo-lab/dayjs";
 import { AppError, Err, Ok, type Result, wrap } from "@vspo-lab/error";
-import { count, desc, eq, inArray } from "drizzle-orm";
+import { count, desc, eq } from "drizzle-orm";
 import {
   type DiscordMessage,
   type DiscordMessages,
@@ -34,12 +34,12 @@ export interface IDiscordMessageRepository {
   count(query: ListQuery): Promise<Result<number, AppError>>;
 }
 
-export class DiscordMessageRepository implements IDiscordMessageRepository {
-  constructor(private readonly db: DB) {}
-
-  async create(
+export function createDiscordMessageRepository(
+  db: DB,
+): IDiscordMessageRepository {
+  const create = async (
     message: DiscordMessage,
-  ): Promise<Result<DiscordMessage, AppError>> {
+  ): Promise<Result<DiscordMessage, AppError>> => {
     return withTracerResult(
       "DiscordMessageRepository",
       "create",
@@ -49,7 +49,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
 
         // Insert or update the message content
         const messageResult = await wrap(
-          this.db
+          db
             .insert(discordMessageTable)
             .values(
               createInsertDiscordMessage({
@@ -82,7 +82,7 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
 
         if (message.type === "admin") {
           const adminMessageResult = await wrap(
-            this.db
+            db
               .insert(discordAdminMessageTable)
               .values(
                 createInsertDiscordAdminMessage({
@@ -121,15 +121,17 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
         );
       },
     );
-  }
+  };
 
-  async getById(id: string): Promise<Result<DiscordMessage, AppError>> {
+  const getById = async (
+    id: string,
+  ): Promise<Result<DiscordMessage, AppError>> => {
     return withTracerResult(
       "DiscordMessageRepository",
       "getById",
       async (span) => {
         const messageResult = await wrap(
-          this.db
+          db
             .select({
               message: discordMessageTable,
               adminMessage: discordAdminMessageTable,
@@ -179,15 +181,17 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
         );
       },
     );
-  }
+  };
 
-  async list(query: ListQuery): Promise<Result<DiscordMessages, AppError>> {
+  const list = async (
+    query: ListQuery,
+  ): Promise<Result<DiscordMessages, AppError>> => {
     return withTracerResult(
       "DiscordMessageRepository",
       "list",
       async (span) => {
         const messagesResult = await wrap(
-          this.db
+          db
             .select({
               message: discordMessageTable,
               adminMessage: discordAdminMessageTable,
@@ -233,18 +237,17 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
         );
       },
     );
-  }
+  };
 
-  async count(query: ListQuery): Promise<Result<number, AppError>> {
+  const countFunc = async (
+    query: ListQuery,
+  ): Promise<Result<number, AppError>> => {
     return withTracerResult(
       "DiscordMessageRepository",
       "count",
       async (span) => {
         const countResult = await wrap(
-          this.db
-            .select({ count: count() })
-            .from(discordMessageTable)
-            .execute(),
+          db.select({ count: count() }).from(discordMessageTable).execute(),
           (err) =>
             new AppError({
               message: `Database error during discord messages count query: ${err.message}`,
@@ -260,5 +263,12 @@ export class DiscordMessageRepository implements IDiscordMessageRepository {
         return Ok(countResult.val.at(0)?.count ?? 0);
       },
     );
-  }
+  };
+
+  return {
+    create,
+    getById,
+    list,
+    count: countFunc,
+  };
 }

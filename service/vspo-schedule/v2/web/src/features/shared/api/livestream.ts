@@ -1,5 +1,4 @@
 import { getCloudflareEnvironmentContext } from "@/lib/cloudflare/context";
-import { addDaysAndConvertToUTC, convertToUTCTimestamp } from "@/lib/dayjs";
 import {
   ListStreams200StreamsItem,
   ListStreamsMemberType,
@@ -7,6 +6,7 @@ import {
   ListStreamsPlatform,
   VSPOApi,
 } from "@vspo-lab/api";
+import { addDaysAndConvertToUTC, convertToUTCTimestamp } from "@vspo-lab/dayjs";
 import { AppError, wrap } from "@vspo-lab/error";
 import { BaseError, Result } from "@vspo-lab/error";
 import { Livestream, Status, livestreamSchema } from "../domain";

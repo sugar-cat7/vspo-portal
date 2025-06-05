@@ -26,23 +26,39 @@ export interface ICreatorService {
   }): Promise<Result<Creators, AppError>>;
 }
 
-export class CreatorService implements ICreatorService {
-  private readonly SERVICE_NAME = "CreatorService";
+// Helper function to check differences between creators
+const diffCreators = (a: Creator, b: Creator): boolean => {
+  if (a.name !== b.name) {
+    return true;
+  }
+  if (a.memberType !== b.memberType) {
+    return true;
+  }
+  if (a.thumbnailURL !== b.thumbnailURL) {
+    return true;
+  }
+  if (a.channel?.youtube?.rawId !== b.channel?.youtube?.rawId) {
+    return true;
+  }
+  if (a.channel?.youtube?.name !== b.channel?.youtube?.name) {
+    return true;
+  }
+  return false;
+};
 
-  constructor(
-    private readonly deps: {
-      youtubeClient: IYoutubeService;
-      creatorRepository: ICreatorRepository;
-      aiService: IAIService;
-      cacheClient: ICacheClient;
-    },
-  ) {}
+export const createCreatorService = (deps: {
+  youtubeClient: IYoutubeService;
+  creatorRepository: ICreatorRepository;
+  aiService: IAIService;
+  cacheClient: ICacheClient;
+}): ICreatorService => {
+  const SERVICE_NAME = "CreatorService";
 
-  async searchCreatorsByMemberType(params: {
+  const searchCreatorsByMemberType = async (params: {
     memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
-  }): Promise<Result<Creators, AppError>> {
+  }): Promise<Result<Creators, AppError>> => {
     return withTracerResult(
-      this.SERVICE_NAME,
+      SERVICE_NAME,
       "searchCreatorsByMemberType",
       async (span) => {
         span.setAttributes({
@@ -50,11 +66,11 @@ export class CreatorService implements ICreatorService {
         });
 
         AppLogger.info("Searching creators by member type", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           memberType: params.memberType,
         });
 
-        const c = await this.deps.creatorRepository.list({
+        const c = await deps.creatorRepository.list({
           limit: 100,
           page: 0,
           memberType: params.memberType,
@@ -62,13 +78,13 @@ export class CreatorService implements ICreatorService {
         });
         if (c.err) {
           AppLogger.error("Failed to list creators", {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             error: c.err,
           });
           return c;
         }
 
-        const chs = await this.deps.youtubeClient.getChannels({
+        const chs = await deps.youtubeClient.getChannels({
           channelIds: c.val
             .map((v) => v.channel?.youtube?.rawId)
             .filter((v) => v !== undefined),
@@ -76,7 +92,7 @@ export class CreatorService implements ICreatorService {
 
         if (chs.err) {
           AppLogger.error("Failed to get YouTube channels", {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             error: chs.err,
           });
           return chs;
@@ -99,7 +115,7 @@ export class CreatorService implements ICreatorService {
                 youtube: ch.youtube,
               },
             });
-            if (this.diff(v, newCreator)) {
+            if (diffCreators(v, newCreator)) {
               return newCreator;
             }
             return null;
@@ -107,36 +123,36 @@ export class CreatorService implements ICreatorService {
           .filter((v) => v !== null);
 
         AppLogger.info("Successfully found creators", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           count: creators.length,
         });
         return Ok(creators);
       },
     );
-  }
+  };
 
-  async searchCreatorsByChannelIds(
+  const searchCreatorsByChannelIds = async (
     params: {
       channelId: string;
       memberType: "vspo_jp" | "vspo_en" | "vspo_ch" | "general";
     }[],
-  ): Promise<Result<Creators, AppError>> {
+  ): Promise<Result<Creators, AppError>> => {
     return withTracerResult(
-      this.SERVICE_NAME,
+      SERVICE_NAME,
       "searchCreatorsByChannelIds",
       async (span) => {
         AppLogger.info("Searching creators by channel IDs", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           channelCount: params.length,
         });
 
-        const chs = await this.deps.youtubeClient.getChannels({
+        const chs = await deps.youtubeClient.getChannels({
           channelIds: params.map((v) => v.channelId),
         });
 
         if (chs.err) {
           AppLogger.error("Failed to get YouTube channels", {
-            service: this.SERVICE_NAME,
+            service: SERVICE_NAME,
             error: chs.err,
           });
           return chs;
@@ -171,73 +187,56 @@ export class CreatorService implements ICreatorService {
         }
 
         AppLogger.info("Successfully created creators", {
-          service: this.SERVICE_NAME,
+          service: SERVICE_NAME,
           count: creators.length,
         });
         return Ok(creators);
       },
     );
-  }
+  };
 
-  async translateCreators({
+  const translateCreators = async ({
     languageCode,
     creators,
   }: {
     languageCode: string;
     creators: Creators;
-  }): Promise<Result<Creators, AppError>> {
-    return withTracerResult(
-      this.SERVICE_NAME,
-      "translateCreators",
-      async (span) => {
-        AppLogger.info("Translating creators", {
-          service: this.SERVICE_NAME,
-          languageCode,
-          creatorCount: creators.length,
-        });
+  }): Promise<Result<Creators, AppError>> => {
+    return withTracerResult(SERVICE_NAME, "translateCreators", async (span) => {
+      AppLogger.info("Translating creators", {
+        service: SERVICE_NAME,
+        languageCode,
+        creatorCount: creators.length,
+      });
 
-        const translatePromises = creators.map((creator) =>
-          this.deps.aiService.translateText(creator.name ?? "", languageCode),
-        );
-        const translatedResults = await Promise.allSettled(translatePromises);
-        const translatedCreators = creators.map((creator, i) => {
-          const translatedText =
-            translatedResults[i].status === "fulfilled"
-              ? (translatedResults[i].value.val?.translatedText ?? creator.name)
-              : creator.name;
-          return {
-            ...creator,
-            name: translatedText,
-            languageCode: languageCode,
-            translated: true,
-          };
-        });
+      const translatePromises = creators.map((creator) =>
+        deps.aiService.translateText(creator.name ?? "", languageCode),
+      );
+      const translatedResults = await Promise.allSettled(translatePromises);
+      const translatedCreators = creators.map((creator, i) => {
+        const translatedText =
+          translatedResults[i].status === "fulfilled"
+            ? (translatedResults[i].value.val?.translatedText ?? creator.name)
+            : creator.name;
+        return {
+          ...creator,
+          name: translatedText,
+          languageCode: languageCode,
+          translated: true,
+        };
+      });
 
-        AppLogger.info("Successfully translated creators", {
-          service: this.SERVICE_NAME,
-          count: translatedCreators.length,
-        });
-        return Ok(translatedCreators);
-      },
-    );
-  }
+      AppLogger.info("Successfully translated creators", {
+        service: SERVICE_NAME,
+        count: translatedCreators.length,
+      });
+      return Ok(translatedCreators);
+    });
+  };
 
-  private diff(a: Creator, b: Creator): boolean {
-    if (a.name !== b.name) {
-      return true;
-    }
-    if (a.memberType !== b.memberType) {
-      return true;
-    }
-    if (a.thumbnailURL !== b.thumbnailURL) {
-      return true;
-    }
-    if (a.channel?.youtube?.rawId !== b.channel?.youtube?.rawId) {
-      return true;
-    }
-    if (a.channel?.youtube?.name !== b.channel?.youtube?.name) {
-      return true;
-    }
-    return false;
-  }
-}
+  return {
+    searchCreatorsByMemberType,
+    searchCreatorsByChannelIds,
+    translateCreators,
+  };
+};

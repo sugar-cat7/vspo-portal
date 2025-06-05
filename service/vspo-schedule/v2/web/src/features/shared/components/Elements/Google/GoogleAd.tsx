@@ -10,12 +10,8 @@ export const GoogleAd: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    try {
-      // eslint-disable-next-line
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (error) {
-      console.error(error);
-    }
+    // eslint-disable-next-line
+    (window.adsbygoogle = window.adsbygoogle || []).push({});
   }, [router.asPath]);
 
   return (

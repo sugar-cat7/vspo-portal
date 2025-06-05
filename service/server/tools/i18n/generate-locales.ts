@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import type { TargetLang } from "../../domain/translate";
-import { AIService } from "../../infra/ai";
+import { createAIService } from "../../infra/ai";
 import { type MessageType, translateMessages } from "./schema";
 
 const targetLanguages: TargetLang[] = [
@@ -16,7 +16,7 @@ const targetLanguages: TargetLang[] = [
 ];
 
 async function generateLocales() {
-  const aiService = new AIService({
+  const aiService = createAIService({
     apiKey: process.env.OPENAI_API_KEY || "",
     organization: process.env.OPENAI_ORG_ID || "",
     project: process.env.OPENAI_PROJECT_ID || "",

@@ -5,12 +5,12 @@ import {
   mockYoutubeClient,
   mockYoutubeResponses,
 } from "../../test/mock/youtube";
-import { YoutubeService, query } from "./index";
+import { type IYoutubeService, createYoutubeService, query } from "./index";
 
 type QueryEventType = "completed" | "live" | "upcoming";
 
 describe("YoutubeService", () => {
-  let youtubeService: YoutubeService;
+  let youtubeService: IYoutubeService;
 
   beforeEach(() => {
     vi.mock("googleapis", () => ({
@@ -18,7 +18,7 @@ describe("YoutubeService", () => {
         youtube: vi.fn().mockImplementation(() => mockYoutubeClient),
       },
     }));
-    youtubeService = new YoutubeService("dummy_api_key");
+    youtubeService = createYoutubeService("dummy_api_key");
     vi.clearAllMocks();
   });
 

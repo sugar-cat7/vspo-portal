@@ -27,15 +27,11 @@ export const DateSearchDialogContainer: React.FC<
     let hasUpdate = false;
 
     if (router.query.date && typeof router.query.date === "string") {
-      try {
-        const dateFromQuery = new Date(router.query.date);
-        if (!isNaN(dateFromQuery.getTime())) {
-          updateFormData.selectedDate = dateFromQuery;
-          setDateInputValue(format(dateFromQuery, "yyyy-MM-dd"));
-          hasUpdate = true;
-        }
-      } catch (e) {
-        console.error("Invalid date in URL", e);
+      const dateFromQuery = new Date(router.query.date);
+      if (!isNaN(dateFromQuery.getTime())) {
+        updateFormData.selectedDate = dateFromQuery;
+        setDateInputValue(format(dateFromQuery, "yyyy-MM-dd"));
+        hasUpdate = true;
       }
     }
 

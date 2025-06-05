@@ -1,6 +1,6 @@
 import { DEFAULT_LOCALE } from "@/lib/Const";
-import { getCurrentUTCDate } from "@/lib/dayjs";
 import { getInitializedI18nInstance } from "@/lib/utils";
+import { getCurrentUTCDate } from "@vspo-lab/dayjs";
 import { GetServerSidePropsContext } from "next";
 import { fetchSingleClipService } from "../../api/clipService";
 import { YouTubeClipsProps } from "./container";

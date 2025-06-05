@@ -52,10 +52,10 @@ type ListQuery = {
   platform?: string;
   status?: string;
   memberType?: string;
-  startDateFrom?: Date; // Start date range: streams starting on or after this date
-  startDateTo?: Date; // Start date range: streams starting on or before this date
+  startDateFrom?: Date;
+  startDateTo?: Date;
   endedAt?: Date;
-  languageCode: string; // ISO 639-1 language code or [default] explicitly specified to narrow down to 1creator
+  languageCode: string;
   orderBy?: "asc" | "desc";
   channelIds?: string[];
   includeDeleted?: boolean;
@@ -69,18 +69,63 @@ export interface IStreamRepository {
   deletedListIds(): Promise<Result<string[], AppError>>;
 }
 
-export class StreamRepository implements IStreamRepository {
-  constructor(private readonly db: DB) {}
+const buildFilters = (query: ListQuery): SQL[] => {
+  const filters: SQL[] = [];
+  const languageCode = query.languageCode || "default";
 
-  async list(query: ListQuery): Promise<Result<Streams, AppError>> {
+  if (query.platform) {
+    filters.push(eq(videoTable.platformType, query.platform));
+  }
+  filters.push(eq(videoTable.videoType, "vspo_stream"));
+  if (query.status) {
+    filters.push(eq(streamStatusTable.status, query.status));
+  }
+  if (query.startDateFrom) {
+    filters.push(
+      gte(streamStatusTable.startedAt, convertToUTCDate(query.startDateFrom)),
+    );
+  }
+
+  if (query.startDateTo) {
+    filters.push(
+      lte(streamStatusTable.startedAt, convertToUTCDate(query.startDateTo)),
+    );
+  }
+  if (query.endedAt) {
+    filters.push(
+      lte(streamStatusTable.endedAt, convertToUTCDate(query.endedAt)),
+    );
+  }
+
+  if (!query.includeDeleted) {
+    filters.push(eq(videoTable.deleted, false));
+  }
+
+  filters.push(eq(videoTranslationTable.languageCode, languageCode));
+  filters.push(eq(creatorTranslationTable.languageCode, languageCode));
+
+  if (query.memberType) {
+    if (query.memberType !== "vspo_all") {
+      filters.push(eq(creatorTable.memberType, query.memberType));
+    }
+  }
+  if (query.channelIds && query.channelIds.length > 0) {
+    filters.push(inArray(videoTable.channelId, query.channelIds));
+  }
+
+  return filters;
+};
+
+export const createStreamRepository = (db: DB): IStreamRepository => {
+  const list = async (query: ListQuery): Promise<Result<Streams, AppError>> => {
     return withTracerResult("StreamRepository", "list", async (span) => {
       AppLogger.info("StreamRepository list", {
         query,
       });
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const streamResult = await wrap(
-        this.db
+        db
           .select()
           .from(videoTable)
           .innerJoin(
@@ -157,14 +202,14 @@ export class StreamRepository implements IStreamRepository {
         ),
       );
     });
-  }
+  };
 
-  async count(query: ListQuery): Promise<Result<number, AppError>> {
+  const count = async (query: ListQuery): Promise<Result<number, AppError>> => {
     return withTracerResult("StreamRepository", "count", async (span) => {
-      const filters = this.buildFilters(query);
+      const filters = buildFilters(query);
 
       const streamResult = await wrap(
-        this.db
+        db
           .select({ value: countDistinct(videoTable.id) })
           .from(videoTable)
           .innerJoin(
@@ -200,9 +245,11 @@ export class StreamRepository implements IStreamRepository {
 
       return Ok(streamResult.val.at(0)?.value ?? 0);
     });
-  }
+  };
 
-  async batchUpsert(streams: Streams): Promise<Result<Streams, AppError>> {
+  const batchUpsert = async (
+    streams: Streams,
+  ): Promise<Result<Streams, AppError>> => {
     return withTracerResult("StreamRepository", "batchUpsert", async (span) => {
       const dbVideos: InsertVideo[] = [];
       const dbStreamStatus: InsertStreamStatus[] = [];
@@ -266,7 +313,7 @@ export class StreamRepository implements IStreamRepository {
         Ok([]);
       if (dbVideos.length > 0) {
         videoResult = await wrap(
-          this.db
+          db
             .insert(videoTable)
             .values(dbVideos)
             .onConflictDoUpdate({
@@ -299,7 +346,7 @@ export class StreamRepository implements IStreamRepository {
       > = Ok([]);
       if (dbStreamStatus.length > 0) {
         streamStatusResult = await wrap(
-          this.db
+          db
             .insert(streamStatusTable)
             .values(dbStreamStatus)
             .onConflictDoUpdate({
@@ -333,7 +380,7 @@ export class StreamRepository implements IStreamRepository {
       > = Ok([]);
       if (dbVideoTranslation.length > 0) {
         videoTranslationResult = await wrap(
-          this.db
+          db
             .insert(videoTranslationTable)
             .values(dbVideoTranslation)
             .onConflictDoUpdate({
@@ -399,12 +446,14 @@ export class StreamRepository implements IStreamRepository {
         ),
       );
     });
-  }
+  };
 
-  async batchDelete(streamIds: string[]): Promise<Result<void, AppError>> {
+  const batchDelete = async (
+    streamIds: string[],
+  ): Promise<Result<void, AppError>> => {
     return withTracerResult("StreamRepository", "batchDelete", async (span) => {
       const result = await wrap(
-        this.db
+        db
           .delete(videoTable)
           .where(inArray(videoTable.id, streamIds))
           .execute(),
@@ -422,15 +471,15 @@ export class StreamRepository implements IStreamRepository {
 
       return Ok();
     });
-  }
+  };
 
-  async deletedListIds(): Promise<Result<string[], AppError>> {
+  const deletedListIds = async (): Promise<Result<string[], AppError>> => {
     return withTracerResult(
       "StreamRepository",
       "deletedListIds",
       async (span) => {
         const result = await wrap(
-          this.db
+          db
             .select({ rawId: videoTable.rawId })
             .from(videoTable)
             .where(eq(videoTable.deleted, true)),
@@ -449,54 +498,13 @@ export class StreamRepository implements IStreamRepository {
         return Ok(result.val.map((v) => v.rawId));
       },
     );
-  }
+  };
 
-  private buildFilters(query: ListQuery): SQL[] {
-    const filters: SQL[] = [];
-    const languageCode = query.languageCode || "default";
-
-    if (query.platform) {
-      filters.push(eq(videoTable.platformType, query.platform));
-    }
-    // Always filter for stream type
-    filters.push(eq(videoTable.videoType, "vspo_stream"));
-    if (query.status) {
-      filters.push(eq(streamStatusTable.status, query.status));
-    }
-    if (query.startDateFrom) {
-      filters.push(
-        gte(streamStatusTable.startedAt, convertToUTCDate(query.startDateFrom)),
-      );
-    }
-
-    if (query.startDateTo) {
-      filters.push(
-        lte(streamStatusTable.startedAt, convertToUTCDate(query.startDateTo)),
-      );
-    }
-    if (query.endedAt) {
-      filters.push(
-        lte(streamStatusTable.endedAt, convertToUTCDate(query.endedAt)),
-      );
-    }
-
-    if (!query.includeDeleted) {
-      filters.push(eq(videoTable.deleted, false));
-    }
-
-    // Always add language filters with default fallback
-    filters.push(eq(videoTranslationTable.languageCode, languageCode));
-    filters.push(eq(creatorTranslationTable.languageCode, languageCode));
-
-    if (query.memberType) {
-      if (query.memberType !== "vspo_all") {
-        filters.push(eq(creatorTable.memberType, query.memberType));
-      }
-    }
-    if (query.channelIds && query.channelIds.length > 0) {
-      filters.push(inArray(videoTable.channelId, query.channelIds));
-    }
-
-    return filters;
-  }
-}
+  return {
+    list,
+    count,
+    batchUpsert,
+    batchDelete,
+    deletedListIds,
+  };
+};
