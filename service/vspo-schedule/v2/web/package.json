@@ -27,7 +27,7 @@
     "@mui/material": "^7.1.0",
     "@mui/material-nextjs": "^7.1.0",
     "@mui/system": "^7.1.0",
-    "@opennextjs/cloudflare": "^1.1.0",
+    "@opennextjs/cloudflare": "^1.2.0",
     "@vspo-lab/api": "workspace:^",
     "@vspo-lab/error": "workspace:^",
     "@vspo-lab/dayjs": "workspace:^",
@@ -59,6 +59,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "typescript": "^5",
-    "wrangler": "^4.14.4"
+    "wrangler": "^4.19.1"
   }
 }
