@@ -27,6 +27,14 @@ localConnectionString = "postgres://user:password@localhost:5432/vspo"
  max_batch_timeout = 3
  dead_letter_queue = "prd-write-queue-dead-letter"
 
+[[durable_objects.bindings]]
+name = "DISCORD_RATE_LIMITER"
+class_name = "DiscordRateLimiter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DiscordRateLimiter"]
+
 [vars]
 SERVICE_NAME = "prd-vspo-portal-app"
 ENVIRONMENT = "production"

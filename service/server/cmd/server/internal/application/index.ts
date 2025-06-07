@@ -9,6 +9,7 @@ import { TargetLangSchema } from "../../../../domain/translate";
 import { cacheKey } from "../../../../infra/cache";
 import type { ICacheClient } from "../../../../infra/cache";
 import { createContainer } from "../../../../infra/dependency";
+import { DiscordRateLimiter } from "../../../../infra/durableObject";
 import { withTracer, withTracerResult } from "../../../../infra/http/trace";
 import {
   type MessageParam,
@@ -690,5 +691,7 @@ export class ApplicationService extends WorkerEntrypoint<AppWorkerEnv> {
     return createContainer(e.data);
   }
 }
+
+export { DiscordRateLimiter };
 
 export default queueHandler;

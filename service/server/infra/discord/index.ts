@@ -1,5 +1,4 @@
-import type { RestManager } from "@discordeno/rest";
-import { createRestManager } from "@discordeno/rest";
+import { type RestManager, createRestManager } from "@discordeno/rest";
 import type { DiscordEmbed } from "@discordeno/types";
 import { getCurrentUTCString } from "@vspo-lab/dayjs";
 import {
@@ -22,6 +21,8 @@ import {
   getStatusFromColor,
 } from "../../domain";
 import { createUUID } from "../../pkg/uuid";
+import type { DiscordRateLimiter } from "../durableObject";
+import { withRateLimitRetry } from "../durableObject/ratelimit";
 import { withTracerResult } from "../http/trace/cloudflare";
 
 type SendMessageParams = {
@@ -67,6 +68,85 @@ export interface IDiscordClient {
   ): Promise<Result<DiscordMessage, AppError>>;
 }
 
+// Helper function to check Discord's built-in rate limit
+const checkDiscordRateLimit = (
+  rest: RestManager,
+  url: string,
+  identifier: string,
+): number | false => {
+  try {
+    return rest.checkRateLimits(url, identifier);
+  } catch (error) {
+    AppLogger.warn("Failed to check Discord rate limits", { error });
+    return false;
+  }
+};
+
+// Helper function to wait for rate limit to reset
+const waitForRateLimitReset = async (resetTime: number): Promise<void> => {
+  const waitMs = resetTime - Date.now();
+  if (waitMs > 0) {
+    AppLogger.info(`Waiting for Discord rate limit reset: ${waitMs}ms`);
+    await new Promise((resolve) => setTimeout(resolve, waitMs));
+  }
+};
+
+// Helper function to check both custom and Discord's built-in rate limits
+const checkRateLimit = async (
+  counter: DiscordRateLimiter,
+  rest: RestManager,
+  operation: string,
+  url?: string,
+): Promise<Result<void, AppError>> => {
+  // Check custom rate limit first
+  const customRateLimitResult = await counter.checkRateLimit();
+  if (customRateLimitResult.err) {
+    AppLogger.warn(`Custom Discord API rate limit exceeded for ${operation}`, {
+      operation,
+      error: customRateLimitResult.err.message,
+    });
+    return Err(
+      new AppError({
+        message: `Custom Discord API rate limit exceeded for ${operation}: ${customRateLimitResult.err.message}`,
+        code: "RATE_LIMITED",
+        cause: customRateLimitResult.err,
+      }),
+    );
+  }
+
+  // Check Discord's built-in rate limit if URL is provided
+  if (url) {
+    const identifier = `${operation}_${Date.now()}`;
+    const rateLimitTime = checkDiscordRateLimit(rest, url, identifier);
+
+    if (rateLimitTime !== false) {
+      AppLogger.warn(`Discord built-in rate limit active for ${operation}`, {
+        operation,
+        url,
+        resetTime: rateLimitTime,
+      });
+
+      // Wait for rate limit to reset
+      await waitForRateLimitReset(rateLimitTime);
+    }
+  }
+
+  // Check if globally rate limited
+  if (rest.globallyRateLimited) {
+    AppLogger.warn(`Discord API globally rate limited for ${operation}`, {
+      operation,
+    });
+    return Err(
+      new AppError({
+        message: `Discord API globally rate limited for ${operation}`,
+        code: "RATE_LIMITED",
+      }),
+    );
+  }
+
+  return Ok(undefined);
+};
+
 // Helper function to determine the appropriate error code based on Discord API errors
 const getErrorCodeFromDiscordError = (err: Error): ErrorCode => {
   // https://github.com/discordeno/discordeno/blob/main/packages/rest/src/manager.ts
@@ -106,48 +186,73 @@ const getErrorCodeFromDiscordError = (err: Error): ErrorCode => {
   return "INTERNAL_SERVER_ERROR";
 };
 
+// Helper function to get DiscordRateLimiter stub
+const getDiscordRateLimiterStub = (
+  binding: DurableObjectNamespace,
+): DiscordRateLimiter => {
+  const id = binding.idFromName("discord-rate-limiter");
+
+  // Get the stub for the Durable Object instance
+  const stub = binding.get(id);
+  return stub as unknown as DiscordRateLimiter;
+};
+
 export const createDiscordClient = (env: DiscordEnv): IDiscordClient => {
   const rest = createRestManager({
     token: env.DISCORD_TOKEN,
   });
   const botId = env.DISCORD_APPLICATION_ID;
+  const counter = getDiscordRateLimiterStub(env.DISCORD_RATE_LIMITER);
 
   const sendMessage = async (
     params: SendMessageParams,
   ): Promise<Result<string, AppError>> => {
     return withTracerResult("discord", "sendMessage", async (span) => {
       const { channelId, content, embeds } = params;
-      AppLogger.info("Sending message to Discord channel", {
-        channel_id: channelId,
-        has_embeds: embeds ? embeds.length > 0 : false,
-      });
 
-      const responseResult = await wrap(
-        rest.sendMessage(channelId, {
-          content,
-          embeds: embeds?.slice(0, 10),
-        }),
-        (err: Error) => {
-          AppLogger.error("Failed to send message to Discord channel", {
-            channel_id: channelId,
-            error: err,
-          });
+      return withRateLimitRetry(async () => {
+        // Check rate limits (both custom and Discord's built-in)
+        const url = `${rest.baseUrl}/v${rest.version}/channels/${channelId}/messages`;
+        const rateLimitCheck = await checkRateLimit(
+          counter,
+          rest,
+          "sendMessage",
+          url,
+        );
+        if (rateLimitCheck.err) return Err(rateLimitCheck.err);
 
-          const errorCode = getErrorCodeFromDiscordError(err);
+        AppLogger.info("Sending message to Discord channel", {
+          channel_id: channelId,
+          has_embeds: embeds ? embeds.length > 0 : false,
+        });
 
-          return new AppError({
-            message: `Failed to send message to channel ${channelId}: ${err.message}`,
-            code: errorCode,
-            cause: err.cause,
-          });
-        },
-      );
-      if (responseResult.err) return Err(responseResult.err);
+        const responseResult = await wrap(
+          rest.sendMessage(channelId, {
+            content,
+            embeds: embeds?.slice(0, 10),
+          }),
+          (err: Error) => {
+            AppLogger.error("Failed to send message to Discord channel", {
+              channel_id: channelId,
+              error: err,
+            });
 
-      AppLogger.info("Successfully sent message to Discord channel", {
-        channel_id: channelId,
-      });
-      return Ok(responseResult.val.id);
+            const errorCode = getErrorCodeFromDiscordError(err);
+
+            return new AppError({
+              message: `Failed to send message to channel ${channelId}: ${err.message}`,
+              code: errorCode,
+              cause: err,
+            });
+          },
+        );
+        if (responseResult.err) return Err(responseResult.err);
+
+        AppLogger.info("Successfully sent message to Discord channel", {
+          channel_id: channelId,
+        });
+        return Ok(responseResult.val.id);
+      }, "sendMessage");
     });
   };
 
@@ -156,57 +261,70 @@ export const createDiscordClient = (env: DiscordEnv): IDiscordClient => {
   ): Promise<Result<DiscordChannel, AppError>> => {
     return withTracerResult("discord", "getChannel", async (span) => {
       const { channelId, serverId } = params;
-      AppLogger.info("Fetching Discord channel info", {
-        channel_id: channelId,
-        server_id: serverId,
-      });
 
-      const responseResult = await wrap(
-        rest.getChannel(channelId),
-        (err: Error) => {
-          AppLogger.error("Failed to fetch Discord channel info", {
-            channel_id: channelId,
-            server_id: serverId,
-            error: err,
-          });
+      return withRateLimitRetry(async () => {
+        // Check rate limits (both custom and Discord's built-in)
+        const url = `${rest.baseUrl}/v${rest.version}/channels/${channelId}`;
+        const rateLimitCheck = await checkRateLimit(
+          counter,
+          rest,
+          "getChannel",
+          url,
+        );
+        if (rateLimitCheck.err) return Err(rateLimitCheck.err);
 
-          const errorCode = getErrorCodeFromDiscordError(err);
-
-          return new AppError({
-            message: `Failed to fetch channel info for ${channelId}: ${err.message}`,
-            code: errorCode,
-            cause: err.cause,
-          });
-        },
-      );
-      if (responseResult.err) return Err(responseResult.err);
-      const channel = responseResult.val;
-      if (!channel) {
-        AppLogger.error("Discord channel not found", {
+        AppLogger.info("Fetching Discord channel info", {
           channel_id: channelId,
           server_id: serverId,
         });
-        return Err(
-          new AppError({
-            message: `Channel info for ${channelId} is undefined`,
-            code: ErrorCodeSchema.Enum.NOT_FOUND,
+
+        const responseResult = await wrap(
+          rest.getChannel(channelId),
+          (err: Error) => {
+            AppLogger.error("Failed to fetch Discord channel info", {
+              channel_id: channelId,
+              server_id: serverId,
+              error: err,
+            });
+
+            const errorCode = getErrorCodeFromDiscordError(err);
+
+            return new AppError({
+              message: `Failed to fetch channel info for ${channelId}: ${err.message}`,
+              code: errorCode,
+              cause: err,
+            });
+          },
+        );
+        if (responseResult.err) return Err(responseResult.err);
+        const channel = responseResult.val;
+        if (!channel) {
+          AppLogger.error("Discord channel not found", {
+            channel_id: channelId,
+            server_id: serverId,
+          });
+          return Err(
+            new AppError({
+              message: `Channel info for ${channelId} is undefined`,
+              code: ErrorCodeSchema.Enum.NOT_FOUND,
+            }),
+          );
+        }
+
+        AppLogger.info("Successfully fetched Discord channel info", {
+          channel_id: channelId,
+          server_id: serverId,
+          channel_name: channel.name,
+        });
+        return Ok(
+          discordChannel.parse({
+            id: createUUID(),
+            rawId: channel.id,
+            serverId,
+            name: channel.name ?? "unknown",
           }),
         );
-      }
-
-      AppLogger.info("Successfully fetched Discord channel info", {
-        channel_id: channelId,
-        server_id: serverId,
-        channel_name: channel.name,
-      });
-      return Ok(
-        discordChannel.parse({
-          id: createUUID(),
-          rawId: channel.id,
-          serverId,
-          name: channel.name ?? "unknown",
-        }),
-      );
+      }, "getChannel");
     });
   };
 
@@ -215,40 +333,53 @@ export const createDiscordClient = (env: DiscordEnv): IDiscordClient => {
   ): Promise<Result<string, AppError>> => {
     return withTracerResult("discord", "updateMessage", async (span) => {
       const { channelId, messageId, content, embeds } = params;
-      AppLogger.info("Updating Discord message", {
-        channel_id: channelId,
-        message_id: messageId,
-        has_embeds: embeds ? embeds.length > 0 : false,
-      });
 
-      const responseResult = await wrap(
-        rest.editMessage(channelId, messageId, {
-          content,
-          embeds: embeds?.slice(0, 10),
-        }),
-        (err: Error) => {
-          AppLogger.error("Failed to update Discord message", {
-            channel_id: channelId,
-            message_id: messageId,
-            error: err,
-          });
+      return withRateLimitRetry(async () => {
+        // Check rate limits (both custom and Discord's built-in)
+        const url = `${rest.baseUrl}/v${rest.version}/channels/${channelId}/messages/${messageId}`;
+        const rateLimitCheck = await checkRateLimit(
+          counter,
+          rest,
+          "updateMessage",
+          url,
+        );
+        if (rateLimitCheck.err) return Err(rateLimitCheck.err);
 
-          const errorCode = getErrorCodeFromDiscordError(err);
+        AppLogger.info("Updating Discord message", {
+          channel_id: channelId,
+          message_id: messageId,
+          has_embeds: embeds ? embeds.length > 0 : false,
+        });
 
-          return new AppError({
-            message: `Failed to update message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
-            code: errorCode,
-            cause: err.cause,
-          });
-        },
-      );
-      if (responseResult.err) return Err(responseResult.err);
+        const responseResult = await wrap(
+          rest.editMessage(channelId, messageId, {
+            content,
+            embeds: embeds?.slice(0, 10),
+          }),
+          (err: Error) => {
+            AppLogger.error("Failed to update Discord message", {
+              channel_id: channelId,
+              message_id: messageId,
+              error: err,
+            });
 
-      AppLogger.info("Successfully updated Discord message", {
-        channel_id: channelId,
-        message_id: messageId,
-      });
-      return Ok(messageId);
+            const errorCode = getErrorCodeFromDiscordError(err);
+
+            return new AppError({
+              message: `Failed to update message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
+              code: errorCode,
+              cause: err,
+            });
+          },
+        );
+        if (responseResult.err) return Err(responseResult.err);
+
+        AppLogger.info("Successfully updated Discord message", {
+          channel_id: channelId,
+          message_id: messageId,
+        });
+        return Ok(messageId);
+      }, "updateMessage");
     });
   };
 
@@ -257,71 +388,84 @@ export const createDiscordClient = (env: DiscordEnv): IDiscordClient => {
   ): Promise<Result<string, AppError>> => {
     return withTracerResult("discord", "deleteMessage", async (span) => {
       const { channelId, messageId } = params;
-      AppLogger.info("Deleting Discord message", {
-        channel_id: channelId,
-        message_id: messageId,
-      });
 
-      const getMsgResult = await wrap(
-        rest.getMessage(channelId, messageId),
-        (err: Error) => {
-          AppLogger.error("Failed to fetch Discord message for deletion", {
-            channel_id: channelId,
-            message_id: messageId,
-            error: err,
-          });
+      return withRateLimitRetry(async () => {
+        // Check rate limits (both custom and Discord's built-in)
+        const url = `${rest.baseUrl}/v${rest.version}/channels/${channelId}/messages/${messageId}`;
+        const rateLimitCheck = await checkRateLimit(
+          counter,
+          rest,
+          "deleteMessage",
+          url,
+        );
+        if (rateLimitCheck.err) return Err(rateLimitCheck.err);
 
-          const errorCode = getErrorCodeFromDiscordError(err);
-
-          return new AppError({
-            message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
-            code: errorCode,
-            cause: err.cause,
-          });
-        },
-      );
-      if (getMsgResult.err) return Err(getMsgResult.err);
-      const message = getMsgResult.val;
-      if (!message.author?.bot || message.author.id !== botId) {
-        AppLogger.warn("Attempted to delete non-bot message", {
+        AppLogger.info("Deleting Discord message", {
           channel_id: channelId,
           message_id: messageId,
-          author_id: message.author?.id,
-          bot_id: botId,
         });
-        return Err(
-          new AppError({
-            message: `Message is not sent by bot. channelId=${channelId}, messageId=${messageId}`,
-            code: ErrorCodeSchema.Enum.FORBIDDEN,
-          }),
-        );
-      }
 
-      const deleteResult = await wrap(
-        rest.deleteMessage(channelId, messageId),
-        (err: Error) => {
-          AppLogger.error("Failed to delete Discord message", {
+        const getMsgResult = await wrap(
+          rest.getMessage(channelId, messageId),
+          (err: Error) => {
+            AppLogger.error("Failed to fetch Discord message for deletion", {
+              channel_id: channelId,
+              message_id: messageId,
+              error: err,
+            });
+
+            const errorCode = getErrorCodeFromDiscordError(err);
+
+            return new AppError({
+              message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
+              code: errorCode,
+              cause: err,
+            });
+          },
+        );
+        if (getMsgResult.err) return Err(getMsgResult.err);
+        const message = getMsgResult.val;
+        if (!message.author?.bot || message.author.id !== botId) {
+          AppLogger.warn("Attempted to delete non-bot message", {
             channel_id: channelId,
             message_id: messageId,
-            error: err,
+            author_id: message.author?.id,
+            bot_id: botId,
           });
+          return Err(
+            new AppError({
+              message: `Message is not sent by bot. channelId=${channelId}, messageId=${messageId}`,
+              code: ErrorCodeSchema.Enum.FORBIDDEN,
+            }),
+          );
+        }
 
-          const errorCode = getErrorCodeFromDiscordError(err);
+        const deleteResult = await wrap(
+          rest.deleteMessage(channelId, messageId),
+          (err: Error) => {
+            AppLogger.error("Failed to delete Discord message", {
+              channel_id: channelId,
+              message_id: messageId,
+              error: err,
+            });
 
-          return new AppError({
-            message: `Failed to delete message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
-            code: errorCode,
-            cause: err.cause,
-          });
-        },
-      );
-      if (deleteResult.err) return Err(deleteResult.err);
+            const errorCode = getErrorCodeFromDiscordError(err);
 
-      AppLogger.info("Successfully deleted Discord message", {
-        channel_id: channelId,
-        message_id: messageId,
-      });
-      return Ok(messageId);
+            return new AppError({
+              message: `Failed to delete message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
+              code: errorCode,
+              cause: err,
+            });
+          },
+        );
+        if (deleteResult.err) return Err(deleteResult.err);
+
+        AppLogger.info("Successfully deleted Discord message", {
+          channel_id: channelId,
+          message_id: messageId,
+        });
+        return Ok(messageId);
+      }, "deleteMessage");
     });
   };
 
@@ -329,60 +473,75 @@ export const createDiscordClient = (env: DiscordEnv): IDiscordClient => {
     channelId: string,
   ): Promise<Result<DiscordMessage[], AppError>> => {
     return withTracerResult("discord", "getLatestBotMessages", async (span) => {
-      AppLogger.info("Fetching latest bot messages from Discord channel", {
-        channel_id: channelId,
-      });
+      return withRateLimitRetry(async () => {
+        // Check rate limits (both custom and Discord's built-in)
+        const url = `${rest.baseUrl}/v${rest.version}/channels/${channelId}/messages`;
+        const rateLimitCheck = await checkRateLimit(
+          counter,
+          rest,
+          "getLatestBotMessages",
+          url,
+        );
+        if (rateLimitCheck.err) return Err(rateLimitCheck.err);
 
-      const query = { limit: 100 };
-      const responseResult = await wrap(
-        rest.getMessages(channelId, query),
-        (err: Error) => {
-          AppLogger.error("Failed to fetch messages from Discord channel", {
+        AppLogger.info("Fetching latest bot messages from Discord channel", {
+          channel_id: channelId,
+        });
+
+        const query = { limit: 100 };
+        const responseResult = await wrap(
+          rest.getMessages(channelId, query),
+          (err: Error) => {
+            AppLogger.error("Failed to fetch messages from Discord channel", {
+              channel_id: channelId,
+              error: err,
+            });
+
+            const errorCode = getErrorCodeFromDiscordError(err);
+
+            return new AppError({
+              message: `Failed to fetch messages in channel ${channelId}: ${err.message}`,
+              code: errorCode,
+              cause: err,
+            });
+          },
+        );
+        if (responseResult.err) return Err(responseResult.err);
+        const messages = responseResult.val;
+        const botMessages = messages.filter(
+          (m) => m.author?.bot && m.author.id === botId,
+        );
+
+        AppLogger.info(
+          "Successfully fetched bot messages from Discord channel",
+          {
             channel_id: channelId,
-            error: err,
-          });
-
-          const errorCode = getErrorCodeFromDiscordError(err);
-
-          return new AppError({
-            message: `Failed to fetch messages in channel ${channelId}: ${err.message}`,
-            code: errorCode,
-            cause: err.cause,
-          });
-        },
-      );
-      if (responseResult.err) return Err(responseResult.err);
-      const messages = responseResult.val;
-      const botMessages = messages.filter(
-        (m) => m.author?.bot && m.author.id === botId,
-      );
-
-      AppLogger.info("Successfully fetched bot messages from Discord channel", {
-        channel_id: channelId,
-        message_count: botMessages.length,
-      });
-      return Ok(
-        discordMessages.parse(
-          botMessages.map((m) => ({
-            id: createUUID(),
-            type: "bot",
-            rawId: m.id,
-            channelId,
-            content: m.content ?? "",
-            createdAt: getCurrentUTCString(),
-            updatedAt: getCurrentUTCString(),
-            embedStreams:
-              m.embeds.map((e) => ({
-                identifier: e.url,
-                title: e.title,
-                url: e.url,
-                thumbnail: e.image?.url ?? "",
-                startedAt: e.fields?.[0]?.value ?? "",
-                status: getStatusFromColor(e.color ?? 0),
-              })) ?? [],
-          })),
-        ),
-      );
+            message_count: botMessages.length,
+          },
+        );
+        return Ok(
+          discordMessages.parse(
+            botMessages.map((m) => ({
+              id: createUUID(),
+              type: "bot",
+              rawId: m.id,
+              channelId,
+              content: m.content ?? "",
+              createdAt: getCurrentUTCString(),
+              updatedAt: getCurrentUTCString(),
+              embedStreams:
+                m.embeds.map((e) => ({
+                  identifier: e.url,
+                  title: e.title,
+                  url: e.url,
+                  thumbnail: e.image?.url ?? "",
+                  startedAt: e.fields?.[0]?.value ?? "",
+                  status: getStatusFromColor(e.color ?? 0),
+                })) ?? [],
+            })),
+          ),
+        );
+      }, "getLatestBotMessages");
     });
   };
 
@@ -391,55 +550,68 @@ export const createDiscordClient = (env: DiscordEnv): IDiscordClient => {
   ): Promise<Result<DiscordMessage, AppError>> => {
     return withTracerResult("discord", "getMessage", async (span) => {
       const { channelId, messageId } = params;
-      AppLogger.info("Fetching Discord message", {
-        channel_id: channelId,
-        message_id: messageId,
-      });
 
-      const responseResult = await wrap(
-        rest.getMessage(channelId, messageId),
-        (err: Error) => {
-          AppLogger.error("Failed to fetch Discord message", {
-            channel_id: channelId,
-            message_id: messageId,
-            error: err,
-          });
+      return withRateLimitRetry(async () => {
+        // Check rate limits (both custom and Discord's built-in)
+        const url = `${rest.baseUrl}/v${rest.version}/channels/${channelId}/messages/${messageId}`;
+        const rateLimitCheck = await checkRateLimit(
+          counter,
+          rest,
+          "getMessage",
+          url,
+        );
+        if (rateLimitCheck.err) return Err(rateLimitCheck.err);
 
-          const errorCode = getErrorCodeFromDiscordError(err);
+        AppLogger.info("Fetching Discord message", {
+          channel_id: channelId,
+          message_id: messageId,
+        });
 
-          return new AppError({
-            message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
-            code: errorCode,
-            cause: err.cause,
-          });
-        },
-      );
-      if (responseResult.err) return Err(responseResult.err);
-      const message = responseResult.val;
+        const responseResult = await wrap(
+          rest.getMessage(channelId, messageId),
+          (err: Error) => {
+            AppLogger.error("Failed to fetch Discord message", {
+              channel_id: channelId,
+              message_id: messageId,
+              error: err,
+            });
 
-      AppLogger.info("Successfully fetched Discord message", {
-        channel_id: channelId,
-        message_id: messageId,
-      });
-      return Ok(
-        discordMessage.parse({
-          id: createUUID(),
-          type: "bot",
-          rawId: message.id,
-          channelId,
-          content: message.content ?? "",
-          createdAt: getCurrentUTCString(),
-          updatedAt: getCurrentUTCString(),
-          embedStreams: message.embeds.map((e) => ({
-            identifier: e.url,
-            title: e.title,
-            url: e.url,
-            thumbnail: e.image?.url ?? "",
-            startedAt: e.fields?.[0]?.value ?? "",
-            status: getStatusFromColor(e.color ?? 0),
-          })),
-        }),
-      );
+            const errorCode = getErrorCodeFromDiscordError(err);
+
+            return new AppError({
+              message: `Failed to fetch message. channelId=${channelId}, messageId=${messageId}: ${err.message}`,
+              code: errorCode,
+              cause: err,
+            });
+          },
+        );
+        if (responseResult.err) return Err(responseResult.err);
+        const message = responseResult.val;
+
+        AppLogger.info("Successfully fetched Discord message", {
+          channel_id: channelId,
+          message_id: messageId,
+        });
+        return Ok(
+          discordMessage.parse({
+            id: createUUID(),
+            type: "bot",
+            rawId: message.id,
+            channelId,
+            content: message.content ?? "",
+            createdAt: getCurrentUTCString(),
+            updatedAt: getCurrentUTCString(),
+            embedStreams: message.embeds.map((e) => ({
+              identifier: e.url,
+              title: e.title,
+              url: e.url,
+              thumbnail: e.image?.url ?? "",
+              startedAt: e.fields?.[0]?.value ?? "",
+              status: getStatusFromColor(e.color ?? 0),
+            })),
+          }),
+        );
+      }, "getMessage");
     });
   };
 

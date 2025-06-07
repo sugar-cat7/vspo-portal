@@ -176,71 +176,47 @@ export const discordSendMessagesWorkflow = () => {
             );
 
             // Process this chunk
-            const results = await Promise.allSettled([
-              step.do(
-                `send videos to channels for ${group.channelLangaugeCode} (chunk ${i + 1}/${chunkedChannelIds.length})`,
-                {
-                  retries: { limit: 1, delay: "5 second", backoff: "linear" },
-                  timeout: "2 minutes",
-                },
-                async () => {
-                  return withTracer(
-                    "discord-workflow",
-                    `send-streams-language-${group.channelLangaugeCode}-chunk-${i + 1}`,
-                    async (span) => {
-                      const vu = await env.APP_WORKER.newDiscordUsecase();
-                      logger.info(
-                        `Sending videos to ${channelIdsChunk.length} channels with language: ${group.channelLangaugeCode}`,
-                        {
-                          channelCount: channelIdsChunk.length,
-                          language: group.channelLangaugeCode,
-                          chunkIndex: i + 1,
-                          totalChunks: chunkedChannelIds.length,
-                        },
-                      );
-                      span.setAttribute("language", group.channelLangaugeCode);
-                      span.setAttribute(
-                        "channels_count",
-                        channelIdsChunk.length,
-                      );
-                      span.setAttribute("chunk_index", i + 1);
-                      span.setAttribute(
-                        "total_chunks",
-                        chunkedChannelIds.length,
-                      );
+            await step.do(
+              `send videos to channels for ${group.channelLangaugeCode} (chunk ${i + 1}/${chunkedChannelIds.length})`,
+              {
+                retries: { limit: 1, delay: "5 second", backoff: "linear" },
+                timeout: "2 minutes",
+              },
+              async () => {
+                return withTracer(
+                  "discord-workflow",
+                  `send-streams-language-${group.channelLangaugeCode}-chunk-${i + 1}`,
+                  async (span) => {
+                    const vu = await env.APP_WORKER.newDiscordUsecase();
+                    logger.info(
+                      `Sending videos to ${channelIdsChunk.length} channels with language: ${group.channelLangaugeCode}`,
+                      {
+                        channelCount: channelIdsChunk.length,
+                        language: group.channelLangaugeCode,
+                        chunkIndex: i + 1,
+                        totalChunks: chunkedChannelIds.length,
+                      },
+                    );
+                    span.setAttribute("language", group.channelLangaugeCode);
+                    span.setAttribute("channels_count", channelIdsChunk.length);
+                    span.setAttribute("chunk_index", i + 1);
+                    span.setAttribute("total_chunks", chunkedChannelIds.length);
 
-                      await vu.sendStreamsToMultipleChannels({
-                        channelIds: channelIdsChunk,
-                        channelLangaugeCode: group.channelLangaugeCode,
-                        channelMemberType: group.channelMemberType,
-                      });
+                    await vu.sendStreamsToMultipleChannels({
+                      channelIds: channelIdsChunk,
+                      channelLangaugeCode: group.channelLangaugeCode,
+                      channelMemberType: group.channelMemberType,
+                    });
 
-                      logger.info(
-                        `Successfully sent videos to chunk ${i + 1}/${chunkedChannelIds.length} with language: ${group.channelLangaugeCode}`,
-                      );
-                    },
-                  );
-                },
-              ),
-            ]);
-
-            const failedSteps = results.filter(
-              (result) => result.status === "rejected",
+                    logger.info(
+                      `Successfully sent videos to chunk ${i + 1}/${chunkedChannelIds.length} with language: ${group.channelLangaugeCode}`,
+                    );
+                  },
+                );
+              },
             );
 
-            if (failedSteps.length > 0) {
-              logger.error(
-                `${failedSteps.length} step(s) failed for chunk ${i + 1}/${chunkedChannelIds.length}. Check logs for details.`,
-              );
-            }
-
-            // Sleep for 3 seconds between chunks, but not after the last chunk
-            if (i < chunkedChannelIds.length - 1) {
-              logger.info(
-                "Sleeping for 3 seconds before processing next chunk",
-              );
-              await step.sleep("3 seconds", "3 seconds");
-            }
+            // await step.sleep("1 seconds", "1 seconds");
           }
         }
       },
