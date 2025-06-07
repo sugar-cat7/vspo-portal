@@ -39,7 +39,7 @@ jobs:
           command: deploy
           preCommands: |
             cp -R ./ ../../../..
-          quiet: true
+          quiet: false
           secrets: |
             OPENAI_ORGANIZATION
             OPENAI_PROJECT
