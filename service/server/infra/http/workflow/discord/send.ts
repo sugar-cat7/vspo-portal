@@ -237,9 +237,9 @@ export const discordSendMessagesWorkflow = () => {
             // Sleep for 3 seconds between chunks, but not after the last chunk
             if (i < chunkedChannelIds.length - 1) {
               logger.info(
-                "Sleeping for 3 seconds before processing next chunk",
+                "Sleeping for 1 seconds before processing next chunk",
               );
-              await step.sleep("3 seconds", "3 seconds");
+              await step.sleep("1 seconds", "1 seconds");
             }
           }
         }

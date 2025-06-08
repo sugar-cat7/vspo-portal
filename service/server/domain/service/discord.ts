@@ -72,8 +72,8 @@ export interface IDiscordService {
 // Helper function to process promises in batches with delay
 const processBatchedPromises = async <T>(
   promises: Promise<T>[],
-  batchSize = 50,
-  delayMs = 1500,
+  batchSize = 45,
+  delayMs = 1000,
 ): Promise<PromiseSettledResult<T>[]> => {
   const allResults: PromiseSettledResult<T>[] = [];
 
