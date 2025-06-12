@@ -210,8 +210,6 @@ const fetchUserStreams = async (
   );
 };
 
-export { type TwitcastingAuthConfig } from "./auth";
-
 export const createTwitcastingService = (
   authConfig: TwitcastingAuthConfig,
 ): ITwitcastingService => {
