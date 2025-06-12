@@ -8,6 +8,7 @@ const PlatformSchema = z.enum([
   "twitch",
   "twitcasting",
   "niconico",
+  "bilibili",
   "unknown",
 ]);
 
@@ -20,6 +21,8 @@ const platformIconURLs: Record<Platform, string> = {
     "https://raw.githubusercontent.com/sugar-cat7/vspo-portal/main/service/server/assets/icon/twitcasting.png",
   niconico:
     "https://raw.githubusercontent.com/sugar-cat7/vspo-portal/main/service/server/assets/icon/niconico.png",
+  bilibili:
+    "https://raw.githubusercontent.com/sugar-cat7/vspo-portal/main/service/server/assets/icon/bilibili.png",
   unknown: "",
 };
 const getPlatformIconURL = (platform: Platform): string => {

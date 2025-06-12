@@ -9,6 +9,7 @@ import {
   type Streams,
 } from "..";
 import {
+  type IBilibiliService,
   type IStreamRepository,
   type ITwitcastingService,
   type ITwitchService,
@@ -25,6 +26,7 @@ export interface IStreamService {
   searchLiveYoutubeStreams(): Promise<Result<Streams, AppError>>;
   searchLiveTwitchStreams(): Promise<Result<Streams, AppError>>;
   searchLiveTwitCastingStreams(): Promise<Result<Streams, AppError>>;
+  searchLiveBilibiliStreams(): Promise<Result<Streams, AppError>>;
   searchAllLiveStreams(): Promise<Result<Streams, AppError>>;
   searchExistStreams(): Promise<Result<Streams, AppError>>;
   getStreamsByIDs({
@@ -113,6 +115,7 @@ export const createStreamService = (deps: {
   youtubeClient: IYoutubeService;
   twitchClient: ITwitchService;
   twitCastingClient: ITwitcastingService;
+  bilibiliClient: IBilibiliService;
   creatorRepository: ICreatorRepository;
   streamRepository: IStreamRepository;
   aiService: IAIService;
@@ -451,6 +454,60 @@ export const createStreamService = (deps: {
     );
   };
 
+  const searchLiveBilibiliStreams = async (): Promise<
+    Result<Streams, AppError>
+  > => {
+    return withTracerResult(
+      SERVICE_NAME,
+      "searchLiveBilibiliStreams",
+      async (span) => {
+        AppLogger.info("Searching live Bilibili streams", {
+          service: SERVICE_NAME,
+        });
+
+        const c = await masterCreators({
+          creatorRepository: deps.creatorRepository,
+        });
+        if (c.err) {
+          AppLogger.error("Failed to get master creators", {
+            service: SERVICE_NAME,
+            error: c.err,
+          });
+          return c;
+        }
+
+        const roomIds = c.val.jp
+          .map((c) => c.channel?.bilibili?.rawId)
+          .concat(c.val.en.map((c) => c.channel?.bilibili?.rawId))
+          .filter((id) => id !== undefined);
+
+        if (roomIds.length === 0) {
+          AppLogger.info("No Bilibili room IDs found", {
+            service: SERVICE_NAME,
+          });
+          return Ok([]);
+        }
+
+        const result = await deps.bilibiliClient.getStreams({
+          roomIds: roomIds,
+        });
+        if (result.err) {
+          AppLogger.error("Failed to get Bilibili streams", {
+            service: SERVICE_NAME,
+            error: result.err,
+          });
+          return result;
+        }
+
+        AppLogger.info("Successfully fetched Bilibili streams", {
+          service: SERVICE_NAME,
+          count: result.val.length,
+        });
+        return Ok(result.val);
+      },
+    );
+  };
+
   const searchAllLiveStreams = async (): Promise<Result<Streams, AppError>> => {
     return withTracerResult(
       SERVICE_NAME,
@@ -464,6 +521,7 @@ export const createStreamService = (deps: {
           searchLiveYoutubeStreams(),
           searchLiveTwitchStreams(),
           searchLiveTwitCastingStreams(),
+          searchLiveBilibiliStreams(),
         ]);
 
         const streams = results
@@ -831,6 +889,7 @@ export const createStreamService = (deps: {
     searchLiveYoutubeStreams,
     searchLiveTwitchStreams,
     searchLiveTwitCastingStreams,
+    searchLiveBilibiliStreams,
     searchAllLiveStreams,
     searchExistStreams,
     getStreamsByIDs,

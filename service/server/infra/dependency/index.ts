@@ -6,6 +6,7 @@ import {
   createCreatorService,
   createStreamService,
 } from "../../domain";
+import { type IBilibiliService, createBilibiliService } from "../bilibili";
 import {
   type DB,
   type ICreatorRepository,
@@ -97,6 +98,7 @@ export function createServices(
   youtubeClient: IYoutubeService,
   twitchClient: ITwitchService,
   twitcastingClient: ITwitcastingService,
+  bilibiliClient: IBilibiliService,
   aiService: IAIService,
   discordClient: IDiscordClient,
   cacheClient: ICacheClient,
@@ -112,6 +114,7 @@ export function createServices(
       youtubeClient,
       twitchClient,
       twitCastingClient: twitcastingClient,
+      bilibiliClient,
       creatorRepository: repos.creatorRepository,
       streamRepository: repos.streamRepository,
       aiService,
@@ -146,6 +149,7 @@ export const createAppContext = (
   youtubeClient: IYoutubeService,
   twitchClient: ITwitchService,
   twitcastingClient: ITwitcastingService,
+  bilibiliClient: IBilibiliService,
   aiService: IAIService,
   discordClient: IDiscordClient,
   cacheClient: ICacheClient,
@@ -165,6 +169,7 @@ export const createAppContext = (
         youtubeClient,
         twitchClient,
         twitcastingClient,
+        bilibiliClient,
         aiService,
         discordClient,
         cacheClient,
@@ -198,6 +203,7 @@ export const createContainer = (env: AppWorkerEnv): IContainer => {
   const twitcastingService = createTwitcastingService(
     env.TWITCASTING_ACCESS_TOKEN,
   );
+  const bilibiliService = createBilibiliService();
   const txManager = createTxManager({
     connectionString:
       env.ENVIRONMENT === "local"
@@ -218,6 +224,7 @@ export const createContainer = (env: AppWorkerEnv): IContainer => {
     youtubeService,
     twitchService,
     twitcastingService,
+    bilibiliService,
     aiService,
     discordClient,
     cacheClient,

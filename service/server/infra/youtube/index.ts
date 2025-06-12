@@ -327,6 +327,7 @@ export const createYoutubeService = (apiKey: string): IYoutubeService => {
               twitch: null,
               twitCasting: null,
               niconico: null,
+              bilibili: null,
             }),
           ),
         ),
