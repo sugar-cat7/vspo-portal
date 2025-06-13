@@ -120,6 +120,7 @@ export const createCreatorRepository = (db: DB): ICreatorRepository => {
               twitch: null,
               twitCasting: null,
               niconico: null,
+              bilibili: null,
             },
           });
         }
@@ -160,6 +161,16 @@ export const createCreatorRepository = (db: DB): ICreatorRepository => {
         }
         if (r.channel.platformType === "niconico") {
           creator.channel.niconico = {
+            rawId: r.channel.platformChannelId,
+            name: r.channel.title,
+            description: r.channel.description,
+            thumbnailURL: r.channel.thumbnailUrl,
+            publishedAt: convertToUTC(r.channel.publishedAt),
+            subscriberCount: r.channel.subscriberCount,
+          };
+        }
+        if (r.channel.platformType === "bilibili") {
+          creator.channel.bilibili = {
             rawId: r.channel.platformChannelId,
             name: r.channel.title,
             description: r.channel.description,
