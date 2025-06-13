@@ -192,6 +192,10 @@ export const setupTxManager = async () => {
     getArchive: async () => Ok([]),
   };
 
+  const bilibiliService = {
+    getStreams: async () => Ok([]),
+  };
+
   afterEach(async () => {
     await container.stop();
   });
@@ -201,6 +205,7 @@ export const setupTxManager = async () => {
     youtubeService,
     twitchService,
     twitcastingService,
+    bilibiliService,
     createAIService({
       apiKey: env.OPENAI_API_KEY,
       organization: env.OPENAI_ORGANIZATION,

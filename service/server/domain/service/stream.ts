@@ -68,7 +68,9 @@ export interface IStreamService {
 // Helper functions for the stream service
 const masterCreators = async (deps: {
   creatorRepository: ICreatorRepository;
-}): Promise<Result<{ jp: Creator[]; en: Creator[] }, AppError>> => {
+}): Promise<
+  Result<{ jp: Creator[]; en: Creator[]; ch: Creator[] }, AppError>
+> => {
   const jpCreators = await deps.creatorRepository.list({
     limit: 300,
     page: 0,
@@ -89,7 +91,17 @@ const masterCreators = async (deps: {
     return enCreators;
   }
 
-  return Ok({ jp: jpCreators.val, en: enCreators.val });
+  const chCreators = await deps.creatorRepository.list({
+    limit: 300,
+    page: 0,
+    memberType: MemberTypeSchema.Enum.vspo_ch,
+    languageCode: "default",
+  });
+  if (chCreators.err) {
+    return chCreators;
+  }
+
+  return Ok({ jp: jpCreators.val, en: enCreators.val, ch: chCreators.val });
 };
 
 const getStreamDifferences = (
@@ -166,7 +178,7 @@ export const createStreamService = (deps: {
       SERVICE_NAME,
       "searchLiveYoutubeStreams",
       async (span) => {
-        AppLogger.info("Searching live YouTube streams", {
+        AppLogger.debug("Searching live YouTube streams", {
           service: SERVICE_NAME,
         });
 
@@ -223,7 +235,7 @@ export const createStreamService = (deps: {
           });
         }
 
-        AppLogger.info("Successfully fetched Raw YouTube streams", {
+        AppLogger.debug("Successfully fetched Raw YouTube streams", {
           service: SERVICE_NAME,
           count: streams.length,
           streamTitles: streams.map((v) => v.title),
@@ -234,7 +246,7 @@ export const createStreamService = (deps: {
           .concat(c.val.en.map((c) => c.channel?.youtube?.rawId))
           .filter((id) => id !== undefined);
 
-        AppLogger.info("Youtube Channels", {
+        AppLogger.debug("Youtube Channels", {
           service: SERVICE_NAME,
           channelIds,
           channelTitles: c.val.jp.map((c) => c.channel?.youtube?.name),
@@ -254,7 +266,7 @@ export const createStreamService = (deps: {
           ),
         );
 
-        AppLogger.info("Successfully fetched Filtered YouTube streams", {
+        AppLogger.debug("Successfully fetched Filtered YouTube streams", {
           service: SERVICE_NAME,
           count: streamIds.length,
           streamTitles: streamIds.map(
@@ -274,7 +286,7 @@ export const createStreamService = (deps: {
           return fetchedStreams;
         }
 
-        AppLogger.info("Successfully fetched YouTube streams", {
+        AppLogger.debug("Successfully fetched YouTube streams", {
           service: SERVICE_NAME,
           count: fetchedStreams.val.length,
           streams: fetchedStreams.val.map((v) => ({
@@ -295,7 +307,7 @@ export const createStreamService = (deps: {
       SERVICE_NAME,
       "searchLiveTwitchStreams",
       async (span) => {
-        AppLogger.info("Searching live Twitch streams", {
+        AppLogger.debug("Searching live Twitch streams", {
           service: SERVICE_NAME,
         });
 
@@ -385,7 +397,7 @@ export const createStreamService = (deps: {
 
           // Delete streams that are no longer live
           if (endedStreamIds.length > 0) {
-            AppLogger.info(
+            AppLogger.debug(
               `Deleting ${endedStreamIds.length} Twitch streams that have ended`,
               {
                 service: SERVICE_NAME,
@@ -398,7 +410,7 @@ export const createStreamService = (deps: {
           }
         }
 
-        AppLogger.info("Successfully fetched Twitch streams", {
+        AppLogger.debug("Successfully fetched Twitch streams", {
           service: SERVICE_NAME,
           count: streams.length,
         });
@@ -414,7 +426,7 @@ export const createStreamService = (deps: {
       SERVICE_NAME,
       "searchLiveTwitCastingStreams",
       async (span) => {
-        AppLogger.info("Searching live TwitCasting streams", {
+        AppLogger.debug("Searching live TwitCasting streams", {
           service: SERVICE_NAME,
         });
 
@@ -445,7 +457,7 @@ export const createStreamService = (deps: {
           return result;
         }
 
-        AppLogger.info("Successfully fetched TwitCasting streams", {
+        AppLogger.debug("Successfully fetched TwitCasting streams", {
           service: SERVICE_NAME,
           count: result.val.length,
         });
@@ -461,7 +473,7 @@ export const createStreamService = (deps: {
       SERVICE_NAME,
       "searchLiveBilibiliStreams",
       async (span) => {
-        AppLogger.info("Searching live Bilibili streams", {
+        AppLogger.debug("Searching live Bilibili streams", {
           service: SERVICE_NAME,
         });
 
@@ -476,20 +488,20 @@ export const createStreamService = (deps: {
           return c;
         }
 
-        const roomIds = c.val.jp
+        const channelIds = c.val.ch
           .map((c) => c.channel?.bilibili?.rawId)
           .concat(c.val.en.map((c) => c.channel?.bilibili?.rawId))
           .filter((id) => id !== undefined);
 
-        if (roomIds.length === 0) {
-          AppLogger.info("No Bilibili room IDs found", {
+        if (channelIds.length === 0) {
+          AppLogger.debug("No Bilibili channel IDs found", {
             service: SERVICE_NAME,
           });
           return Ok([]);
         }
 
         const result = await deps.bilibiliClient.getStreams({
-          roomIds: roomIds,
+          channelIds: channelIds,
         });
         if (result.err) {
           AppLogger.error("Failed to get Bilibili streams", {
@@ -499,9 +511,16 @@ export const createStreamService = (deps: {
           return result;
         }
 
-        AppLogger.info("Successfully fetched Bilibili streams", {
+        AppLogger.debug("Successfully fetched Bilibili streams", {
           service: SERVICE_NAME,
-          count: result.val.length,
+          videos: result.val.map((v) => ({
+            rawChannelID: v.rawChannelID,
+            rawId: v.rawId,
+            title: v.title,
+            status: v.status,
+            platform: v.platform,
+            creatorName: v.creatorName,
+          })),
         });
         return Ok(result.val);
       },
@@ -513,7 +532,7 @@ export const createStreamService = (deps: {
       SERVICE_NAME,
       "searchAllLiveStreams",
       async (span) => {
-        AppLogger.info("Searching all live streams", {
+        AppLogger.debug("Searching all live streams", {
           service: SERVICE_NAME,
         });
 
@@ -521,7 +540,7 @@ export const createStreamService = (deps: {
           searchLiveYoutubeStreams(),
           searchLiveTwitchStreams(),
           searchLiveTwitCastingStreams(),
-          searchLiveBilibiliStreams(),
+          // searchLiveBilibiliStreams(),
         ]);
 
         const streams = results
@@ -543,7 +562,7 @@ export const createStreamService = (deps: {
           });
         }
 
-        AppLogger.info("Successfully fetched all live streams", {
+        AppLogger.debug("Successfully fetched all live streams", {
           service: SERVICE_NAME,
           count: streams.length,
           streams: streams.map((v) => ({
@@ -687,7 +706,7 @@ export const createStreamService = (deps: {
 
         const deletedStreams = deletedYtStreams;
 
-        AppLogger.info("Successfully fetched deleted streams", {
+        AppLogger.debug("Successfully fetched deleted streams", {
           service: SERVICE_NAME,
           count: deletedStreams.length,
           streams: deletedStreams.map((v) => ({
@@ -715,7 +734,7 @@ export const createStreamService = (deps: {
     streams: Streams;
   }): Promise<Result<Streams, AppError>> => {
     return withTracerResult(SERVICE_NAME, "translateStreams", async (span) => {
-      AppLogger.info("Translating streams", {
+      AppLogger.debug("Translating streams", {
         service: SERVICE_NAME,
         languageCode,
         streamCount: streams.length,
@@ -738,7 +757,7 @@ export const createStreamService = (deps: {
         };
       });
 
-      AppLogger.info("Successfully translated streams", {
+      AppLogger.debug("Successfully translated streams", {
         service: SERVICE_NAME,
         count: translatedStreams.length,
       });
@@ -791,7 +810,7 @@ export const createStreamService = (deps: {
 
       const streamsWithDiff = getStreamDifferences(streams, existingStreams);
 
-      AppLogger.info("Successfully fetched member streams", {
+      AppLogger.debug("Successfully fetched member streams", {
         service: SERVICE_NAME,
         count: streamsWithDiff.length,
         streams: streamsWithDiff.map((v) => ({
@@ -825,7 +844,7 @@ export const createStreamService = (deps: {
       SERVICE_NAME,
       "getStreamsByChannel",
       async (span) => {
-        AppLogger.info("Fetching streams by channel ID", {
+        AppLogger.debug("Fetching streams by channel ID", {
           service: SERVICE_NAME,
           channelId,
         });
@@ -855,7 +874,7 @@ export const createStreamService = (deps: {
           return yt;
         }
 
-        AppLogger.info("Successfully fetched streams by channel", {
+        AppLogger.debug("Successfully fetched streams by channel", {
           service: SERVICE_NAME,
           channelId,
           count: yt.val.length,
