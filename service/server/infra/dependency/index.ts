@@ -58,6 +58,7 @@ import {
 import { type IAIService, createAIService } from "../ai";
 import { type ICacheClient, createCloudflareKVCacheClient } from "../cache";
 import { type IDiscordClient, createDiscordClient } from "../discord";
+import { type IMastraService, createMastraService } from "../mastra";
 import { type IClipRepository, createClipRepository } from "../repository/clip";
 import {
   type IEventRepository,
@@ -102,6 +103,7 @@ export function createServices(
   aiService: IAIService,
   discordClient: IDiscordClient,
   cacheClient: ICacheClient,
+  mastraService: IMastraService,
 ): IServices {
   return {
     creatorService: createCreatorService({
@@ -153,6 +155,7 @@ export const createAppContext = (
   aiService: IAIService,
   discordClient: IDiscordClient,
   cacheClient: ICacheClient,
+  mastraService: IMastraService,
 ): IAppContext => {
   const runInTx = async <T>(
     operation: (
@@ -173,6 +176,7 @@ export const createAppContext = (
         aiService,
         discordClient,
         cacheClient,
+        mastraService,
       );
 
       return operation(repos, services);
@@ -218,6 +222,12 @@ export const createContainer = (env: AppWorkerEnv): IContainer => {
     baseURL: env.OPENAI_BASE_URL,
   });
 
+  const mastraService = createMastraService({
+    baseUrl: env.MASTRA_BASE_URL,
+    agentId: env.MASTRA_AGENT_ID,
+    apiKey: env.MASTRA_API_KEY,
+  });
+
   const discordClient = createDiscordClient(env);
   const context = createAppContext(
     txManager,
@@ -228,6 +238,7 @@ export const createContainer = (env: AppWorkerEnv): IContainer => {
     aiService,
     discordClient,
     cacheClient,
+    mastraService,
   );
   const creatorInteractor = createCreatorInteractor(context);
   const streamInteractor = createStreamInteractor(context);

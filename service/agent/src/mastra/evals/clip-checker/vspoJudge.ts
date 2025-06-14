@@ -27,6 +27,7 @@ export class VspoClipCheckerJudge extends MastraAgentJudge {
     hasPermissionNumber: boolean;
     detectedMembers: string[];
     permissionNumber: string | null;
+    confidence: number;
   }> {
     const clipPrompt = generateVspoClipPrompt({
       input,
@@ -47,6 +48,7 @@ export class VspoClipCheckerJudge extends MastraAgentJudge {
         hasPermissionNumber: z.boolean(),
         detectedMembers: z.array(z.string()),
         permissionNumber: z.string().nullable(),
+        confidence: z.number().min(0).max(1),
       }),
     });
 
@@ -60,6 +62,7 @@ export class VspoClipCheckerJudge extends MastraAgentJudge {
     hasPermissionNumber: boolean;
     detectedMembers: string[];
     permissionNumber: string | null;
+    confidence: number;
   }): Promise<string> {
     const prompt = generateReasonPrompt(args);
     const result = await this.agent.generate(prompt, {

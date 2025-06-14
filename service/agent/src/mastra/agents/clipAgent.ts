@@ -1,4 +1,4 @@
-import { createOpenAI, openai } from "@ai-sdk/openai";
+import { createOpenAI } from "@ai-sdk/openai";
 import { Agent } from "@mastra/core/agent";
 import {
   CategoryMatcherMetric,
@@ -24,16 +24,16 @@ export const clipAgent = new Agent({
     "You help analyze video content to determine if videos are official Vspo clips with proper permissions " +
     "or if they are YouTube Short format videos. You evaluate based on permission numbers, member keywords, " +
     "content relevance, video duration, tags, and other indicators.",
-  model: generateOpenAIModel("gpt-4o-mini"),
+  model: generateOpenAIModel("gpt-4.1-mini"),
   evals: {
     vspoClipChecker: new VspoClipCheckerMetric(
-      generateOpenAIModel("gpt-4o-mini"),
+      generateOpenAIModel("gpt-4.1-mini"),
     ),
     youTubeShortChecker: new YouTubeShortCheckerMetric(
-      generateOpenAIModel("gpt-4o-mini"),
+      generateOpenAIModel("gpt-4.1-mini"),
     ),
     categoryMatcher: new CategoryMatcherMetric(
-      generateOpenAIModel("gpt-4o-mini"),
+      generateOpenAIModel("gpt-4.1-mini"),
     ),
   },
 });

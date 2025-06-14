@@ -23,61 +23,105 @@ export const generateVspoClipPrompt = ({
   vspoKeywords: string[];
 }) => `Analyze if this YouTube clip video is an official vspo clip.
 
-Check for the following criteria:
-1. Permission number (許諾番号) - Look for patterns like:
-   - "ぶいすぽっ！許諾番号：" followed by numbers
-   - "許諾番号" with any numbers
-   - "Vspo! License Number" with numbers
-   
-2. Vspo member keywords - Match any of these exact names or variations:
-   ${vspoKeywords.join(", ")}
-   
-3. Vspo-related terms - Look for:
-   - "ぶいすぽ" or "ぶいすぽっ" 
-   - "切り抜き" (clip)
-   - Member names in title, description, or tags
-   
-4. Content relevance - Gaming, streaming, member activities related to vspo
+CRITICAL VSPO MEMBER DETECTION RULES:
+1. **ONLY USE PROVIDED KEYWORD LIST** - You can ONLY detect members whose names appear in the provided vspoKeywords list below
+2. **DO NOT USE EXTERNAL KNOWLEDGE** - Do not use your general knowledge about VTubers or any other sources
+3. **STRICT KEYWORD MATCHING** - Only match exact names or variations from the provided list
+4. **EXCLUDE ALL OTHER VTUBERS** - Members from Nijisanji, Hololive, or any other VTuber groups are NOT vspo members
+5. **Member Detection is MANDATORY** - A video can ONLY be classified as vspo clip if actual vspo members from the list are detected
 
-IMPORTANT MATCHING RULES:
-- If you find "ぶいすぽ" anywhere in title, description, or tags → isVspoClip should be true
-- If you find any member name from the keywords list → add to detectedMembers and set isVspoClip to true
-- If you find "許諾番号" with numbers → hasPermissionNumber should be true
-- Extract the actual permission number (e.g., "09522" from "ぶいすぽっ！許諾番号：09522")
+IMPORTANT EXCLUSIONS - THESE ARE NOT VSPO MEMBERS:
+- Any Nijisanji members (にじさんじ) - NOT vspo members
+- Any Hololive members - NOT vspo members  
+- Any other VTuber agency members - NOT vspo members
+- Only members explicitly listed in the vspoKeywords below are valid
+
+**OFFICIAL VSPO MEMBERS ONLY (from provided keyword list):**
+${vspoKeywords.join(", ")}
+
+**ABSOLUTE RULE: NO VSPO MEMBERS FROM LIST = NOT VSPO CLIP**
+If ZERO members from the above list are detected in title/description/tags, then isVspoClip = false, regardless of any other indicators.
+
+Check for the following criteria:
+1. **Vspo member keywords (HIGHEST PRIORITY)** - Match ONLY these exact names or variations from the list above
+2. **Content relevance** - Gaming, streaming, member activities related to vspo
+3. **Optional: Permission number** - Look for "許諾番号" with numbers (not required for classification)
+
+STRICT MATCHING RULES:
+- **MUST HAVE DETECTED MEMBERS FROM LIST**: If no members from the provided keyword list are found → isVspoClip MUST be false
+- **EXACT KEYWORD MATCHING**: Only names that appear in the vspoKeywords list can be added to detectedMembers
+- **NO EXTERNAL MEMBER DETECTION**: Never detect members not in the provided list, even if they seem like VTubers
+- **NIJISANJI EXCLUSION**: If "にじさんじ" is mentioned, this strongly indicates NON-vspo content
+- **No Valid Members = Not Vspo**: Even with "ぶいすぽ" terms or permission numbers, if no valid members from the list are detected → isVspoClip = false
+
+CONFIDENCE SCORING RULES:
+- If detectedMembers is empty (no valid members from list found) → confidence should be VERY LOW (0.05-0.15) and isVspoClip = false
+- If "にじさんじ" is mentioned and no vspo members detected → confidence should be EXTREMELY LOW (0.05) and isVspoClip = false
+- If detectedMembers has 1+ valid members from list → confidence should be HIGH (0.8-0.95) and isVspoClip = true
+- If only vspo-related terms but no valid members from list → confidence should be VERY LOW (0.05-0.2) and isVspoClip = false
 
 Video Information to analyze:
 Title: ${input.title}
 Description: ${input.description || "No description provided"}
 Tags: ${input.tags && input.tags.length > 0 ? input.tags.join(", ") : "No tags provided"}
 
-Example with valid vspo clip:
+Example with valid vspo clip (member from list detected):
 Title: "【切り抜き】橘ひなの APEX配信ハイライト"
-Description: "橘ひなの APEX配信 許諾番号:VSP2024-001 #橘ひなの #ぶいすぽっ"
+Description: "橘ひなの APEX配信 #橘ひなの #ぶいすぽっ"
 Tags: ["橘ひなの", "APEX", "ぶいすぽっ", "切り抜き"]
 Response: {
   "isVspoClip": true,
-  "hasPermissionNumber": true,
+  "hasPermissionNumber": false,
   "detectedMembers": ["橘ひなの"],
-  "permissionNumber": "VSP2024-001"
+  "permissionNumber": null,
+  "confidence": 0.9
 }
 
-Example non-vspo clip:
-Title: "【切り抜き】他のVTuber ゲーム実況"
-Description: "他のVTuberのゲーム実況ハイライト"
-Tags: ["ゲーム", "実況", "切り抜き"]
+Example with Nijisanji member (NOT vspo clip):
+Title: "【MADTOWN】にじさんじメンバー配信"
+Description: "ぶいすぽ許諾番号: 20567 #にじさんじ #MADTOWN"
+Tags: ["にじさんじ", "MADTOWN"]
+Response: {
+  "isVspoClip": false,
+  "hasPermissionNumber": true,
+  "detectedMembers": [],
+  "permissionNumber": "20567",
+  "confidence": 0.05
+}
+
+Example with permission number but NO valid members (NOT vspo clip):
+Title: "【切り抜き】他のVTuber配信"
+Description: "他のVTuberの配信切り抜き 許諾番号：12345"
+Tags: ["切り抜き", "配信"]
+Response: {
+  "isVspoClip": false,
+  "hasPermissionNumber": true,
+  "detectedMembers": [],
+  "permissionNumber": "12345",
+  "confidence": 0.1
+}
+
+Example with vspo terms but NO valid members (NOT vspo clip):
+Title: "【切り抜き】ぶいすぽ関連の話題"
+Description: "ぶいすぽっ！について話している配信"
+Tags: ["ぶいすぽ", "切り抜き"]
 Response: {
   "isVspoClip": false,
   "hasPermissionNumber": false,
   "detectedMembers": [],
-  "permissionNumber": null
+  "permissionNumber": null,
+  "confidence": 0.1
 }
+
+**REMEMBER: If detectedMembers array is empty, isVspoClip MUST be false regardless of any other factors**
 
 Return your response in this exact JSON format:
 {
-  "isVspoClip": boolean,
+  "isVspoClip": boolean, // MUST be false if no valid members from provided list are detected
   "hasPermissionNumber": boolean,
-  "detectedMembers": ["list of detected vspo member names"],
-  "permissionNumber": "string or null"
+  "detectedMembers": ["only members from the provided vspoKeywords list"], // MUST only contain names from the keyword list
+  "permissionNumber": "string or null",
+  "confidence": number // 0.0 to 1.0, very low when no valid members from list detected
 }`;
 
 export const generateReasonPrompt = ({
@@ -85,21 +129,24 @@ export const generateReasonPrompt = ({
   hasPermissionNumber,
   detectedMembers,
   permissionNumber,
+  confidence,
 }: {
   isVspoClip: boolean;
   hasPermissionNumber: boolean;
   detectedMembers: string[];
   permissionNumber: string | null;
+  confidence: number;
 }) => `Explain why this content is${isVspoClip ? "" : " not"} a valid vspo clip.
 
 Analysis results:
 - Permission number found: ${hasPermissionNumber ? "Yes" : "No"}
 - Permission number: ${permissionNumber || "None"}
 - Detected vspo members: ${detectedMembers.length > 0 ? detectedMembers.join(", ") : "None"}
+- Confidence level: ${(confidence * 100).toFixed(1)}%
 
 Return your response in this format:
 {
-  "reason": "This content is ${isVspoClip ? "a valid vspo clip" : "not a valid vspo clip"} because [detailed explanation]"
+  "reason": "This content is ${isVspoClip ? "a valid vspo clip" : "not a valid vspo clip"} because [detailed explanation]. Confidence is ${confidence < 0.5 ? "low" : confidence < 0.8 ? "moderate" : "high"} due to ${detectedMembers.length === 0 ? "no detected members" : `${detectedMembers.length} detected member(s)`} and ${hasPermissionNumber ? "presence" : "absence"} of permission number."
 }`;
 
 export const SHORT_INSTRUCTIONS =
@@ -190,16 +237,30 @@ Return your response in this format:
 }`;
 
 export const CATEGORY_INSTRUCTIONS =
-  "You are a content categorization analyzer that matches video content to the most appropriate category or suggests new categories.";
+  "You are a VTuber streaming content categorization analyzer that matches video content to the most appropriate category with focus on games (specific titles), chatting, and other streaming content.";
 
 export const generateCategoryMatchPrompt = ({
   input,
 }: {
   input: CategoryInput;
-}) => `Analyze this video content and determine the most appropriate category from the existing list, or suggest a new category if none fit well.
+}) => `Analyze this VTuber streaming content and determine the most appropriate category from the existing list, or suggest a new category if none fit well.
+
+VTuber Content Classification Guidelines:
+1. **Game Content** - Look for specific game titles, gaming keywords, gameplay mentions
+2. **Chatting Content** - Look for conversation, talk, discussion, daily life topics
+3. **Other Streaming Content** - Singing, drawing, cooking, ASMR, collaboration, special projects
 
 Existing Categories:
 ${input.existingCategories.map((cat, index) => `${index + 1}. ${cat}`).join("\n")}
+
+Popular Game Keywords to Watch For:
+- APEX系: "APEX", "エーペックス", "エペ", "APEX Legends"
+- Valorant系: "Valorant", "ヴァロラント", "バロラント", "VALO"
+- Minecraft系: "Minecraft", "マインクラフト", "マイクラ"
+- その他人気ゲーム: "フォートナイト", "デッバイ", "原神", "ポケモン", "スプラ", etc.
+
+Chatting Keywords to Watch For:
+- "雑談", "おしゃべり", "トーク", "話", "日常", "近況", "相談", "質問コーナー"
 
 Video Information to analyze:
 Title: ${input.title}
@@ -207,34 +268,62 @@ Description: ${input.description || "No description provided"}
 Tags: ${input.tags && input.tags.length > 0 ? input.tags.join(", ") : "No tags provided"}
 
 Analysis Guidelines:
-1. Look for keywords and themes in title, description, and tags
-2. Consider the content type and subject matter
-3. Match against existing categories based on semantic similarity
-4. If no existing category fits well (confidence < 0.7), suggest a new category
-5. New category names should be concise, descriptive, and general enough for future content
+1. **Game Detection Priority**: 
+   - Search for specific game titles in title/description/tags
+   - If found, match to the specific game category or suggest new game category
+   - Extract the actual game title for gameTitle field
+   
+2. **Chatting Detection**:
+   - Look for chatting keywords
+   - Consider content without game mentions as potential chatting
+   
+3. **Confidence Scoring**:
+   - High confidence (0.8-1.0): Clear game title or chatting keywords found
+   - Medium confidence (0.5-0.7): Partial matches or contextual clues
+   - Low confidence (0.1-0.4): Ambiguous content or no clear indicators
 
-Example with existing category match:
-Title: "APEX配信ハイライト"
-Description: "今日のAPEX Legendsの面白いシーンをまとめました"
-Tags: ["APEX", "FPS", "ゲーム", "配信"]
-Existing Categories: ["FPS Games", "RPG Games", "Music", "Cooking"]
-Response: {
-  "matchedCategory": "FPS Games",
-  "confidence": 0.95,
-  "isNewCategory": false,
-  "suggestedNewCategory": null
-}
+4. **New Category Suggestions**:
+   - Suggest new game-specific categories for unrecognized games
+   - Use format: "Game Title" (exact game name)
+   - For non-game content, suggest descriptive categories
 
-Example with new category suggestion:
-Title: "手料理レシピ解説"
-Description: "簡単にできる料理のレシピを説明します"
-Tags: ["料理", "レシピ", "解説"]
-Existing Categories: ["Gaming", "Music", "Technology"]
+Example with specific game:
+Title: "【APEX】ランク上げ頑張る！"
+Description: "APEX Legendsでランクマッチに挑戦"
+Tags: ["APEX", "ランク", "FPS"]
+Existing Categories: ["雑談", "歌枠", "その他"]
 Response: {
   "matchedCategory": null,
-  "confidence": 0.3,
+  "confidence": 0.9,
   "isNewCategory": true,
-  "suggestedNewCategory": "Cooking & Recipes"
+  "suggestedNewCategory": "APEX Legends",
+  "gameTitle": "APEX Legends"
+}
+
+Example with chatting:
+Title: "おはよう雑談！今日の予定話すよ～"
+Description: "朝の雑談配信です"
+Tags: ["雑談", "おしゃべり", "朝活"]
+Existing Categories: ["APEX Legends", "雑談", "歌枠"]
+Response: {
+  "matchedCategory": "雑談",
+  "confidence": 0.95,
+  "isNewCategory": false,
+  "suggestedNewCategory": null,
+  "gameTitle": null
+}
+
+Example with existing game category match:
+Title: "マイクラで建築しよう！"
+Description: "Minecraftで街作り"
+Tags: ["Minecraft", "建築", "マイクラ"]
+Existing Categories: ["Minecraft", "雑談", "歌枠"]
+Response: {
+  "matchedCategory": "Minecraft",
+  "confidence": 0.9,
+  "isNewCategory": false,
+  "suggestedNewCategory": null,
+  "gameTitle": "Minecraft"
 }
 
 Return your response in this exact JSON format:
@@ -242,7 +331,8 @@ Return your response in this exact JSON format:
   "matchedCategory": "string or null",
   "confidence": number, // 0.0 to 1.0
   "isNewCategory": boolean,
-  "suggestedNewCategory": "string or null"
+  "suggestedNewCategory": "string or null",
+  "gameTitle": "string or null" // Extract specific game title if detected
 }`;
 
 export const generateCategoryReasonPrompt = ({
@@ -250,20 +340,23 @@ export const generateCategoryReasonPrompt = ({
   confidence,
   isNewCategory,
   suggestedNewCategory,
+  gameTitle,
 }: {
   matchedCategory: string | null;
   confidence: number;
   isNewCategory: boolean;
   suggestedNewCategory: string | null;
-}) => `Explain the category classification decision for this video content.
+  gameTitle: string | null;
+}) => `Explain the category classification decision for this VTuber streaming content.
 
 Classification results:
 - Matched category: ${matchedCategory || "None"}
 - Confidence level: ${(confidence * 100).toFixed(1)}%
 - Is new category: ${isNewCategory ? "Yes" : "No"}
 - Suggested new category: ${suggestedNewCategory || "None"}
+- Detected game title: ${gameTitle || "None"}
 
 Return your response in this format:
 {
-  "reason": "This content ${isNewCategory ? `should be categorized as a new category '${suggestedNewCategory}'` : `matches the category '${matchedCategory}'`} because [detailed explanation of the analysis and reasoning]"
+  "reason": "This VTuber streaming content ${isNewCategory ? `should be categorized as a new category '${suggestedNewCategory}'` : `matches the category '${matchedCategory}'`} because [detailed explanation]. ${gameTitle ? `Detected game: ${gameTitle}.` : ""} Confidence is ${confidence < 0.5 ? "low" : confidence < 0.8 ? "moderate" : "high"} due to [reasoning about confidence level]."
 }`;

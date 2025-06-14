@@ -15,6 +15,7 @@ import { createAIService } from "../infra/ai";
 import { createCloudflareKVCacheClient } from "../infra/cache";
 import { createAppContext } from "../infra/dependency";
 import { createDiscordClient } from "../infra/discord";
+import { createMastraService } from "../infra/mastra";
 import {
   type InsertVideo,
   channelTable,
@@ -214,5 +215,10 @@ export const setupTxManager = async () => {
     }),
     createDiscordClient(env),
     createCloudflareKVCacheClient(env.APP_KV),
+    createMastraService({
+      baseUrl: env.MASTRA_BASE_URL,
+      agentId: env.MASTRA_AGENT_ID,
+      apiKey: env.MASTRA_API_KEY,
+    }),
   );
 };
