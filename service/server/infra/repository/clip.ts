@@ -187,6 +187,7 @@ export function createClipRepository(db: DB): IClipRepository {
               link: r.video.link ?? "",
               type: ClipTypeSchema.parse(r.video.videoType),
               deleted: r.video.deleted,
+              duration: r.video.duration ?? 0,
             };
           }),
         ),
@@ -261,6 +262,7 @@ export function createClipRepository(db: DB): IClipRepository {
               thumbnailUrl: v.thumbnailURL,
               link: v.link,
               deleted: v.deleted,
+              duration: v.duration ?? 0,
             }),
           );
         }

@@ -87,6 +87,7 @@ export const videoTable = pgTable(
     thumbnailUrl: text("thumbnail_url").notNull(), // Video's thumbnail URL
     link: text("link"), // Video's link
     deleted: boolean("deleted").notNull().default(false), // Deleted flag
+    duration: integer("duration"), // Duration in seconds
   },
   (table) => ({
     videoTypeIdx: index("video_video_type_idx").on(table.videoType),

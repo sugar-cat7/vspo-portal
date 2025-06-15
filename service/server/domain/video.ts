@@ -49,6 +49,7 @@ const BaseVideoSchema = z.object({
   translated: z.boolean().optional(),
   videoPlayerLink: z.string().optional().nullable(),
   chatPlayerLink: z.string().optional().nullable(),
+  duration: z.number().int().nonnegative().optional(), // Duration in seconds
 });
 
 // Type inference

@@ -64,6 +64,13 @@
       "when": 1748119785224,
       "tag": "0008_flimsy_blob",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1749990622377,
+      "tag": "0009_lethal_red_ghost",
+      "breakpoints": true
     }
   ]
 }

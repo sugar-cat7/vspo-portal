@@ -489,6 +489,8 @@ export const createYoutubeService = (apiKey: string): IYoutubeService => {
         createClips(
           items.map((item) => {
             const videoId = item.id || "";
+            const duration = item.contentDetails?.duration || "";
+            const durationInSeconds = parseYoutubeDuration(duration);
             return createClip({
               id: "",
               rawId: videoId,
@@ -508,6 +510,7 @@ export const createYoutubeService = (apiKey: string): IYoutubeService => {
                 item.snippet?.thumbnails?.high?.url ||
                 "",
               type: isYoutubeShort(item) ? "short" : "clip",
+              duration: durationInSeconds,
             });
           }) ?? [],
         ),
